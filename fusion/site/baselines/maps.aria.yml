@@ -99,7 +99,6 @@
   - button "Copy code, The markup"
   - code: <helix-map label="Food and drink in Austin"> <div id="map"></div> <helix-map-points label="Food and drink" src="/maps/austin-food-and-drink.geojson" cluster ></helix-map-points> </helix-map>
   - group "Food and drink in Austin, 3,252 places":
-    - region "Map"
     - group "Food and drink":
       - button "204 places"
       - button "231 places"
