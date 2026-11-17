@@ -164,6 +164,16 @@ static TOUCH_SET: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new("setProperty\\(\\s*['\"`](--[a-z][a-z0-9-]*)").expect("a literal pattern compiles")
 });
 
+/// A hook read off an element from a module, by name.
+///
+/// A component whose script times or sizes something from a hook reads it
+/// with `getPropertyValue`, and has no rule or template to read it with: List
+/// reads `--list-move-duration` to time its rows sliding into place, and a
+/// headless family ships no sheet at all.
+static TOUCH_GOT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new("getPropertyValue\\(\\s*['\"`](--[a-z][a-z0-9-]*)").expect("a literal pattern compiles")
+});
+
 /// A family reached by interpolating its suffix, in a template or a `setProperty`.
 static TOUCH_FAMILY: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(--[a-z][a-z0-9-]*)-\$\{").expect("a literal pattern compiles"));
@@ -324,6 +334,16 @@ fn survey(context: &Context) -> Survey {
                             .or_insert_with(|| where_.clone());
                     }
                 }
+                /* A read from script, which is the whole of a headless family's
+                reading where it times something from a hook. */
+                for found in TOUCH_GOT.captures_iter(&uncommented(&text)) {
+                    if ours(&found[1]) {
+                        survey
+                            .read
+                            .entry(found[1].to_owned())
+                            .or_insert_with(|| where_.clone());
+                    }
+                }
                 /* A read written into a template's `style=`, and only there, so
                 an ordinary `var()` in prose still does not count as one. */
                 for attribute in STYLE.captures_iter(&text) {
@@ -408,6 +428,9 @@ fn touches(survey: &mut Survey, text: &str, where_: &str, stylesheet: bool) {
         touched(&found[1]);
     }
     for found in TOUCH_SET.captures_iter(&source) {
+        touched(&found[1]);
+    }
+    for found in TOUCH_GOT.captures_iter(&source) {
         touched(&found[1]);
     }
     for found in TOUCH_FAMILY.captures_iter(&source) {
