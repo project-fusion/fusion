@@ -79,7 +79,7 @@
  *
  * Every dimension is still a hook, so a consumer who wants the bar back writes
  * two of them. */
-:host(:not(:state(read))) [part="item"]::before {
+[part="item"]::before {
   background-color: var(--notifications-unread-mark, var(--helix-color-primary));
   block-size: var(--_notifications-unread);
   border-radius: var(--notifications-unread-radius, var(--helix-radii-full));
@@ -108,6 +108,16 @@
     )
   );
   position: absolute;
+  /* **Drawn on every row and shrunk away once it is read**, so marking a row
+     read, or all of them, shows each dot going. */
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    scale var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host(:state(read)) [part="item"]::before {
+  opacity: 0;
+  scale: 0;
 }
 
 /* **A row as its own box, where the feed wants boxes rather than a list.**

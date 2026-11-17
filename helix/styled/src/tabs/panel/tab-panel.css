@@ -1,4 +1,8 @@
 :host {
+  --tabs-panel-enter-distance: var(--helix-space-2xs);
+  --tabs-panel-enter-duration: var(--helix-duration-normal);
+  --tabs-panel-enter-easing: var(--helix-easing-decelerate);
+
   /*
  *  No box of its own. The panel that is showing is the box, and the ones that
  *      are not have to cost nothing: `display: block` here gave every panel host a

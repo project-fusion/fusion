@@ -158,6 +158,15 @@
   box-shadow: var(--toggle-group-indicator-shadow, var(--helix-shadow-sm));
 }
 
+/* **Pressed and released in a beat**, under `selection-mode="multiple"`, where
+   no marker travels to say it: the item's fill and lift come and go over
+   `fast` instead of in one frame. */
+:host([selection-mode="multiple"]) ::slotted(helix-toggle) {
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* One marker that travels. */
 [part="indicator"] {
   block-size: var(--indicator-block-size, 0);

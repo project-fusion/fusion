@@ -1074,6 +1074,18 @@ helix-toggle[disabled]::part(item) {
   opacity: var(--helix-opacity-disabled);
 }
 
+/* **A speed dial's plus turns an eighth into a cross while its actions are
+   out**, in a trigger the page slots as well as in the one the dial draws, so
+   the button that opened them reads as the one that puts them away. Only a
+   plus: any other glyph holds still. */
+:where(helix-speed-dial) > :where([slot="trigger"]) :where(helix-icon[name="plus"]) {
+  transition: rotate var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+:where(helix-speed-dial:state(open)) > :where([slot="trigger"]) :where(helix-icon[name="plus"]) {
+  rotate: 45deg;
+}
+
 /* The nav item. */
 /* Either the recipe or a link inside a nav bar, which is the same thing said two
    ways so that neither has to be written by script. */

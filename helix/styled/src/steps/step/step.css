@@ -41,6 +41,10 @@
   background-color: var(--steps-connector-color, var(--helix-color-border));
   content: "";
   position: absolute;
+  /* The line takes its done ink over the marker's own pace and a little after
+     it, so finishing a step reads as the progress reaching the next. */
+  transition: background-color var(--helix-duration-slow) var(--helix-easing-standard)
+    var(--helix-duration-fast);
   z-index: var(--helix-layer-base);
 }
 

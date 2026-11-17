@@ -234,14 +234,23 @@
 }
 
 /* Waiting out `delay`: the drawing keeps its box and is not drawn, so the
-   line it sits in does not move when it appears. */
+   line it sits in does not move when it appears. **And it fades in when the
+   wait is over**, so a loader that turns up mid-task arrives instead of
+   flashing on. */
+[part="svg"],
+[part="mark"] {
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
 [part="svg"][hidden] {
   display: inline;
+  opacity: 0;
   visibility: hidden;
 }
 
 [part="mark"][hidden] {
   display: flex;
+  opacity: 0;
   visibility: hidden;
 }
 
