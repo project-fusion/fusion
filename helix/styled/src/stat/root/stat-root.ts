@@ -19,6 +19,8 @@ import { styles } from './stat-root.css.js'
  *
  * @csspart value - The slot the value is written in, or the figure the stat writes from `value` or from slotted text. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
  *
+ * @cssproperty --stat-count-duration - How long a new `value` takes to count from the one before. Defaults to `--helix-duration-slow`. `0ms` changes the figure at once.
+ * @cssproperty --stat-count-easing - The curve a new `value` counts along. Defaults to `--helix-easing-decelerate`, so the figure slows as it arrives.
  * @cssproperty --stat-gap - Space between the label and the value, and between the value and the unit in a row.
  * @cssproperty --stat-label-color - Color of the label.
  * @cssproperty --stat-label-size - Size of the label.
