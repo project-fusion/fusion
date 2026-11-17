@@ -28,6 +28,7 @@ import { columnManagerArt } from './art/column-manager'
 import { comboboxArt } from './art/combobox'
 import { commandArt } from './art/command'
 import { copyButtonArt } from './art/copy-button'
+import { cursorArt } from './art/cursor'
 import { dataTableArt } from './art/data-table'
 import { dateInputArt } from './art/date-input'
 import { datePickerArt } from './art/date-picker'
@@ -210,6 +211,7 @@ const art: Record<string, ReactNode> = {
   combobox: comboboxArt,
   command: commandArt,
   'copy-button': copyButtonArt,
+  cursor: cursorArt,
   'data-table': dataTableArt,
   'date-input': dateInputArt,
   'date-picker': datePickerArt,

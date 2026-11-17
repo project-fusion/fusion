@@ -1,0 +1,64 @@
+/* **At the box's top left, taking no room and no pointer**, so a page places
+   one in any positioned box and every click goes past it. The left edge on
+   every page, right to left too, because `x` is a position a collaboration
+   service reports from the left, as a pointer event's is. */
+:host {
+  inset-block-start: 0;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-overlay);
+}
+
+/* Glides to each place, so updates a few times a second read as a hand
+   moving. */
+/* The color is resolved here, where the template writes the series, and not
+   on the host, which would resolve it before the series is known. */
+[part="pointer"] {
+  --_cursor-color: var(--cursor-color, var(--_cursor-series, var(--helix-color-primary)));
+
+  align-items: start;
+  display: flex;
+  transition: translate var(--cursor-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
+  translate: var(--_cursor-x, 0) var(--_cursor-y, 0);
+}
+
+[part="arrow"] {
+  block-size: var(--helix-size-icon);
+  fill: var(--_cursor-color);
+  filter: drop-shadow(
+    0 1px 1px color-mix(in oklab, var(--helix-color-foreground) 25%, transparent)
+  );
+  flex: none;
+  inline-size: var(--helix-size-icon);
+  stroke: var(--cursor-on-color, var(--helix-color-background));
+  stroke-linejoin: round;
+  stroke-width: var(--helix-border-thin);
+}
+
+/* The name in the person's color, a little below and after the tip. */
+[part="label"] {
+  background-color: var(--_cursor-color);
+  border-radius: var(--helix-radii-full);
+  color: var(--cursor-on-color, var(--helix-color-background));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin-block-start: var(--helix-space-md);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="pointer"] {
+    transition: none;
+  }
+}
+
+/* Hidden on paper, where where another person's pointer was is no news. */
+@media print {
+  :host {
+    display: none;
+  }
+}

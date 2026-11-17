@@ -1,0 +1,10 @@
+/* A shared board for the pointers to move over, positioned so they are
+   placed against it. */
+.board {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: 14rem;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  overflow: hidden;
+  position: relative;
+}

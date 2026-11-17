@@ -1,0 +1,38 @@
+<!-- @summary Two people's pointers on a shared board, gliding to each place a collaboration service reports. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div
+  class="board"
+  id="board"
+>
+  <helix-cursor
+    id="ada"
+    name="Ada"
+    series="1"
+    x="40"
+    y="40"
+  ></helix-cursor>
+  <helix-cursor
+    id="grace"
+    name="Grace"
+    series="4"
+    x="220"
+    y="120"
+  ></helix-cursor>
+</div>
+
+<script type="module">
+  const board = document.getElementById('board')
+  const people = [document.getElementById('ada'), document.getElementById('grace')]
+
+  // Stands in for a collaboration service reporting where each person points.
+  setInterval(() => {
+    for (const person of people) {
+      person.x = Math.round(Math.random() * (board.clientWidth - 80))
+      person.y = Math.round(Math.random() * (board.clientHeight - 40))
+    }
+  }, 900)
+</script>
