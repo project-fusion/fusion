@@ -1,29 +1,16 @@
-- group "Rows":
-  - text: Rows
-  - radio "Filtered (3)" [checked]
-  - text: Filtered (3)
-  - radio "All (3)"
-  - text: All (3)
-- group "Columns":
-  - text: Columns
-  - radio "Visible (3)" [checked]
-  - text: Visible (3)
-  - radio "All (3)"
-  - text: All (3)
-- group "Values":
-  - text: Values
-  - radio "As shown" [checked]
-  - text: As shown
-  - radio "Raw"
-  - text: Raw
-- group "Format":
-  - text: Format
-  - radio "CSV" [checked]
-  - text: CSV
-  - radio "TSV"
-  - text: TSV
-  - radio "JSON"
-  - text: JSON
+- text: Rows
+- radio "Filtered (3)" [checked]
+- radio "All (3)"
+- text: Columns
+- radio "Visible (3)" [checked]
+- radio "All (3)"
+- text: Values
+- radio "As shown" [checked]
+- radio "Raw"
+- text: Format
+- radio "CSV" [checked]
+- radio "TSV"
+- radio "JSON"
 - button "Copy"
 - button "Export 3 rows"
 - rowgroup:
