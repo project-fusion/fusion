@@ -32,6 +32,16 @@ describe('splitter server output', () => {
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(split), 'helix-headless-splitter')).toEqual(['default-position'])
   })
+
+  test('a length is in the markup as written, which the server cannot turn into a percentage', () => {
+    // A server has no box to divide by, so a sidebar written in pixels can only
+    // arrive at its width if the stylesheet is handed the pixels.
+    const sidebar = html`<helix-headless-splitter default-position="280px" min="200px">
+      <div slot="start">one</div>
+      <div slot="end">two</div>
+    </helix-headless-splitter>`
+    expect(partTag(ssr(sidebar), 'start')).toContain('clamp(max(0%, 200px), 280px,')
+  })
 })
 
 const nest = html`<helix-headless-splitter default-position="30">

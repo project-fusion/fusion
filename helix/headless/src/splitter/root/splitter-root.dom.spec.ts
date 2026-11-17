@@ -1351,6 +1351,57 @@ describe('a primary pane', () => {
   })
 })
 
+describe('a position written as a length', () => {
+  type Holding = Splitter & { holdPrimary(length: number): void }
+  const drawn = (host: HTMLElement): string =>
+    (part(host, 'start') as HTMLElement).style.getPropertyValue('--splitter-position')
+
+  /* The stylesheet places a length as written, so the divider is where it
+     belongs before anything has measured the box: a sidebar of 280 pixels is
+     280 pixels on the first paint, not 50% corrected to 280 a frame later. */
+  test('is drawn as the length, between the bounds, with nothing measured', async () => {
+    const host = await splitter('default-position="280px"')
+    expect(drawn(host)).toBe('clamp(max(0%, 0%), 280px, min(100%, 100%, calc(100% - 0%)))')
+  })
+
+  test('holds to `min`, `max` and `end-min` in CSS, whichever way each is written', async () => {
+    const host = await splitter('position="20rem" min="10" max="16rem" end-min="25"')
+    expect(drawn(host)).toBe('clamp(max(0%, 10%), 20rem, min(100%, 16rem, calc(100% - 25%)))')
+  })
+
+  test('is taken from script as well as from markup', async () => {
+    const host = (await splitter()) as Splitter & { position: number | string }
+    host.position = '300px'
+    await host.updateComplete
+    expect(drawn(host)).toContain(', 300px, ')
+  })
+
+  test('reads as a percentage, and as 50 where there is no box to measure', async () => {
+    const host = await splitter('default-position="280px"')
+    expect(host.position).toBe(50)
+    expect(separator(host).getAttribute('aria-valuenow')).toBe('50')
+  })
+
+  test('settles on a percentage once the reader moves it', async () => {
+    const host = await splitter('default-position="280px"')
+    await press(host, 'ArrowRight')
+    expect(drawn(host)).toBe('52%')
+  })
+
+  test('a start pane written as a length keeps it as the splitter resizes', async () => {
+    const host = (await splitter('primary="start" default-position="280px"')) as Holding
+    host.holdPrimary(800)
+    host.holdPrimary(1000)
+    await host.updateComplete
+    expect(drawn(host)).toContain(', 280px, ')
+  })
+
+  test('a length the splitter cannot read keeps the default, as a number it cannot read does', async () => {
+    const host = await splitter('default-position="wide"')
+    expect(drawn(host)).toBe('50%')
+  })
+})
+
 describe('a row of three panes from splitters nested on one axis', () => {
   type Holding = Splitter & { holdPrimary(length: number): void }
 
