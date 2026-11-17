@@ -7,9 +7,12 @@
  * is not in the app to place the style's own labels.
  */
 
+import { gridOf, type PlaceNameBox } from './boxes.js'
 import type { MapView, ScreenPoint } from './camera.js'
 import type { SnapshotTiles } from './snapshot.js'
 import type { TileLayer } from './tile.js'
+
+export type { PlaceNameBox } from './boxes.js'
 
 /**
  * One kind of place name, **the same as `mapLibreStyle`'s layer of the same
@@ -132,7 +135,7 @@ const LETTER: Readonly<Record<PlaceNameLayer['weight'], number>> = {
   regular: 0.54,
 }
 
-/** How wide words are drawn, in pixels: an estimate from their letters, which a phone draws in its own face. */
+/** How wide words are drawn, in pixels: an estimate from their letters, where nothing measured them. */
 export const placeNameWidth = (
   words: string,
   size: number,
@@ -142,6 +145,35 @@ export const placeNameWidth = (
 ): number =>
   words.length * size * (LETTER[weight] + (uppercase ? 0.12 : 0)) +
   Math.max(words.length - 1, 0) * spacing
+
+/**
+ * Words as a renderer measures them before their names are placed: in the
+ * weight of their layer, **at its size rounded to a whole pixel**, so one
+ * measure serves every view near that zoom, with the space between
+ * letters in ems, and in capitals where the layer writes them so.
+ */
+export interface PlaceNameText {
+  /** The space added between letters, in ems. */
+  readonly letterSpacing: number
+  /** The size measured at, a whole number of pixels. */
+  readonly size: number
+  readonly text: string
+  readonly weight: PlaceNameLayer['weight']
+}
+
+/** How wide a renderer drew words, in pixels at their `size`, or `undefined` where it has not measured them. */
+export type PlaceNameMeasure = (text: PlaceNameText) => number | undefined
+
+/** The one key of words in a weight, a size and a spacing, which a renderer keeps what it measured under. */
+export const placeNameKey = (one: PlaceNameText): string =>
+  `${one.weight} ${one.size} ${one.letterSpacing} ${one.text}`
+
+/** The face a layer's words are measured in at a zoom. */
+const faceOf = (layer: PlaceNameLayer, zoom: number): Omit<PlaceNameText, 'text'> => ({
+  letterSpacing: layer.letterSpacing ?? 0,
+  size: Math.max(1, Math.round(placeNameSize(layer, zoom))),
+  weight: layer.weight,
+})
 
 /** Words wrapped at the style's width, a word too long for a line kept whole on its own. */
 const wrapped = (words: string, fits: (line: string) => boolean): string[] => {
@@ -162,17 +194,23 @@ const wrapped = (words: string, fits: (line: string) => boolean): string[] => {
   return lines
 }
 
-/** A box on the screen in pixels: left, top, right and bottom. */
-export type PlaceNameBox = readonly [number, number, number, number]
-
-type Box = PlaceNameBox
-
-const overlaps = (a: Box, b: Box): boolean =>
-  a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3]
+/** Each run of words in a row that a line of a wrapped name could hold. */
+const runsOf = (words: string): string[] => {
+  const parts = words.split(/\s+/).filter((one) => one !== '')
+  const runs: string[] = []
+  for (let from = 0; from < parts.length; from += 1) {
+    for (let to = from + 1; to <= parts.length; to += 1) {
+      runs.push(parts.slice(from, to).join(' '))
+    }
+  }
+  return runs
+}
 
 /** A name found in a tile, before it is placed. */
 interface Found {
   readonly at: ScreenPoint
+  /** Its words as drawn, in capitals where its layer writes them so. */
+  readonly drawn: string
   readonly layer: PlaceNameLayer
   readonly order: number
   readonly rank: number
@@ -195,20 +233,20 @@ const nameOf = (properties: Readonly<Record<string, unknown>>, language: string)
   return ''
 }
 
+/** What the tiles hold for a view: each tile's address and its `place` layer. */
+type FoundTiles = Iterable<readonly [readonly [number, number], TileLayer | undefined]>
+
 /**
- * The place names a view draws from the `place` layer of each tile:
- * **the most important placed first**, by the layers' order and then by
- * each place's `rank`, and each left out where its box, padded, would
- * overlap a name already placed, one of `taken`, such as the counts a
- * points layer draws, or run past the view's edge.
+ * The names of the `place` layer of each tile that the view's zoom shows,
+ * **the most important first**, by the layers' order and then by each
+ * place's `rank`.
  */
-export const placeNames = (
+const candidatesOf = (
   tiles: SnapshotTiles,
   view: MapView,
-  found: Iterable<readonly [readonly [number, number], TileLayer | undefined]>,
-  language = 'en',
-  taken: readonly PlaceNameBox[] = [],
-): PlaceName[] => {
+  found: FoundTiles,
+  language: string,
+): Found[] => {
   const shown = PLACE_NAME_LAYERS.filter((layer) => view.zoom >= layer.minzoom)
   const { camera, span } = tiles
   const candidates: Found[] = []
@@ -227,16 +265,18 @@ export const placeNames = (
         continue
       }
       const rank = Number(feature.properties.rank)
+      const named = shown[order] as PlaceNameLayer
       candidates.push({
         at,
-        layer: shown[order] as PlaceNameLayer,
+        drawn: named.uppercase ? words.toLocaleUpperCase(language) : words,
+        layer: named,
         order,
         rank: Number.isFinite(rank) ? rank : Number.POSITIVE_INFINITY,
         words,
       })
     }
   }
-  candidates.sort(
+  return candidates.sort(
     (a, b) =>
       a.order - b.order ||
       a.rank - b.rank ||
@@ -244,48 +284,92 @@ export const placeNames = (
       a.at[1] - b.at[1] ||
       a.at[0] - b.at[0],
   )
-  const placed: { box: Box; name: PlaceName }[] = []
-  for (const one of candidates) {
+}
+
+/**
+ * The words a renderer measures before `placeNames` places a view's names
+ * by their widths: each run of each name's words that a line could hold,
+ * once each, in its layer's face at the view's zoom.
+ */
+export const placeNameTexts = (
+  tiles: SnapshotTiles,
+  view: MapView,
+  found: FoundTiles,
+  language = 'en',
+): PlaceNameText[] => {
+  const texts = new Map<string, PlaceNameText>()
+  for (const one of candidatesOf(tiles, view, found, language)) {
+    const face = faceOf(one.layer, view.zoom)
+    for (const text of runsOf(one.drawn)) {
+      const measured = { ...face, text }
+      texts.set(placeNameKey(measured), measured)
+    }
+  }
+  return [...texts.values()]
+}
+
+/**
+ * The place names a view draws from the `place` layer of each tile:
+ * **the most important placed first**, by the layers' order and then by
+ * each place's `rank`, and each left out where its box, padded, would
+ * overlap a name already placed, one of `taken`, such as the counts and
+ * dots a points layer draws, the markers, and the frame's controls, or run
+ * past the view's edge. **Each line is as wide as `measure` says** where a
+ * renderer measured it, scaled from the whole pixel it was measured at,
+ * and an estimate from its letters where none did.
+ */
+export const placeNames = (
+  tiles: SnapshotTiles,
+  view: MapView,
+  found: FoundTiles,
+  language = 'en',
+  taken: readonly PlaceNameBox[] = [],
+  measure?: PlaceNameMeasure,
+): PlaceName[] => {
+  const grid = gridOf(view)
+  for (const box of taken) {
+    grid.add(box)
+  }
+  const placed: PlaceName[] = []
+  for (const one of candidatesOf(tiles, view, found, language)) {
     if (placed.length >= MOST_NAMES) {
       break
     }
     const { layer } = one
     const size = placeNameSize(layer, view.zoom)
     const spacing = (layer.letterSpacing ?? 0) * size
-    const words = layer.uppercase ? one.words.toLocaleUpperCase(language) : one.words
-    const widthOf = (line: string) =>
-      placeNameWidth(line, size, layer.weight, spacing, layer.uppercase)
-    const lines = wrapped(words, (line) => widthOf(line) <= MOST_EMS * size)
+    const face = faceOf(layer, view.zoom)
+    const widthOf = (line: string) => {
+      const measured = measure?.({ ...face, text: line })
+      return measured === undefined
+        ? placeNameWidth(line, size, layer.weight, spacing, layer.uppercase)
+        : (measured * size) / face.size
+    }
+    const lines = wrapped(one.drawn, (line) => widthOf(line) <= MOST_EMS * size)
     const width = Math.max(...lines.map(widthOf))
     const height = lines.length * size * LINE
     const [x, y] = one.at
-    const box: Box = [
+    const box: PlaceNameBox = [
       x - width / 2 - PADDING,
       y - height / 2 - PADDING,
       x + width / 2 + PADDING,
       y + height / 2 + PADDING,
     ]
     const outside = box[0] < 0 || box[1] < 0 || box[2] > view.width || box[3] > view.height
-    if (
-      outside ||
-      taken.some((other) => overlaps(other, box)) ||
-      placed.some((other) => overlaps(other.box, box))
-    ) {
+    if (outside || grid.hits(box)) {
       continue
     }
+    grid.add(box)
     placed.push({
-      box,
-      name: {
-        amount: layer.amount,
-        id: layer.id,
-        letterSpacing: spacing,
-        lines,
-        size,
-        weight: layer.weight,
-        x,
-        y,
-      },
+      amount: layer.amount,
+      id: layer.id,
+      letterSpacing: spacing,
+      lines,
+      size,
+      weight: layer.weight,
+      x,
+      y,
     })
   }
-  return placed.map(({ name }) => name)
+  return placed
 }

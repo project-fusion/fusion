@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import type { MapView } from './camera.js'
-import { PLACE_NAME_LAYERS, placeNameSize, placeNames, placeNameWidth } from './names.js'
+import {
+  PLACE_NAME_LAYERS,
+  type PlaceNameText,
+  placeNameKey,
+  placeNameSize,
+  placeNames,
+  placeNameTexts,
+  placeNameWidth,
+} from './names.js'
 import { legible, parseColor, type Rgb } from './oklab.js'
 import { snapshotTiles } from './snapshot.js'
 import { mapLibreStyle } from './style.js'
@@ -188,5 +196,106 @@ describe('placeNames', () => {
         8 * (name?.size ?? 0),
       )
     }
+  })
+})
+
+describe('placeNameTexts', () => {
+  test("asks for each run of a name's words once, in its layer's face at a whole pixel", () => {
+    const texts = placeNameTexts(snapshotTiles(VIEW, 14, 4), VIEW, [
+      tileOf([
+        place('Round Rock', 'town', 2048, 2048),
+        place('Round Rock', 'town', 2048, 3000),
+        place('Hyde Park', 'suburb', 600, 600),
+      ]),
+    ])
+    const town = PLACE_NAME_LAYERS[1]
+    const size = Math.round(placeNameSize(town as never, VIEW.zoom))
+    expect(texts.map((one) => one.text).sort()).toEqual([
+      'HYDE',
+      'HYDE PARK',
+      'PARK',
+      'Rock',
+      'Round',
+      'Round Rock',
+    ])
+    expect(texts.find((one) => one.text === 'Round Rock')).toEqual({
+      letterSpacing: 0,
+      size,
+      text: 'Round Rock',
+      weight: 'regular',
+    })
+    expect(texts.find((one) => one.text === 'HYDE')?.letterSpacing).toBe(0.12)
+  })
+})
+
+describe('placeNames with measured widths', () => {
+  /** A measure that draws every letter `wide` ems across, at the size it was measured at. */
+  const measured =
+    (wide: number) =>
+    (one: PlaceNameText): number =>
+      one.text.length * one.size * wide
+
+  test('sizes each box by the widths a renderer measured, scaled from the whole pixel', () => {
+    /* Two towns side by side: 36 pixels apart, which the estimate clears
+       and letters an em wide each do not. */
+    const towns = [
+      tileOf([place('Abc', 'town', 2048, 2048, { rank: 1 }), place('Xyz', 'town', 2336, 2048)]),
+    ]
+    const tiles = snapshotTiles(VIEW, 14, 4)
+    expect(placeNames(tiles, VIEW, towns).map((one) => one.lines[0])).toEqual(['Abc', 'Xyz'])
+    expect(
+      placeNames(tiles, VIEW, towns, 'en', [], measured(1)).map((one) => one.lines[0]),
+    ).toEqual(['Abc'])
+  })
+
+  test('wraps by the measured widths', () => {
+    const tiles = snapshotTiles(VIEW, 14, 4)
+    const long = [tileOf([place('Aa Bb Cc', 'town', 2048, 2048)])]
+    expect(placeNames(tiles, VIEW, long, 'en', [], measured(0.5))[0]?.lines).toEqual(['Aa Bb Cc'])
+    expect(placeNames(tiles, VIEW, long, 'en', [], measured(1.5))[0]?.lines).toEqual([
+      'Aa Bb',
+      'Cc',
+    ])
+  })
+
+  test('falls back to the estimate for words not measured yet', () => {
+    const tiles = snapshotTiles(VIEW, 14, 4)
+    const one = [tileOf([place('Austin', 'city', 2048, 2048)])]
+    expect(placeNames(tiles, VIEW, one, 'en', [], () => undefined)).toEqual(
+      placeNames(tiles, VIEW, one),
+    )
+  })
+
+  test('keys words by their weight, size, spacing and text', () => {
+    const text = { letterSpacing: 0.12, size: 11, text: 'HYDE', weight: 'medium' } as const
+    expect(placeNameKey(text)).toBe('medium 11 0.12 HYDE')
+    expect(placeNameKey({ ...text, size: 12 })).not.toBe(placeNameKey(text))
+  })
+})
+
+describe('placeNames among many boxes taken', () => {
+  test('keeps clear of each of thousands of small boxes, such as dots, and places between them', () => {
+    const dots: [number, number, number, number][] = []
+    for (let x = 0; x < 512; x += 8) {
+      for (let y = 0; y < 200; y += 8) {
+        dots.push([x, y, x + 4, y + 4])
+      }
+    }
+    const names = placeNames(
+      snapshotTiles(VIEW, 14, 4),
+      VIEW,
+      [tileOf([place('Under', 'town', 2048, 600), place('Clear', 'town', 2048, 2048)])],
+      'en',
+      dots,
+    )
+    expect(dots.length).toBeGreaterThan(1000)
+    expect(names.map((one) => one.lines[0])).toEqual(['Clear'])
+  })
+
+  test('keeps clear of a box that runs past the view, such as the controls in a corner', () => {
+    const tiles = snapshotTiles(VIEW, 14, 4)
+    const corner = [tileOf([place('Corner', 'town', 3900, 300)])]
+    expect(placeNames(tiles, VIEW, corner).map((one) => one.lines[0])).toEqual(['Corner'])
+    expect(placeNames(tiles, VIEW, corner, 'en', [[440, -20, 600, 200]])).toEqual([])
   })
 })
