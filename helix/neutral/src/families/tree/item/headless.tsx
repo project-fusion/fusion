@@ -19,6 +19,11 @@ import { bare, boolean, cancelable, headless, Pressable, Slot, View } from '../.
  * **A `disabled` item is reached by the arrow keys and announced as
  * unavailable**, and a press, Enter, or Space on it does nothing.
  *
+ * **The check mark, under `selection-mode="multiple"`, is an inert
+ * `Checkbox`**, so its box is the one a form draws. The row is the control a
+ * screen reader reaches, and the box takes no touch, so a press on it lands on
+ * the `checkbox` part around it, which checks the row.
+ *
  * **A `lazy` item is a branch whose children load as it opens**: opening it
  * sends `load`, and the row says it is busy until `lazy` is removed.
  *
@@ -124,20 +129,24 @@ export default headless('tree-item', {
             ariaHidden
             part="checkbox"
           >
-            {treeItem.checkMark && (
-              <View
-                icon="check"
-                part="checkbox-glyph"
-                platform="native"
-              />
-            )}
-            {treeItem.dashMark && (
-              <View
-                icon="minus"
-                part="checkbox-glyph"
-                platform="native"
-              />
-            )}
+            <View
+              draws="checkbox"
+              exports={{
+                box: true,
+                control: true,
+                feedback: true,
+                field: true,
+                hint: true,
+                label: true,
+                mark: true,
+                'mark-checked': true,
+                'mark-dash': true,
+                'mark-indeterminate': true,
+              }}
+              gives={{ checked: treeItem.checkMark, indeterminate: treeItem.dashMark }}
+              inert
+              part="check"
+            />
           </Pressable>
         )}
         <Slot name="start" />

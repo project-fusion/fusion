@@ -44,9 +44,9 @@ export default styles(
     hooks: {
       actionsColor: token('color-foreground-muted'),
       actionsSize: null,
-      checkboxBackgroundColor: token('color-background'),
+      checkboxBackgroundColor: null,
       checkboxBorderColor: null,
-      checkboxMarkColor: token('color-foreground'),
+      checkboxMarkColor: null,
       checkboxSize: null,
       chevronGap: token('space-none'),
       chevronOrder: '0',
@@ -89,8 +89,6 @@ export default styles(
   ({ hook, keyframes, on, own, rule }) => {
     const step = first(hook.indent, sum(own.treeChevron, token('space-2xs')))
     const inset = sum(own.treeInset, product(difference(measured('tree-level', 1), 1), step))
-    /* Checkbox's own size and edge, so a tree's box reads as the box a form draws. */
-    const size = first(hook.checkboxSize, token('size-checkbox'))
     /* An icon passed in the chevron's place is sized, colored and turned the same way. */
     const turned = [
       rule({ transform: 'rotate(-90deg)' }),
@@ -422,37 +420,37 @@ export default styles(
         ...turned,
         ...breathes,
       ]),
-      /* The check mark: the checkbox's own box, at the size of the chevron. */
+      /* The check mark of a tree under `selection-mode="multiple"`: **an inert
+         `Checkbox`**, so the box, its edge, its corner and its tick are the ones
+         a form draws, at Checkbox's size. */
       on('checkbox', [
         rule({
-          web: { display: 'grid', placeItems: 'center' },
           alignSelf: 'center',
-          backgroundColor: hook.checkboxBackgroundColor,
-          blockSize: size,
-          border: [
-            token('border-thin'),
-            'solid',
-            first(hook.checkboxBorderColor, token('color-foreground-subtle')),
-          ],
-          borderRadius: token('radii-sm'),
-          color: hook.checkboxMarkColor,
           flex: '0 0 auto',
-          inlineSize: size,
+          /* **Checkbox's `space-xs`, 8, between the box and its words**, where
+             the row's own gap drew 4. The row's gap still spaces the chevron and
+             the icons, so only the room after the box grows. */
+          marginInlineEnd: difference(token('space-xs'), token('space-2xs')),
+          web: { display: 'inline-flex' },
         }),
-        native([rule({ alignItems: 'center', justifyContent: 'center' })]),
-        rule(
-          { also: { 'checkbox-checked': true } },
-          { borderColor: first(hook.checkboxBorderColor, token('color-foreground')) },
-        ),
-        rule(
-          { also: { 'checkbox-mixed': true } },
-          { borderColor: first(hook.checkboxBorderColor, token('color-foreground')) },
-        ),
       ]),
-      on({ part: 'checkbox', inner: 'svg' }, [
-        web([rule({ blockSize: '80%', inlineSize: '80%' })]),
+      /* Tree's hooks hand on to Checkbox's, and one left unset leaves Checkbox's own. */
+      on('check', [
+        rule({
+          '--checkbox-background-color': hook.checkboxBackgroundColor,
+          '--checkbox-border-color': hook.checkboxBorderColor,
+          '--checkbox-mark-color': hook.checkboxMarkColor,
+          '--checkbox-size': first(hook.checkboxSize, token('size-checkbox')),
+        }),
       ]),
-      on('checkbox-glyph', [native([rule({ blockSize: '80%', inlineSize: '80%' })])]),
+      /* **The row is the target, so the box keeps its own size on a touch
+         screen.** There a checkbox's row grows to 44 pixels and keeps the box at
+         its top, and in a tree row shorter than that it pushed the row taller
+         and the box off its middle. */
+      on({ part: 'check', selector: '[part="check"]::part(field)' }, [
+        web([rule({ alignItems: 'center', minBlockSize: 0 })]),
+      ]),
+      on('check-field', [native([rule({ alignItems: 'center', minBlockSize: 0 })])]),
       /* The grip, at the far end of the row. `touch-action: none`, so a drag on a
          phone moves the item and does not scroll the page. */
       on('grip', [

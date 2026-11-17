@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { HelixRoot } from '../index'
+import { HelixCheckbox } from './checkbox/index.native'
 import { HelixTree, HelixTreeItem } from './tree/index.native'
 
 const Item = HelixTreeItem
@@ -44,6 +45,46 @@ const press = async (words: string) => {
   await act(async () => {
     await Promise.resolve()
   })
+}
+
+type Found = ReturnType<typeof screen.getByRole>
+
+/** A tree under `selection-mode="multiple"`, with a branch of two. */
+const drawChecks = async () =>
+  render(
+    <HelixRoot>
+      <HelixTree label="Files" selectionMode="multiple">
+        <Item defaultOpen value="docs">
+          Docs
+          <Item slot="children" value="guide">
+            Guide
+          </Item>
+          <Item slot="children" value="notes">
+            Notes
+          </Item>
+        </Item>
+        <Item value="log">Log</Item>
+      </HelixTree>
+    </HelixRoot>,
+  )
+
+/** Each row's check mark, a Checkbox no screen reader reaches. */
+const boxes = () => screen.getAllByRole('checkbox', { includeHiddenElements: true })
+
+/** The view around a check mark that takes no touch. */
+const inertAround = (box: Found) => {
+  let at = box.parent
+  while (at && at.props.pointerEvents !== 'none') {
+    at = at.parent
+  }
+  return at
+}
+
+/** The box a Checkbox draws for its input, in the checkbox's row. */
+const drawnBox = (field: Found) => {
+  const box = field.children[0]
+  const drawn = typeof box === 'string' ? undefined : box?.children[0]
+  return typeof drawn === 'string' ? undefined : StyleSheet.flatten(drawn?.props.style)
 }
 
 const Moved = () => {
@@ -95,6 +136,47 @@ describe('Tree on a phone', () => {
     expect(row('Docs').props.accessibilityState.checked).toBe(true)
     await press('Guide')
     expect(row('Docs').props.accessibilityState.checked).toBe(false)
+  })
+
+  test('under multiple each check mark is an inert Checkbox, and a press on it checks the row', async () => {
+    await drawChecks()
+    /* A screen reader reaches the rows, never the boxes. */
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
+    expect(boxes()).toHaveLength(4)
+    for (const box of boxes()) {
+      expect(inertAround(box)?.props.pointerEvents).toBe('none')
+    }
+    /* A press on Guide's box lands on the part around it, which checks the row. */
+    await fireEvent.press(boxes()[1] as never)
+    await act(async () => {
+      await Promise.resolve()
+    })
+    expect(row('Guide').props.accessibilityState.checked).toBe(true)
+    expect(boxes()[1]?.props.accessibilityState.checked).toBe(true)
+    expect(row('Docs').props.accessibilityState.checked).toBe('mixed')
+    expect(boxes()[0]?.props.accessibilityState.checked).toBe('mixed')
+    expect(boxes()[3]?.props.accessibilityState.checked).toBe(false)
+  })
+
+  test("a check mark draws a form's box, centered at its own height, 8 from the words", async () => {
+    await drawChecks()
+    const box = boxes()[3] as Found
+    const field = StyleSheet.flatten(box.props.style)
+    expect(field.minHeight).toBe(0)
+    expect(field.alignItems).toBe('center')
+    const holder = StyleSheet.flatten(inertAround(box)?.parent?.props.style)
+    expect(holder.alignSelf).toBe('center')
+    expect(Number(holder.marginEnd) + Number(StyleSheet.flatten(row('Log').props.style).gap)).toBe(
+      8,
+    )
+    const drawn = drawnBox(box)
+    await screen.unmount()
+    await render(
+      <HelixRoot>
+        <HelixCheckbox />
+      </HelixRoot>,
+    )
+    expect(drawn).toEqual(drawnBox(screen.getByRole('checkbox')))
   })
 
   test('a screen reader moves an item, and the page moving it takes its new place', async () => {
