@@ -11,6 +11,7 @@ import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
 import arranging from '../.examples/selecting-and-arranging.html' with { type: 'text' }
 import serving from '../.examples/serving-the-first-page.html' with { type: 'text' }
+import sorting from '../.examples/sorting.html' with { type: 'text' }
 import summary_and_size from '../.examples/summary-and-size.html' with { type: 'text' }
 import windowed_paging from '../.examples/windowed-paging.html' with { type: 'text' }
 import windowing from '../.examples/windowing.html' with { type: 'text' }
@@ -45,6 +46,20 @@ const next = (table: HTMLElement): void => {
   const pagination = table.shadowRoot?.querySelector('[part~="pagination"]') as HTMLElement | null
   ;(pagination?.shadowRoot?.querySelector('[part~="next"]') as HTMLElement | null)?.click()
 }
+
+describe('the sorting example', () => {
+  run('a heading sorts the rows by its column, kept by their version', async () => {
+    await example(sorting)
+    await idle()
+    const table = document.getElementById('releases') as HTMLElement & { sort: string }
+    const heading = table.querySelector('helix-table-column[field="downloads"]') as HTMLElement
+    ;(heading.shadowRoot?.querySelector('[part="sort"]') as HTMLElement | null)?.click()
+    await idle()
+    expect(table.sort).toBe('downloads:asc')
+    const first = table.shadowRoot?.querySelector('[part~="row"] [part~="cell"]')
+    expect(first?.textContent?.trim()).toBe('2.5.0')
+  })
+})
 
 describe('the column menu example', () => {
   run('each heading holds a menu button, and a sortable one still sorts', async () => {

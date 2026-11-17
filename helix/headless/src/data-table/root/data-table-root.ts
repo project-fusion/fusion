@@ -1496,6 +1496,35 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
      Chromium, 5,001 rows for 5,000. Marking it moved nothing on the styled
      tier, whose `overflow-x: auto` already made the box a scroll container on
      both axes, which is the measurement `Megamenu` asks for. */
+  /**
+   * Sliding each column to its new place when it moves, by its menu, its keys
+   * or its grip, the cells under it with it, and fading in a column shown
+   * again. Measured by the heading, which is the page's element and keeps who
+   * it is across the move; the cells are drawn again in their new places, so
+   * the ones under the heading after the move are the ones that slide.
+   */
+  protected readonly columnMotion = new LayoutMotionController(this, {
+    boxes: (heading) => {
+      const at = this.shownColumns.indexOf(heading as HelixHeadlessTableColumn) + this.lead
+      return [
+        heading,
+        ...(this.renderRoot?.querySelectorAll<HTMLElement>(
+          `[part~="row"] > [data-column="${at}"]`,
+        ) ?? []),
+      ]
+    },
+    items: () => this.shownColumns,
+    scroller: () => this.renderRoot?.querySelector('[part="table"]'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--data-table-move-duration'),
+        easing: style.getPropertyValue('--data-table-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
+
   private readonly virtualize = new VirtualizeController(this, {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and

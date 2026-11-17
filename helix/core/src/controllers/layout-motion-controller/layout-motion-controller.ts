@@ -29,6 +29,15 @@ export interface LayoutMotionOptions {
    * by the distance they scrolled.
    */
   scroller?: () => Element | null | undefined
+
+  /**
+   * The boxes an item is drawn in, where they are not the item and what it
+   * draws: a table's column is its heading and the cells under it, which
+   * live in different rows. The first is the one its place is measured by,
+   * and each is resolved as an item is, so one that is `display: contents`
+   * gives the boxes it draws.
+   */
+  boxes?: (item: HTMLElement) => readonly HTMLElement[]
 }
 
 /** Where an item's box sits inside its host, in the host's layout pixels. */
@@ -285,9 +294,12 @@ export class LayoutMotionController implements ReactiveController {
     return { now, showing, within }
   }
 
-  /** The boxes an item is drawn in. */
-  private boxes(item: HTMLElement): HTMLElement[] {
-    return boxesOf(item)
+  /**
+   * The boxes an item is drawn in. What `boxes` names is resolved as an item
+   * is, so a heading that draws its box in its shadow root gives that box.
+   */
+  private boxes(item: HTMLElement): readonly HTMLElement[] {
+    return this.options.boxes ? this.options.boxes(item).flatMap(boxesOf) : boxesOf(item)
   }
 
   /** The translation an item's own move in flight is drawing now, from its eased progress. */
