@@ -220,6 +220,8 @@
   );
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--navigation-item-radius, var(--helix-radii-sm));
+  /* Shown here: the headless tier keeps it hidden, out of the row's layout. */
+  display: block;
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;

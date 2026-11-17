@@ -147,7 +147,7 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * @slot menu-icon - Replaces the glyph on the overflow button where it is too narrow for words.
  * @slot more-icon - Replaces the caret on the button that opens the overflow menu.
  *
- * @csspart highlight - The wash under the pointer, which glides from destination to destination while a mouse or pen moves along them. It carries the destination's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives.
+ * @csspart highlight - The wash under the pointer, which glides from destination to destination while a mouse or pen moves along them. It carries the destination's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart indicator - The marker that moves to the current destination. It carries the destination's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed.
  * @csspart more - The button that opens the overflow menu, drawn after the last destination on the row while any has folded.
  * @csspart more-current - The current destination's name on the button, while every destination has folded.
@@ -715,7 +715,7 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<nav part="nav" aria-label=${this.label || this.fallbackLabel}>
-      <div part="highlight" aria-hidden="true"></div>
+      <div part="highlight" aria-hidden="true" hidden></div>
       <div part="indicator" aria-hidden="true"><slot name="indicator"></slot></div>
       <slot @slotchange=${this.handleSlotChange}></slot>
       ${this.renderOverflow()}

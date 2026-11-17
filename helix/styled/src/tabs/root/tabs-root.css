@@ -266,6 +266,8 @@ slot[name="scroll-end-icon"]::slotted(*) {
   );
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--tabs-tab-radius, var(--_tab-radius, var(--helix-radii-none)));
+  /* Shown here: the headless tier keeps it hidden, out of the strip's layout. */
+  display: block;
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
