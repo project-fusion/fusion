@@ -531,11 +531,22 @@ export class HelixHeadlessSplitter extends HelixElement {
   private length = 0
 
   /**
-   * Starts or stops watching the length, according to `primary`, and holds
-   * the primary pane's size in pixels as the length changes.
+   * Whether the position or a bound is written as a length, which reads as a
+   * different percentage at every length of the splitter.
+   */
+  private get inLengths(): boolean {
+    return [this.declared, this.min, this.max, this.endMin].some(isLength)
+  }
+
+  /**
+   * Starts or stops watching the length, according to `primary` and to
+   * whether anything is written as a length. It holds the primary pane's
+   * size in pixels as the length changes, and, where something is written as
+   * a length, draws the divider again, so the percentage it announces is the
+   * one it is drawn at.
    */
   private watchLength(): void {
-    if (!this.held || typeof ResizeObserver === 'undefined') {
+    if ((!this.held && !this.inLengths) || typeof ResizeObserver === 'undefined') {
       this.lengths?.disconnect()
       this.lengths = undefined
       this.length = 0
@@ -550,7 +561,11 @@ export class HelixHeadlessSplitter extends HelixElement {
         (this.vertical
           ? (box?.blockSize ?? entry?.contentRect.height)
           : (box?.inlineSize ?? entry?.contentRect.width)) ?? 0
+      const before = this.length
       this.holdPrimary(length)
+      if (this.inLengths && length !== before) {
+        this.requestUpdate()
+      }
     })
     this.lengths.observe(this)
   }
@@ -1567,7 +1582,11 @@ export class HelixHeadlessSplitter extends HelixElement {
     if (changed.has('orientation')) {
       this.watchWidth()
     }
-    if (changed.has('primary')) {
+    if (
+      ['primary', 'position', 'defaultPosition', 'min', 'max', 'endMin'].some((key) =>
+        changed.has(key),
+      )
+    ) {
       this.watchLength()
     }
     /* The resolved collapse, mirrored for a consumer's own rules: a shut pane

@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -1370,22 +1377,57 @@ describe('a position written as a length', () => {
   })
 
   test('is taken from script as well as from markup', async () => {
-    const host = (await splitter()) as Splitter & { position: number | string }
+    /* `position` reads back a percentage and takes a length too. */
+    const host = (await splitter()) as Omit<Splitter, 'position'> & { position: number | string }
     host.position = '300px'
     await host.updateComplete
     expect(drawn(host)).toContain(', 300px, ')
   })
 
-  test('reads as a percentage, and as 50 where there is no box to measure', async () => {
-    const host = await splitter('default-position="280px"')
-    expect(host.position).toBe(50)
-    expect(separator(host).getAttribute('aria-valuenow')).toBe('50')
+  /* The box, stated, as the specs above state it: with no layout a length has
+     nothing to resolve against, and in a browser it resolves against whatever
+     box the page gives, so the width the arithmetic is about is set here. */
+  const boxed = (host: Splitter, width: number): Splitter => {
+    host.getBoundingClientRect = () => ({ height: 400, width }) as DOMRect
+    return host
+  }
+
+  /* Two frames, after which a browser has laid the splitter out and reported its size. */
+  const frames = () =>
+    new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+
+  test('reads as a percentage of the box, and as 50 where there is no box to measure', async () => {
+    const none = boxed(await splitter('default-position="280px"'), 0)
+    expect(none.position).toBe(50)
+    const wide = boxed(await splitter('default-position="280px"'), 1400) as Splitter & {
+      requestUpdate(): void
+    }
+    expect(wide.position).toBe(20)
+    wide.requestUpdate()
+    await wide.updateComplete
+    expect(separator(wide).getAttribute('aria-valuenow')).toBe('20')
   })
 
   test('settles on a percentage once the reader moves it', async () => {
-    const host = await splitter('default-position="280px"')
+    const host = boxed(await splitter('default-position="280px"'), 1400)
     await press(host, 'ArrowRight')
-    expect(drawn(host)).toBe('52%')
+    expect(drawn(host)).toBe('22%')
+  })
+
+  test('says the percentage it is drawn at once it is laid out, and again as it resizes', async () => {
+    if (!hasLayout()) {
+      return
+    }
+    const host = await splitter(
+      'default-position="280px" style="display: block; inline-size: 1400px"',
+    )
+    await frames()
+    await host.updateComplete
+    expect(separator(host).getAttribute('aria-valuenow')).toBe('20')
+    host.style.inlineSize = '700px'
+    await frames()
+    await host.updateComplete
+    expect(separator(host).getAttribute('aria-valuenow')).toBe('40')
   })
 
   test('a start pane written as a length keeps it as the splitter resizes', async () => {
