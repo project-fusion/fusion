@@ -56,8 +56,13 @@
   padding-inline: var(--helix-space-xs);
 }
 
+/* An action rather than a preset, so it takes no pressed pill and needs none
+   of a preset's room around it: the remove button's padding. At 16 a side the
+   example's three presets and Save view came to 354 in a 342 column at 390,
+   and Save view wrapped under them inside the track. */
 [part="save"] {
   color: var(--helix-color-primary);
+  padding-inline: var(--helix-space-xs);
 }
 
 [part~="preset"]:focus-visible,
