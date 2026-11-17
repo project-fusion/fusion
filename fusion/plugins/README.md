@@ -217,3 +217,41 @@ A tracker whose service checks no versions passes the suite too, since each chec
 follows what `check` reports. The tests run the suite against the reference
 tracker, against the example as a tracker and as a source, and against a
 tracker that breaks the contract, which fails the checks it breaks.
+
+## Catalogs
+
+[`fusion:catalog`](wit/catalog/catalog.wit) is for records kept in another
+service that a product shows or sells, such as products in a store, events in
+a ticketing service, or listings. It is generic: a store is one catalog, and
+nothing in the world names a vendor.
+
+- Its `reader` world exports `spec`, `check`, `list` since a cursor, `get`,
+  `search`, and `receive`, which reads a delivery the service sent, such as a
+  webhook, and returns the ids of the records it says changed.
+- Its `writer` world includes the `reader` world and adds `create` and
+  `update` with a version.
+
+Each record carries its id, its version, a handle for addresses, its state
+(active, draft, or archived), named fields as typed values, its pictures, and
+each variant it is offered in, with a price and the options that name it. A
+price is a `money` record, a decimal string and a currency code, so no float
+rounds it. Text a person wrote in the service is `untrusted`, as in the work
+protocol.
+
+A host keeps its copy current in two ways. It lists from its last cursor on a
+schedule, which catches anything a delivery missed, and it hands each delivery
+to `receive` and fetches the records it names. A catalog verifies every
+delivery, such as by its signature, and refuses one it cannot verify with
+`denied`, so a forged delivery changes nothing.
+
+A catalog is lent its binding's settings and the secrets its grant names, such
+as the key its service signs deliveries with, and nothing else. A host loads a
+component as a writer only for a binding whose grant allows writing, and a
+catalog loaded as a reader is refused every write.
+
+`Catalog` and `Editor` are the worlds' exports as Rust traits, `Component`
+implements them for a component loaded from a file, and `Memory` is the
+reference catalog. `conformance::run` checks a reader, and
+`conformance::editor` adds a write that lands, a stale version refused, and a
+record made. Its fixture names records the binding holds, one it does not, and
+a delivery the service signed with a forged copy of it.
