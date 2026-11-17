@@ -13,6 +13,7 @@ import {
   inRowOrder,
   internalsOf,
   KeyboardNavigationController,
+  LayoutMotionController,
   type NavigableItem,
   numberConverter,
   placeKey,
@@ -107,6 +108,13 @@ import {
  * | Space, Enter | Drops the row. |
  * | Escape | Puts the row back where it was. |
  *
+ * **Rows slide to their places.** When you sort, add, remove or hide rows,
+ * each one moves from where it was drawn to where it is now, and a row you
+ * add fades in. The list times it from `--list-move-duration` and
+ * `--list-move-easing`, which the styled tier sets from the duration and
+ * easing tokens. Here neither is set, so nothing moves until you set them.
+ * Under reduced motion nothing moves, whatever they say.
+ *
  * `start` and `reversed` number an ordered list as `<ol>` does. The list
  * writes where the numbers start and which way they run as `--list-first` and
  * `--list-step` on its slot, which the styled tier counts from. Reversed with
@@ -155,6 +163,8 @@ import {
  * @csspart loading - The row after the last while `loading` is set. A grid row with one cell in a list that selects.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
+ * @cssproperty --list-move-duration - How long a row takes to slide to its new place, or to fade in. Unset, nothing moves.
+ * @cssproperty --list-move-easing - The curve a row slides and fades in along.
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
  *
  * @cssstate empty - While the list has no rows.
@@ -441,6 +451,18 @@ export class HelixHeadlessList extends HelixElement {
     scroller: () => {
       const first = this.rows[0]
       return first ? scrollingAncestor(first, { axis: 'y', overflowing: true }) : null
+    },
+  })
+
+  /** Sliding each row to its new place when the page sorts, adds, removes or hides rows. */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => this.rows,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--list-move-duration'),
+        easing: style.getPropertyValue('--list-move-easing'),
+      }
     },
   })
 

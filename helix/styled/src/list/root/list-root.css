@@ -4,6 +4,16 @@
   gap: var(--list-gap, var(--helix-space-none));
 }
 
+/* **Rows slide to their new places at the pace of a change that answers a
+   hand.** The list reads these from its script, so they are set here rather
+   than read with a fallback, and a page setting either on the element wins
+   over this rule. Reduced motion takes the token to 0.01ms, and the list moves
+   nothing then whatever is set. */
+:host {
+  --list-move-duration: var(--helix-duration-normal);
+  --list-move-easing: var(--helix-easing-standard);
+}
+
 /* **The rows' words on the list's own edge, and their fills past it.** Each row
    reads this and takes it as a negative margin and as its inset, so the words of
    every row sit on the column a divider or a heading beside the list is set on

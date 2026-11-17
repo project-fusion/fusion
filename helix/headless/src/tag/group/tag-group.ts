@@ -8,6 +8,7 @@ import {
   hostAria,
   internalsOf,
   KeyboardNavigationController,
+  LayoutMotionController,
   type NavigableItem,
   pressedValue,
   prunedValue,
@@ -65,6 +66,13 @@ export type TagSelectionMode = SelectionMode
  * Where only disabled tags are left, the first of them holds the tab stop and
  * takes focus, so the reader stays in the set.
  *
+ * **Tags slide to their places.** When you remove a tag, the ones after it
+ * close the gap, across a wrap too, and a tag you add fades in. The group
+ * times it from `--tag-group-move-duration` and `--tag-group-move-easing`,
+ * which the styled tier sets from the duration and easing tokens. Here neither
+ * is set, so nothing moves until you set them. Under reduced motion nothing
+ * moves, whatever they say.
+ *
  * **Typing new tags.** A field where people type tags and press Enter to add
  * each one is Combobox with `multiple` and `allows-custom-value`, or
  * `creatable` to ask first with `helix-create`. It draws each value as a tag,
@@ -84,6 +92,9 @@ export type TagSelectionMode = SelectionMode
  * @event {HelixDismissEvent} helix-dismiss - A tag's remove button was pressed, or Delete or Backspace on the focused tag. Bubbles from that tag, which is its `target`; remove the tag in response. Cancelable.
  *
  * @csspart empty - Holds the `empty` slot while the group has no tags, rendered only then. Takes focus when the last tag is removed.
+ *
+ * @cssproperty --tag-group-move-duration - How long a tag takes to slide to its new place, or to fade in. Unset, nothing moves.
+ * @cssproperty --tag-group-move-easing - The curve a tag slides and fades in along.
  */
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
@@ -190,6 +201,18 @@ export class HelixHeadlessTagGroup extends HelixElement {
           .filter((one) => one !== '')
           .join(',')
   }
+
+  /** Sliding each tag to its new place when the page adds, removes or hides tags. */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => this.tags,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--tag-group-move-duration'),
+        easing: style.getPropertyValue('--tag-group-move-easing'),
+      }
+    },
+  })
 
   /** The tags the group holds, in order. */
   get tags(): HelixHeadlessTag[] {
