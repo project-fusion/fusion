@@ -17,6 +17,8 @@ import { styles } from './tag-group.css.js'
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @cssproperty --tag-group-gap - The space between tags, across and between rows.
+ * @cssproperty --tag-group-move-duration - How long a tag takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --tag-group-move-easing - The curve a tag slides and fades in along. Defaults to `--helix-easing-standard`.
  */
 @customElement('helix-tag-group')
 export class HelixTagGroup extends HelixHeadlessTagGroup {

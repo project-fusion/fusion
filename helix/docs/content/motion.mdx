@@ -146,6 +146,37 @@ they settle.
 A graph layout that runs past five seconds also offers its own button, in the
 graph's frame, that stops it where the notes stand.
 
+## Rows and tags that move
+
+When you sort, add, remove, or hide the rows of a `List` or the tags of a
+`Tag.Group`, each one slides from where it was to where it is now. A row or a
+tag you add fades in. A list you render again with all new elements appears at
+once.
+
+Each family times the move from two hooks of its own, which the styled tier
+sets from the tokens:
+
+| Hook | Default |
+| --- | --- |
+| `--list-move-duration`, `--tag-group-move-duration` | `--helix-duration-normal` |
+| `--list-move-easing`, `--tag-group-move-easing` | `--helix-easing-standard` |
+
+Set them on the element to change one list, or on a selector to change many:
+
+```css
+helix-list {
+  --list-move-duration: 320ms;
+  --list-move-easing: var(--helix-easing-spring);
+}
+```
+
+`0ms` turns the move off. The headless tier sets neither hook, so its rows do
+not move until you set them. With reduced motion set, nothing moves, even
+where a hook holds a duration of its own.
+
+`Toast` makes room for a message and closes the gap after one in its own
+stylesheet, so its stack has no hooks of this kind.
+
 ## Starting styles and view transitions
 
 Overlays use `@starting-style` to animate in. It sets a starting value and needs

@@ -34,6 +34,8 @@ import { styles } from './list-root.css.js'
  * @cssproperty --list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --list-loading-padding - The space around the text in the row drawn while `loading` is set.
  * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
+ * @cssproperty --list-move-duration - How long a row takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --list-move-easing - The curve a row slides and fades in along. Defaults to `--helix-easing-standard`.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.
  * @cssproperty --list-rail-style - The counter style of the rail's numbers. Takes any `list-style-type`.
  *
