@@ -4,13 +4,11 @@ import type { Scenario, Setup } from '../format.js'
  * The scenarios of Map, a frame around a map and its places. Both halves
  * press the frame's controls, and the comparison holds the two records to
  * each other: each `map-zoom`, `map-pan`, `map-rotate` and `map-tilt` a
- * control sends, and the `activate` a marker's press sends from the frame.
- * **The web's frame draws no map of its own**: it says a move only once a
- * renderer tells it the view moved, and stands a points layer's places only
- * once a renderer draws them, where a phone's frame is the renderer itself.
- * So what the live region says, and a press on a point or a count, are each
- * platform's own spec's: `map-root.dom.spec.ts`, `map.jest.tsx` and
- * `map-points.jest.tsx`.
+ * control sends. **The web's frame draws no map of its own**: it says a move
+ * only once a renderer tells it the view moved, and stands a marker on its
+ * place only once a renderer projects it, where a phone's frame is the
+ * renderer itself. So what the live region says, and a marker's press, are
+ * each platform's own spec's: `map-root.dom.spec.ts` and `map.jest.tsx`.
  */
 
 /** A marker at a place. */
@@ -61,14 +59,5 @@ export const MAP: readonly Scenario[] = [
     ],
     name: 'the rotate controls, the compass and the 3D button ask for a turn and a tilt',
     setup: frame({ controls: 'rotate tilt zoom' }),
-  },
-  {
-    family: 'map',
-    intents: [
-      { kind: 'press', label: 'Texas Capitol' },
-      { kind: 'press', label: 'Congress Avenue Bridge' },
-    ],
-    name: "a marker's press sends activate from the frame with the marker's name",
-    setup: frame(),
   },
 ]
