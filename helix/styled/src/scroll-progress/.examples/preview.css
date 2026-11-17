@@ -1,0 +1,5 @@
+/* A box short enough to scroll, so the bar above it has something to follow. */
+.article {
+  block-size: 12rem;
+  overflow: auto;
+}
