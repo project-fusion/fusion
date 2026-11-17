@@ -1,0 +1,111 @@
+:host {
+  --_hover-card-ground: var(--hover-card-background-color, var(--helix-color-surface-overlay));
+  --_hover-card-raised: var(--helix-color-surface-raised);
+  --_hover-card-surface: var(--helix-color-surface);
+  --_hover-card-border: var(--helix-color-border);
+}
+
+/* The UA's own `[popover]` rules are said again in full, as Popover's sheet
+   says why: a UA border, padding, inset and margin would each move the card.
+
+   **What sits on the card steps up from it**, as inside Popover's panel: in
+   dark the overlay rung is the card's own fill, so an avatar's disc, drawn on
+   that rung, vanished into the card. The rungs step up from the card by 3%, 9%
+   and 12% of the ink. */
+[part~="surface"] {
+  --helix-color-surface-overlay: light-dark(
+    var(--_hover-card-ground),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_hover-card-ground))
+  );
+  --helix-color-surface-raised: light-dark(
+    var(--_hover-card-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_hover-card-ground))
+  );
+  --helix-color-surface: light-dark(
+    var(--_hover-card-surface),
+    color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_hover-card-ground))
+  );
+  --helix-color-border: light-dark(
+    var(--_hover-card-border),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_hover-card-ground))
+  );
+
+  background-color: var(--_hover-card-ground);
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
+  /* The house radius, as every floating panel draws it. */
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--hover-card-shadow, var(--helix-shadow-floating));
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  inline-size: var(--hover-card-inline-size, 20rem);
+  inset: auto;
+  margin: var(--helix-space-none);
+  max-inline-size: calc(100vw - var(--helix-space-lg));
+  overflow: visible;
+  padding: var(--hover-card-padding, var(--helix-space-md));
+}
+
+[part~="surface"]:not(:popover-open) {
+  display: none;
+}
+
+/* **It rises a little out of the edge it opened against**, as Popover's panel
+   does, and leaves the way it came, carried through `display` and the top
+   layer until it has gone. */
+[part~="surface"] {
+  --_travel: calc(var(--helix-space-2xs) * -1);
+
+  opacity: 0;
+  transform: translateY(var(--_travel));
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    transform var(--helix-duration-fast) var(--helix-easing-accelerate),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+[part~="surface"]:popover-open {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    transform var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+}
+
+/* Opening upward, it comes up from the link rather than down onto it. */
+[part~="surface"][data-placement^="top"] {
+  --_travel: var(--helix-space-2xs);
+}
+
+[part~="surface"][data-placed] {
+  opacity: 1;
+  transform: none;
+}
+
+/* **Under reduced motion it fades and does not move**, over `fade`, which the
+   base layer leaves alone. */
+@media (prefers-reduced-motion: reduce) {
+  [part~="surface"],
+  [part~="surface"]:popover-open,
+  [part~="surface"][data-placed] {
+    transform: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
+  }
+}
+
+@media (forced-colors: active) {
+  [part~="surface"] {
+    border-color: CanvasText;
+  }
+}
+
+/* Hides: a printed page has no pointer to rest on the link, and the link is
+   printed as it is. */
+@media print {
+  [part~="surface"] {
+    display: none;
+  }
+}

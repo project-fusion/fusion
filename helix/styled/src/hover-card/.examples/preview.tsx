@@ -1,0 +1,30 @@
+export function Example() {
+  return (
+    <helix-text as="p">
+      The release notes were written by{' '}
+      <a
+        href="#ada"
+        id="ada"
+      >
+        Ada Lovelace
+      </a>
+      <helix-hover-card for="ada">
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-flex
+            align-items="center"
+            gap="sm"
+          >
+            <helix-avatar name="Ada Lovelace"></helix-avatar>
+            <helix-text scale="body-strong">Ada Lovelace</helix-text>
+          </helix-flex>
+          <helix-text>Writes the analysis notes and the release notes for the engine.</helix-text>
+          <a href="#ada-notes">Read her notes</a>
+        </helix-flex>
+      </helix-hover-card>{' '}
+      and reviewed by the whole team.
+    </helix-text>
+  )
+}
