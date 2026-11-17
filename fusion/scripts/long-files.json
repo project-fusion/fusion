@@ -381,7 +381,6 @@
     "helix/native/src/render/element.tsx",
     "helix/native/src/render/nodes.tsx",
     "helix/native/src/render/windowed.tsx",
-    "helix/native/src/style/apply.ts",
     "helix/native/src/style/style.pure.spec.ts",
     "helix/native/src/style/style.ts",
     "helix/native/tests/conformance/harness.tsx",
