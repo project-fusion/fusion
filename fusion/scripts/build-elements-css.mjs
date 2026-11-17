@@ -84,6 +84,11 @@ const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
    flow either way. The icon button takes the square its stylesheet draws, so a
    toolbar is its final width before a definition lands.
 
+   A tooltip and a badge wrap what they describe, and take the display they
+   have once upgraded: a tooltip none of its own, a badge a flex box. As inline
+   boxes they stood 45 pixels around a 40 pixel button, from the line's strut,
+   and a rail of buttons under them moved up 5 pixels a button as they arrived.
+
    Here rather than beside each component, for the reason the table rules below
    are: the selector reaches the component's light DOM, which no component
    stylesheet can. A tag that stops existing fails the build rather than leaving
@@ -109,6 +114,16 @@ const PENDING = [
     rule: 'display: none;',
     select: (tag) => `${tag}:not(:defined) > [slot="content"]`,
     tags: ['helix-tooltip'],
+  },
+  {
+    rule: 'display: contents;',
+    select: (tag) => `${tag}:not(:defined)`,
+    tags: ['helix-tooltip'],
+  },
+  {
+    rule: 'display: inline-flex;',
+    select: (tag) => `${tag}:not(:defined)`,
+    tags: ['helix-badge'],
   },
   {
     rule: `block-size: var(--icon-button-size, var(--helix-size-control));
