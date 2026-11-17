@@ -2,7 +2,7 @@
 
 .sectionTitle {
   font-family: var(--helix-font-display);
-  font-size: clamp(var(--helix-text-xl), 3vw, calc(var(--helix-text-2xl) * 1.16));
+  font-size: var(--site-text-section);
   font-weight: var(--helix-weight-semibold);
   letter-spacing: -0.02em;
   line-height: 1.1;

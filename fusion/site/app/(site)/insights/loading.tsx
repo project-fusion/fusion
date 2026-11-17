@@ -34,7 +34,7 @@ export default function Loading() {
       <div className={loading.standIn} inert>
         <PageHero className={browser.insightsHero}>
           <helix-flex align-items="center" data-density="sm" direction="column" gap="sm">
-            <helix-text as="h1">
+            <helix-text as="h1" data-page-title>
               <span className={loading.heroTitle} data-skeleton="text" />
             </helix-text>
             <helix-text as="p" className={pageHero.pageHeroLede}>
