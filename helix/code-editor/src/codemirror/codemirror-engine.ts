@@ -43,7 +43,11 @@ import type {
   CodeEditorFindQuery,
   CodeEditorFindResult,
 } from '@fusion.dev/helix-headless/code-editor'
-import { syntaxHighlighter, syntaxRules } from '@fusion.dev/helix-sandbox/highlight'
+import {
+  remeasureOnFonts,
+  syntaxHighlighter,
+  syntaxRules,
+} from '@fusion.dev/helix-sandbox/highlight'
 
 /** A language's grammar, loaded when an editor first asks for it. */
 type Loader = () => Promise<Extension>
@@ -332,6 +336,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEng
           numbers.of(
             state.lineNumbers ? [lineNumbers(), highlightActiveLineGutter(), foldGutter()] : [],
           ),
+          remeasureOnFonts,
           history(),
           drawSelection(),
           indentOnInput(),
