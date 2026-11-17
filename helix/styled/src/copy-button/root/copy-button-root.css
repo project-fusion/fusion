@@ -55,16 +55,18 @@ slot[hidden] {
   display: none;
 }
 
-/* **The mark that takes over arrives**: the check scales up into place as the
-   clipboard gives way to it, and the clipboard does the same when it comes
-   back, on the curve a floating panel opens on. A slot coming back from
-   `display: none` gives its mark a first style, which is what the starting
-   style below starts from. **At `normal`**: at `fast` the curve's slow start
-   left about 60 milliseconds of visible growth, which read as no motion. */
+/* **The mark that takes over pops into place**: the check grows a little past
+   its size and settles back as the clipboard gives way to it, and the
+   clipboard does the same when it comes back. On `spring`, which the motion
+   page keeps for the few places where overshoot reads as a response and not
+   as a bug: a confirmation is one. Over `slow`, the time a spring takes to
+   settle; at `normal` on `emphasized` it read as no motion, a 16 pixel mark
+   growing six pixels. A slot coming back from `display: none` gives its mark
+   a first style, which is what the starting style below starts from. */
 [part="mark"] {
   transition:
-    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
-    scale var(--helix-duration-normal) var(--helix-easing-emphasized);
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate),
+    scale var(--helix-duration-slow) var(--helix-easing-spring);
 }
 
 @starting-style {
