@@ -179,6 +179,20 @@ describe('Tree on a phone', () => {
     expect(drawn).toEqual(drawnBox(screen.getByRole('checkbox')))
   })
 
+  test('a heading tree rests its leaves in the full ink, and its heading in the muted', async () => {
+    const ink = (words: string) =>
+      StyleSheet.flatten(screen.getByText(words, { includeHiddenElements: true }).props.style).color
+    await draw()
+    const muted = ink('Log')
+    expect(ink('Docs')).toBe(muted)
+    expect(ink('Guide')).toBe(muted)
+    await screen.unmount()
+    await draw({ nesting: 'heading' })
+    expect(ink('Docs')).toBe(muted)
+    expect(ink('Log')).not.toBe(muted)
+    expect(ink('Guide')).toBe(ink('Log'))
+  })
+
   test('a screen reader moves an item, and the page moving it takes its new place', async () => {
     await render(<Moved />)
     expect(row('a').props.accessibilityValue.text).toBe('Level 1, 1 of 3')

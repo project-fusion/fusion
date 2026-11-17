@@ -76,9 +76,11 @@ export default styles(
       treeHeadingTracking: null,
       treeInset: null,
       treeLabelFlex: null,
+      treeLeafInk: null,
       treeNestedText: null,
       treePad: null,
       treeReserve: null,
+      treeRestInk: null,
       treeRow: null,
       treeRowFill: null,
       treeRowInk: null,
@@ -157,7 +159,12 @@ export default styles(
              asks for one, and the hover below still wins over it. */
           backgroundColor: own.treeRowFill('transparent'),
           borderRadius: hook.rowRadius,
-          color: first(own.treeRowInk, hook.rowColor),
+          /* The ink the row rests in, named once so a disabled row under the
+             pointer goes back to it. A heading tree hands its rows the full ink. */
+          own: {
+            treeRestInk: hook.rowColor(first(own.treeLeafInk, token('color-foreground-muted'))),
+          },
+          color: first(own.treeRowInk, own.treeRestInk),
           display: 'flex',
           /* The row's own size, which the tree's `nesting` decides. */
           fontSize: first(own.treeText, token('text-control')),
@@ -193,11 +200,17 @@ export default styles(
             },
           ),
           /* A parent reads as a parent: at `nesting="heading"` the three
-             properties the rail heading adds, handed down by the tree. */
+             properties the rail heading adds, handed down by the tree.
+
+             **So a heading and its leaves take different inks.** The heading
+             keeps the muted label ink, and every leaf rests in the full
+             foreground the hover lifts a row to. In the muted ink at both, a
+             heading at 12 pixels and a row at 13 were one pixel apart and read
+             as the same thing. */
           rule(
             { holds: { toggle: true } },
             {
-              color: first(own.treeRowInk, own.treeHeadingInk, hook.rowColor),
+              own: { treeRestInk: first(own.treeHeadingInk, hook.rowColor) },
               fontSize: first(own.treeHeadingText, own.treeText, token('text-control')),
               letterSpacing: own.treeHeadingTracking(token('tracking-normal')),
             },
@@ -253,7 +266,7 @@ export default styles(
           rule(
             { part: { 'data-heading': true } },
             {
-              color: token('color-foreground-muted'),
+              own: { treeRestInk: token('color-foreground-muted') },
               fontSize: token('text-xs'),
               letterSpacing: token('tracking-wide'),
             },
@@ -530,7 +543,7 @@ export default styles(
           rule({ has: 'disabled' }, { cursor: 'not-allowed', opacity: hook.rowDisabledOpacity }),
           rule(
             { has: 'disabled', hover: true },
-            { backgroundColor: 'transparent', color: hook.rowColor },
+            { backgroundColor: 'transparent', color: own.treeRestInk },
           ),
         ]),
         rule({ active: true }, { backgroundColor: token('color-press') }),

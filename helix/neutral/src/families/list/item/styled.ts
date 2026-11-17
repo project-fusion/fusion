@@ -301,8 +301,11 @@ export default styles(
     on({ part: 'row', selector: ':host(:not([disabled])) [part~="row"][role="gridcell"]:active' }, [
       web([rule({ backgroundColor: token('color-press'), borderRadius: token('radii-sm') })]),
     ]),
+    /* Pressed to select or act, as a button is, so its words are not selectable.
+       A list without `selection-mode` keeps them selectable, for copying. A
+       phone's words are not selectable unless asked, so the rule is the web's. */
     on({ part: 'row', selector: '[part~="row"][role="gridcell"]' }, [
-      web([rule({ cursor: 'pointer' })]),
+      web([rule({ cursor: 'pointer', userSelect: 'none' })]),
     ]),
     on({ part: 'row', selector: ':host([disabled]) [part~="row"][role="gridcell"]' }, [
       web([rule({ cursor: 'not-allowed' })]),

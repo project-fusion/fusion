@@ -34,6 +34,7 @@ export default styles(
       treeHeadingText: null,
       treeHeadingTracking: null,
       treeLabelFlex: null,
+      treeLeafInk: null,
       treeNestedText: null,
       treeReserve: null,
     },
@@ -75,19 +76,28 @@ export default styles(
         /* Depth is a change of kind here, so a nested row drops a step down the
            type scale. */
         rule({ nesting: 'subordinate' }, { own: { treeNestedText: token('text-xs') } }),
-        /* Here the change is at the parent: a branch is the name of the list it
-           holds, so it takes `Text`'s `label` recipe and its children keep the
-           size every other row has. */
-        rule(
-          { nesting: 'heading' },
-          {
-            own: {
-              treeHeadingInk: token('color-foreground-muted'),
-              treeHeadingText: token('text-xs'),
-              treeHeadingTracking: token('tracking-wide'),
-            },
+      ]),
+      /* Here the change is at the parent: a branch is the name of the list it
+         holds, so it takes `Text`'s `label` recipe and its children keep the
+         size every other row has. Its ink is `foreground-muted`, because a
+         heading is read and the quieter `foreground-subtle` is not solved
+         against a theme's grounds. The leaves take the full foreground, so a
+         heading and the rows under it differ in ink as well as size. Handed
+         down as values rather than as the attribute: only the item sheet can
+         tell a branch from a leaf. A phone's items read the leaves' ink from the
+         tree they join, and mark a heading themselves. */
+      rule(
+        { nesting: 'heading' },
+        {
+          own: {
+            treeHeadingInk: token('color-foreground-muted'),
+            treeHeadingText: token('text-xs'),
+            treeHeadingTracking: token('tracking-wide'),
+            treeLeafInk: token('color-foreground'),
           },
-        ),
+        },
+      ),
+      web([
         /* Print: a structure, and printing it flat loses the structure. */
         rule({ print: true }, { printColorAdjust: 'economy' }),
       ]),
