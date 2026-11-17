@@ -21,26 +21,48 @@ interface Asked {
 
 const asked = new Map<HTMLElement, Asked[]>()
 
-/**
- * How far down a move in flight is drawing an item now, read from the move it
- * was last asked for, as a browser draws the translation into the item's box.
- */
-const drawn = (element: HTMLElement): number => {
-  const latest = asked
-    .get(element)
-    ?.findLast((one) => !one.canceled && one.options.composite === 'add')
-  const from = /translate\(0px, (-?[\d.]+)px\)/.exec(String(latest?.keyframes[0]?.transform))
-  return latest && from ? Number(from[1]) * (1 - latest.progress) : 0
+/** The host an item sits in: the element whose parent is the body. */
+const hostOf = (element: HTMLElement): HTMLElement => {
+  let up = element
+  while (up.parentElement && up.parentElement !== document.body) {
+    up = up.parentElement
+  }
+  return up
 }
 
-/** A row drawn at its place among the shown rows, which records every animation it is asked for. */
+/**
+ * How far down the moves in flight are drawing an item now: its own latest
+ * move and every one around it, as a browser draws the translations into the
+ * item's box.
+ */
+const drawn = (element: HTMLElement): number => {
+  let total = 0
+  for (
+    let up: HTMLElement | null = element;
+    up && up.parentElement !== document.body;
+    up = up.parentElement
+  ) {
+    const latest = asked
+      .get(up)
+      ?.findLast((one) => !one.canceled && one.options.composite === 'add')
+    const from = /translate\(0px, (-?[\d.]+)px\)/.exec(String(latest?.keyframes[0]?.transform))
+    total += latest && from ? Number(from[1]) * (1 - latest.progress) : 0
+  }
+  return total
+}
+
+/**
+ * A row drawn at its place among the shown rows, in document order, so a row
+ * inside another is drawn under it as a tree's branch is. It records every
+ * animation it is asked for.
+ */
 const row = (name: string): HTMLElement => {
   const element = document.createElement('div')
-  element.textContent = name
+  element.dataset.name = name
   element.getClientRects = () => (element.hidden ? [] : [{}]) as unknown as DOMRectList
   element.getBoundingClientRect = () => {
-    const shown = [...(element.parentElement?.children ?? [])].filter(
-      (one) => !(one as HTMLElement).hidden,
+    const shown = [...hostOf(element).querySelectorAll<HTMLElement>('div')].filter(
+      (one) => !one.closest('[hidden]'),
     )
     const top = (shown.indexOf(element) * ROW + drawn(element)) * scale
     return { height: ROW * scale, left: 0, top, width: 200 * scale } as DOMRect
@@ -94,7 +116,7 @@ const moving = (element: ReturnType<typeof host>, duration = '200ms') => {
     element.style.setProperty('--list-move-easing', 'cubic-bezier(0.2, 0, 0, 1)')
   }
   const controller = new LayoutMotionController(element, {
-    items: () => [...element.children] as HTMLElement[],
+    items: () => [...element.querySelectorAll<HTMLElement>('div')],
     timing: () => {
       const style = getComputedStyle(element)
       return {
@@ -246,9 +268,42 @@ describe('a host whose items move', () => {
   test('a change inside a row is no move', async () => {
     const element = host('a', 'b')
     moving(element)
-    rows(element)[0]?.append('streamed text')
+    rows(element)[0]?.append('streamed text', document.createElement('span'))
     await settle()
     expect(asked.size).toBe(0)
+  })
+
+  test('a branch moved with its rows carries them, and they move only by the difference', async () => {
+    const element = host('a', 'b')
+    moving(element)
+    const [a, b] = rows(element) as [HTMLElement, HTMLElement]
+    const leaf = row('a1')
+    a.append(leaf)
+    await settle()
+    finish()
+    asked.clear()
+    element.append(a)
+    await settle()
+    expect(start(b)).toBe('translate(0px, 80px)')
+    expect(start(a)).toBe('translate(0px, -40px)')
+    expect(asked.has(leaf)).toBe(false)
+  })
+
+  test('a row added to a branch fades in, and a branch added with its rows fades once', async () => {
+    const element = host('a', 'b')
+    moving(element)
+    const [a] = rows(element) as [HTMLElement]
+    const leaf = row('a1')
+    a.append(leaf)
+    await settle()
+    expect(asked.get(leaf)?.[0]?.keyframes).toEqual([{ opacity: 0 }, { opacity: 1 }])
+    const branch = row('c')
+    const inside = row('c1')
+    branch.append(inside)
+    element.append(branch)
+    await settle()
+    expect(asked.get(branch)?.[0]?.keyframes).toEqual([{ opacity: 0 }, { opacity: 1 }])
+    expect(asked.has(inside)).toBe(false)
   })
 
   test('nothing is heard while disconnected', async () => {
