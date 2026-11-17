@@ -30,6 +30,7 @@ import { customElement, HelixElement, reportRuntime, words } from '@fusion.dev/h
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, unsafeCSS } from 'lit'
 import { property } from 'lit/decorators.js'
+import { remeasureOnFonts } from '../../highlight/fonts.js'
 import { type HighlightLanguage, languageOf } from '../../highlight/language.js'
 import { shellMode, shellTokens } from '../../highlight/shell.js'
 import { syntaxHighlighter, syntaxRules } from '../../highlight/syntax.js'
@@ -311,6 +312,7 @@ export class HelixSandboxEditor extends HelixElement {
         doc: this.value,
         extensions: [
           lineNumbers(),
+          remeasureOnFonts,
           history(),
           /* Two spaces, and Tab types them.
            *
