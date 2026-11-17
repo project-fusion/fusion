@@ -59,11 +59,12 @@ slot[hidden] {
    clipboard gives way to it, and the clipboard does the same when it comes
    back, on the curve a floating panel opens on. A slot coming back from
    `display: none` gives its mark a first style, which is what the starting
-   style below starts from. */
+   style below starts from. **At `normal`**: at `fast` the curve's slow start
+   left about 60 milliseconds of visible growth, which read as no motion. */
 [part="mark"] {
   transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-decelerate),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    scale var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
 @starting-style {

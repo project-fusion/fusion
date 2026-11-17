@@ -1,0 +1,36 @@
+<!-- @summary Rows that slide to their new places when a heading sorts them, and columns that slide when you move one. -->
+
+<helix-data-table
+  id="releases"
+  label="Releases"
+  reorderable
+  row-key="version"
+>
+  <helix-table-column
+    field="version"
+    menu
+    sortable
+  >Version</helix-table-column>
+  <helix-table-column
+    field="downloads"
+    menu
+    sortable
+    text-align="end"
+  >Downloads</helix-table-column>
+  <helix-table-column
+    field="owner"
+    menu
+    sortable
+  >Owner</helix-table-column>
+</helix-data-table>
+
+<script>
+  document.getElementById('releases').rows = [
+    { downloads: 4210, owner: 'Platform', version: '2.4.0' },
+    { downloads: 18904, owner: 'Design', version: '2.1.3' },
+    { downloads: 920, owner: 'Platform', version: '2.5.0' },
+    { downloads: 11280, owner: 'Growth', version: '2.2.0' },
+    { downloads: 7615, owner: 'Design', version: '2.3.1' },
+    { downloads: 2304, owner: 'Growth', version: '2.4.2' },
+  ]
+</script>
