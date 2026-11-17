@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-docs",
   "description": "Versioned documentation content and registry for Helix.",
-  "version": "0.240.4",
+  "version": "0.241.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {
