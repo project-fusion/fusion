@@ -204,10 +204,6 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /** The letters typed so far, for moving to an item by its name. */
   private readonly typeahead = new Typeahead()
 
-  /**
-   * Moving items among their siblings, in a `reorderable` tree. The items are
-   * the page's, so a drop asks the page to move them.
-   */
   /** Sliding each item to its new place when the page moves, adds, removes or hides items. */
   protected readonly motion = new LayoutMotionController(this, {
     items: () => this.items,
@@ -220,6 +216,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     },
   })
 
+  /**
+   * Moving items among their siblings, in a `reorderable` tree. The items are
+   * the page's, so a drop asks the page to move them.
+   */
   private readonly reorder = new ReorderController(this, {
     axis: 'block',
     box: (key) => this.itemFor(key)?.getBoundingClientRect(),

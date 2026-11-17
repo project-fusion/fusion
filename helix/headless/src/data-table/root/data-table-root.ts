@@ -1469,15 +1469,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /** Said once, so a table that re-renders does not repeat it. */
   private warnedAboutKey = false
 
-  /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
-     pixel row, which is a fact about the platform rather than a preference.
-
-     **The box this scrolls carries `data-scroller` while windowed**, the rule
-     in `HelixElement`. Before this it took its `overflow` from the styled
-     sheet, so a page loading only `helix/headless` drew every row: measured in
-     Chromium, 5,001 rows for 5,000. Marking it moved nothing on the styled
-     tier, whose `overflow-x: auto` already made the box a scroll container on
-     both axes, which is the measurement `Megamenu` asks for. */
   /**
    * Sliding each row it keeps to its new place when the table sorts or `rows`
    * changes. Looked for after each update, because the table draws its rows,
@@ -1496,6 +1487,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     watch: 'updates',
   })
 
+  /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
+     pixel row, which is a fact about the platform rather than a preference.
+
+     **The box this scrolls carries `data-scroller` while windowed**, the rule
+     in `HelixElement`. Before this it took its `overflow` from the styled
+     sheet, so a page loading only `helix/headless` drew every row: measured in
+     Chromium, 5,001 rows for 5,000. Marking it moved nothing on the styled
+     tier, whose `overflow-x: auto` already made the box a scroll container on
+     both axes, which is the measurement `Megamenu` asks for. */
   private readonly virtualize = new VirtualizeController(this, {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and
