@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+[part="content"] {
+  transition:
+    opacity var(--reveal-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate)
+    var(--reveal-delay, 0ms),
+    translate var(--reveal-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate)
+    var(--reveal-delay, 0ms);
+}
+
+/* **Waiting below the view**, faded and lowered, until it scrolls in. The
+   transition back is the entrance. */
+:host(:state(waiting)) [part="content"] {
+  opacity: 0;
+  transition: none;
+  translate: 0 var(--reveal-distance, var(--helix-space-lg));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="content"],
+  :host(:state(waiting)) [part="content"] {
+    opacity: 1;
+    transition: none;
+    translate: none;
+  }
+}
+
+@media print {
+  :host(:state(waiting)) [part="content"] {
+    opacity: 1;
+    translate: none;
+  }
+}

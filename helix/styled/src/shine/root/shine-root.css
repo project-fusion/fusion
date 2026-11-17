@@ -1,0 +1,93 @@
+:host {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+
+/* **The clip is a layer over the content, and not the host**, so the focus
+   ring of a button inside, drawn outside its edge, is not cut off. */
+[part="sweep"] {
+  border-radius: var(--shine-radius, var(--helix-radii-sm));
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+/* **A slanted band, waiting beyond the inline start**, wide enough that its
+   soft edges never show a hard line. White in light mode, where an action is
+   drawn in dark ink, and a dark sheen in dark mode, where it is drawn in light
+   ink and a white band would not show. */
+[part="band"] {
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    var(
+        --shine-color,
+        light-dark(
+          color-mix(in oklab, var(--helix-color-foreground-media) 45%, transparent),
+          color-mix(in oklab, var(--helix-color-surface-media) 18%, transparent)
+        )
+      )
+      50%,
+    transparent 70%
+  );
+  inset: 0;
+  position: absolute;
+  translate: -100% 0;
+}
+
+/* One crossing for a pointer arriving or focus coming in. */
+:host(:hover) [part="band"],
+:host(:focus-within) [part="band"] {
+  animation: helix-shine var(--shine-duration, calc(var(--helix-duration-slow) * 2.5))
+    var(--helix-easing-standard) both;
+}
+
+/* By itself, a crossing in the first third of each turn and a rest for the
+   other two. */
+:host([loop]) [part="band"] {
+  animation: helix-shine-loop
+    calc(var(--shine-duration, calc(var(--helix-duration-slow) * 2.5)) * 3)
+    var(--helix-easing-standard) infinite;
+}
+
+:host([loop]:state(paused)) [part="band"] {
+  animation-play-state: paused;
+}
+
+@keyframes helix-shine {
+  to {
+    translate: 100% 0;
+  }
+}
+
+@keyframes helix-shine-loop {
+  33%,
+  100% {
+    translate: 100% 0;
+  }
+}
+
+/* From the right on a right-to-left page, whose inline start is the right:
+   the whole layer is mirrored, so the band and its slant turn with it. */
+:host(:dir(rtl)) [part="sweep"] {
+  scale: -1 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="band"],
+  :host(:hover) [part="band"],
+  :host(:focus-within) [part="band"],
+  :host([loop]) [part="band"] {
+    animation: none;
+    display: none;
+  }
+}
+
+@media print {
+  [part="sweep"] {
+    display: none;
+  }
+}
