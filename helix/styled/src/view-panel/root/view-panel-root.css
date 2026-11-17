@@ -67,6 +67,16 @@
   display: block;
 }
 
+/* At Column Manager's and Table Export's size, a step under the density's, and
+   in the panel's regular words rather than a form label's medium. */
+[part~="choice"] {
+  --radio-size: var(--helix-size-checkbox-tight);
+}
+
+[part~="choice"]::part(label) {
+  font-weight: var(--helix-weight-regular);
+}
+
 [part="reset"]:focus-visible,
 [part="back"]:focus-visible,
 [part="section"]:focus-visible {

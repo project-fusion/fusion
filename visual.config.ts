@@ -244,6 +244,19 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    /* A check a family draws for itself, a tree's marks, a task list's boxes,
+       a panel's sort orders, is pictured with every state set, since a preview
+       shows few of them or none, and these draw the box `Checkbox` and `Radio`
+       draw. */
+    {
+      files,
+      glob: '{name}/.examples/checked.html',
+      kind: 'html',
+      name: 'checked',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
   ],
   /* `verify`'s browser jobs and `measure-browser.mjs` name a file here, and
      `measure:browser --from` merges a run's worth of them. */
