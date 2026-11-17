@@ -150,7 +150,9 @@ graph's frame, that stops it where the notes stand.
 
 When you sort, add, remove, or hide the rows of a `List`, the tags of a
 `Tag.Group`, or the items of a `Tree`, each one slides from where it was to
-where it is now. A tree's branch carries its rows with it. A row, a tag, or an
+where it is now. A tree's branch carries its rows with it. A `Table` or a
+Data Table that sorts moves its rows the same way, each row's cells
+together. A Data Table needs `row-key` to know a row across the change. A row, a tag, or an
 item you add fades in. A list you render again with all new elements appears
 at once.
 
@@ -159,8 +161,8 @@ sets from the tokens:
 
 | Hook | Default |
 | --- | --- |
-| `--list-move-duration`, `--tag-group-move-duration`, `--tree-move-duration` | `--helix-duration-normal` |
-| `--list-move-easing`, `--tag-group-move-easing`, `--tree-move-easing` | `--helix-easing-standard` |
+| `--list-move-duration`, `--tag-group-move-duration`, `--tree-move-duration`, `--table-move-duration`, `--data-table-move-duration` | `--helix-duration-normal` |
+| `--list-move-easing`, `--tag-group-move-easing`, `--tree-move-easing`, `--table-move-easing`, `--data-table-move-easing` | `--helix-easing-standard` |
 
 Set them on the element to change one list, or on a selector to change many:
 

@@ -42,6 +42,8 @@ import '../../checkbox/index.js'
  * @cssproperty --table-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
  * @cssproperty --table-error-color - The color of the words in the line shown while `error-text` is set.
  * @cssproperty --table-heading-background-color - The fill behind the headings while `windowed`, which the rows scroll under. The page's background by default.
+ * @cssproperty --table-move-duration - How long a row takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --table-move-easing - The curve a row slides and fades in along. Defaults to `--helix-easing-standard`.
  * @cssproperty --table-title-color - The color of the words in the `heading` slot.
  * @cssproperty --table-title-gap - The space between the `heading` slot and the grid.
  * @cssproperty --table-title-text - The font size of the words in the `heading` slot.

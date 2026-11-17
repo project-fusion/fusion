@@ -36,6 +36,7 @@ import {
   inlineStep,
   inRowOrder,
   internalsOf,
+  LayoutMotionController,
   MIRROR_RULE,
   MixinCollection,
   markMatches,
@@ -319,6 +320,16 @@ const isControl = (element: HTMLElement): boolean =>
  * nothing while a `sort` is set, since the sort decides the order, and a tree
  * grid draws none.
  *
+ * **Rows slide to their places.** When the table sorts, or `rows` changes,
+ * each row it keeps moves from where it was drawn to where it is now, its
+ * cells together, and a row it adds fades in. Set `row-key` so a row is known
+ * across the change. The table times it from `--data-table-move-duration` and
+ * `--data-table-move-easing`, which the styled tier sets from the duration and
+ * easing tokens. Here neither is set, so nothing moves until you set them.
+ * Under reduced motion nothing moves, whatever they say. A `windowed` table
+ * draws only the rows in view, so a sort that brings in other rows fades them
+ * in where they land.
+ *
  * **Editable cells.** `editable` on a column lets a reader edit its cells,
  * and `rowEditable` decides row by row. The column's `type` picks the field:
  * text, a number, a date, or a select of an enum's values, and a boolean
@@ -524,6 +535,8 @@ const isControl = (element: HTMLElement): boolean =>
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
+ * @cssproperty --data-table-move-duration - How long a row takes to slide to its new place, or to fade in. Unset, nothing moves.
+ * @cssproperty --data-table-move-easing - The curve a row slides and fades in along.
  * @cssproperty --data-table-pin-offset - How far a pinned column's cell stays from its end of the row, in pixels: the width of the pinned columns before it. The component writes it on each cell of a pinned column, and the stylesheet reads it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  *
@@ -1465,6 +1478,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
      Chromium, 5,001 rows for 5,000. Marking it moved nothing on the styled
      tier, whose `overflow-x: auto` already made the box a scroll container on
      both axes, which is the measurement `Megamenu` asks for. */
+  /**
+   * Sliding each row it keeps to its new place when the table sorts or `rows`
+   * changes. Looked for after each update, because the table draws its rows,
+   * and in the box that scrolls them.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])],
+    scroller: () => this.renderRoot?.querySelector('[part="table"]'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--data-table-move-duration'),
+        easing: style.getPropertyValue('--data-table-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
+
   private readonly virtualize = new VirtualizeController(this, {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and
