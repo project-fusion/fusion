@@ -205,7 +205,15 @@ export default styles(
       ]),
       /* What a phone's row draws around each cell. */
       /* A phone's checkbox stands at its own height, in the middle of the cell. */
-      on('checkbox', [native([rule({ alignSelf: 'center' })])]),
+      on('checkbox', [
+        /* **A table's checkbox is a step under the density's.** A row's words
+           are the control text, 13 at the default density, and a 20 pixel box
+           beside them read half again their size. The tight step is 16 there,
+           as an icon button's glyph is. Only the drawn box: the press still
+           takes the whole target. */
+        web([rule({ '--checkbox-size': token('size-checkbox-tight') })]),
+        native([rule({ alignSelf: 'center' })]),
+      ]),
       on('cell-box', [
         native([
           rule({ flexDirection: 'row' }),
