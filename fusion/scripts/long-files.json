@@ -206,7 +206,6 @@
     "helix/headless/src/copy-button/root/copy-button-root.ts",
     "helix/headless/src/data-table/root/data-table-root.dom.spec.ts",
     "helix/headless/src/data-table/root/data-table-root.ts",
-    "helix/headless/src/data-table/view.ts",
     "helix/headless/src/date-input/root/date-input-root.dom.spec.ts",
     "helix/headless/src/date-input/root/date-input-root.ts",
     "helix/headless/src/date-picker/root/date-picker-root.dom.spec.ts",
