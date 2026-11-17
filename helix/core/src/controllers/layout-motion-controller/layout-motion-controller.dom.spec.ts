@@ -64,7 +64,7 @@ const row = (name: string): HTMLElement => {
     const shown = [...hostOf(element).querySelectorAll<HTMLElement>('div')].filter(
       (one) => !one.closest('[hidden]'),
     )
-    const top = (shown.indexOf(element) * ROW + drawn(element)) * scale
+    const top = (shown.indexOf(element) * ROW + drawn(element) - scrolled) * scale
     return { height: ROW * scale, left: 0, top, width: 200 * scale } as DOMRect
   }
   element.animate = ((keyframes: Keyframe[], options: KeyframeAnimationOptions) => {
@@ -85,6 +85,9 @@ const row = (name: string): HTMLElement => {
 
 /** How much larger than its layout box the host is drawn. */
 let scale = 1
+
+/** How far the host's own box is scrolled down. */
+let scrolled = 0
 
 /** A plain element standing in for a Lit host, holding rows. */
 const host = (...names: string[]) => {
@@ -151,6 +154,7 @@ const realMatchMedia = globalThis.matchMedia
 beforeEach(() => {
   asked.clear()
   scale = 1
+  scrolled = 0
   reduce = false
   /* A real ResizeObserver reports once on observing, which is the first record. */
   globalThis.ResizeObserver = class {
@@ -304,6 +308,58 @@ describe('a host whose items move', () => {
     await settle()
     expect(asked.get(branch)?.[0]?.keyframes).toEqual([{ opacity: 0 }, { opacity: 1 }])
     expect(asked.has(inside)).toBe(false)
+  })
+
+  test('a row drawn by its cells moves as its cells, once the update that sorts it has finished', async () => {
+    const element = host()
+    const rowOf = (name: string): HTMLElement => {
+      const contents = document.createElement('section')
+      contents.style.display = 'contents'
+      contents.append(row(name))
+      return contents
+    }
+    element.append(rowOf('a'), rowOf('b'))
+    const sections = () => [...element.querySelectorAll<HTMLElement>('section')]
+    element.style.setProperty('--list-move-duration', '200ms')
+    const controller = new LayoutMotionController(element, {
+      items: sections,
+      timing: () => ({
+        duration: getComputedStyle(element).getPropertyValue('--list-move-duration'),
+        easing: 'ease',
+      }),
+      watch: 'updates',
+    })
+    controller.hostConnected()
+    const [first, second] = sections() as [HTMLElement, HTMLElement]
+    element.append(first)
+    await settle()
+    expect(asked.size).toBe(0)
+    controller.hostUpdated()
+    await settle()
+    expect(start(first.firstElementChild as HTMLElement)).toBe('translate(0px, -40px)')
+    expect(start(second.firstElementChild as HTMLElement)).toBe('translate(0px, 40px)')
+    expect(asked.has(first)).toBe(false)
+  })
+
+  test('a reader who scrolled the box between two changes sees only the change move', async () => {
+    const element = host('a', 'b')
+    element.style.setProperty('--list-move-duration', '200ms')
+    Object.defineProperty(element, 'scrollTop', { get: () => scrolled })
+    const controller = new LayoutMotionController(element, {
+      items: () => [...element.querySelectorAll<HTMLElement>('div')],
+      scroller: () => element,
+      timing: () => ({
+        duration: getComputedStyle(element).getPropertyValue('--list-move-duration'),
+        easing: 'ease',
+      }),
+    })
+    controller.hostConnected()
+    scrolled = 30
+    const [a, b] = rows(element) as [HTMLElement, HTMLElement]
+    element.append(a)
+    await settle()
+    expect(start(a)).toBe('translate(0px, -40px)')
+    expect(start(b)).toBe('translate(0px, 40px)')
   })
 
   test('nothing is heard while disconnected', async () => {

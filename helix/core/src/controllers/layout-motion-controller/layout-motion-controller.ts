@@ -12,6 +12,23 @@ export interface LayoutMotionOptions {
    * change. A duration that is empty, or under a millisecond, moves nothing.
    */
   timing: () => { duration: string; easing: string }
+
+  /**
+   * What says the items changed. `children`, the default, hears the page add,
+   * remove, reorder or hide the host's children. `updates` looks once each
+   * update of the host has finished, for a host that draws or arranges its
+   * items itself: a table that sorts by assigning its rows to a slot in a new
+   * order, or one that renders its rows.
+   */
+  watch?: 'children' | 'updates'
+
+  /**
+   * The box the items scroll in, where it is not the page: a table that
+   * scrolls sideways in its own box. Its scroll is added back to each place,
+   * so a reader who scrolled between two changes does not see every row slide
+   * by the distance they scrolled.
+   */
+  scroller?: () => Element | null | undefined
 }
 
 /** Where an item's box sits inside its host, in the host's layout pixels. */
@@ -22,7 +39,8 @@ interface Place {
 
 /** A move in flight: the offset it started from, so the offset it shows now can be worked out. */
 interface Flight {
-  animation: Animation
+  /** One for each box the item is drawn in, all on one curve. */
+  animations: Animation[]
   from: Place
 }
 
@@ -51,6 +69,22 @@ const scaleOf = (host: HTMLElement, box: DOMRect): Place => {
 }
 
 /**
+ * The boxes an element is drawn in: the element itself, or where it is
+ * `display: contents`, as a table's row is, the boxes of what it draws, through
+ * its shadow root and its slots. A row of cells moves as its cells.
+ */
+const boxesOf = (element: Element): HTMLElement[] => {
+  if (getComputedStyle(element).display !== 'contents') {
+    return element instanceof HTMLElement ? [element] : []
+  }
+  const inside =
+    element instanceof HTMLSlotElement
+      ? element.assignedElements({ flatten: true })
+      : [...(element.shadowRoot ?? element).children]
+  return inside.flatMap(boxesOf)
+}
+
+/**
  * Moves each item from where it was drawn to where it is drawn after a change,
  * so a row that is added, sorted, hidden or closed up slides into its place
  * instead of jumping there.
@@ -71,9 +105,9 @@ const scaleOf = (host: HTMLElement, box: DOMRect): Place => {
  * family's own hooks, which `timing` reads by name so each family publishes
  * the hooks it reads. The styled tier sets them from the duration and easing
  * tokens, and the page can set them on the element. The headless tier sets
- * neither, so it never moves until the page does. **Reduced motion stops every move**, whatever the
- * properties say, because a page that writes a literal duration has not
- * answered the reader's setting.
+ * neither, so it never moves until the page does. **Reduced motion stops
+ * every move**, whatever the properties say, because a page that writes a
+ * literal duration has not answered the reader's setting.
  *
  * **Places are layout pixels inside the host.** A box measured on screen is
  * divided by the host's scale, because a move is written as a translation in
@@ -86,6 +120,10 @@ const scaleOf = (host: HTMLElement, box: DOMRect): Place => {
  * than added to it, and the whole list arriving at once would be a flash.
  * The items there when the host connected arrive with the page, and do not
  * fade.
+ *
+ * **An item with no box of its own moves as the boxes it draws.** A table's
+ * row is `display: contents`, so its cells take the move, one animation each
+ * on one curve, and a row of cells slides as one.
  *
  * Only `transform` and `opacity` are animated, so a move never sets off
  * layout, and each animation is composited onto the item's own transform.
@@ -101,6 +139,9 @@ export class LayoutMotionController implements ReactiveController {
   /** Whether the host has been measured once, so a change after that is a change. */
   private recorded = false
 
+  /** The items in the order they were drawn after the last change, which `updates` compares against. */
+  private order: readonly HTMLElement[] = []
+
   /** The moves in flight, by item. */
   private readonly flights = new WeakMap<HTMLElement, Flight>()
 
@@ -115,7 +156,7 @@ export class LayoutMotionController implements ReactiveController {
   }
 
   hostConnected(): void {
-    if (typeof MutationObserver !== 'undefined') {
+    if (this.options.watch !== 'updates' && typeof MutationObserver !== 'undefined') {
       this.mutations ??= new MutationObserver((records) => this.heard(records))
       this.mutations.observe(this.host, {
         attributeFilter: ['hidden'],
@@ -134,7 +175,29 @@ export class LayoutMotionController implements ReactiveController {
     this.mutations?.disconnect()
     this.resizes?.disconnect()
     this.places = new Map()
+    this.order = []
     this.recorded = false
+  }
+
+  /**
+   * Looks for a change once the host's update has finished, under `updates`.
+   *
+   * **A microtask later**, because a host's `updated` runs after its
+   * controllers hear `hostUpdated`, and a table assigns its rows in `updated`.
+   * Measured before that, every row was still in the order of the last sort.
+   */
+  hostUpdated(): void {
+    if (this.options.watch !== 'updates') {
+      return
+    }
+    queueMicrotask(() => {
+      const items = this.options.items()
+      const same =
+        items.length === this.order.length && items.every((item, at) => item === this.order[at])
+      if (!same) {
+        this.move()
+      }
+    })
   }
 
   /**
@@ -160,6 +223,7 @@ export class LayoutMotionController implements ReactiveController {
   /** Records where every item is drawn now, with no move started. */
   private record(): void {
     this.places = this.measure().now
+    this.order = this.options.items()
     this.recorded = true
   }
 
@@ -204,25 +268,34 @@ export class LayoutMotionController implements ReactiveController {
     const now = new Map<HTMLElement, Place>()
     const frame = this.host.getBoundingClientRect()
     const scale = scaleOf(this.host, frame)
+    const scroller = this.options.scroller?.()
+    const scrolled = { x: scroller?.scrollLeft ?? 0, y: scroller?.scrollTop ?? 0 }
     for (const item of items) {
-      if (item.getClientRects().length === 0) {
+      const first = this.boxes(item)[0]
+      if (!first || first.getClientRects().length === 0) {
         continue
       }
-      const box = item.getBoundingClientRect()
+      const box = first.getBoundingClientRect()
       const offset = shown(item)
       now.set(item, {
-        x: (box.left - frame.left) / scale.x - offset.x,
-        y: (box.top - frame.top) / scale.y - offset.y,
+        x: (box.left - frame.left) / scale.x - offset.x + scrolled.x,
+        y: (box.top - frame.top) / scale.y - offset.y + scrolled.y,
       })
     }
     return { now, showing, within }
   }
 
+  /** The boxes an item is drawn in. */
+  private boxes(item: HTMLElement): HTMLElement[] {
+    return boxesOf(item)
+  }
+
   /** The translation an item's own move in flight is drawing now, from its eased progress. */
   private offset(item: HTMLElement): Place {
     const flight = this.flights.get(item)
-    const progress = flight?.animation.effect?.getComputedTiming().progress
-    if (!flight || typeof progress !== 'number' || flight.animation.playState !== 'running') {
+    const first = flight?.animations[0]
+    const progress = first?.effect?.getComputedTiming().progress
+    if (!flight || typeof progress !== 'number' || first?.playState !== 'running') {
       return { x: 0, y: 0 }
     }
     return { x: flight.from.x * (1 - progress), y: flight.from.y * (1 - progress) }
@@ -242,6 +315,7 @@ export class LayoutMotionController implements ReactiveController {
     const recorded = this.recorded
     const { now, showing, within } = this.measure()
     this.places = now
+    this.order = this.options.items()
     this.recorded = true
     const timing = this.options.timing()
     const duration = milliseconds(timing.duration)
@@ -270,16 +344,17 @@ export class LayoutMotionController implements ReactiveController {
       }
       const around = (outer && journeys.get(outer)) ?? { x: 0, y: 0 }
       const from = { x: journey.x - around.x, y: journey.y - around.y }
-      this.flights.get(item)?.animation.cancel()
-      this.flights.delete(item)
+      this.land(item)
       if (Math.abs(from.x) < 0.5 && Math.abs(from.y) < 0.5) {
         continue
       }
-      const animation = item.animate(
-        [{ transform: `translate(${from.x}px, ${from.y}px)` }, { transform: 'translate(0, 0)' }],
-        { composite: 'add', duration, easing },
+      const animations = this.boxes(item).map((box) =>
+        box.animate(
+          [{ transform: `translate(${from.x}px, ${from.y}px)` }, { transform: 'translate(0, 0)' }],
+          { composite: 'add', duration, easing },
+        ),
       )
-      this.flights.set(item, { animation, from })
+      this.flights.set(item, { animations, from })
     }
   }
 
@@ -292,13 +367,25 @@ export class LayoutMotionController implements ReactiveController {
    * the item's own and never fade.
    */
   private arrive(item: HTMLElement, duration: number, easing: string): void {
-    this.flights.get(item)?.animation.cancel()
+    this.land(item)
+    for (const box of this.boxes(item)) {
+      box.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing })
+      box.animate(
+        [{ transform: `translate(0, ${-ARRIVAL}px)` }, { transform: 'translate(0, 0)' }],
+        {
+          composite: 'add',
+          duration,
+          easing,
+        },
+      )
+    }
+  }
+
+  /** Ends an item's move in flight where it is, for a new one to start from. */
+  private land(item: HTMLElement): void {
+    for (const animation of this.flights.get(item)?.animations ?? []) {
+      animation.cancel()
+    }
     this.flights.delete(item)
-    item.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing })
-    item.animate([{ transform: `translate(0, ${-ARRIVAL}px)` }, { transform: 'translate(0, 0)' }], {
-      composite: 'add',
-      duration,
-      easing,
-    })
   }
 }

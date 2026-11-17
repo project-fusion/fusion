@@ -96,6 +96,8 @@ const bleedConverter = {
  * @cssproperty --data-table-message-border-color - The edge of the message under a cell whose value a rule refused. The danger color by default.
  * @cssproperty --data-table-message-border-width - The width of that message's edge.
  * @cssproperty --data-table-message-shadow - The shadow under that message.
+ * @cssproperty --data-table-move-duration - How long a row takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --data-table-move-easing - The curve a row slides and fades in along. Defaults to `--helix-easing-standard`.
  * @cssproperty --data-table-more-border-color - The color of the edge around the button in the `load-more` row.
  * @cssproperty --data-table-more-hover-background-color - The fill behind the button in the `load-more` row while the pointer is over it.
  * @cssproperty --data-table-more-padding-block - The space above and below the words of the button in the `load-more` row.

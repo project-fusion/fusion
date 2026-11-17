@@ -20,6 +20,7 @@ import {
   HelixSelectEvent,
   HelixSortEvent,
   inRowOrder,
+  LayoutMotionController,
   MixinCollection,
   onAndroid,
   parse,
@@ -232,10 +233,18 @@ const ESTIMATE = 40
  * loading lines, the live region says it, and the table takes the `error`
  * state. Clear it once you try again.
  *
- * The CSS custom properties listed for this component are written by it and
- * read by the stylesheet that draws it. Do not set them. Each holds a number
- * the component computes and CSS cannot, so the stylesheet can draw the table
- * without measuring anything.
+ * **Rows slide to their places.** When the table sorts, or you add, remove or
+ * reorder rows, each one moves from where it was drawn to where it is now, its
+ * cells together, and a row you add fades in. The table times it from
+ * `--table-move-duration` and `--table-move-easing`, which the styled tier
+ * sets from the duration and easing tokens. Here neither is set, so nothing
+ * moves until you set them. Under reduced motion nothing moves, whatever they
+ * say.
+ *
+ * The other CSS custom properties listed for this component are written by it
+ * and read by the stylesheet that draws it. Do not set them. Each holds a
+ * number the component computes and CSS cannot, so the stylesheet can draw the
+ * table without measuring anything.
  *
  * @since 0.1.0
  * @status stable
@@ -286,6 +295,8 @@ const ESTIMATE = 40
  * @csspart select-all - The heading that holds the checkbox that selects every row.
  * @csspart table - The grid.
  *
+ * @cssproperty --table-move-duration - How long a row takes to slide to its new place, or to fade in. Unset, nothing moves.
+ * @cssproperty --table-move-easing - The curve a row slides and fades in along.
  * @cssproperty --table-template - The column track list the table works out from its columns. The component writes it inline on the element that reads it, so setting it has no effect. Set `columns` to change the tracks.
  *
  * @cssstate empty - While there are no rows and none are loading.
@@ -774,6 +785,28 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /** The rows the body slot was last given, under `windowed`. */
   private drawnRows: Element[] = []
+
+  /**
+   * Sliding each row to its new place when the table sorts or the page changes
+   * its rows. Looked for after each update, because the table draws its rows
+   * in order by assigning them, and in the table's own box, which scrolls
+   * sideways.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () =>
+      (this.windowed ? this.drawnRows : this.arrangedRows).filter(
+        (row): row is HTMLElement => row instanceof HTMLElement,
+      ),
+    scroller: () => this,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--table-move-duration'),
+        easing: style.getPropertyValue('--table-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
 
   /**
    * The rows drawn now, each by its first cell, with its place among the
