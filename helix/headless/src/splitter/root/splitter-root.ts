@@ -35,6 +35,40 @@ import { snapTo } from '../snap.js'
  */
 const STACK_BELOW = 512
 
+/** A CSS length a position or a bound can be written in, besides a bare percentage. */
+const LENGTH = /^(-?[\d.]+)(em|px|rem)$/
+
+/** Whether a position or a bound was written as a length rather than a percentage. */
+const isLength = (value: number | string): boolean =>
+  typeof value === 'string' && LENGTH.test(value.trim())
+
+/**
+ * A position or a bound as the stylesheet takes it: a percentage, or the length
+ * it was written in, and `fallback` for anything that is neither.
+ */
+const asCss = (value: number | string, fallback: string): string => {
+  if (isLength(value)) {
+    return String(value).trim()
+  }
+  const percent =
+    typeof value === 'number' ? value : value.trim() === '' ? Number.NaN : Number(value)
+  return Number.isFinite(percent) ? `${percent}%` : fallback
+}
+
+/**
+ * Reads a position attribute. A number is a percentage, as it always was, and a
+ * length such as `280px` is kept as written, for the stylesheet to place.
+ * Anything else is read as `numberConverter` reads it, which warns once and
+ * keeps the default.
+ */
+const positionConverter = (attribute: string, fallback: number | undefined) => {
+  const numbers = numberConverter(attribute, fallback)
+  return {
+    fromAttribute: (value: string | null): number | string | undefined =>
+      value !== null && isLength(value) ? value.trim() : numbers.fromAttribute?.(value),
+  }
+}
+
 /** What a nested splitter tells the one it crosses. */
 interface Crossed {
   /** Records that `by` crosses this splitter at `at` percent along it. */
@@ -87,6 +121,11 @@ const FOCUSABLE =
  * `min` is the least the start pane keeps and `end-min` the least the end pane
  * keeps, each a percentage or a CSS length such as `16rem`.
  *
+ * `position` and `default-position` take a length as well as a percentage,
+ * such as `280px`, which is the start pane's size. The stylesheet places it
+ * with nothing measured, so the divider is where it belongs from the first
+ * paint, and the start pane keeps that size as the splitter's own size changes.
+ *
  * Set `primary` to the pane that keeps its size when the splitter's own size
  * changes, such as a sidebar beside a window being resized. The other pane
  * takes all of the change, as Web Awesome's split panel does. Without it,
@@ -131,7 +170,7 @@ const FOCUSABLE =
  * @csspart start - The box that holds the first pane.
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
- * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
+ * @cssproperty --splitter-position - Where the divider sits: a percentage of the box, or, for a position written as a length, that length held between `min` and `max`.
  *
  * @cssstate collapsed - While a pane is shut. `data-collapsed` on the host says which.
  * @cssstate dragging - While the pointer or a corner holds the divider.
@@ -269,10 +308,11 @@ export class HelixHeadlessSplitter extends HelixElement {
   defaultCollapsed?: 'end' | 'start'
 
   /**
-   * Where the divider starts, when `position` is not set.
+   * Where the divider starts, when `position` is not set: a percentage, or a
+   * length such as `280px`, as `position` takes.
    */
-  @property({ attribute: 'default-position', converter: numberConverter('default-position', 50) })
-  defaultPosition = 50
+  @property({ attribute: 'default-position', converter: positionConverter('default-position', 50) })
+  defaultPosition: number | string = 50
 
   /**
    * The least the end pane keeps, in the units `min` takes: a percentage, or
@@ -354,7 +394,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     if (Number.isFinite(bare)) {
       return bare
     }
-    const length = /^(-?[\d.]+)(em|px|rem)$/.exec(text)
+    const length = LENGTH.exec(text)
     if (!length || typeof window === 'undefined') {
       return fallback
     }
@@ -411,19 +451,39 @@ export class HelixHeadlessSplitter extends HelixElement {
    * Reading gives where it is; writing declares it the consumer's, and
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
+   *
+   * **Written as a length, such as `280px` or `16rem`, it is the start pane's
+   * size**, which the stylesheet lays out as written, between `min` and `max`.
+   * Nothing is measured to place it, so it is where it belongs on the first
+   * paint and in the server's markup, and it keeps its size as the splitter's
+   * own size changes. A percentage is drawn only once the splitter knows its
+   * box, so a sidebar of a fixed width written as one is drawn at some other
+   * width first and corrected, which a browser counts as a layout shift.
+   *
+   * Reading always gives a percentage, measured against the box, and 50 where
+   * there is no box yet. A drag, a key or a double click settles on a
+   * percentage, and `helix-resized` carries one: a consumer keeping a length
+   * converts it and writes the length back.
    */
-  @property({ converter: numberConverter('position', undefined) })
+  @property({ converter: positionConverter('position', undefined) })
   get position(): number {
     const shut = this.collapsed
     if (shut) {
       return shut === 'start' ? this.sliver : 100 - this.sliver
     }
-    return this.clamp(this.positionState ?? this.defaultPosition)
+    return this.clamp(this.toPercent(this.declared, 50))
   }
 
-  set position(next: number) {
+  set position(next: number | string) {
     const previous = this.position
+    const written = this.declared
     this.positionState = next
+    /* Lit compares the percentage read back, and a length can change what is
+       drawn without changing it: 280px and 300px both read 50 in a box nobody
+       has measured yet, so the second would never be drawn. */
+    if (next !== written) {
+      this.requestUpdate()
+    }
     /* The consumer has spoken, so the drag stops standing in for them. Without
        this the divider flashes back: `showing` falls to the position set before
        the gesture and is drawn there for the frame it takes them to answer the
@@ -521,6 +581,11 @@ export class HelixHeadlessSplitter extends HelixElement {
     if (this.collapsed || this.dragging) {
       return
     }
+    /* A start pane written as a length already keeps its pixels: the
+       stylesheet lays it out as written, whatever the length of the whole. */
+    if (held === 'start' && isLength(this.declared)) {
+      return
+    }
     const position = this.position
     const kept = ((held === 'start' ? position : 100 - position) / 100) * before
     const share = (kept / length) * 100
@@ -592,7 +657,30 @@ export class HelixHeadlessSplitter extends HelixElement {
   step = 2
 
   /** The position, whoever set it, and `undefined` until somebody has. */
-  private positionState: number | undefined = undefined
+  private positionState: number | string | undefined = undefined
+
+  /** The position as it was written, by whoever wrote it last. */
+  private get declared(): number | string {
+    return this.positionState ?? this.defaultPosition
+  }
+
+  /**
+   * The position as the stylesheet takes it, in `--splitter-position`.
+   *
+   * A length stays a length, held between `min` and `max` by CSS rather than by
+   * a measurement, so the browser places the divider with nothing to correct.
+   * Everything else is the percentage `showing` gives: a drag in progress, a
+   * shut pane, and a position written as a percentage.
+   */
+  private get drawn(): string {
+    const declared = this.declared
+    if (this.reached !== undefined || this.collapsed || !isLength(declared)) {
+      return `${this.showing}%`
+    }
+    const least = `max(0%, ${asCss(this.min, '0%')})`
+    const most = `min(100%, ${asCss(this.max, '100%')}, calc(100% - ${asCss(this.endMin, '0%')}))`
+    return `clamp(${least}, ${String(declared).trim()}, ${most})`
+  }
 
   /** The collapse, whoever set it, and `undefined` until somebody has. */
   private collapsedState: 'end' | 'none' | 'start' | undefined = undefined
@@ -1170,7 +1258,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         const previous = this.collapsed
         if (opened !== undefined) {
           this.positionState = opened
-        } else if (this.shutAt(this.clamp(this.positionState ?? this.defaultPosition))) {
+        } else if (this.shutAt(this.clamp(this.toPercent(this.declared, 50)))) {
           this.positionState = this.defaultPosition
         }
         this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
@@ -1195,9 +1283,14 @@ export class HelixHeadlessSplitter extends HelixElement {
 
        Declared rather than remembered, so it is a value a consumer can state
        and change, and it needs no capture at all. */
-    const home = this.clamp(this.defaultPosition)
+    const home = this.clamp(this.toPercent(this.defaultPosition, 50))
     // Announced before it is applied, for the reason the key handler records.
     this.settle(home)
+    /* A home written as a length goes back to being one where nobody refused
+       it, so the pane keeps its size again as the splitter's changes. */
+    if (this.positionState === home && isLength(this.defaultPosition)) {
+      this.positionState = this.defaultPosition
+    }
   }
 
   private readonly handleDoubleClick = (): void => {
@@ -1541,7 +1634,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         id="start"
         ?data-dragging=${this.dragging}
         ?inert=${shut === 'start'}
-        style="--splitter-position: ${position}%"
+        style="--splitter-position: ${this.drawn}"
       >
         <slot name="start"></slot>
       </div>
@@ -1588,7 +1681,7 @@ export class HelixHeadlessSplitter extends HelixElement {
           aria-valuenow=${Math.round(crossing.at)}
           aria-valuetext=${this.cornerWords(position, crossing.at)}
           data-cross=${index}
-          style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${position}%"
+          style="--splitter-corner-at: ${crossing.at}%; --splitter-position: ${this.drawn}"
           @dblclick=${this.handleCornerDoubleClick}
           @keydown=${this.handleCornerKeydown}
           @pointercancel=${this.handleCornerUp}
