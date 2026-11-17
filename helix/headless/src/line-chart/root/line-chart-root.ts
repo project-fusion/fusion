@@ -143,7 +143,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
- * @csspart terminus - The mark on one series' last reading.
+ * @csspart terminus - The mark on one series' last reading. It carries `data-jumped` for the drawing where its line took a new shape at once, with a reading more or fewer, so a stylesheet moving the mark can move it at once too.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -532,12 +532,25 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * coordinate space, so a length in there means two different things depending
    * on how wide the consumer made the chart. The host's box stretches nothing.
    */
+  /**
+   * How many readings each series' line was last drawn with, so a terminus
+   * can tell a line that moves to its new shape from one that jumps to it.
+   */
+  private readonly drawnCounts = new Map<string, number>()
+
   private ends(
     series: Series[],
     x: (value: number) => number,
     y: (value: number) => number,
-  ): Array<{ index: number; x: number; y: number }> {
+  ): Array<{ index: number; jumped: boolean; x: number; y: number }> {
     return series.flatMap((one, depth) => {
+      /* **A line moves to its new shape only through the same number of
+         readings**: a path's shape moves point by point, and one with a point
+         more or fewer takes its new shape at once. Its terminus is told, so it
+         jumps with the line rather than gliding away from it. */
+      const before = this.drawnCounts.get(one.name)
+      this.drawnCounts.set(one.name, one.points.length)
+      const jumped = before !== undefined && before !== one.points.length
       const last = one.points.at(-1)
       if (!this.showsSeries(one.name)) {
         return []
@@ -550,6 +563,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       return [
         {
           index: seriesIndex(depth),
+          jumped,
           x: (x(last.at) / PLOT_WIDTH) * 100,
           y: (y(last.value) / PLOT_HEIGHT) * 100,
         },
@@ -782,7 +796,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * differently without reimplementing the plot.
    */
   protected renderTermini(
-    ends: Array<{ index: number; x: number; y: number }>,
+    ends: Array<{ index: number; jumped: boolean; x: number; y: number }>,
   ): TemplateResult | typeof nothing {
     if (ends.length === 0) {
       return nothing
@@ -791,6 +805,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       (end) =>
         html`<span
           aria-hidden="true"
+          ?data-jumped=${end.jumped}
           part="terminus"
           style=${`--chart-series: var(--chart-series-${end.index}); --chart-terminus-x: ${end.x}%; --chart-terminus-y: ${end.y}%`}
         ></span>`,

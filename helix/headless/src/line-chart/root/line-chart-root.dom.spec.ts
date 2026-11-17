@@ -89,6 +89,29 @@ const termini = (host: HTMLElement): Element[] => [
  * this component's.
  */
 describe('termini', () => {
+  test('say when their line jumped to a new shape, with a reading more, and not when it moved', async () => {
+    const more = (id: string, value: number): string =>
+      CHANNELS.replace('id="channels"', `id="${id}"`).replace(
+        '</tbody>',
+        `<tr><th scope="row">Mar</th><td data-value="${value}">${value}</td><td data-value="9">9</td></tr></tbody>`,
+      )
+    await mount(`<div>${CHANNELS}${more('longer', 30)}${more('moved', 25)}</div>`)
+    const host = document.createElement('helix-headless-line-chart') as HTMLElement & {
+      for: string
+      updateComplete: Promise<unknown>
+    }
+    host.for = 'channels'
+    document.body.querySelector('div')?.append(host)
+    await host.updateComplete
+    expect(termini(host).some((one) => one.hasAttribute('data-jumped'))).toBe(false)
+    host.for = 'longer'
+    await host.updateComplete
+    expect(termini(host).every((one) => one.hasAttribute('data-jumped'))).toBe(true)
+    host.for = 'moved'
+    await host.updateComplete
+    expect(termini(host).some((one) => one.hasAttribute('data-jumped'))).toBe(false)
+  })
+
   test('one per series, absent meaning a dot', async () => {
     const host = await chart(CHANNELS, 'for="channels"')
     expect(termini(host)).toHaveLength(2)
