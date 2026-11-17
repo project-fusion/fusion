@@ -2,10 +2,7 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-flex
-      direction="column"
-      gap="none"
-    >
+    <div className="reader">
       <helix-scroll-progress for="article"></helix-scroll-progress>
       <div
         className="article"
@@ -23,8 +20,14 @@ export function Example() {
             own hand.
           </p>
           <p>On paper it is hidden, since a printed page is not scrolled.</p>
+          <p>
+            A box with nothing to scroll reads as full, as a page that fits on one screen has been
+            read to its end.
+          </p>
+          <p>The bar scales rather than resizing, so following a scroll moves no layout.</p>
+          <p>Place it yourself, such as at the top of a sticky header.</p>
         </helix-text>
       </div>
-    </helix-flex>
+    </div>
   )
 }
