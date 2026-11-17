@@ -48,6 +48,7 @@ import { formatDateArt } from './art/format-date'
 import { graphArt } from './art/graph'
 import { gridArt } from './art/grid'
 import { heatmapArt } from './art/heatmap'
+import { hoverCardArt } from './art/hover-card'
 import { iconArt } from './art/icon'
 import { iconButtonArt } from './art/icon-button'
 import { imageArt } from './art/image'
@@ -221,6 +222,7 @@ const art: Record<string, ReactNode> = {
   graph: graphArt,
   grid: gridArt,
   heatmap: heatmapArt,
+  'hover-card': hoverCardArt,
   icon: iconArt,
   'icon-button': iconButtonArt,
   image: imageArt,
