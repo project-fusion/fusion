@@ -340,3 +340,63 @@
     display: none;
   }
 }
+
+/* **The turns in outline take the places turns take.** The wrapper draws no
+   box, so each placeholder is a turn in the log's own column, at the log's gap,
+   and each is a message's bubble: its corner, its padding, its widest measure,
+   and the reader's own against the end edge. The turn from `me` is one short
+   line, as a question usually is, and the reply three lines, the last stopping
+   short as a paragraph's does. */
+[part="placeholder"] {
+  display: contents;
+}
+
+[part="placeholder-turn"] {
+  /* The leading of a line of the turn's text, as a skeleton reads it: its line
+     height less its type, half above the glyphs and half below. */
+  --_chat-leading: calc(1lh - 1em);
+
+  border-radius: var(--chat-message-radius, var(--helix-radii-md));
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--_chat-leading);
+  inline-size: min(28em, 80%);
+  padding-block: calc(
+    var(--chat-message-padding-block, var(--helix-space-xs)) +
+    var(--_chat-leading) /
+    2
+  );
+  padding-inline: var(--chat-message-padding-inline, var(--helix-space-sm));
+}
+
+[part="placeholder-turn"][data-author="me"] {
+  align-self: flex-end;
+  inline-size: min(12em, 80%);
+}
+
+/* A skeleton's fill: 8% of the ink, light enough to read as a shape rather
+   than as anything to read. */
+[part="placeholder-line"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  block-size: 1em;
+  border-radius: var(--helix-radii-sm);
+}
+
+[part="placeholder-line"]:last-child:not(:first-child) {
+  inline-size: 60%;
+}
+
+/* The loading words stay for a screen reader and leave the picture to the
+   outline, clipped as the live region is. */
+[part="loading"]:has(+ [part="placeholder"]) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

@@ -178,6 +178,14 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * set or older turns load, the log carries `aria-busy`, as the APG asks of a
  * feed.
  *
+ * **A conversation opening with nothing in it yet draws turns in outline.**
+ * While `loading` is set and there are no turns, the log holds two placeholder
+ * turns, one from `me` and a reply, drawn in a skeleton's fill where a
+ * message's bubble would be, so the transcript has the shape a conversation
+ * takes rather than a line of text that the first turns push away. They are
+ * hidden from screen readers, which hear `loading-text`. A server, which
+ * cannot know whether children will arrive, draws the line alone.
+ *
  * The log is `aria-live="off"`. A separate status region announces each new
  * turn once, when it has finished arriving. It skips the user's own turns
  * unless they failed to send, turns loaded as history, and the turns already
@@ -305,6 +313,9 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart message-state - The state text of a turn from `turns`, when there is one to show.
  * @csspart message-time - The time of a turn from `turns`.
  * @csspart message-work - The box around a turn's `work`, for a turn from `turns`, which has none.
+ * @csspart placeholder - The turns drawn in outline while `loading` is set and there are none. Hidden from screen readers.
+ * @csspart placeholder-line - One line of text in a placeholder turn.
+ * @csspart placeholder-turn - One placeholder turn. The one from `me` carries `data-author="me"`.
  * @csspart resume - The control shown while the user is scrolled away from the bottom.
  * @csspart resume-button - The button the `resume` region shows when nothing is slotted into it.
  * @csspart resume-mark - The arrow on the default `resume-button`.
@@ -1591,6 +1602,26 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.reachHistory()
   }
 
+  /**
+   * Two turns in outline, while the conversation loads with none: one from `me`
+   * and a reply of three lines, as a conversation opens.
+   *
+   * Boxes of this element's own rather than messages and skeletons, which
+   * would each publish their parts through this one for a picture nobody
+   * reads. The styled tier draws them as a message's bubble and a skeleton's
+   * fill; here they are empty and draw nothing. Hidden from screen readers,
+   * which hear the loading words instead. A method, so a tier above can draw a
+   * different outline.
+   */
+  protected renderPlaceholder(): TemplateResult {
+    return html`<div part="placeholder" aria-hidden="true">
+      <div part="placeholder-turn" data-author="me"><span part="placeholder-line"></span></div>
+      <div part="placeholder-turn">
+        <span part="placeholder-line"></span><span part="placeholder-line"></span><span part="placeholder-line"></span>
+      </div>
+    </div>`
+  }
+
   /** The turns fed as data, a window of them, between the room the rest would take. */
   private renderTurns(): TemplateResult {
     const { after, before, first, last } = this.virtualize.window
@@ -1654,6 +1685,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
        no title and a single control still needs the row that control sits in. */
     const titled = this.has('header') || this.has('actions')
     const busy = this.loading || this.history === 'loading'
+    /* Not empty where nobody can know yet: a server, and the render that has
+       to be the server's. */
+    const turned = fed || this.messages.length > 0 || !this.childrenKnown
     return html`<div part="header" ?hidden=${!titled}>
         <slot name="header"></slot>
         <span part="actions" ?hidden=${!this.has('actions')}>
@@ -1673,11 +1707,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         ${this.history === 'loading' ? html`<p part="history">${this.historyText}</p>` : nothing}
         ${fed ? this.renderTurns() : nothing}
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
-        ${
-          /* Not empty where nobody can know yet: a server, and the render that
-             has to be the server's. */
-          this.renderStatus(fed || this.messages.length > 0 || !this.childrenKnown)
-        }
+        ${this.renderStatus(turned)}${this.loading && !turned ? this.renderPlaceholder() : nothing}
       </div>
       <span part="live" role="status">${keyed(this.said, this.announcement)}</span>
       <div part="resume" ?hidden=${!away} @click=${this.handleResume}>
