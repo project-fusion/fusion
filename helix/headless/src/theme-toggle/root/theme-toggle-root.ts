@@ -126,7 +126,7 @@ export class HelixHeadlessThemeToggle extends HelixElement {
     const box = this.partNamed('button')?.getBoundingClientRect()
     const next: ColorMode = colorMode() === 'dark' ? 'light' : 'dark'
     await setColorMode(next, {
-      from: box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : undefined,
+      ...(box ? { from: { x: box.left + box.width / 2, y: box.top + box.height / 2 } } : {}),
       transition: this.transition ?? 'circle',
     })
     this.mode = colorMode()
