@@ -639,7 +639,20 @@ describe('the words on the wheels', () => {
     expect(column(host, 'minute').getAttribute('aria-label')).toBe('분')
     const halves = [...column(host, 'meridiem').querySelectorAll('[part~="option"]')]
     expect(halves.map((one) => one.getAttribute('value'))).toEqual(['AM', 'PM'])
-    expect(halves.map((one) => one.textContent?.trim())).toEqual(['오전', '오후'])
+    /* The engine's own words for the halves, read off its Korean rendering of a
+       morning and an evening time. Most engines say 오전 and 오후, and those are
+       held to it; WebKit on ubuntu-26.04 writes Korean times with AM and PM, and
+       a picker that matches what the engine writes is the right one there. */
+    const engine = [9, 21].map(
+      (hour) =>
+        new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', hour12: true, timeZone: 'UTC' })
+          .formatToParts(new Date(Date.UTC(1970, 0, 1, hour)))
+          .find((part) => part.type === 'dayPeriod')?.value,
+    )
+    expect(halves.map((one) => one.textContent?.trim())).toEqual(engine)
+    if (engine[0] !== 'AM') {
+      expect(engine).toEqual(['오전', '오후'])
+    }
   })
 
   test('are the locale’s own names where no property is set', async () => {
