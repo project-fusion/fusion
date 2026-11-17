@@ -1,8 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTreeItem } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
-import { styles as checkStyles } from '../../shared/check/check.css.js'
 import { styles } from './tree-item.css.js'
+import '../../checkbox/index.js'
 
 /**
  * @summary One node in a tree.
@@ -29,9 +29,20 @@ import { styles } from './tree-item.css.js'
  *
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  *
- * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
- * @csspart checkbox-checked - The check mark's box while the item is checked.
- * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
+ * @csspart check - The inert `Checkbox` that draws the check mark, inside `checkbox`.
+ * @csspart check-box - Forwarded from the checkbox: the box drawn for its input.
+ * @csspart check-control - Forwarded from the checkbox: its native input, inert.
+ * @csspart check-feedback - Forwarded from the checkbox. Not shown, since a check mark is never wrong.
+ * @csspart check-field - Forwarded from the checkbox: the row that holds its box.
+ * @csspart check-hint - Forwarded from the checkbox. Not shown, since a check mark has no help.
+ * @csspart check-label - Forwarded from the checkbox. Not shown, since the item's own label names it.
+ * @csspart check-mark - Forwarded from the checkbox: the tick, or the dash while some of a branch's items are checked.
+ * @csspart check-mark-checked - Forwarded from the checkbox: added to `check-mark` while the item is checked.
+ * @csspart check-mark-dash - Forwarded from the checkbox: added to `check-mark` while it is the dash.
+ * @csspart check-mark-indeterminate - Forwarded from the checkbox: added to `check-mark` while some of a branch's items are checked.
+ * @csspart checkbox - What holds the check mark, in a tree with `selection-mode="multiple"`. A press on it checks the item.
+ * @csspart checkbox-checked - Added to `checkbox` while the item is checked.
+ * @csspart checkbox-mixed - Added to `checkbox` while some of a branch's items are checked.
  * @csspart grip - The handle a pointer drags to move the item, in a `reorderable` tree.
  * @csspart grip-mark - The icon on the grip.
  * @csspart group - The container for nested items.
@@ -67,7 +78,10 @@ import { styles } from './tree-item.css.js'
  */
 @customElement('helix-tree-item')
 export class HelixTreeItem extends HelixHeadlessTreeItem {
-  static override styles: CSSResultGroup = [checkStyles, styles]
+  /** Composes the styled `Checkbox` for its check mark. */
+  static override tier = 'helix-'
+
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

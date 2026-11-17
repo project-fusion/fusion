@@ -361,56 +361,34 @@ slot[name="chevron"]::slotted(*) {
   transform: rotate(0deg);
 }
 
-/* The check mark of a tree under `selection-mode="multiple"`: **Checkbox's own
-   box**, at its size, in its edge, with its corner and its tick from
-   `shared/check/check.css`. At the chevron's 16 in the field edge it measured
-   about 1.2:1 against Checkbox's 3.9:1, a box a reader could miss beside the
-   one a form draws. No fill of its own, as Checkbox's has none, so the box is
-   an empty square on a hovered or chosen row's wash. */
-:host {
-  --_check-size: var(--tree-checkbox-size, var(--helix-size-checkbox));
-}
-
+/* The check mark of a tree under `selection-mode="multiple"`: **an inert
+   `Checkbox`**, so the box, its edge, its corner and its tick are the ones a
+   form draws, at Checkbox's size. Tree's hooks hand on to Checkbox's, and one
+   left unset leaves Checkbox's own. */
 [part~="checkbox"] {
   align-self: center;
-  background-color: var(--tree-checkbox-background-color, transparent);
-  block-size: var(--_check-size);
-  border: var(--helix-border-thin) solid
-    var(--tree-checkbox-border-color, var(--helix-color-foreground-subtle));
-  border-radius: var(--_check-radius);
-  box-sizing: border-box;
-  color: var(--tree-checkbox-mark-color, var(--helix-color-foreground));
-  display: grid;
+  display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--_check-size);
-  place-items: center;
+  /* **Checkbox's `space-xs`, 8, between the box and its words**, where the row's own gap
+     drew 4. The row's gap still spaces the chevron and the icons, so only the
+     room after the box grows. */
+  margin-inline-end: calc(var(--helix-space-xs) - var(--helix-space-2xs));
 }
 
-[part~="checkbox-checked"],
-[part~="checkbox-mixed"] {
-  border-color: var(--tree-checkbox-border-color, var(--helix-color-foreground));
+[part="check"] {
+  --checkbox-background-color: var(--tree-checkbox-background-color);
+  --checkbox-border-color: var(--tree-checkbox-border-color);
+  --checkbox-mark-color: var(--tree-checkbox-mark-color);
+  --checkbox-size: var(--tree-checkbox-size, var(--helix-size-checkbox));
 }
 
-/* The headless tier's icon stays in the markup for a page without this sheet,
-   and Checkbox's tick is drawn in its place. */
-[part~="checkbox"] svg {
-  display: none;
-}
-
-[part~="checkbox-checked"]::after,
-[part~="checkbox-mixed"]::after {
-  background-color: currentColor;
-  block-size: var(--_check-size);
-  content: "";
-  inline-size: var(--_check-size);
-  mask-image: var(--_check-tick);
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: 100%;
-}
-
-[part~="checkbox-mixed"]::after {
-  mask-image: var(--_check-dash);
+/* **The row is the target, so the box keeps its own size on a touch screen.**
+   There a checkbox's row grows to 44 pixels and keeps the box at its top, and
+   in a tree row shorter than that it pushed the row taller and the box off its
+   middle. */
+[part="check"]::part(field) {
+  align-items: center;
+  min-block-size: 0;
 }
 
 /* The grip, in a `reorderable` tree: at the far end of the row, after `end`
