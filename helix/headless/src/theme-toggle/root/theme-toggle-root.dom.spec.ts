@@ -13,6 +13,20 @@ afterEach(() => {
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
 
+/**
+ * Presses the button and waits for the switch to land. In a browser the mode
+ * changes a frame later, once the view transition has its first picture, so a
+ * fixed wait read the old mode.
+ */
+const press = async (toggle: HTMLElement, button: HTMLElement): Promise<void> => {
+  const changed = new Promise((resolve) =>
+    toggle.addEventListener('change', resolve, { once: true }),
+  )
+  button.click()
+  await changed
+  await (toggle as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+}
+
 type Toggle = HTMLElement & { updateComplete: Promise<unknown> }
 
 describe('theme toggle', () => {
@@ -27,16 +41,12 @@ describe('theme toggle', () => {
     })
     const button = part(toggle, 'button') as HTMLButtonElement
     expect(button.getAttribute('aria-pressed')).toBe('false')
-    button.click()
-    await settle()
-    await toggle.updateComplete
+    await press(toggle, button)
     expect(document.documentElement.getAttribute('data-color-mode')).toBe('dark')
     expect(button.getAttribute('aria-pressed')).toBe('true')
     expect(hasState(toggle, 'dark')).toBe(true)
     expect(changes).toBe(1)
-    button.click()
-    await settle()
-    await toggle.updateComplete
+    await press(toggle, button)
     expect(document.documentElement.getAttribute('data-color-mode')).toBe('light')
     expect(hasState(toggle, 'dark')).toBe(false)
   })
@@ -57,9 +67,7 @@ describe('theme toggle', () => {
     )) as Toggle
     const button = part(toggle, 'button') as HTMLButtonElement
     expect(button.getAttribute('aria-label')).toBe('Dark mode')
-    button.click()
-    await settle()
-    await toggle.updateComplete
+    await press(toggle, button)
     expect(button.getAttribute('aria-label')).toBe('Dark mode')
   })
 })
