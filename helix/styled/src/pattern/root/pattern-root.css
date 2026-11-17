@@ -1,0 +1,188 @@
+:host {
+  display: block;
+  isolation: isolate;
+  position: relative;
+}
+
+/* **Behind the content and out of the way of it**: under it in the host's
+   own stacking context, and taking no pointer. */
+[part="motif"],
+[part="glow"] {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+[part="content"] {
+  display: contents;
+}
+
+::slotted(*) {
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="glow"] {
+  display: none;
+}
+
+/* **A honeycomb of fine lines**, a 20 pixel side, as a mask over a fill of
+   the line color, so the lines take any token. */
+:host(:not([motif="stars"], [motif="contours"])) [part="motif"] {
+  background-color: var(--pattern-color, var(--helix-color-border));
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 34.641' preserveAspectRatio='none'%3E%3Cpath d='M0 17.32L10 0H30L40 17.32 30 34.641H10ZM40 17.32H60' fill='none' stroke='black' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")
+    0 0 / 60px 34.641px;
+}
+
+/* The glow under the pointer: the same honeycomb in the primary color, shown
+   only within a circle round the pointer, fading in and out. */
+:host(:not([motif="stars"], [motif="contours"])) [part="glow"] {
+  background-color: var(--pattern-glow-color, var(--helix-color-primary));
+  display: block;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 34.641' preserveAspectRatio='none'%3E%3Cpath d='M0 17.32L10 0H30L40 17.32 30 34.641H10ZM40 17.32H60' fill='none' stroke='black' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")
+    0 0 / 60px 34.641px,
+    radial-gradient(
+      circle calc(var(--helix-space-3xl) * 2.5) at var(--_pattern-x, -999px)
+        var(--_pattern-y, -999px),
+      black,
+      transparent
+    );
+  mask-composite: intersect;
+  opacity: 0;
+  transition: opacity var(--helix-duration-slow) var(--helix-easing-standard);
+}
+
+:host(:not([motif="stars"], [motif="contours"])) [part="glow"][data-on] {
+  opacity: 1;
+}
+
+/* **Contour lines**, a tile drawn once a page in script, drifting sideways a
+   tile every four minutes. */
+:host([motif="contours"]) [part="motif"] {
+  animation: helix-pattern-contours calc(var(--helix-duration-crawl) * 60) linear infinite;
+  background-color: var(--pattern-color, var(--helix-color-border));
+  mask: var(--_pattern-tile, none) 0 0 / 480px 480px;
+}
+
+@keyframes helix-pattern-contours {
+  to {
+    mask-position: 480px 0;
+  }
+}
+
+/* **Stars, in three layers**, each a tile of points of one size, drifting at
+   its own pace and twinkling on its own beat, so the field never shows its
+   repeat. */
+:host([motif="stars"]) [part="motif"],
+:host([motif="stars"]) [part="motif"]::before,
+:host([motif="stars"]) [part="motif"]::after {
+  --_pattern-ink: var(--pattern-color, var(--helix-color-foreground-muted));
+}
+
+:host([motif="stars"]) [part="motif"] {
+  animation: helix-pattern-drift-near calc(var(--helix-duration-crawl) * 45) linear infinite;
+  background-image:
+    radial-gradient(1.2px 1.2px at 82px 38px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 101px 166px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 12px 18px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 210px 137px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 24px 93px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 149px 14px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 232px 129px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 54px 9px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 22px 111px, var(--_pattern-ink) 99%, transparent);
+  background-size: 233px 233px;
+}
+
+:host([motif="stars"]) [part="motif"]::before,
+:host([motif="stars"]) [part="motif"]::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+:host([motif="stars"]) [part="motif"]::before {
+  animation:
+    helix-pattern-drift-middle calc(var(--helix-duration-crawl) * 75) linear infinite,
+    helix-pattern-twinkle calc(var(--helix-duration-turn) * 4) var(--helix-easing-standard) infinite
+    alternate;
+  background-image:
+    radial-gradient(1.6px 1.6px at 214px 35px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 123px 46px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 282px 217px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 30px 289px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 63px 114px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 298px 31px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(1.6px 1.6px at 295px 299px, var(--_pattern-ink) 99%, transparent);
+  background-size: 313px 313px;
+}
+
+:host([motif="stars"]) [part="motif"]::after {
+  animation:
+    helix-pattern-drift-far calc(var(--helix-duration-crawl) * 120) linear infinite,
+    helix-pattern-twinkle calc(var(--helix-duration-turn) * 7) var(--helix-easing-standard) infinite
+    alternate;
+  background-image:
+    radial-gradient(2.2px 2.2px at 203px 25px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(2.2px 2.2px at 113px 23px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(2.2px 2.2px at 285px 68px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(2.2px 2.2px at 148px 214px, var(--_pattern-ink) 99%, transparent),
+    radial-gradient(2.2px 2.2px at 73px 276px, var(--_pattern-ink) 99%, transparent);
+  background-size: 419px 419px;
+}
+
+@keyframes helix-pattern-drift-near {
+  to {
+    background-position: -233px 0;
+  }
+}
+
+@keyframes helix-pattern-drift-middle {
+  to {
+    background-position: -313px 0;
+  }
+}
+
+@keyframes helix-pattern-drift-far {
+  to {
+    background-position: -419px 0;
+  }
+}
+
+@keyframes helix-pattern-twinkle {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.35;
+  }
+}
+
+:host(:state(paused)) [part="motif"],
+:host(:state(paused)) [part="motif"]::before,
+:host(:state(paused)) [part="motif"]::after {
+  animation-play-state: paused;
+}
+
+/* Still for a reader who asked for less movement: the field is drawn, and
+   nothing in it moves. */
+@media (prefers-reduced-motion: reduce) {
+  :host([motif="contours"]) [part="motif"],
+  :host([motif="stars"]) [part="motif"],
+  :host([motif="stars"]) [part="motif"]::before,
+  :host([motif="stars"]) [part="motif"]::after {
+    animation: none;
+  }
+}
+
+/* Hidden on paper, where a background pattern is ink spent on nothing. */
+@media print {
+  [part="motif"],
+  [part="glow"] {
+    display: none;
+  }
+}

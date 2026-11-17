@@ -1,0 +1,11 @@
+/* A hero's room round the words, so the pattern shows past them. */
+.hero {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: grid;
+  gap: var(--helix-space-sm);
+  overflow: hidden;
+  padding: var(--helix-space-3xl) var(--helix-space-xl);
+  place-items: center;
+  text-align: center;
+}

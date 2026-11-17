@@ -77,6 +77,7 @@ import { optionArt } from './art/option'
 import { orbArt } from './art/orb'
 import { outlineArt } from './art/outline'
 import { paginationArt } from './art/pagination'
+import { patternArt } from './art/pattern'
 import { pinInputArt } from './art/pin-input'
 import { popoverArt } from './art/popover'
 import { progressArt } from './art/progress'
@@ -255,6 +256,7 @@ const art: Record<string, ReactNode> = {
   orb: orbArt,
   outline: outlineArt,
   pagination: paginationArt,
+  pattern: patternArt,
   'pin-input': pinInputArt,
   popover: popoverArt,
   progress: progressArt,
