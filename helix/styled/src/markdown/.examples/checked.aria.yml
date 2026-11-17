@@ -1,0 +1,14 @@
+- heading "Before the release" [level=2]
+- list:
+  - listitem:
+    - checkbox [checked]
+    - text: Back up the database
+  - listitem:
+    - checkbox [checked]
+    - text: Stop the workers
+  - listitem:
+    - checkbox
+    - text: Run the down step
+  - listitem:
+    - checkbox
+    - text: Start the workers again
