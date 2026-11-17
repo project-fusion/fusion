@@ -1366,7 +1366,7 @@ jobs:
   conformance:
     needs: [browser, tests]
     if: ${{ !cancelled() && needs.browser.result != 'skipped' && needs.tests.result != 'skipped' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - name: Check out
