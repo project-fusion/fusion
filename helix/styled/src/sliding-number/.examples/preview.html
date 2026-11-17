@@ -1,12 +1,18 @@
 <!-- @summary A count whose changing digits roll to their new figures, while the rest hold still. -->
-<helix-text scale="display">
-  <helix-sliding-number
-    id="sales"
-    value="1284"
-  ></helix-sliding-number>
-</helix-text>
+<helix-flex
+  align-items="start"
+  direction="column"
+  gap="md"
+>
+  <helix-text scale="display">
+    <helix-sliding-number
+      id="sales"
+      value="1284"
+    ></helix-sliding-number>
+  </helix-text>
 
-<helix-button id="sell">Add a sale</helix-button>
+  <helix-button id="sell">Add a sale</helix-button>
+</helix-flex>
 
 <script type="module">
   const sales = document.getElementById('sales')

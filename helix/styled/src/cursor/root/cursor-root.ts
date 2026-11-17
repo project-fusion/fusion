@@ -14,7 +14,7 @@ const SERIES = 20
  * each person there, and set `x` and `y` as their pointer moves: pixels from
  * the box's top left, as a collaboration service reports them. The pointer
  * glides from each place to the next, so updates that arrive a few times a
- * second read as a hand moving rather than a pointer jumping.
+ * second read as a hand moving.
  *
  * **Each person in a color of their own** from the series palette, by
  * `series`, so a pointer and the person's other marks on the page, such as a

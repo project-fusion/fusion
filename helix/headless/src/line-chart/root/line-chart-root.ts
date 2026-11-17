@@ -525,6 +525,12 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   zero = false
 
   /**
+   * How many readings each series' line was last drawn with, so a terminus
+   * can tell a line that moves to its new shape from one that jumps to it.
+   */
+  private readonly drawnCounts = new Map<string, number>()
+
+  /**
    * Where each series ends, as percentages of the drawing's own box.
    *
    * Percentages rather than user units, for the reason the mark is a `<span>`
@@ -532,12 +538,6 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * coordinate space, so a length in there means two different things depending
    * on how wide the consumer made the chart. The host's box stretches nothing.
    */
-  /**
-   * How many readings each series' line was last drawn with, so a terminus
-   * can tell a line that moves to its new shape from one that jumps to it.
-   */
-  private readonly drawnCounts = new Map<string, number>()
-
   private ends(
     series: Series[],
     x: (value: number) => number,

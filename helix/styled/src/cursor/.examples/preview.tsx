@@ -1,41 +1,40 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import './preview.css'
 
+const places = [
+  [40, 40, 220, 120],
+  [180, 90, 60, 150],
+  [260, 30, 140, 60],
+] as const
+
 export function Example() {
-  const board = useRef<HTMLDivElement>(null)
-  const [ada, setAda] = useState({ x: 40, y: 40 })
-  const [grace, setGrace] = useState({ x: 220, y: 120 })
+  const [turn, setTurn] = useState(0)
+  const [adaX, adaY, graceX, graceY] = places[turn] ?? places[0]
 
   // Stands in for a collaboration service reporting where each person points.
-  useEffect(() => {
-    const place = () => ({
-      x: Math.round(Math.random() * ((board.current?.clientWidth ?? 320) - 80)),
-      y: Math.round(Math.random() * ((board.current?.clientHeight ?? 224) - 40)),
-    })
-    const timer = setInterval(() => {
-      setAda(place())
-      setGrace(place())
-    }, 900)
-    return () => clearInterval(timer)
-  }, [])
+  const report = () => setTurn((before) => (before + 1) % places.length)
 
   return (
-    <div
-      className="board"
-      ref={board}
+    <helix-flex
+      direction="column"
+      gap="md"
     >
-      <helix-cursor
-        name="Ada"
-        series={1}
-        x={ada.x}
-        y={ada.y}
-      ></helix-cursor>
-      <helix-cursor
-        name="Grace"
-        series={4}
-        x={grace.x}
-        y={grace.y}
-      ></helix-cursor>
-    </div>
+      <div className="board">
+        <helix-cursor
+          name="Ada"
+          series={1}
+          x={adaX}
+          y={adaY}
+        ></helix-cursor>
+        <helix-cursor
+          name="Grace"
+          series={4}
+          x={graceX}
+          y={graceY}
+        ></helix-cursor>
+      </div>
+
+      <helix-button onClick={report}>Report new places</helix-button>
+    </helix-flex>
   )
 }

@@ -9,7 +9,7 @@ export function Example() {
         id="ada"
       >
         Ada Lovelace
-      </a>
+      </a>{' '}
       <helix-headless-hover-card for="ada">
         <strong>Ada Lovelace</strong>
         <p>Writes the analysis notes and the release notes for the engine.</p>

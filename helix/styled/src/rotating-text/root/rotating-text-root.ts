@@ -43,13 +43,13 @@ const MOST = 6
  *
  * @cssproperty --rotating-text-distance - How far below its place a word waits, and above it a word leaves to. Defaults to `0.6em`.
  *
- * @cssstate paused - The page's motion is paused, so the word showing stays.
  * @cssstate leave-1 - The first word is leaving.
  * @cssstate leave-2 - The second word is leaving.
  * @cssstate leave-3 - The third word is leaving.
  * @cssstate leave-4 - The fourth word is leaving.
  * @cssstate leave-5 - The fifth word is leaving.
  * @cssstate leave-6 - The sixth word is leaving.
+ * @cssstate paused - The page's motion is paused, so the word showing stays.
  * @cssstate rotating - The words have begun to turn, so the word showing is the one a `show-` state names.
  * @cssstate show-1 - The first word is showing.
  * @cssstate show-2 - The second word is showing.

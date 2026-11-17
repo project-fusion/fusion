@@ -30,7 +30,7 @@ import { styles } from './magnetic-root.css.js'
  *
  * @cssproperty --magnetic-reach - How far the content drifts at most, with the pointer at an edge. Defaults to `--helix-space-sm`.
  *
- * @cssstate pulled - A pointer is over the content, which follows it closely, rather than springing back.
+ * @cssstate pulled - A pointer is over the content, which follows it closely. It springs back once the pointer leaves.
  */
 @customElement('helix-magnetic')
 export class HelixMagnetic extends HelixElement {
