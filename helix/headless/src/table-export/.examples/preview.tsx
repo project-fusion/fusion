@@ -6,6 +6,8 @@ const rows = [
   { amount: 6980, customer: 'Acme Robotics', id: 'INV-2052' },
 ]
 
+const money = new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' })
+
 export function Example() {
   return (
     <div className="export-pane">
@@ -25,6 +27,7 @@ export function Example() {
         </helix-headless-table-column>
         <helix-headless-table-column field="customer">Customer</helix-headless-table-column>
         <helix-headless-table-column
+          cell={(row) => money.format(row.amount as number)}
           field="amount"
           text-align="end"
           type="number"

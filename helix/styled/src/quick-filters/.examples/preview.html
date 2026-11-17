@@ -41,4 +41,8 @@
     { amount: 6980, customer: 'Acme Robotics', id: 'INV-2052', status: 'Overdue' },
     { amount: 15120, customer: 'Acme Foods', id: 'INV-2063', status: 'Paid' },
   ]
+
+  /* Amounts read as dollars, and the column still sorts and filters by the number. */
+  const money = new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' })
+  document.querySelector('#invoices [field="amount"]').cell = (row) => money.format(row.amount)
 </script>

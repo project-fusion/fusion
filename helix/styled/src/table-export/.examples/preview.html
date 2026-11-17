@@ -32,4 +32,8 @@
     { amount: 8250, customer: 'Acme Logistics', id: 'INV-2047' },
     { amount: 6980, customer: 'Acme Robotics', id: 'INV-2052' },
   ]
+
+  /* Amounts read as dollars: "As shown" exports them so, and "Raw" exports the number. */
+  const money = new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' })
+  document.querySelector('#invoices [field="amount"]').cell = (row) => money.format(row.amount)
 </script>

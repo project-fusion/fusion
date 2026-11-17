@@ -10,6 +10,8 @@ const rows = [
 const status = (value: string) =>
   JSON.stringify({ filters: [{ field: 'status', operator: 'any', values: [value] }] })
 
+const money = new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' })
+
 export function Example() {
   return (
     <>
@@ -43,6 +45,7 @@ export function Example() {
           Status
         </helix-headless-table-column>
         <helix-headless-table-column
+          cell={(row) => money.format(row.amount as number)}
           field="amount"
           text-align="end"
           type="number"
