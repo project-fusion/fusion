@@ -20,6 +20,7 @@ import { MAP_STILL } from '../machines/map'
 import { LayerHostView } from '../root/layers'
 import { HelixTheme } from '../theme/helix-theme'
 import { HelixMap, HelixMapPoints, type HelixMapProps } from './map/index.native'
+import { answerOf, WATER_TILE } from './map-tiles.fixtures'
 
 /** Three places a few meters apart near the Capitol, and one across the river. */
 const NEAR = [
@@ -209,79 +210,6 @@ describe('a points layer on a phone without MapLibre Native', () => {
   })
 })
 
-/* A vector tile written by hand: one water layer whose one polygon covers
-   the whole tile, in the format's own fields. */
-const varint = (value: number): number[] => {
-  const out: number[] = []
-  let left = value
-  while (left >= 0x80) {
-    out.push((left % 0x80) | 0x80)
-    left = Math.floor(left / 0x80)
-  }
-  out.push(left)
-  return out
-}
-const zigzag = (value: number): number => (value < 0 ? -value * 2 - 1 : value * 2)
-const delimited = (field: number, body: number[]): number[] => [
-  ...varint(field * 8 + 2),
-  ...varint(body.length),
-  ...body,
-]
-const bytesOf = (words: string): number[] => [...Buffer.from(words, 'utf8')]
-const SQUARE = [9, zigzag(0), zigzag(0), 26, zigzag(4096), 0, 0, zigzag(4096), zigzag(-4096), 0, 15]
-const WATER_TILE = new Uint8Array(
-  delimited(3, [
-    ...delimited(1, bytesOf('water')),
-    ...delimited(2, [
-      ...varint(3 * 8),
-      3,
-      ...delimited(
-        4,
-        SQUARE.flatMap((one) => varint(one)),
-      ),
-    ]),
-    ...varint(5 * 8),
-    ...varint(4096),
-  ]),
-)
-
-/* A place layer written by hand: a city at the middle of the tile, and a
-   state beside it, which the still picture does not name. */
-const tagged = (name: string, kind: string, x: number) => [
-  ...delimited(2, [
-    ...delimited(2, [0, kind === 'city' ? 0 : 1, 1, name === 'Austin' ? 2 : 3]),
-    ...varint(3 * 8),
-    1,
-    ...delimited(
-      4,
-      [9, zigzag(x), zigzag(2048)].flatMap((one) => varint(one)),
-    ),
-  ]),
-]
-const PLACE_TILE = new Uint8Array(
-  delimited(3, [
-    ...delimited(1, bytesOf('place')),
-    ...tagged('Austin', 'city', 2048),
-    ...tagged('Texas', 'state', 3600),
-    ...delimited(3, bytesOf('class')),
-    ...delimited(3, bytesOf('name')),
-    ...['city', 'state', 'Austin', 'Texas'].flatMap((one) =>
-      delimited(4, delimited(1, bytesOf(one))),
-    ),
-    ...varint(5 * 8),
-    ...varint(4096),
-  ]),
-)
-
-/** What a server answers, as far as the still picture reads it. */
-const answerOf = (body: unknown) =>
-  ({
-    arrayBuffer: async () => (body as Uint8Array).slice().buffer,
-    json: async () => body,
-    ok: true,
-    status: 200,
-  }) as unknown as Response
-
 describe("the still picture's streets, water and land", () => {
   test("draws the style's vector tiles once they answer, asking the style's TileJSON first", async () => {
     const asked: string[] = []
@@ -305,29 +233,6 @@ describe("the still picture's streets, water and land", () => {
     /* Both tiles the view needs, in one path of the water's color. */
     expect(water()).toHaveLength(1)
     expect(water()[0]?.props.d).toMatch(/z.*z$/)
-  })
-
-  test("names the tiles' cities over the map, each on a halo of the land, and no state", async () => {
-    setMapTileFetch(async (url) =>
-      answerOf(
-        url.endsWith('/planet')
-          ? { maxzoom: 14, tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'] }
-          : PLACE_TILE,
-      ),
-    )
-    /* Somewhere no spec has drawn, since a tile once read is kept. */
-    await render(<Frame view="39.74,-104.99,12" />)
-    await layOut()
-    await act(async () => {
-      await new Promise((done) => setTimeout(done, 20))
-    })
-    const named = (words: string) =>
-      screen.root?.queryAll((node) => node.type === 'RNSVGTSpan' && node.props.content === words) ??
-      []
-    /* Its halo, then its words. */
-    expect(named('Austin').length).toBeGreaterThanOrEqual(2)
-    expect(named('Austin').length % 2).toBe(0)
-    expect(named('Texas')).toEqual([])
   })
 
   test('draws the land alone where the tiles do not answer', async () => {

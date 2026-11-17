@@ -22,7 +22,15 @@ import {
   type ScreenPoint,
   screenOf,
 } from '@fusion.dev/helix-core/map'
-import { createContext, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { type LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native'
 import { loadMapLibre } from '../capabilities/renderer'
 import type { MachineUse } from '../ir.generated'
@@ -36,6 +44,7 @@ import { MapLive, MapStill } from './map-drawing'
 import { menuOf, useMapType, useShown } from './map-menu'
 import { controlsOf, ROTATE_STEP, TILTED } from './map-moves'
 import { childrenOf, inkOf, layersOf, locatedSpec, placedChildren, placesOf } from './map-read'
+import { type MarkerStand, sameStand, standBoxes, useChromeBoxes } from './map-taken'
 import { useStillGround } from './map-tiles'
 import { useMapView } from './map-view'
 import { langOf } from './picker-field-kind'
@@ -64,6 +73,8 @@ export interface MapBoard {
   readonly press: (key: string, value: string) => void
   /** Moves the view to a place at a zoom, as a count's press zooms in to it. */
   readonly show: (place: MapPlace, zoom: number) => void
+  /** Keeps where a marker stands by its key, which the place names keep clear of, or forgets it with `undefined`. */
+  readonly stand: (key: string, stand: MarkerStand | undefined) => void
   readonly view: MapView | undefined
 }
 
@@ -85,12 +96,18 @@ const colorsOf = (ink: (token: string) => string) => ({
  * The credit OpenFreeMap's tiles ask for, as its TileJSON names it, which the
  * web's connector writes from the renderer. **In the frame's credit strip
  * wherever the page wrote none**, under MapLibre Native's map and under the
- * still picture alike, in the strip's own words' size and color.
+ * still picture alike, in the strip's own words' size and color. **In a
+ * corner over the map it is one line**, cut short where it runs out of
+ * room, as the web's compact credit is; a screen reader reads it whole.
  */
 const MAP_CREDIT = 'OpenFreeMap © OpenMapTiles Data from OpenStreetMap'
 
-const Credit = () => (
-  <Text allowFontScaling={false} style={useInheritedText()}>
+const Credit = ({ cornered }: { readonly cornered: boolean }) => (
+  <Text
+    allowFontScaling={false}
+    numberOfLines={cornered ? 1 : undefined}
+    style={useInheritedText()}
+  >
     {MAP_CREDIT}
   </Text>
 )
@@ -107,8 +124,19 @@ export const MAP_DRAWN = 'helix-map-drawn'
  * run waits for, since a map waiting on its tiles stands as still as a
  * drawn one. It stays its own view so the id reaches the phone's tree.
  */
-const viewportOf = (ready: boolean, measure: (event: LayoutChangeEvent) => void): PartBinding => ({
-  view: { collapsable: false, onLayout: measure, testID: ready ? MAP_DRAWN : undefined },
+const viewportOf = (
+  ready: boolean,
+  measure: (event: LayoutChangeEvent) => void,
+  laid: (event: LayoutChangeEvent) => void,
+): PartBinding => ({
+  view: {
+    collapsable: false,
+    onLayout: (event: LayoutChangeEvent) => {
+      measure(event)
+      laid(event)
+    },
+    testID: ready ? MAP_DRAWN : undefined,
+  },
 })
 
 /** A tap on the map: the nearest thing a layer draws within reach is pressed, or `missed` runs. */
@@ -157,6 +185,28 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
   const latest = useRef(props)
   latest.current = props
   const hits = useRef(new Set<MapHit>())
+  const chrome = useChromeBoxes()
+  const [stands, setStands] = useState<ReadonlyMap<string, MarkerStand>>(() => new Map())
+  const stand = useCallback((key: string, one: MarkerStand | undefined) => {
+    setStands((was) => {
+      if (sameStand(was.get(key), one)) {
+        return was
+      }
+      const now = new Map(was)
+      if (one === undefined) {
+        now.delete(key)
+      } else {
+        now.set(key, one)
+      }
+      return now
+    })
+  }, [])
+  /* **What the still picture's names keep clear of** besides the points:
+     the markers where they stand at the view, the controls and the credit. */
+  const taken = useMemo(
+    () => (view === undefined ? [] : [...standBoxes(view, stands.values()), ...chrome.boxes]),
+    [view, stands, chrome.boxes],
+  )
 
   const layers = useMemo(() => layersOf(children, ink, shown.hidden), [children, ink, shown.hidden])
   const specs = useMemo(
@@ -225,6 +275,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
     },
     project: (place) => (view === undefined ? undefined : screenOf(view, place)),
     show: moves.show,
+    stand,
     view,
   }
 
@@ -252,6 +303,8 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       ...(Math.round(pitch) !== 0 ? ['tilted'] : []),
     ],
     parts: {
+      attribution: { view: { onLayout: chrome.attribution } },
+      controls: { view: { onLayout: chrome.controls } },
       drawing: {
         drawing: () =>
           view === undefined ? null : lib === null ? (
@@ -271,6 +324,8 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
                 land={ink('color-surface')}
                 namesOf={ground.namesOf}
                 specs={specs}
+                taken={taken}
+                texts={ground.texts}
                 view={view}
               />
             </Pressable>
@@ -316,7 +371,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       'rotate-left': pressed(() => moves.turn({ by: -ROTATE_STEP })),
       'rotate-right': pressed(() => moves.turn({ by: ROTATE_STEP })),
       tilt: pressed(() => moves.tilt(Math.round(pitch) > 0 ? 0 : TILTED)),
-      viewport: viewportOf(ready, measure),
+      viewport: viewportOf(ready, measure, chrome.viewport),
       'zoom-in': pressed(() => moves.zoom(1)),
       'zoom-out': pressed(() => moves.zoom(-1)),
     },
@@ -326,7 +381,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
     regions: {
       ...(props.attribution !== undefined && props.attribution !== null
         ? {}
-        : { attribution: <Credit /> }),
+        : { attribution: <Credit cornered={wordsIn(read('credit-placement')) !== ''} /> }),
       default: placedChildren(children),
     },
   }

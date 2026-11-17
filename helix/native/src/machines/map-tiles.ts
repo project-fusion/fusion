@@ -17,8 +17,11 @@ import {
   mix,
   type PlaceName,
   type PlaceNameBox,
+  type PlaceNameMeasure,
+  type PlaceNameText,
   parseColor,
   placeNames,
+  placeNameTexts,
   SNAPSHOT_LAYERS,
   type SnapshotLayer,
   type SnapshotTiles,
@@ -238,18 +241,25 @@ const TOWARD: Readonly<Record<SnapshotLayer['toward'], string>> = {
   success: 'color-success',
 }
 
+/** The place names of the tiles read so far that fit the view, clear of `taken`, as wide as `measure` says. */
+export type NamesOf = (
+  taken: readonly PlaceNameBox[],
+  measure?: PlaceNameMeasure,
+) => readonly PlaceName[]
+
 /** What the still picture is given of the tiles: their paths, each layer's color, and the place names. */
 export interface StillGround {
   readonly base: readonly StillBase[]
   readonly colorOf: (layer: SnapshotLayer) => string
   /** A name's color: the land moved toward the ink by its amount, and further where it falls short of 4.5:1. */
   readonly inkOf: (amount: number) => string
-  /** The place names of the tiles read so far that fit the view, clear of `taken`. */
-  readonly namesOf: (taken: readonly PlaceNameBox[]) => readonly PlaceName[]
+  readonly namesOf: NamesOf
+  /** The words those names could take, which a phone measures before they are placed. */
+  readonly texts: readonly PlaceNameText[]
 }
 
 /** No names, before the tiles answer and under the satellite map type. */
-const NO_NAMES = (): readonly PlaceName[] => []
+const NO_NAMES = { namesOf: (): readonly PlaceName[] => [], texts: [] }
 
 /**
  * The still picture's streets, water and land for a view, from the style's
@@ -306,14 +316,18 @@ export const useStillGround = (
         : baseOf(view, covered, source, roads, tiles),
     [view, covered, source, roads, tiles],
   )
-  const namesOf = useMemo(() => {
+  const names = useMemo(() => {
     if (view === undefined || covered === undefined || source === undefined || !roads) {
       return NO_NAMES
     }
     const found = covered.wanted.map(
       (at) => [at, tiles.get(tileAddress(source.template, covered.depth, at))?.[PLACES]] as const,
     )
-    return (taken: readonly PlaceNameBox[]) => placeNames(covered, view, found, language, taken)
+    return {
+      namesOf: ((taken, measure) =>
+        placeNames(covered, view, found, language, taken, measure)) as NamesOf,
+      texts: placeNameTexts(covered, view, found, language),
+    }
   }, [view, covered, source, roads, tiles, language])
   const colorOf = useMemo(() => {
     const land = parseColor(ink('color-surface'))
@@ -342,5 +356,5 @@ export const useStillGround = (
       return color
     }
   }, [ink])
-  return { base, colorOf, inkOf, namesOf }
+  return { base, colorOf, inkOf, ...names }
 }

@@ -154,7 +154,12 @@ export default styles(
         }),
         /* A phone's map takes the room the rest of the frame leaves, and
            keeps a least height of its own at the largest text sizes. */
-        native([rule({ flexBasis: 0, flexGrow: 1, flexShrink: 1, minBlockSize: '12rem' })]),
+        native([
+          rule({ flexBasis: 0, flexGrow: 1, flexShrink: 1, minBlockSize: '12rem' }),
+          /* **Covering the container, the map is as tall as the container**,
+             as the web's map row is, so the view centers in what shows. */
+          rule({ fill: true }, { minBlockSize: 0 }),
+        ]),
       ]),
       on('drawing', [native([rule({ inset: 0, position: 'absolute' })])]),
       /* **The routes and areas, said rather than shown.** The renderer draws

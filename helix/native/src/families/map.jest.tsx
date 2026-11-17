@@ -13,7 +13,7 @@ import { fakeRenderer } from '@fusion.dev/helix-core/capabilities/renderer/fake'
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createElement, forwardRef, type ReactNode, useImperativeHandle } from 'react'
-import { Text, TurboModuleRegistry } from 'react-native'
+import { StyleSheet, Text, TurboModuleRegistry } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { absoluteUrl, setBaseUrl } from '../capabilities/base-url'
 import { forgetMapLibre } from '../capabilities/renderer'
@@ -120,6 +120,28 @@ describe('Map on a phone without MapLibre Native', () => {
     await render(<Frame attribution={<Text>© OpenStreetMap contributors</Text>} />)
     await layOut()
     expect(screen.queryByText('OpenFreeMap © OpenMapTiles Data from OpenStreetMap')).toBeNull()
+  })
+
+  test('draws the credit in a corner over the map on one line, and in its strip whole', async () => {
+    const CREDIT = 'OpenFreeMap © OpenMapTiles Data from OpenStreetMap'
+    await render(<Frame />)
+    expect(screen.getByText(CREDIT).props.numberOfLines).toBeUndefined()
+    await render(<Frame creditPlacement="bottom-end" />)
+    expect(screen.getByText(CREDIT).props.numberOfLines).toBe(1)
+  })
+
+  test("covering its container, the map is as tall as the container, as the web's map row is", async () => {
+    /* The viewport: the one view that stays its own view for the id a device run waits for. */
+    const viewport = () =>
+      screen.root?.queryAll(
+        (node) => typeof node.type === 'string' && node.props.collapsable === false,
+      )[0]
+    const least = () =>
+      (StyleSheet.flatten(viewport()?.props.style) as { minHeight?: unknown }).minHeight
+    await render(<Frame />)
+    expect(least()).toBeGreaterThan(0)
+    await render(<Frame fill />)
+    expect(least()).toBe(0)
   })
 
   test('names each shown layer for a screen reader, with its description', async () => {

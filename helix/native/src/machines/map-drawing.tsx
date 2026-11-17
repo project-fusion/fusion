@@ -11,8 +11,9 @@
  * from core's projection at the view the controls move, in the colors and
  * widths MapLibre draws them in, a points layer that clusters as MapLibre's
  * counts, then the names of the tiles' cities, towns, villages and
- * neighborhoods where they do not overlap (`map-names.tsx`), then the areas'
- * captions. Road names, shields, landmarks, imagery, shading, raised
+ * neighborhoods where they overlap no other name, count, dot, marker, or
+ * the frame's controls and credit (`map-names.tsx`, `map-taken.ts`), then
+ * the areas' captions. Road names, shields, landmarks, imagery, shading, raised
  * buildings, and the frame's own land cover are MapLibre's alone.
  */
 import {
@@ -21,19 +22,20 @@ import {
   type MapDrawnPoint,
   type MapLayerSpec,
   type MapView,
-  type PlaceName,
   type PlaceNameBox,
+  type PlaceNameText,
   pointsDrawn,
   type ScreenPoint,
   screenOf,
   snapshotWidth,
 } from '@fusion.dev/helix-core/map'
-import { memo, type ReactNode, type Ref, useMemo } from 'react'
+import { memo, type ReactNode, type Ref, useMemo, useReducer } from 'react'
 import { StyleSheet } from 'react-native'
 import type { CameraRef, MapLibreModule, ViewStateChangeEvent } from '../render/maplibre-types'
 import { svg } from '../render/vector'
-import { nameShapes } from './map-names'
-import type { StillBase } from './map-tiles'
+import { allMeasured, measuredWidth, NameMeter, nameShapes } from './map-names'
+import { dotAt, inViewOf, pointBoxes } from './map-taken'
+import type { NamesOf, StillBase } from './map-tiles'
 
 /** The most places of one layer the still picture draws in view, past which it draws every so many. */
 const MOST_DOTS = 5000
@@ -55,28 +57,6 @@ const pathOf = (view: MapView, spec: MapLayerSpec, closed: boolean): string => {
     pieces.push('Z')
   }
   return pieces.length > 1 ? pieces.join('') : ''
-}
-
-/** Where one place or count falls in view, or `undefined` where it is out of it by more than `radius`. */
-export const inViewOf = (
-  view: MapView,
-  one: MapDrawnPoint,
-  radius: number,
-): ScreenPoint | undefined => {
-  const point = screenOf(view, one.place)
-  return point === undefined ||
-    point[0] < -radius ||
-    point[1] < -radius ||
-    point[0] > view.width + radius ||
-    point[1] > view.height + radius
-    ? undefined
-    : point
-}
-
-/** How wide a place apart is drawn at a zoom, and its edge, as the points layer's `interpolate` widens them from 8 to 15. */
-export const dotAt = (zoom: number): { edge: number; radius: number } => {
-  const share = Math.min(Math.max(zoom - 8, 0), 7) / 7
-  return { edge: 1 + 0.5 * share, radius: 3 + 3 * share }
 }
 
 /** A points layer's places apart in view as one path of small circles. */
@@ -106,9 +86,13 @@ interface StillProps {
   /** A place name's color by how far its layer moves the land toward the ink. */
   readonly inkOf: (amount: number) => string
   readonly land: string
-  /** The tiles' place names that fit the view, clear of the boxes given. */
-  readonly namesOf: (taken: readonly PlaceNameBox[]) => readonly PlaceName[]
+  /** The tiles' place names that fit the view, clear of the boxes given, as wide as measured. */
+  readonly namesOf: NamesOf
   readonly specs: readonly MapLayerSpec[]
+  /** The boxes over the map the names keep clear of besides the points: the markers, the controls and the credit. */
+  readonly taken: readonly PlaceNameBox[]
+  /** The words the names could take, measured before they are placed. */
+  readonly texts: readonly PlaceNameText[]
   readonly view: MapView
 }
 
@@ -268,27 +252,6 @@ const pointsShapes = (module: SvgModule, view: MapView, spec: MapLayerSpec): Rea
   ]
 }
 
-/**
- * The box round each count the points layers draw in view, its halo
- * included, which a place name keeps clear of: a name across a count
- * hides its figures.
- */
-const countBoxes = (view: MapView, specs: readonly MapLayerSpec[]): PlaceNameBox[] =>
-  specs.flatMap((spec) =>
-    spec.kind !== 'points'
-      ? []
-      : pointsDrawn(spec, view.zoom).flatMap((one): PlaceNameBox[] => {
-          if (one.kind !== 'cluster') {
-            return []
-          }
-          const reach = clusterRadiusOf(one.count) + 6
-          const at = inViewOf(view, one, reach)
-          return at === undefined
-            ? []
-            : [[at[0] - reach, at[1] - reach, at[0] + reach, at[1] + reach]]
-        }),
-  )
-
 /** The tiles' layers, each one path in its color: a fill, or a line as wide as the style draws it at the zoom. */
 const baseShapes = (
   { Path }: SvgModule,
@@ -321,28 +284,46 @@ const SHAPES: Partial<
   >
 > = { area: areaShapes, points: pointsShapes, route: routeShapes }
 
-/** The still picture, drawn again only when the view or the layers change. */
-export const MapStill = memo(({ base, colorOf, inkOf, land, namesOf, specs, view }: StillProps) => {
+/**
+ * The still picture, drawn again only when the view, the layers or what
+ * the names keep clear of change. **The names wait for their widths**: none
+ * is placed until every word the view's names could take is measured.
+ */
+export const MapStill = memo((props: StillProps) => {
+  const { base, colorOf, inkOf, land, namesOf, specs, taken, texts, view } = props
   const module = svg()
   const { Rect, Svg } = module
+  /* A new measure each time the words answer, so the names are placed again. */
+  const [widths, measured] = useReducer(() => ({ of: measuredWidth }), { of: measuredWidth })
   const ground = useMemo(
     () => baseShapes(module, view, base, colorOf),
     [module, view, base, colorOf],
   )
+  const ready = allMeasured(texts)
   const shapes = useMemo(
     () => [
       ...specs.flatMap((spec) => SHAPES[spec.kind]?.(module, view, spec) ?? []),
-      ...nameShapes(module, namesOf(countBoxes(view, specs)), land, inkOf),
+      ...(ready
+        ? nameShapes(
+            module,
+            namesOf([...pointBoxes(view, specs), ...taken], widths.of),
+            land,
+            inkOf,
+          )
+        : []),
       ...specs.flatMap((spec) => captionShapes(module, view, spec)),
     ],
-    [module, specs, view, namesOf, land, inkOf],
+    [module, specs, view, namesOf, land, inkOf, taken, ready, widths],
   )
   return (
-    <Svg height={view.height} style={StyleSheet.absoluteFill} width={view.width}>
-      <Rect fill={land} height={view.height} width={view.width} x={0} y={0} />
-      {ground}
-      {shapes}
-    </Svg>
+    <>
+      <Svg height={view.height} style={StyleSheet.absoluteFill} width={view.width}>
+        <Rect fill={land} height={view.height} width={view.width} x={0} y={0} />
+        {ground}
+        {shapes}
+      </Svg>
+      <NameMeter measured={measured} texts={texts} />
+    </>
   )
 })
 

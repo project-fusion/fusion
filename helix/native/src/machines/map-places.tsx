@@ -22,15 +22,15 @@ import {
 } from '@fusion.dev/helix-core/map'
 import { formatMessage } from '@fusion.dev/helix-core/words'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { I18nManager } from 'react-native'
+import { I18nManager, type LayoutChangeEvent } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Entry } from '../render/entry'
 import type { Family } from '../style/form'
 import { kebab, numberIn, wordsIn } from './date-picker-read'
 import { type MapBoard, MapBoardContext, type MapHit } from './map'
-import { dotAt } from './map-drawing'
 import { pointsOfElement } from './map-read'
+import { dotAt, standOf } from './map-taken'
 import { langOf } from './picker-field-kind'
 import { boundTo, given, tell } from './props'
 
@@ -71,6 +71,10 @@ export const useMapMarker = (family: Family, props: Props, use: MachineUse): Beh
   const key = name || label
   const shown = board !== undefined && board.current !== '' && board.current === key
   const flag = (one: string) => boundTo(use, one, 'state') ?? kebab(one)
+  /* **The frame keeps where the marker stands**, so the still picture's
+     place names keep clear of it, and forgets it as the marker goes. */
+  const stand = board?.stand
+  useEffect(() => () => stand?.(key, undefined), [stand, key])
   return {
     marks: [
       ...(at === undefined ? [] : ['placed']),
@@ -82,7 +86,16 @@ export const useMapMarker = (family: Family, props: Props, use: MachineUse): Beh
     measured:
       at === undefined ? {} : { '_map-marker-x': `${at[0]}px`, '_map-marker-y': `${at[1]}px` },
     parts: {
-      host: { states: { [flag('named')]: named, [flag('open')]: shown } },
+      host: {
+        states: { [flag('named')]: named, [flag('open')]: shown },
+        view: {
+          onLayout: (event: LayoutChangeEvent) => {
+            if (place !== undefined && at !== undefined) {
+              stand?.(key, standOf(place, at, event.nativeEvent.layout))
+            }
+          },
+        },
+      },
       marker: { view: { onPress: () => board?.press(key, name || label) } },
     },
   }
