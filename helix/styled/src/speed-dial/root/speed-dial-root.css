@@ -211,6 +211,17 @@
   position: absolute;
 }
 
+/* **The drawn plus turns an eighth into a cross while the actions are out**,
+   so the button that opened them reads as the one that puts them away. A glyph
+   of your own holds still: a pencil turned an eighth is a pencil at an angle. */
+[part="trigger"] [data-glyph] {
+  transition: rotate var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+:host(:state(open)) [part="trigger"] [data-glyph] {
+  rotate: 45deg;
+}
+
 /* A glyph of your own in the drawn trigger takes the plus's size. */
 ::slotted([slot="icon"]) {
   block-size: var(--icon-size);

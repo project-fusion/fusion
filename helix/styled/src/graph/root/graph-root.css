@@ -100,6 +100,31 @@
   display: none;
 }
 
+/* **The floating notes settle in and fade out**, as a popover's panel does,
+   instead of appearing in one frame over the graph. */
+:host([no-panel]) [part="panel"] {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    scale var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-fast) allow-discrete;
+}
+
+:host([no-panel]) [part="panel"][hidden] {
+  opacity: 0;
+  scale: 0.96;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate),
+    display var(--helix-duration-fast) allow-discrete;
+}
+
+@starting-style {
+  :host([no-panel]) [part="panel"] {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
 :host([no-panel]) [part="body"]:has([part="panel"]:not([hidden])) [part="controls"] {
   inset-inline-end: calc(min(var(--graph-panel-size, 18rem), 100%) + var(--helix-space-sm) * 2);
 }

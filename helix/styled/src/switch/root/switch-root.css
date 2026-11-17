@@ -131,7 +131,13 @@
   pointer-events: none;
   position: absolute;
   translate: 0 -50%;
-  transition: translate var(--helix-duration-fast) var(--helix-easing-emphasized);
+  /* The thumb's fill, edge and icon change over the travel, so it arrives in
+     its new colors. */
+  transition:
+    translate var(--helix-duration-fast) var(--helix-easing-emphasized),
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* No hairline once it is on: the thumb is white on the accent, which separates

@@ -177,6 +177,12 @@
   display: inline-flex;
   inline-size: var(--helix-size-control-tight);
   justify-content: center;
+  /* Hover, press, and the end of the slides, eased as Button's are, so
+     reaching the last slide dims the control that can go no further. */
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* At an end a stepper keeps focus and says so with `aria-disabled`, so it has to

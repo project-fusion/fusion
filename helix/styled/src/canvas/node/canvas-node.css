@@ -263,9 +263,16 @@
    the two, and the handles, which sit across the card's edge, floated in the
    gap rather than on a line. The focus ring is inside the box, so a card that
    is both still says both. */
-:host(:state(selected)) {
-  outline: var(--helix-border-thick) solid var(--canvas-selected-color, var(--helix-color-accent));
+/* The edge is drawn on every card in no color, and takes the accent when the
+   card is selected, so selecting fades it in instead of switching it on. */
+:host {
+  outline: var(--helix-border-thick) solid transparent;
   outline-offset: calc(var(--helix-border-thin) * -1);
+  transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:state(selected)) {
+  outline-color: var(--canvas-selected-color, var(--helix-color-accent));
 }
 
 /* **Where a connection being drawn can land, and where it will.** Every card it

@@ -55,6 +55,35 @@
   display: none;
 }
 
+/* **A stop settles in and fades out**, as `Popover`'s panel does, on opacity
+   and scale alone: the floating controller places a bubble through
+   `translate`, which a transition here would drag from the corner. Leaving, it
+   accelerates away and is drawn until it has gone. */
+[part="surface"] {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    scale var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+:host [part="surface"][hidden] {
+  opacity: 0;
+  scale: 0.96;
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+@starting-style {
+  [part="surface"] {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
 /* **A dialog stop sits in the middle of the window**, which the user agent's
    `inset: 0` already asks for and the `margin: 0` above took away. */
 :host([type="dialog"]) [part="surface"] {
