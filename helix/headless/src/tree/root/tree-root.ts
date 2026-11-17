@@ -9,6 +9,7 @@ import {
   HelixElement,
   inlineStep,
   keyClaimed,
+  LayoutMotionController,
   MixinCollection,
   MixinControllerActive,
   ReorderController,
@@ -111,6 +112,13 @@ const KEYS = new Set([
  * holding that branch's items in their new order. The tree says the move with
  * `moved-into-label`.
  *
+ * **Items slide to their places.** When you move, add, remove or hide items,
+ * each one moves from where it was drawn to where it is now, a branch carrying
+ * its rows with it, and an item you add fades in. The tree times it from
+ * `--tree-move-duration` and `--tree-move-easing`, which the styled tier sets
+ * from the duration and easing tokens. Here neither is set, so nothing moves
+ * until you set them. Under reduced motion nothing moves, whatever they say.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -130,6 +138,9 @@ const KEYS = new Set([
  * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows load.
  * @csspart tree - The tree container.
+ *
+ * @cssproperty --tree-move-duration - How long an item takes to slide to its new place, or to fade in. Unset, nothing moves.
+ * @cssproperty --tree-move-easing - The curve an item slides and fades in along.
  */
 @customElement('helix-headless-tree')
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
@@ -197,6 +208,18 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * Moving items among their siblings, in a `reorderable` tree. The items are
    * the page's, so a drop asks the page to move them.
    */
+  /** Sliding each item to its new place when the page moves, adds, removes or hides items. */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => this.items,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--tree-move-duration'),
+        easing: style.getPropertyValue('--tree-move-easing'),
+      }
+    },
+  })
+
   private readonly reorder = new ReorderController(this, {
     axis: 'block',
     box: (key) => this.itemFor(key)?.getBoundingClientRect(),

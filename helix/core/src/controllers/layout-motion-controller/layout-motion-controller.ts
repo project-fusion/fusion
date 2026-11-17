@@ -137,10 +137,20 @@ export class LayoutMotionController implements ReactiveController {
     this.recorded = false
   }
 
-  /** Whether a set of records changed the items: one arriving or leaving, or turning `hidden`. */
+  /**
+   * Whether a set of records changed the items: one arriving or leaving the
+   * host or another item, as a row does a tree's branch, or turning `hidden`.
+   * A change inside an item, such as a streaming turn's text, is none.
+   */
   private heard(records: readonly MutationRecord[]): void {
+    const items = new Set<Node>(this.options.items())
     const changed = records.some((one) =>
-      one.type === 'childList' ? one.target === this.host : one.target.parentNode === this.host,
+      one.type === 'childList'
+        ? one.target === this.host ||
+          (items.has(one.target) &&
+            ([...one.addedNodes].some((node) => items.has(node)) ||
+              [...one.removedNodes].some((node) => this.places.has(node as HTMLElement))))
+        : items.has(one.target) || one.target.parentNode === this.host,
     )
     if (changed) {
       this.move()
@@ -154,31 +164,61 @@ export class LayoutMotionController implements ReactiveController {
   }
 
   /**
-   * Where each drawn item is laid out now, and the offset each move in flight
-   * is showing on top of that. An item with no box, `hidden` or in a closed
-   * subtree, has no place.
+   * Where each drawn item is laid out now, the offset the moves in flight are
+   * showing on top of that, and the nearest item each one sits inside. An item
+   * with no box, `hidden` or in a closed subtree, has no place.
+   *
+   * **The offset an item shows is its own move and every move around it**,
+   * because an item inside another, as a tree's branch holds its rows, is
+   * drawn wherever its parent's translation puts it.
    */
-  private measure(): { now: Map<HTMLElement, Place>; showing: Map<HTMLElement, Place> } {
-    const now = new Map<HTMLElement, Place>()
+  private measure(): {
+    now: Map<HTMLElement, Place>
+    showing: Map<HTMLElement, Place>
+    within: Map<HTMLElement, HTMLElement>
+  } {
+    const items = this.options.items()
+    const all = new Set(items)
+    const within = new Map<HTMLElement, HTMLElement>()
+    for (const item of items) {
+      for (let up = item.parentElement; up && up !== this.host; up = up.parentElement) {
+        if (all.has(up)) {
+          within.set(item, up)
+          break
+        }
+      }
+    }
     const showing = new Map<HTMLElement, Place>()
+    const shown = (item: HTMLElement): Place => {
+      const known = showing.get(item)
+      if (known) {
+        return known
+      }
+      const own = this.offset(item)
+      const outer = within.get(item)
+      const around = outer ? shown(outer) : { x: 0, y: 0 }
+      const total = { x: own.x + around.x, y: own.y + around.y }
+      showing.set(item, total)
+      return total
+    }
+    const now = new Map<HTMLElement, Place>()
     const frame = this.host.getBoundingClientRect()
     const scale = scaleOf(this.host, frame)
-    for (const item of this.options.items()) {
+    for (const item of items) {
       if (item.getClientRects().length === 0) {
         continue
       }
       const box = item.getBoundingClientRect()
-      const offset = this.offset(item)
-      showing.set(item, offset)
+      const offset = shown(item)
       now.set(item, {
         x: (box.left - frame.left) / scale.x - offset.x,
         y: (box.top - frame.top) / scale.y - offset.y,
       })
     }
-    return { now, showing }
+    return { now, showing, within }
   }
 
-  /** The translation a move in flight is drawing on an item now, from its eased progress. */
+  /** The translation an item's own move in flight is drawing now, from its eased progress. */
   private offset(item: HTMLElement): Place {
     const flight = this.flights.get(item)
     const progress = flight?.animation.effect?.getComputedTiming().progress
@@ -188,11 +228,19 @@ export class LayoutMotionController implements ReactiveController {
     return { x: flight.from.x * (1 - progress), y: flight.from.y * (1 - progress) }
   }
 
-  /** Slides every item that moved from where it was drawn to where it is now. */
+  /**
+   * Slides every item that moved from where it was drawn to where it is now.
+   *
+   * **An item inside another moves only by the difference.** Its parent's
+   * translation already carries it, so its own starts from where it was drawn
+   * less where its parent's starts, and the two run on one curve and add up to
+   * its whole journey at every frame. An item that arrives inside another that
+   * arrives fades in with it, and does not fade a second time.
+   */
   private move(): void {
     const before = this.places
     const recorded = this.recorded
-    const { now, showing } = this.measure()
+    const { now, showing, within } = this.measure()
     this.places = now
     this.recorded = true
     const timing = this.options.timing()
@@ -202,20 +250,31 @@ export class LayoutMotionController implements ReactiveController {
     }
     const easing = timing.easing.trim() || 'ease'
     const replaced = [...now.keys()].every((item) => !before.has(item))
+    const journeys = new Map<HTMLElement, Place>()
     for (const [item, place] of now) {
       const was = before.get(item)
-      if (!was) {
-        if (!replaced) {
+      if (was) {
+        const drawn = showing.get(item) ?? { x: 0, y: 0 }
+        journeys.set(item, { x: was.x + drawn.x - place.x, y: was.y + drawn.y - place.y })
+      }
+    }
+    for (const item of now.keys()) {
+      const outer = within.get(item)
+      const journey = journeys.get(item)
+      if (!journey) {
+        const carried = outer !== undefined && now.has(outer) && !before.has(outer)
+        if (!replaced && !carried) {
           this.arrive(item, duration, easing)
         }
         continue
       }
-      const drawn = showing.get(item) ?? { x: 0, y: 0 }
-      const from = { x: was.x + drawn.x - place.x, y: was.y + drawn.y - place.y }
+      const around = (outer && journeys.get(outer)) ?? { x: 0, y: 0 }
+      const from = { x: journey.x - around.x, y: journey.y - around.y }
+      this.flights.get(item)?.animation.cancel()
+      this.flights.delete(item)
       if (Math.abs(from.x) < 0.5 && Math.abs(from.y) < 0.5) {
         continue
       }
-      this.flights.get(item)?.animation.cancel()
       const animation = item.animate(
         [{ transform: `translate(${from.x}px, ${from.y}px)` }, { transform: 'translate(0, 0)' }],
         { composite: 'add', duration, easing },

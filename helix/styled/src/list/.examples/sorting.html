@@ -1,0 +1,84 @@
+<!-- @summary Rows that slide to their new places when you sort, add, or remove them. -->
+<helix-button-group label="List actions">
+  <helix-button id="sort">Sort by name</helix-button>
+  <helix-button id="add">Add a project</helix-button>
+</helix-button-group>
+
+<helix-list
+  divided
+  id="projects"
+  label="Projects"
+>
+  <helix-list-item value="orbit">
+    Orbit
+    <helix-icon-button
+      label="Remove Orbit"
+      slot="end"
+    >
+      <helix-icon name="x"></helix-icon>
+    </helix-icon-button>
+  </helix-list-item>
+  <helix-list-item value="cedar">
+    Cedar
+    <helix-icon-button
+      label="Remove Cedar"
+      slot="end"
+    >
+      <helix-icon name="x"></helix-icon>
+    </helix-icon-button>
+  </helix-list-item>
+  <helix-list-item value="lumen">
+    Lumen
+    <helix-icon-button
+      label="Remove Lumen"
+      slot="end"
+    >
+      <helix-icon name="x"></helix-icon>
+    </helix-icon-button>
+  </helix-list-item>
+  <helix-list-item value="atlas">
+    Atlas
+    <helix-icon-button
+      label="Remove Atlas"
+      slot="end"
+    >
+      <helix-icon name="x"></helix-icon>
+    </helix-icon-button>
+  </helix-list-item>
+</helix-list>
+
+<script type="module">
+  const projects = document.getElementById('projects')
+  const more = ['Harbor', 'Ember', 'Fjord', 'Juniper']
+
+  const row = (name) => {
+    const item = document.createElement('helix-list-item')
+    item.setAttribute('value', name.toLowerCase())
+    item.append(name)
+    const remove = document.createElement('helix-icon-button')
+    remove.setAttribute('label', `Remove ${name}`)
+    remove.setAttribute('slot', 'end')
+    remove.innerHTML = '<helix-icon name="x"></helix-icon>'
+    item.append(remove)
+    return item
+  }
+
+  // The list moves no row itself: sort, add, and remove the rows, and each one slides.
+  document.getElementById('sort').addEventListener('click', () => {
+    const rows = [...projects.children].sort((a, b) =>
+      a.getAttribute('value').localeCompare(b.getAttribute('value')),
+    )
+    projects.append(...rows)
+  })
+  document.getElementById('add').addEventListener('click', () => {
+    const name = more.shift()
+    if (name) {
+      projects.prepend(row(name))
+    }
+  })
+  projects.addEventListener('click', (event) => {
+    if (event.target.closest('helix-icon-button')) {
+      event.target.closest('helix-list-item')?.remove()
+    }
+  })
+</script>

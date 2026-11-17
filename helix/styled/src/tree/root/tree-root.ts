@@ -39,6 +39,8 @@ import { styles } from './tree-root.css.js'
  * @cssproperty --tree-drag-preview-shadow - The shadow that raises the copy of an item a pointer drags over the page.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-indent - Indent added per level.
+ * @cssproperty --tree-move-duration - How long an item takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --tree-move-easing - The curve an item slides and fades in along. Defaults to `--helix-easing-standard`.
  * @cssproperty --tree-row-size - Minimum height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree')
