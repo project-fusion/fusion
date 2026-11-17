@@ -94,16 +94,16 @@
 }
 
 /* Two chevrons, quiet until one of them is the current direction. The box is
-   wider than the chevrons so the hover has room to draw behind them. **An even
-   size, 12, 14 and 16 beside headings of 12, 13 and 14**, Button's icon step,
-   so the chevrons' center lands on a whole pixel. At `1.07em` it was 12.83,
-   13.91 and 14.97. */
+   wider than the chevrons so the hover has room to draw behind them. **At the
+   small icon step, 16 pixels at the default density**, the size of the grip's
+   and the menu button's marks, so the heading's three marks are one size.
+   Decided by the owner on November 17, 2026: at a step past the heading's
+   words, 14 pixels beside 13 pixel words, they read as too small to aim at. */
 [part="sort-mark"] {
-  --_table-sort-mark: round(down, 1.15em, 2px);
-  block-size: var(--_table-sort-mark);
+  block-size: var(--helix-size-icon-sm);
   border-radius: var(--helix-radii-sm);
   flex: none;
-  inline-size: var(--_table-sort-mark);
+  inline-size: var(--helix-size-icon-sm);
 }
 
 /* The whole heading is the button, so the highlight answers a pointer anywhere
@@ -177,11 +177,11 @@
   order: -1;
 }
 
-/* The grip's mark size, so the two buttons in a heading are one square, on
-   whole pixels where `1.07em` landed between them. */
+/* The grip's mark size, so the two buttons in a heading are one 24 pixel
+   square at the default density, with the small icon step inside. */
 [part="menu-mark"] {
-  block-size: var(--helix-text-control);
-  inline-size: var(--helix-text-control);
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
 }
 
 [part="menu-button"]:hover,
@@ -272,11 +272,10 @@
   }
 }
 
-/* The row's and the list item's grip, which the heading's smaller type would
-   otherwise draw a pixel smaller. */
+/* At the small icon step, as the menu button's mark and the chevrons are. */
 [part="grip-mark"] {
-  block-size: var(--helix-text-control);
-  inline-size: var(--helix-text-control);
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
 }
 
 /* **A strip on the edge, wider than the line it draws**, because a one pixel
