@@ -29,10 +29,22 @@ export const COLOR_MODE_ATTRIBUTE = 'data-color-mode'
  */
 export const COLOR_TRANSITION_ATTRIBUTE = 'data-helix-color-transition'
 
+/**
+ * The mode a transition is on its way to, before its picture is taken and the
+ * attribute written, so a second press read during it goes the other way.
+ */
+let heading: ColorMode | undefined
+
+/** Which call to `setColorMode` is the latest, so only that one takes its marks off the document. */
+let turn = 0
+
 /** The page's mode: the one written on the document element, or the reader's system setting. Light on a server. */
 export const colorMode = (): ColorMode => {
   if (typeof document === 'undefined') {
     return 'light'
+  }
+  if (heading) {
+    return heading
   }
   const written = document.documentElement.getAttribute(COLOR_MODE_ATTRIBUTE)
   if (written === 'dark' || written === 'light') {
@@ -112,16 +124,32 @@ export const setColorMode = async (
   root.style.setProperty('--theme-toggle-origin-y', `${y}px`)
   root.style.setProperty('--theme-toggle-radius', `${Math.ceil(radius)}px`)
   root.setAttribute(COLOR_TRANSITION_ATTRIBUTE, transition)
+  heading = mode
+  turn += 1
+  const mine = turn
+  /* **A press during a transition skips it**, the browser starting the new
+     one from where the old one stood, and the old one's promises reject: the
+     mode is set all the same, so a skip is no error. */
   try {
-    await start.call(document, apply).finished
+    const running = start.call(document, () => {
+      heading = undefined
+      apply()
+    }) as { finished: Promise<void>; ready?: Promise<void> }
+    running.ready?.catch(() => {})
+    await running.finished.catch(() => {})
   } finally {
-    root.removeAttribute(COLOR_TRANSITION_ATTRIBUTE)
-    for (const name of [
-      '--theme-toggle-origin-x',
-      '--theme-toggle-origin-y',
-      '--theme-toggle-radius',
-    ]) {
-      root.style.removeProperty(name)
+    /* Only the latest: an earlier one finishing as it is skipped would take
+       the circle's point off the one running. */
+    if (mine === turn) {
+      heading = undefined
+      root.removeAttribute(COLOR_TRANSITION_ATTRIBUTE)
+      for (const name of [
+        '--theme-toggle-origin-x',
+        '--theme-toggle-origin-y',
+        '--theme-toggle-radius',
+      ]) {
+        root.style.removeProperty(name)
+      }
     }
   }
 }

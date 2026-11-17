@@ -2,7 +2,7 @@ import './preview.css'
 
 export function Example() {
   return (
-    <p>
+    <div>
       The release notes were written by{' '}
       <a
         href="#ada"
@@ -16,6 +16,6 @@ export function Example() {
         <a href="#ada-notes">Read her notes</a>
       </helix-headless-hover-card>{' '}
       and reviewed by the whole team.
-    </p>
+    </div>
   )
 }

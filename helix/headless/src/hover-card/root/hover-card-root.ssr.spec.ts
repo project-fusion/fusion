@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -10,7 +10,7 @@ describe('hover card server output', () => {
 
   test('serves the card closed, as a popover', () => {
     expect(hasPart(served, 'surface')).toBe(true)
-    expect(served).toContain('popover="manual"')
+    expect(partTag(served, 'surface')).toContain('popover="manual"')
   })
 
   test('the host carries nothing the page did not write', () => {
