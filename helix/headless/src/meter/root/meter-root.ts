@@ -1,5 +1,6 @@
 import {
   auditName,
+  CountController,
   customElement,
   drawStatus,
   formatWords,
@@ -8,6 +9,7 @@ import {
   internalsOf,
   numberConverter,
   readingText,
+  SPOKEN_RULE,
   StatusController,
   slottedWords,
   words,
@@ -71,6 +73,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  *
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
+ * @cssproperty --meter-count-duration - How long the number shown under `show-value` takes to count to a new value. Unset, it changes at once.
+ * @cssproperty --meter-count-easing - The curve the number shown counts along.
  * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --meter-span - How much the range holds, `max` less `min`, which a segment divides its own value by to find its width.
  * @cssproperty --meter-sweep - How much of the circle the arc covers, as a path length.
@@ -83,6 +87,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  */
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
+  protected static override markRules = [SPOKEN_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-meter': { liveLabel: '{reading}, {band}' } })`.
@@ -407,6 +413,33 @@ export class HelixHeadlessMeter extends HelixElement {
    * `format-options`, a share of the range for a percent and the value for
    * anything else.
    */
+  /**
+   * Counting the number shown under `show-value` from the one before, so it
+   * keeps pace with the fill. While it counts, the passing numbers are hidden
+   * from screen readers and the new reading is read in their place.
+   */
+  protected readonly count = new CountController(this, {
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--meter-count-duration'),
+        easing: style.getPropertyValue('--meter-count-easing'),
+      }
+    },
+  })
+
+  /** The number drawn while a count runs. */
+  private get countingText(): string {
+    const { max, min } = this.span
+    const counting = this.count.counting ?? this.amount
+    return readingText(
+      counting,
+      (counting - min) / (max - min),
+      wordsLocale(this),
+      this.formatOptions,
+    )
+  }
+
   private get text(): string {
     return (
       this.valueText ||
@@ -421,6 +454,16 @@ export class HelixHeadlessMeter extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    const was = changed.get('value') as number | undefined
+    if (
+      changed.has('value') &&
+      this.hasUpdated &&
+      was !== undefined &&
+      this.showValue &&
+      !this.valueText
+    ) {
+      this.count.start(was, this.value)
+    }
     const { max, min } = this.span
     /* On the host through internals, so the reading is the element itself and
        an author's own `aria-label` beats it without anything being written onto
@@ -575,7 +618,15 @@ export class HelixHeadlessMeter extends HelixElement {
             }
           </div>`
     }
-      ${this.showValue ? html`<span part="value">${this.text}</span>` : nothing}${drawStatus(this.status)}`
+      ${
+        this.showValue
+          ? this.count.counting === undefined
+            ? html`<span part="value">${this.text}</span>`
+            : html`<span part="value" aria-hidden="true">${this.countingText}</span><span data-spoken
+                >${this.text}</span
+              >`
+          : nothing
+      }${drawStatus(this.status)}`
   }
 }
 

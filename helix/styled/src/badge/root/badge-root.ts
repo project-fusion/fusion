@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessBadge } from '@fusion.dev/helix-headless/badge'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './badge-root.css.js'
 
@@ -26,6 +26,7 @@ import { styles } from './badge-root.css.js'
  *
  * @cssproperty --badge-attention-duration - How long one beat of `attention` takes.
  * @cssproperty --badge-background-color - The fill of the indicator.
+ * @cssproperty --badge-bump-duration - How long the mark takes to swell and settle when its count changes. Defaults to `--helix-duration-normal`; `0ms` changes the count with no bump.
  * @cssproperty --badge-color - The color of the count, to pair with a fill set through `--badge-background-color`.
  * @cssproperty --badge-font-weight - The weight of the count.
  * @cssproperty --badge-gap - The space between the content and the count under `placement="inline"`.
@@ -87,6 +88,40 @@ export class HelixBadge extends HelixHeadlessBadge {
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   static override styles: CSSResultGroup = styles
+
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    /* **A count that changes swells and settles**, so a new message is seen
+       arriving on a mark that was already there. Not on the first render, nor
+       when the mark itself arrives or goes, which the sheet's own scale draws. */
+    const was = changed.get('value') as number | string | undefined
+    if (changed.has('value') && was !== undefined && was !== '' && this.value !== '') {
+      this.bump()
+    }
+  }
+
+  /** Swells the mark and settles it, over the time `--badge-bump-duration` holds. */
+  private bump(): void {
+    const mark = this.partNamed('indicator')
+    if (
+      !mark ||
+      mark.hasAttribute('data-blank') ||
+      typeof mark.animate !== 'function' ||
+      reducedMotion()
+    ) {
+      return
+    }
+    const written = getComputedStyle(this).getPropertyValue('--badge-bump-duration').trim()
+    const amount = Number.parseFloat(written)
+    const duration = written.endsWith('ms') ? amount : amount * 1000
+    if (!(duration >= 1)) {
+      return
+    }
+    mark.animate([{ scale: '1' }, { offset: 0.35, scale: '1.2' }, { scale: '1' }], {
+      duration,
+      easing: 'ease-out',
+    })
+  }
 }
 
 declare global {

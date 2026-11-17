@@ -2,6 +2,11 @@
    there is not: the grid only exists under `show-value`, so a plain progress bar
    generates exactly the box it always did. */
 :host {
+  /* The number under `show-value` counts at the fill's pace and along its
+     curve, so the two arrive together. */
+  --progress-count-duration: var(--progress-transition-duration, var(--helix-duration-normal));
+  --progress-count-easing: var(--helix-easing-decelerate);
+
   display: block;
 }
 

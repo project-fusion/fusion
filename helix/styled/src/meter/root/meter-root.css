@@ -5,6 +5,11 @@
 
    The *height* is deliberately not the same: see `--helix-size-meter`. */
 :host {
+  /* The number under `show-value` counts at the fill's pace and along its
+     curve, so the two arrive together. */
+  --meter-count-duration: var(--meter-transition-duration, var(--helix-duration-normal));
+  --meter-count-easing: var(--helix-easing-decelerate);
+
   display: block;
 }
 

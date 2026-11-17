@@ -8,17 +8,6 @@ export function Example() {
         data-dock-within
         label="Actions"
       >
-        <helix-icon-button
-          emphasis="solid"
-          label="Actions"
-          raised
-          shape="circle"
-          slot="trigger"
-          tone="primary"
-        >
-          <helix-icon name="plus"></helix-icon>
-        </helix-icon-button>
-
         <helix-speed-dial-item value="share">
           Share
           <helix-icon
