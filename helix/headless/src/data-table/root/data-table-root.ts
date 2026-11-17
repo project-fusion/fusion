@@ -991,8 +991,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * Lets users reorder the columns.
    *
-   * Each heading with a `field` gets a grip, dragged along the header or moved a
-   * place at a time with the arrow keys once it has focus.
+   * Each heading with a `field` gets a grip, moved a place at a time with the
+   * arrow keys once it has focus. A pointer drags the grip or the heading
+   * itself along the header, and a press that does not travel still sorts.
    */
   @property({ type: Boolean })
   reorderable = false
@@ -1387,9 +1388,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * A column dragged by its grip. The headings follow the pointer and the
-   * order is asked for once it lets go, so a consumer hears one order and not
-   * the dozen a drag passes through. The arrow keys on a grip move a column a
+   * A column dragged by its grip or its heading. The headings follow the
+   * pointer and the order is asked for once it lets go, so a consumer hears
+   * one order and not the dozen a drag passes through. The arrow keys on a grip move a column a
    * place each, which `handleGripKey` does, so this only drags.
    */
   private readonly columnMoves = new ReorderController(this, {
@@ -1405,8 +1406,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return wanted.join(' ') === this.fields.join(' ') || this.requestOrder(wanted, key)
     },
     enabled: () => this.reorderable,
+    /* **The whole heading drags**, as its grip does. A press that does not
+       travel past the slop is still a click, which sorts, and the click a
+       drag's release raises is swallowed. The menu button, the menu it opens
+       and the resizer keep their presses. */
     grip: (event) => {
-      const column = this.partIn(event, 'grip') ? this.columnFrom(event) : undefined
+      const own = event
+        .composedPath()
+        .some(
+          (node) =>
+            node instanceof Element && /^(menu|resizer)/.test(node.getAttribute('part') ?? ''),
+        )
+      const column =
+        this.partIn(event, 'grip') || (this.partIn(event, 'column') && !own)
+          ? this.columnFrom(event)
+          : undefined
       return column?.field ? { element: column, key: column.field } : undefined
     },
     holds: false,
