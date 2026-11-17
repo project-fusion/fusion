@@ -1,0 +1,81 @@
+:host {
+  display: inline-block;
+}
+
+/* **A quiet button on the floating surface**, as `Motion Toggle` is, so the
+   two read as one pair in a page's header: square with the icon alone, and as
+   wide as its text with text. Not drawn pressed while dark: the icon says
+   which mode a press goes to, and a pressed fill would say it twice. */
+[part="button"] {
+  align-items: center;
+  background-color: var(--theme-toggle-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  justify-content: center;
+  min-block-size: var(--helix-size-control-sm);
+  min-inline-size: var(--helix-size-control-sm);
+  /* Room either side of the icon and any text beside it, which a square
+     button with the icon alone keeps inside its least width. */
+  padding: 0 var(--helix-space-xs);
+}
+
+[part="icon"] {
+  display: inline-flex;
+}
+
+[part="icon"] svg,
+[part="icon"] ::slotted(*) {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="button"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--theme-toggle-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+[part="button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* A press lays the press wash over the fill, as Button's press is a step past
+   its hover, so a tap on a phone, where no hover comes first, shows. */
+[part="button"]:active {
+  background-image: linear-gradient(var(--helix-color-press), var(--helix-color-press));
+}
+
+/* A mode switch means nothing on paper, which prints in the light mode. */
+@media print {
+  :host {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [part="button"] {
+    border-color: ButtonText;
+  }
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="button"] {
+  position: relative;
+}
+
+[part="button"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}

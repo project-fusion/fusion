@@ -413,6 +413,16 @@ export {
 } from './utils/clock/clock.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { closestName } from './utils/closest-name/closest-name.js'
+export {
+  COLOR_MODE_ATTRIBUTE,
+  COLOR_TRANSITION_ATTRIBUTE,
+  type ColorMode,
+  type ColorModeOptions,
+  type ColorModeTransition,
+  colorMode,
+  onColorModeChange,
+  setColorMode,
+} from './utils/color-mode/color-mode.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
 export { columnStep } from './utils/column-step/column-step.js'
 export {

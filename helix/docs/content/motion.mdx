@@ -207,6 +207,12 @@ Overlays use `@starting-style` to animate in. It sets a starting value and needs
 no duration token of its own. The transition that runs from it uses the tokens
 above.
 
-The library does not use view transitions. A view transition runs between two
-states of the document, so a component cannot own one. If you want view
-transitions, start them from your own code.
+Helix starts one view transition, when the page changes color mode. A view
+transition draws the whole document twice and runs between the two pictures,
+so a component that started one for its own sake would cancel the page's own,
+or have its own cancelled. The color mode belongs to the whole document, so
+changing it is the one move that is the document's to make. `Theme Toggle` and
+`setColorMode` from `@fusion.dev/helix-core` spread the new mode in a circle
+from the button, wipe it across, or fade it, and change it at once under
+reduced motion. Any other view transition is yours to start from your own
+code.
