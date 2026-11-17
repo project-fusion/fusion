@@ -120,12 +120,15 @@ export default defineConfig({
            loads MapLibre and draws, and a whole-page picture taken before it
            finished showed its frame empty: on November 17, 2026 two accepted
            baselines held an empty map and the next run, drawn, failed
-           against them. `:state(ready)` turns on once the map has drawn its
-           view, and its clusters are drawn by then. */
+           against them. Each count the map draws in view is written as a
+           `count` button in the points layer once the map settles, so the
+           wait is for the clusters themselves. Not `:state(ready)`, which
+           also waits for every tile, and the harness refuses the tile
+           server's requests, so it never turned on. */
         {
           name: 'maps',
           path: '/helix/maps',
-          selector: 'helix-map:has(> helix-map-points[cluster]):state(ready)',
+          selector: 'helix-map-points[cluster] [part~="count"]',
         },
         { name: 'components-loading', path: '/stand-ins/components' },
         { name: 'insights-loading', path: '/stand-ins/insights' },
