@@ -104,10 +104,12 @@
   align-items: center;
 }
 
-/* The words are the panel's, at a control's size, and not the checkbox
-   label's. */
+/* The words are the panel's, at a control's size and the regular weight, and
+   not the checkbox label's medium: a column's name is a row of a list, as
+   Data Table's cells are, and not a form's answer. */
 [part="name"] {
   font-size: var(--helix-text-control);
+  font-weight: var(--helix-weight-regular);
   min-inline-size: 0;
 }
 

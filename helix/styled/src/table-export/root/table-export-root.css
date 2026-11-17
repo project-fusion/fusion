@@ -34,6 +34,17 @@ fieldset {
   margin-block-end: var(--helix-space-2xs);
 }
 
+/* The rows' radios are the size of Column Manager's boxes, a step under the
+   density's, so the two panels a table opens draw one mark, and their words
+   are regular, as the panel's other words are, and not a form label's medium. */
+[part="rows"] [part~="choice"] {
+  --radio-size: var(--helix-size-checkbox-tight);
+}
+
+[part="rows"] [part~="choice"]::part(label) {
+  font-weight: var(--helix-weight-regular);
+}
+
 [part="options"] [part~="choice"] {
   align-items: center;
   cursor: pointer;
