@@ -76,6 +76,14 @@ export class HelixScrollProgress extends HelixElement {
     super.disconnectedCallback()
   }
 
+  /* After the first render too, for a box that arrived with the same update. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    if (!this.followed) {
+      this.follow()
+    }
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     if (this.isConnected && (changed.has('for') || changed.has('axis'))) {
@@ -95,11 +103,22 @@ export class HelixScrollProgress extends HelixElement {
     return root.getElementById?.(this.for) ?? undefined
   }
 
-  /** Starts following the box `for` names, from a first reading. */
+  /**
+   * Starts following the box `for` names, from a first reading.
+   *
+   * **A box after the bar in the page is not there yet** when a served page
+   * connects the bar, since the parser has not reached it, so the bar looks
+   * again once the document has been read.
+   */
   private follow(): void {
     this.unfollow()
     const box = this.box
     if (!box) {
+      if (typeof document !== 'undefined' && document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.isConnected && this.follow(), {
+          once: true,
+        })
+      }
       return
     }
     const listener = (): void => this.schedule()

@@ -1,5 +1,18 @@
-/* A box short enough to scroll, so the bar above it has something to follow. */
+/* A framed reader, with the bar along its top edge, and a box under it short
+   enough to scroll, so the bar has something to follow. The words keep clear
+   of the bar, so a scrolled line never runs under it. */
+.reader {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  overflow: hidden;
+}
+
 .article {
-  block-size: 12rem;
+  block-size: 8rem;
   overflow: auto;
+  padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+.article p {
+  margin-block: var(--helix-space-none) var(--helix-space-sm);
 }
