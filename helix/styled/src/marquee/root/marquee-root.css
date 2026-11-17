@@ -1,0 +1,99 @@
+:host {
+  --_marquee-gap: var(--marquee-gap, var(--helix-space-xl));
+
+  display: block;
+  /* **The row fades in and out at either edge**, so an item leaving does not
+     end at a hard cut. */
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--marquee-fade, var(--helix-space-2xl)),
+    black calc(100% - var(--marquee-fade, var(--helix-space-2xl))),
+    transparent
+  );
+  overflow: hidden;
+}
+
+[part="track"] {
+  animation: helix-marquee var(--marquee-duration, calc(var(--helix-duration-crawl) * 5)) linear
+    infinite;
+  display: flex;
+  gap: var(--_marquee-gap);
+  inline-size: max-content;
+}
+
+[part="items"],
+[part="copy"] {
+  align-items: center;
+  display: flex;
+  flex: none;
+  gap: var(--_marquee-gap);
+}
+
+/* Half the track is one drawing and the gap after it, so moving by half joins
+   the copy's start exactly where the items started. */
+@keyframes helix-marquee {
+  to {
+    translate: calc(-50% - var(--_marquee-gap) / 2) 0;
+  }
+}
+
+/* The other way round, from the inline start, and the same on a right-to-left
+   page, whose inline start is the right. */
+:host([reverse]) [part="track"] {
+  animation-direction: reverse;
+}
+
+:host(:dir(rtl)) [part="track"] {
+  animation-direction: reverse;
+}
+
+:host(:dir(rtl)[reverse]) [part="track"] {
+  animation-direction: normal;
+}
+
+/* **Held where a reader is**: under a pointer, with focus inside, and while
+   the page's motion is paused. */
+:host(:hover) [part="track"],
+:host(:focus-within) [part="track"],
+:host(:state(paused)) [part="track"] {
+  animation-play-state: paused;
+}
+
+/* **No loop for a reader who asked for less movement**: the row scrolls by
+   hand, and the copy that joined the loop is not drawn. */
+@media (prefers-reduced-motion: reduce) {
+  [part="track"] {
+    animation: none;
+  }
+
+  :host {
+    overflow-x: auto;
+  }
+
+  [part="copy"] {
+    display: none;
+  }
+}
+
+/* Unclips: a printed page holds no loop, so the items print once, wrapping
+   onto as many lines as they need. */
+@media print {
+  :host {
+    mask-image: none;
+    overflow: visible;
+  }
+
+  [part="track"] {
+    animation: none;
+    inline-size: auto;
+  }
+
+  [part="items"] {
+    flex-wrap: wrap;
+  }
+
+  [part="copy"] {
+    display: none;
+  }
+}

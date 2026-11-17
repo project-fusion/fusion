@@ -62,6 +62,7 @@ import { loaderArt } from './art/loader'
 import { logArt } from './art/log'
 import { mapArt } from './art/map'
 import { markdownArt } from './art/markdown'
+import { marqueeArt } from './art/marquee'
 import { megamenuArt } from './art/megamenu'
 import { menuArt } from './art/menu'
 import { meterArt } from './art/meter'
@@ -234,6 +235,7 @@ const art: Record<string, ReactNode> = {
   log: logArt,
   map: mapArt,
   markdown: markdownArt,
+  marquee: marqueeArt,
   megamenu: megamenuArt,
   menu: menuArt,
   meter: meterArt,
