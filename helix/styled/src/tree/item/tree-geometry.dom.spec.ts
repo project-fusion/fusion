@@ -286,8 +286,7 @@ const sheet = (tag: 'helix-tree' | 'helix-tree-item' = 'helix-tree-item'): strin
     (Array.isArray(declared) ? declared : [declared])
       .flat(Number.POSITIVE_INFINITY)
       .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-      .join('
-'),
+      .join('\n'),
   )
 }
 
