@@ -1611,6 +1611,31 @@ fn hooks_read_by_the_layer() {
     );
 }
 
+/// A headless family ships no sheet, so a hook it times something from is read
+/// in its script, and that read is what pairs the declaration.
+#[test]
+fn hooks_read_from_script() {
+    plant_in(
+        "hooks-script",
+        "hooks",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/headless/src"] }"#),
+            (
+                "pkg/headless/src/list/list.ts",
+                "/**\n * @cssproperty --list-move-duration - How long a row takes to slide.\n */\nexport class List extends HTMLElement {\n  get duration() {\n    return getComputedStyle(this).getPropertyValue('--list-move-duration')\n  }\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "pkg/headless/src/list/list.ts",
+                "/**\n * @cssproperty --list-move-duration - How long a row takes to slide.\n */\nexport class List extends HTMLElement {}\n",
+            );
+        },
+        "documents `--list-move-duration` and no rule reads it",
+        "pkg/headless/src/list/list.ts",
+    );
+}
+
 /// The analyzer reads the block the element is declared on, so the decorator
 /// under it is where a documented hook stops being collected.
 #[test]

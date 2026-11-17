@@ -94,6 +94,10 @@ export {
   type KeyboardOrigin,
   type NavigableItem,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
+export {
+  LayoutMotionController,
+  type LayoutMotionOptions,
+} from './controllers/layout-motion-controller/layout-motion-controller.js'
 export { ListedController } from './controllers/listed-controller/listed-controller.js'
 export {
   MediaSessionController,
