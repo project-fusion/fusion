@@ -115,7 +115,18 @@ export default defineConfig({
         { name: 'button', path: '/helix/components/button' },
         { name: 'sandbox', path: '/helix/sandbox' },
         { name: 'theme', path: '/helix/theme', selector: '[data-preview-drawn]' },
-        { name: 'maps', path: '/helix/maps' },
+        /* **The food and drink map is awaited until it has drawn whole.**
+           It starts when it nears the viewport, then asks for its snapshot,
+           loads MapLibre and draws, and a whole-page picture taken before it
+           finished showed its frame empty: on November 17, 2026 two accepted
+           baselines held an empty map and the next run, drawn, failed
+           against them. `:state(ready)` turns on once the map has drawn its
+           view, and its clusters are drawn by then. */
+        {
+          name: 'maps',
+          path: '/helix/maps',
+          selector: 'helix-map:has(> helix-map-points[cluster]):state(ready)',
+        },
         { name: 'components-loading', path: '/stand-ins/components' },
         { name: 'insights-loading', path: '/stand-ins/insights' },
         { name: 'reference-loading', path: '/stand-ins/reference' },
