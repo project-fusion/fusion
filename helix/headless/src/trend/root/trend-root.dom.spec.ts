@@ -316,3 +316,32 @@ describe('the old `direction`', () => {
     expect(warnings[0]).toContain('movement="up"')
   })
 })
+
+describe('a new value', () => {
+  test('counts to the new change, and a screen reader reads only the new change', async () => {
+    const trend = (await mount(
+      '<helix-headless-trend value="10" style="--trend-count-duration: 320ms"></helix-headless-trend>',
+    )) as HTMLElement & Updatable & { value: number }
+    const clock = { finished: false, progress: 0 }
+    trend.animate = (() =>
+      ({
+        cancel: () => {},
+        effect: { getComputedTiming: () => ({ progress: clock.finished ? null : clock.progress }) },
+        get playState() {
+          return clock.finished ? 'finished' : 'running'
+        },
+      }) as unknown as Animation) as HTMLElement['animate']
+    trend.value = 20
+    await trend.updateComplete
+    clock.progress = 0.5
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    await trend.updateComplete
+    const shown = part(trend, 'value')
+    expect(shown?.querySelector('[aria-hidden="true"]')?.textContent).toBe('15')
+    expect(shown?.querySelector('[data-spoken]')?.textContent).toBe('20')
+    clock.finished = true
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    await trend.updateComplete
+    expect(part(trend, 'value')?.textContent).toBe('20')
+  })
+})

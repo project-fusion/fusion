@@ -182,12 +182,24 @@ stylesheet, so its stack has no hooks of this kind.
 
 ## Figures that count
 
-A new `value` on a `Stat` counts to the new number from the one before. A
-screen reader reads only the new number. The count takes
-`--stat-count-duration`, `--helix-duration-slow` by default, along
-`--stat-count-easing`, `--helix-easing-decelerate` by default, so the figure
-slows as it arrives. `0ms` changes the figure at once, as reduced motion does.
-A figure you put in the slot changes at once.
+A new `value` on a `Stat` or a `Trend` counts to the new number from the one
+before. A screen reader reads only the new number. The count takes
+`--stat-count-duration` or `--trend-count-duration`, `--helix-duration-slow` by
+default, along `--stat-count-easing` or `--trend-count-easing`,
+`--helix-easing-decelerate` by default, so the figure slows as it arrives.
+`0ms` changes the figure at once, as reduced motion does. A figure you put in
+the slot changes at once.
+
+## Charts that follow their readings
+
+When a chart's readings change, its marks move from the old readings to the
+new: the bars of a `Bar Chart` and a `Sparkline`, the line and area of a
+`Line Chart`, an `Area Chart` and a `Sparkline`, the slices of a
+`Donut Chart`, and the points of a `Scatter Chart`. A `Heatmap` cell takes its
+new color the same way. Every move uses `--helix-easing-decelerate`, which
+never passes the value it is heading for, so no frame draws a reading the data
+does not hold. Safari does not transition a path's shape, so lines, areas, and
+points there take their new shape at once.
 
 ## Starting styles and view transitions
 

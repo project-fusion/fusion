@@ -40,6 +40,10 @@ export {
   type CopyOptions,
 } from './controllers/copy-controller/copy-controller.js'
 export {
+  CountController,
+  type CountOptions,
+} from './controllers/count-controller/count-controller.js'
+export {
   CountdownController,
   type CountdownOptions,
 } from './controllers/countdown-controller/countdown-controller.js'

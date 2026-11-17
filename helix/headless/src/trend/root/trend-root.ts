@@ -1,9 +1,11 @@
 import {
+  CountController,
   customElement,
   formatWords,
   HelixElement,
   numberConverter,
   reportRuntime,
+  SPOKEN_RULE,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -62,6 +64,13 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * such as `{"style":"percent"}` for `12%`. `movement` still wins when it is
  * written. Without `value` the metric is what the page slots.
  *
+ * **A new `value` counts to the new change** from the one before, as Stat's
+ * figure does, and a screen reader reads only the new change. The trend times
+ * the count from `--trend-count-duration` and `--trend-count-easing`, which
+ * the styled tier sets from the duration and easing tokens. Here neither is
+ * set, so the change shows at once until you set them, and under reduced
+ * motion it always does.
+ *
  * Slot one glyph per movement into `up-icon`, `down-icon` and `neutral-icon`,
  * and the trend shows the one that matches; a glyph in `icon` stands in for
  * all three. Inside a `Stat`, put the trend in the stat's `trend` slot so it is
@@ -88,6 +97,9 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @csspart icon - The arrow.
  * @csspart value - The change written from `value`, hidden while `value` is no number.
  *
+ * @cssproperty --trend-count-duration - How long a new `value` takes to count from the one before. Unset, the change shows at once.
+ * @cssproperty --trend-count-easing - The curve a new `value` counts along.
+ *
  * @cssstate better - The trend moved the way `good` names.
  * @cssstate down - The trend moved down, as `movement`, the old `direction`, or the sign of `value` says.
  * @cssstate up - The trend moved up, as `movement`, the old `direction`, or the sign of `value` says.
@@ -95,6 +107,19 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  */
 @customElement('helix-headless-trend')
 export class HelixHeadlessTrend extends HelixElement {
+  protected static override markRules = [SPOKEN_RULE]
+
+  /** Counting a new `value` from the one before. */
+  protected readonly count = new CountController(this, {
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--trend-count-duration'),
+        easing: style.getPropertyValue('--trend-count-easing'),
+      }
+    },
+  })
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-trend': { upLabel: 'Gestiegen' } })`.
@@ -284,6 +309,10 @@ export class HelixHeadlessTrend extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    const was = changed.get('value') as number | undefined
+    if (changed.has('value') && this.hasUpdated && was !== undefined) {
+      this.count.start(was, this.value)
+    }
     const judged = this.judged
     this.toggleState('better', judged === 'better')
     this.toggleState('worse', judged === 'worse')
@@ -337,9 +366,17 @@ export class HelixHeadlessTrend extends HelixElement {
       value === undefined || !Number.isFinite(value)
         ? ''
         : figureOf(value, wordsLocale(this), this.formatOptions)
+    /* **While it counts, the passing changes are hidden from screen readers**
+       and the change it is counting to is read in their place, so a reader who
+       reaches the trend mid-count hears the new change. */
+    const counting = this.count.counting
+    const shown =
+      counting === undefined
+        ? figure
+        : html`<span aria-hidden="true">${figureOf(counting, wordsLocale(this), this.formatOptions)}</span><span data-spoken>${figure}</span>`
     return html`${glyph}
       <span part="direction">${said}</span>
-      <span part="value" ?hidden=${figure === ''}>${figure}</span><slot></slot>
+      <span part="value" ?hidden=${figure === ''}>${shown}</span><slot></slot>
       <slot name="label"></slot>`
   }
 }

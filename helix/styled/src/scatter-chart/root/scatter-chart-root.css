@@ -108,6 +108,17 @@
   stroke-width: var(--_scatter-chart-diameter);
 }
 
+/* **A point moves from its last reading to its new one**, and grows or
+   shrinks with its weight, as Line Chart's line and Bar Chart's bars do, on
+   `decelerate`, which is monotonic, so no frame draws a value the data does
+   not hold. */
+[part="point"],
+[part="point-ring"] {
+  transition:
+    d var(--helix-duration-normal) var(--helix-easing-decelerate),
+    stroke-width var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
 [part="point-ring"] {
   stroke: var(--scatter-chart-point-ring-color, var(--helix-color-background));
   stroke-width: calc(var(--_scatter-chart-diameter) + 2 * var(--helix-border-thin));
