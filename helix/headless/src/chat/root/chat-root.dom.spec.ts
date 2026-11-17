@@ -491,6 +491,35 @@ describe('a transcript with nothing in it', () => {
     expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
     expect(part(host, 'empty')).toBeNull()
   })
+
+  /* A conversation opening with nothing yet has the shape one takes, so the
+     first turns arrive where the outline was rather than pushing a line away. */
+  test('and draws two turns in outline, hidden from screen readers', async () => {
+    const host = await mount('<helix-headless-chat label="Support" loading></helix-headless-chat>')
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const outline = part(host, 'placeholder')
+    expect(outline?.getAttribute('aria-hidden')).toBe('true')
+    const turns = [...(outline?.querySelectorAll('[part="placeholder-turn"]') ?? [])]
+    expect(turns.map((one) => one.getAttribute('data-author'))).toEqual(['me', null])
+    expect(turns.map((one) => one.querySelectorAll('[part="placeholder-line"]').length)).toEqual([
+      1, 3,
+    ])
+  })
+
+  test('but not over turns it already has, nor once it has loaded', async () => {
+    const filled = await mount(
+      '<helix-headless-chat label="Support" loading><helix-headless-chat-message>Hi</helix-headless-chat-message></helix-headless-chat>',
+    )
+    await (filled as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(filled, 'placeholder')).toBeNull()
+
+    const loaded = await mount(
+      '<helix-headless-chat label="Support" loading></helix-headless-chat>',
+    )
+    loaded.removeAttribute('loading')
+    await (loaded as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(loaded, 'placeholder')).toBeNull()
+  })
 })
 
 describe('the other side typing', () => {
