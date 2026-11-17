@@ -2,7 +2,6 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCheckbox } from '@fusion.dev/helix-headless/checkbox'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as checkStyles } from '../../shared/check/check.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldInlineStyles } from '../../shared/field/field-inline.css.js'
 import { styles } from './checkbox-root.css.js'
@@ -39,7 +38,7 @@ import { styles } from './checkbox-root.css.js'
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixHeadlessCheckbox {
-  static override styles: CSSResultGroup = [checkStyles, fieldStyles, fieldInlineStyles, styles]
+  static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
 
   /**
    * How the option is set off from the page. `plain` shows the box next to its

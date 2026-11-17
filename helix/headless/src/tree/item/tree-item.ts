@@ -6,11 +6,13 @@ import {
   HelixLoadEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
-import { caretDown, check, dotsSixVertical, minus } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { caretDown, dotsSixVertical } from '@fusion.dev/helix-icons'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
 import { fromGrip } from '../grip.js'
+import '../../checkbox/index.js'
 
 /** Where an item stands in a move: the item being moved, or the one the drop indicator is beside. */
 export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
@@ -84,9 +86,20 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
  * @csspart actions - The `actions` slot, which draws no box of its own. `inert` while the actions are not shown, which takes what it holds off the tab order and out of reach of the pointer.
- * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
- * @csspart checkbox-checked - The check mark's box while the item is checked.
- * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
+ * @csspart check - The inert `Checkbox` that draws the check mark, inside `checkbox`.
+ * @csspart check-box - Forwarded from the checkbox: the box drawn for its input.
+ * @csspart check-control - Forwarded from the checkbox: its native input, inert.
+ * @csspart check-feedback - Forwarded from the checkbox. Not shown, since a check mark is never wrong.
+ * @csspart check-field - Forwarded from the checkbox: the row that holds its box.
+ * @csspart check-hint - Forwarded from the checkbox. Not shown, since a check mark has no help.
+ * @csspart check-label - Forwarded from the checkbox. Not shown, since the item's own label names it.
+ * @csspart check-mark - Forwarded from the checkbox: the tick, or the dash while some of a branch's items are checked.
+ * @csspart check-mark-checked - Forwarded from the checkbox: added to `check-mark` while the item is checked.
+ * @csspart check-mark-dash - Forwarded from the checkbox: added to `check-mark` while it is the dash.
+ * @csspart check-mark-indeterminate - Forwarded from the checkbox: added to `check-mark` while some of a branch's items are checked.
+ * @csspart checkbox - What holds the check mark, in a tree with `selection-mode="multiple"`. A press on it checks the item.
+ * @csspart checkbox-checked - Added to `checkbox` while the item is checked.
+ * @csspart checkbox-mixed - Added to `checkbox` while some of a branch's items are checked.
  * @csspart grip - The handle a pointer drags to move the item, in a `reorderable` tree. Hidden from screen readers, which move the item with Alt and an arrow.
  * @csspart grip-mark - The icon on the grip.
  * @csspart group - The container for nested items.
@@ -602,22 +615,41 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     >`
   }
 
-  /** The check mark, in a tree with `selection-mode="multiple"`. */
+  /**
+   * The check mark, in a tree with `selection-mode="multiple"`: the library's
+   * own `Checkbox`, so the box is the one every form draws, and `inert`.
+   *
+   * **Inert, because the row is the control.** The row is a `treeitem` that
+   * says checked, unchecked or mixed in a multiselectable tree, and a tree is
+   * one tab stop moved by the arrow keys. A live checkbox in it would be a
+   * second control read inside every row and a tab stop of its own. `inert`
+   * takes the box out of focus, out of the accessibility tree and out of
+   * hit testing, so it only draws. In a shadow root it joins no form either.
+   *
+   * **The press lands on the span around it.** An inert element is not a
+   * target, so a press on the box goes to the span under it, which checks the
+   * row, as a press on the box always has.
+   */
   private renderCheckbox(): TemplateResult | typeof nothing {
     if (!this.checkable) {
       return nothing
     }
     const mixed = this.checked === 'mixed'
-    const glyph = mixed ? minus : this.checked ? check : undefined
+    const checkbox = this.tag('checkbox')
     return html`<span
       part="checkbox${mixed ? ' checkbox-mixed' : this.checked ? ' checkbox-checked' : ''}"
       aria-hidden="true"
       @click=${this.handleCheckClick}
-      >${
-        glyph
-          ? html`<svg fill="currentColor" viewBox=${glyph.viewBox}>${unsafeSVG(glyph.content)}</svg>`
-          : nothing
-      }</span
+      ><${checkbox}
+        part="check"
+        exportparts="box: check-box, control: check-control, feedback: check-feedback,
+          field: check-field, hint: check-hint, label: check-label, mark: check-mark,
+          mark-checked: check-mark-checked, mark-dash: check-mark-dash,
+          mark-indeterminate: check-mark-indeterminate"
+        inert
+        .checked=${this.checked === true}
+        .indeterminate=${mixed}
+      ></${checkbox}></span
     >`
   }
 
