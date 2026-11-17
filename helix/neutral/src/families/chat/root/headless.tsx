@@ -29,6 +29,12 @@ import {
  * up the room the keyboard takes from the chat, by what the chat itself measures,
  * so an app that moves its own content moves nothing twice.
  *
+ * **A conversation opening with nothing in it yet draws turns in outline.** While
+ * `loading` is set and there are no turns, two placeholder turns stand where turns
+ * would, one from `me` and a reply of three lines. They are hidden from screen
+ * readers, which hear the loading words. The reply's last line carries `data-last`
+ * for a phone, whose rules have no `:last-child`.
+ *
  * **What a screen reader hears.** Core's `turnsToSay` finds what is new, the same
  * on both platforms, and the web's status region says it where a phone announces
  * it. A phone has no trait for a log or an article, and reads the turns in order.
@@ -101,6 +107,7 @@ export default headless('chat', {
     meLabel: 'meLabel',
     messageLabel: 'messageLabel',
     named: 'named',
+    placeholderShown: 'placeholderShown',
     onHistory: 'history',
     onSend: 'send',
     said: 'said',
@@ -186,8 +193,32 @@ export default headless('chat', {
             />
           </View>
           {chatRoot.loadingShown && (
-            <View part="loading">
+            <View
+              data-outlined={chatRoot.placeholderShown}
+              part="loading"
+            >
               <Text part="loading-words">{props.loadingText}</Text>
+            </View>
+          )}
+          {chatRoot.placeholderShown && (
+            <View
+              ariaHidden
+              part="placeholder"
+            >
+              <View
+                data-author="me"
+                part="placeholder-turn"
+              >
+                <View part="placeholder-line" />
+              </View>
+              <View part="placeholder-turn">
+                <View part="placeholder-line" />
+                <View part="placeholder-line" />
+                <View
+                  data-last
+                  part="placeholder-line"
+                />
+              </View>
             </View>
           )}
           {chatRoot.blank && (

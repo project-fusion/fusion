@@ -355,6 +355,8 @@ const statesOf = (
   [flag('historyShown')]: facts.history === 'loading',
   [flag('loadingShown')]: facts.loading,
   [flag('named')]: facts.label,
+  /* Turns in outline while the conversation loads with none, as the web draws them. */
+  [flag('placeholderShown')]: facts.loading && !facts.fed && !facts.holds,
   [flag('said')]: facts.said,
   [flag('scrolls')]: !facts.fed,
   [flag('statusEmpty')]: !has(props.status) && facts.typing === '',

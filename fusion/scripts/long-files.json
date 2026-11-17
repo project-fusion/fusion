@@ -392,6 +392,7 @@
     "helix/neutral/src/families/card/root/styled.ts",
     "helix/neutral/src/families/carousel/root/styled.ts",
     "helix/neutral/src/families/chat/composer/styled.ts",
+    "helix/neutral/src/families/chat/root/styled.ts",
     "helix/neutral/src/families/code-block/root/headless.tsx",
     "helix/neutral/src/families/code-block/root/styled.ts",
     "helix/neutral/src/families/color-picker/root/headless.tsx",

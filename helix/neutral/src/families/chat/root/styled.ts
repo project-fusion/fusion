@@ -1,5 +1,16 @@
 import chatTyping from '../../../fragments/chat-typing.js'
-import { fn, mix, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  hookOf,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import chat from './headless.js'
 
@@ -25,6 +36,10 @@ const rule_ = [token('border-thin'), 'solid'] as const
  *
  * **The status band is emptied and never hidden**, because it is a live region, and
  * one that is `display: none` is out of the accessibility tree.
+ *
+ * **The turns in outline take the places turns take**, each a message's bubble with
+ * its corner, its padding, and its widest measure, and the reader's own against the
+ * end edge. A phone draws them in a column of their own at the log's gap.
  */
 export default styles(
   chat,
@@ -47,6 +62,7 @@ export default styles(
     own: {
       collectionInsetBlock: null,
       collectionInsetInline: null,
+      chatLeading: null,
       chatTypingCycle: null,
     },
     stylesheet: 'chat/root/chat-root.generated.css',
@@ -320,6 +336,100 @@ export default styles(
         ]),
       ],
     ),
+    /* The wrapper draws no box on the web, so each placeholder is a turn in the
+       log's own column, at the log's gap. */
+    on('placeholder', [
+      web([rule({ display: 'contents' })]),
+      native([rule({ display: 'flex', flexDirection: 'column', gap: hook.gap })]),
+    ]),
+    on('placeholder-turn', [
+      rule({
+        /* The leading of a line of the turn's text, as a skeleton reads it: its line
+           height less its type, half above the glyphs and half below. A phone's
+           `calc()` reads no `lh`, so it takes the half em of a line at 1.5. */
+        own: { chatLeading: web(difference('1lh', '1em')) },
+        borderRadius: hookOf('chat', 'message-radius', token('radii-md')),
+        boxSizing: 'border-box',
+        display: 'flex',
+        flex: 'none',
+        flexDirection: 'column',
+        gap: own.chatLeading,
+        inlineSize: web(fn('min', '28em', '80%')),
+        paddingBlock: web(
+          sum(
+            hookOf('chat', 'message-padding-block', token('space-xs')),
+            quotient(own.chatLeading, 2),
+          ),
+        ),
+        paddingInline: hookOf('chat', 'message-padding-inline', token('space-sm')),
+      }),
+      rule(
+        { part: { 'data-author': 'me' } },
+        {
+          alignSelf: 'flex-end',
+          inlineSize: web(fn('min', '12em', '80%')),
+        },
+      ),
+      native([
+        rule({
+          own: { chatLeading: '0.5em' },
+          inlineSize: '28em',
+          maxInlineSize: '80%',
+          paddingBlock: sum(hookOf('chat', 'message-padding-block', token('space-xs')), '0.25em'),
+        }),
+        rule({ part: { 'data-author': 'me' } }, { inlineSize: '12em' }),
+      ]),
+    ]),
+    /* A skeleton's fill: 8% of the ink, light enough to read as a shape. */
+    on('placeholder-line', [
+      rule({
+        backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+        blockSize: '1em',
+        borderRadius: token('radii-sm'),
+      }),
+      native([rule({ part: { 'data-last': true } }, { inlineSize: '60%' })]),
+    ]),
+    /* Written out: the vocabulary reads no position among siblings. */
+    on(
+      {
+        part: 'placeholder-line',
+        selector: '[part="placeholder-line"]:last-child:not(:first-child)',
+      },
+      [web([rule({ inlineSize: '60%' })])],
+    ),
+    /* The loading words stay for a screen reader and leave the picture to the
+       outline, clipped as the live region is. Written out: the vocabulary reads no
+       following sibling. A phone marks the words `data-outlined`. */
+    on({ part: 'loading', selector: '[part="loading"]:has(+ [part="placeholder"])' }, [
+      web([
+        rule({
+          blockSize: '1px',
+          clipPath: 'inset(50%)',
+          inlineSize: '1px',
+          insetBlockStart: 0,
+          insetInlineStart: 0,
+          overflow: 'hidden',
+          position: 'absolute',
+          whiteSpace: 'nowrap',
+        }),
+      ]),
+    ]),
+    on('loading', [
+      native([
+        rule(
+          { part: { 'data-outlined': true } },
+          {
+            blockSize: 1,
+            inlineSize: 1,
+            insetBlockStart: 0,
+            insetInlineStart: 0,
+            overflow: 'hidden',
+            paddingBlock: 0,
+            position: 'absolute',
+          },
+        ),
+      ]),
+    ]),
     on('history', [
       rule({
         color: token('color-foreground-muted'),
