@@ -647,7 +647,7 @@ describe('the words on the wheels', () => {
       (hour) =>
         new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', hour12: true, timeZone: 'UTC' })
           .formatToParts(new Date(Date.UTC(1970, 0, 1, hour)))
-          .find((part) => part.type === 'dayPeriod')?.value,
+          .find((part) => part.type === 'dayPeriod')?.value ?? '',
     )
     expect(halves.map((one) => one.textContent?.trim())).toEqual(engine)
     if (engine[0] !== 'AM') {
