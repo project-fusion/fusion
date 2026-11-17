@@ -44,6 +44,14 @@ export class HelixScrollProgress extends HelixElement {
   static override styles: CSSResultGroup = styles
 
   /**
+   * The direction the scrolling runs: `block`, down a page, or `inline`,
+   * along a row. Absent is `block`, and writes no attribute, so a served bar
+   * and the bar after upgrade carry the same markup.
+   */
+  @property({ reflect: true })
+  axis?: 'block' | 'inline'
+
+  /**
    * The `id` of the box that scrolls, looked up in the bar's own root, so a
    * bar inside a shadow root reads a box in that root.
    *
@@ -51,13 +59,6 @@ export class HelixScrollProgress extends HelixElement {
    */
   @property()
   for = ''
-
-  /**
-   * The direction the scrolling runs: `block`, down a page, or `inline`,
-   * along a row.
-   */
-  @property({ reflect: true })
-  axis: 'block' | 'inline' = 'block'
 
   /** The box being followed, and what stops following it. */
   private followed: { box: Element | Window; stop: () => void } | undefined
