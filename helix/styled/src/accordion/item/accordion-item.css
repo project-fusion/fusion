@@ -51,12 +51,12 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* Rotation rather than a swapped glyph: opening is a short movement, not a
-   substitution. **At the panel's pace**, `normal`, so the chevron finishes
-   turning as the panel finishes opening. At `fast` it was done 80
-   milliseconds before the panel it was about. **Turned, as Tree's and
-   Megamenu's are**: flipped through `scaleY` it passed through a flat line,
-   0 pixels tall, on its way over. */
+/* **Flipped over its own middle** as the panel opens, from pointing down to
+   pointing up: a short movement, and no swapped glyph. The owner chose the
+   flip on November 17, 2026, over the half turn Tree and Megamenu take, which
+   this followed before. **At the panel's pace**, `normal`, so the chevron
+   finishes flipping as the panel finishes opening, along `emphasized`, which
+   leaves the flat middle of the flip quickly. */
 [part="chevron"] {
   block-size: var(--helix-size-icon-tight);
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
@@ -69,17 +69,17 @@
      whole pixel at the middle of the trigger and of the line. Rounded down it
      sat at 11.5, half a pixel high, at every density. */
   margin-block-start: calc((1lh - var(--helix-size-icon-tight)) / 2);
-  transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
-/* An icon slotted in its place is sized, colored and turned the same way. */
+/* An icon slotted in its place is sized, colored and flipped the same way. */
 ::slotted([slot="chevron"]) {
   block-size: var(--helix-size-icon-tight);
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
   margin-block-start: calc((1lh - var(--helix-size-icon-tight)) / 2);
-  transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
 /* Pushed to the far end only where it belongs there. **And on the line a
@@ -96,7 +96,7 @@
 
 :host(:state(open)) [part="chevron"],
 :host(:state(open)) ::slotted([slot="chevron"]) {
-  rotate: 180deg;
+  scale: 1 -1;
 }
 
 /* **The row's hover wash**, 8% in light and 12% in dark, as a menu row, a tree
