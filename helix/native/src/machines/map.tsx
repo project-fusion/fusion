@@ -191,7 +191,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
   }
   /* **The still picture's streets, water and land**, from the style's own
      tiles, in the layers and colors of the web's snapshot. */
-  const ground = useStillGround(view, style, mapType, ink, lib === null)
+  const ground = useStillGround(view, style, mapType, ink, lib === null, lang)
 
   /* The still picture is whole as soon as it is drawn. */
   const still = lib === null && view !== undefined
@@ -267,7 +267,9 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
               <MapStill
                 base={ground.base}
                 colorOf={ground.colorOf}
+                inkOf={ground.inkOf}
                 land={ink('color-surface')}
+                namesOf={ground.namesOf}
                 specs={specs}
                 view={view}
               />

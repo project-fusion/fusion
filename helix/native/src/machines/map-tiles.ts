@@ -3,7 +3,8 @@
  * from, where MapLibre Native is not in the app: the style's own TileJSON,
  * the tiles the view needs at its zoom, and each feature as a path through
  * MapLibre's camera, in the layers and colors the web's snapshot draws a
- * page's first paint in.
+ * page's first paint in, with the names of its cities, towns, villages and
+ * neighborhoods placed over them.
  *
  * **Each tile is drawn as it arrives**, as MapLibre draws one, and kept
  * for the moves after it. A tile that does not answer in time, or bytes
@@ -11,9 +12,13 @@
  */
 import {
   cssColor,
+  legible,
   type MapView,
   mix,
+  type PlaceName,
+  type PlaceNameBox,
   parseColor,
+  placeNames,
   SNAPSHOT_LAYERS,
   type SnapshotLayer,
   type SnapshotTiles,
@@ -37,8 +42,11 @@ const MOST_TILES = 24
 /** The most tiles kept read, the oldest let go first. */
 const KEPT = 96
 
+/** The tiles' layer the place names are read from. */
+const PLACES = 'place'
+
 /** The tiles' layers the still picture reads. */
-const READ = [...new Set(SNAPSHOT_LAYERS.map((layer) => layer.source))]
+const READ = [...new Set([...SNAPSHOT_LAYERS.map((layer) => layer.source), PLACES])]
 
 /** A TileJSON as far as the still picture reads one: the tiles' address and their deepest zoom. */
 interface Source {
@@ -230,18 +238,26 @@ const TOWARD: Readonly<Record<SnapshotLayer['toward'], string>> = {
   success: 'color-success',
 }
 
-/** What the still picture is given of the tiles: their paths, and each layer's color. */
+/** What the still picture is given of the tiles: their paths, each layer's color, and the place names. */
 export interface StillGround {
   readonly base: readonly StillBase[]
   readonly colorOf: (layer: SnapshotLayer) => string
+  /** A name's color: the land moved toward the ink by its amount, and further where it falls short of 4.5:1. */
+  readonly inkOf: (amount: number) => string
+  /** The place names of the tiles read so far that fit the view, clear of `taken`. */
+  readonly namesOf: (taken: readonly PlaceNameBox[]) => readonly PlaceName[]
 }
+
+/** No names, before the tiles answer and under the satellite map type. */
+const NO_NAMES = (): readonly PlaceName[] => []
 
 /**
  * The still picture's streets, water and land for a view, from the style's
  * own TileJSON, in the theme's colors: **nothing until the tiles answer**,
- * then each tile as it arrives. Roads are left out under the satellite map
- * type, as it leaves them out of MapLibre's style. **Only where `drawn`**:
- * a frame MapLibre Native draws asks for none.
+ * then each tile as it arrives. Roads and place names are left out under
+ * the satellite map type, as it leaves them out of MapLibre's style. Names
+ * are in `language` where the tiles carry it. **Only where `drawn`**: a
+ * frame MapLibre Native draws asks for none.
  */
 export const useStillGround = (
   asked: MapView | undefined,
@@ -249,6 +265,7 @@ export const useStillGround = (
   mapType: string,
   ink: (token: string) => string,
   drawn: boolean,
+  language = 'en',
 ): StillGround => {
   const view = drawn ? asked : undefined
   const url =
@@ -289,6 +306,15 @@ export const useStillGround = (
         : baseOf(view, covered, source, roads, tiles),
     [view, covered, source, roads, tiles],
   )
+  const namesOf = useMemo(() => {
+    if (view === undefined || covered === undefined || source === undefined || !roads) {
+      return NO_NAMES
+    }
+    const found = covered.wanted.map(
+      (at) => [at, tiles.get(tileAddress(source.template, covered.depth, at))?.[PLACES]] as const,
+    )
+    return (taken: readonly PlaceNameBox[]) => placeNames(covered, view, found, language, taken)
+  }, [view, covered, source, roads, tiles, language])
   const colorOf = useMemo(() => {
     const land = parseColor(ink('color-surface'))
     const fallback = ink('color-surface')
@@ -299,5 +325,22 @@ export const useStillGround = (
         : cssColor(mix(land, toward, layer.amount))
     }
   }, [ink])
-  return { base, colorOf }
+  const inkOf = useMemo(() => {
+    const land = parseColor(ink('color-surface'))
+    const words = parseColor(ink('color-foreground'))
+    const found = new Map<number, string>()
+    return (amount: number): string => {
+      const had = found.get(amount)
+      if (had !== undefined) {
+        return had
+      }
+      const color =
+        land === undefined || words === undefined
+          ? ink('color-foreground')
+          : legible(land, words, land, 4.5, amount)
+      found.set(amount, color)
+      return color
+    }
+  }, [ink])
+  return { base, colorOf, inkOf, namesOf }
 }

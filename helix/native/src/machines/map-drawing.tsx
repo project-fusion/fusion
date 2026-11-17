@@ -10,8 +10,10 @@
  * draws them in (`map-tiles.ts`), then each area, route and points layer
  * from core's projection at the view the controls move, in the colors and
  * widths MapLibre draws them in, a points layer that clusters as MapLibre's
- * counts. Labels, landmarks and signs, imagery, shading, raised buildings,
- * and the frame's own land cover are MapLibre's alone.
+ * counts, then the names of the tiles' cities, towns, villages and
+ * neighborhoods where they do not overlap (`map-names.tsx`), then the areas'
+ * captions. Road names, shields, landmarks, imagery, shading, raised
+ * buildings, and the frame's own land cover are MapLibre's alone.
  */
 import {
   clusterRadiusOf,
@@ -19,6 +21,8 @@ import {
   type MapDrawnPoint,
   type MapLayerSpec,
   type MapView,
+  type PlaceName,
+  type PlaceNameBox,
   pointsDrawn,
   type ScreenPoint,
   screenOf,
@@ -28,6 +32,7 @@ import { memo, type ReactNode, type Ref, useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import type { CameraRef, MapLibreModule, ViewStateChangeEvent } from '../render/maplibre-types'
 import { svg } from '../render/vector'
+import { nameShapes } from './map-names'
 import type { StillBase } from './map-tiles'
 
 /** The most places of one layer the still picture draws in view, past which it draws every so many. */
@@ -98,7 +103,11 @@ interface StillProps {
   readonly base: readonly StillBase[]
   /** A tiles' layer's color: the land moved toward its token. */
   readonly colorOf: (layer: StillBase['layer']) => string
+  /** A place name's color by how far its layer moves the land toward the ink. */
+  readonly inkOf: (amount: number) => string
   readonly land: string
+  /** The tiles' place names that fit the view, clear of the boxes given. */
+  readonly namesOf: (taken: readonly PlaceNameBox[]) => readonly PlaceName[]
   readonly specs: readonly MapLayerSpec[]
   readonly view: MapView
 }
@@ -259,6 +268,27 @@ const pointsShapes = (module: SvgModule, view: MapView, spec: MapLayerSpec): Rea
   ]
 }
 
+/**
+ * The box round each count the points layers draw in view, its halo
+ * included, which a place name keeps clear of: a name across a count
+ * hides its figures.
+ */
+const countBoxes = (view: MapView, specs: readonly MapLayerSpec[]): PlaceNameBox[] =>
+  specs.flatMap((spec) =>
+    spec.kind !== 'points'
+      ? []
+      : pointsDrawn(spec, view.zoom).flatMap((one): PlaceNameBox[] => {
+          if (one.kind !== 'cluster') {
+            return []
+          }
+          const reach = clusterRadiusOf(one.count) + 6
+          const at = inViewOf(view, one, reach)
+          return at === undefined
+            ? []
+            : [[at[0] - reach, at[1] - reach, at[0] + reach, at[1] + reach]]
+        }),
+  )
+
 /** The tiles' layers, each one path in its color: a fill, or a line as wide as the style draws it at the zoom. */
 const baseShapes = (
   { Path }: SvgModule,
@@ -292,7 +322,7 @@ const SHAPES: Partial<
 > = { area: areaShapes, points: pointsShapes, route: routeShapes }
 
 /** The still picture, drawn again only when the view or the layers change. */
-export const MapStill = memo(({ base, colorOf, land, specs, view }: StillProps) => {
+export const MapStill = memo(({ base, colorOf, inkOf, land, namesOf, specs, view }: StillProps) => {
   const module = svg()
   const { Rect, Svg } = module
   const ground = useMemo(
@@ -302,9 +332,10 @@ export const MapStill = memo(({ base, colorOf, land, specs, view }: StillProps) 
   const shapes = useMemo(
     () => [
       ...specs.flatMap((spec) => SHAPES[spec.kind]?.(module, view, spec) ?? []),
+      ...nameShapes(module, namesOf(countBoxes(view, specs)), land, inkOf),
       ...specs.flatMap((spec) => captionShapes(module, view, spec)),
     ],
-    [module, specs, view],
+    [module, specs, view, namesOf, land, inkOf],
   )
   return (
     <Svg height={view.height} style={StyleSheet.absoluteFill} width={view.width}>
