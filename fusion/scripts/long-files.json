@@ -363,7 +363,6 @@
     "helix/map/src/maplibre/maplibre-driver.dom.spec.ts",
     "helix/map/src/maplibre/maplibre-driver.ts",
     "helix/map/src/snapshot/snapshot.pure.spec.ts",
-    "helix/map/src/snapshot/snapshot.ts",
     "helix/native/src/machines/carousel.tsx",
     "helix/native/src/machines/chat.tsx",
     "helix/native/src/machines/code-block-model.ts",

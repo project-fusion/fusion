@@ -1,3 +1,4 @@
+import { CLUSTER_MAX_ZOOM, CLUSTER_RADIUS } from './clusters.js'
 import type { MapLayerSpec } from './driver.js'
 import {
   buildingsExtrusion,
@@ -141,7 +142,9 @@ const pointsAdded = (spec: MapLayerSpec, face: string[]): Added => {
     sources: {
       [source]: {
         cluster: spec.cluster === true,
-        clusterRadius: 50,
+        /* The web's driver's, so a phone's counts are the web's. */
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+        clusterRadius: CLUSTER_RADIUS,
         data: pointsJson(spec.points),
         type: 'geojson',
       },

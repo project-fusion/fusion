@@ -4,6 +4,8 @@ import {
   buildingsExtrusion,
   buildingsLayer,
   CAPTIONS,
+  CLUSTER_MAX_ZOOM,
+  CLUSTER_RADIUS,
   COVERS,
   captionLayer,
   contoursSource,
@@ -615,8 +617,8 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
               cluster,
               /* Apart from street level on, where a block of six is six
                  places a reader can tell apart. */
-              clusterMaxZoom: 14,
-              clusterRadius: 44,
+              clusterMaxZoom: CLUSTER_MAX_ZOOM,
+              clusterRadius: CLUSTER_RADIUS,
               data: pointsJson(spec.points),
               type: 'geojson',
             } as never)
