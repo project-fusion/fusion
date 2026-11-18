@@ -296,11 +296,14 @@
   block-size: var(--_megamenu-caret);
   flex: 0 0 auto;
   inline-size: var(--_megamenu-caret);
-  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
+/* **Flipped open, as Accordion's chevron is**, over the same beat: a 180°
+   turn swung the caret through a sideways point on its way, which a flip
+   crosses fast along `emphasized`. */
 [part="trigger"][aria-expanded="true"] [part="trigger-indicator"] {
-  rotate: 180deg;
+  scale: 1 -1;
 }
 
 /* **One panel handing over to the next, as the reader moves along the bar.**
