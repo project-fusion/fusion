@@ -367,6 +367,17 @@ pass() {
       say "Maestro's driver did not start; running $name again"
       driver=--reinstall-driver
       rm -rf "$out/debug/$name"
+      # **A driver that missed its start stayed stuck on that simulator**: the
+      # rerun on the same simulator timed out too, in two jobs of run
+      # 44214044810, and the next pass read nothing of the screen but the
+      # status bar. The simulator starts again first, which keeps its
+      # appearance, text size and the gallery.
+      if [[ $platform == ios ]]; then
+        say "Starting the simulator again"
+        xcrun simctl shutdown "$device" > /dev/null 2>&1 || true
+        xcrun simctl boot "$device" > /dev/null 2>&1 || true
+        xcrun simctl bootstatus "$device" -b > /dev/null 2>&1 || true
+      fi
       run_maestro "$name" "$@" || result=failed
     elif driver_lost "$name"; then
       say "Maestro lost the simulator; running $name again"
