@@ -177,9 +177,13 @@ describe('a selection', () => {
     await layOut()
     const flat = (style: unknown): Record<string, unknown> =>
       Object.assign({}, ...[style].flat(9).filter(Boolean))
-    /* The selected card's own edge, an outline over its border. */
+    /* The selected card's own edge, an outline over its border. Every card draws
+       the edge, in no color until it is selected. */
     const ringed = screen.root?.queryAll(
-      (node) => typeof node.type === 'string' && flat(node.props.style).outlineWidth === 2,
+      (node) =>
+        typeof node.type === 'string' &&
+        flat(node.props.style).outlineWidth === 2 &&
+        flat(node.props.style).outlineColor !== 'transparent',
     )
     expect(ringed).toHaveLength(1)
     const card = screen.getByLabelText('Review the draft', { includeHiddenElements: true })

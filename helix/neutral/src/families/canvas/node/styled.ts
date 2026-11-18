@@ -225,14 +225,15 @@ export default styles(
           { backgroundColor: first(own.canvasCardHookFill, token('color-surface-filled')) },
         ),
         /* **Selected, until the reader selects something else or nothing**,
-           on the card's own edge. */
-        rule(
-          { selected: true },
-          {
-            outline: [token('border-thick'), 'solid', selectedColor],
-            outlineOffset: product(token('border-thin'), '-1'),
-          },
-        ),
+           on the card's own edge. The edge is drawn on every card in no color,
+           and takes the accent when the card is selected, so selecting fades it
+           in instead of switching it on. */
+        rule({
+          outline: [token('border-thick'), 'solid', 'transparent'],
+          outlineOffset: product(token('border-thin'), '-1'),
+          transition: ['outline-color', token('duration-fast'), token('easing-standard')],
+        }),
+        rule({ selected: true }, { outlineColor: selectedColor }),
         rule({ target: true }, { boxShadow: [0, 0, 0, token('border-thick'), connectColor] }),
         rule(
           [
