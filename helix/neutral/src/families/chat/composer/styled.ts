@@ -64,6 +64,8 @@ export default styles(
       borderWidth: token('border-thin'),
       glowColor: token('color-primary'),
       maxBlockSize: '12rem',
+      moveDuration: null,
+      moveEasing: null,
     },
     own: {
       chatComposerBloom: null,
@@ -79,6 +81,18 @@ export default styles(
     stylesheet: 'chat/composer/chat-composer.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => [
+    /* An attachment arriving fades in, one leaving fades where it was, and the
+       rest slide into place, at the pace and on the curve rows and tags move by
+       everywhere. A phone moves nothing: its attachments stand in their new
+       places at once. */
+    on('host', [
+      web([
+        rule({
+          '--chat-composer-move-duration': token('duration-normal'),
+          '--chat-composer-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('host', [
       rule({ display: 'block' }),
       web([
@@ -420,6 +434,9 @@ export default styles(
         paddingBlockStart: FIELD_INSET,
         paddingInline: FIELD_INSET,
       }),
+      /* Where a leaving attachment's copy fades, so the box the copy is placed
+         against: the web's layout motion lays it there. */
+      web([rule({ position: 'relative' })]),
       native([rule({ flexDirection: 'row' })]),
       rule({ part: { hidden: true } }, { display: 'none' }),
     ]),

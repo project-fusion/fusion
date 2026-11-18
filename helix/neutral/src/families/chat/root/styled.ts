@@ -3,6 +3,7 @@ import {
   difference,
   fn,
   hookOf,
+  list,
   mix,
   native,
   product,
@@ -172,6 +173,29 @@ export default styles(
     /* Written out: the vocabulary reads no attribute's value by a part's index. */
     on({ part: 'turn', selector: '[part="turn"]:not([data-index="0"])' }, [
       web([rule({ paddingBlockStart: hook.gap })]),
+    ]),
+    /* A turn arriving rises into place, a step below where it lands, and fades
+       in. Only a turn added at the end, which the web's headless tier marks
+       `data-arriving` for the render it arrives in: not the conversation the page
+       came with, not history loaded above, not a turn scrolled back into view. A
+       phone's turn stands in its place at once. */
+    on('turn', [
+      web([
+        rule(
+          { part: { 'data-arriving': true } },
+          {
+            transition: list(
+              ['opacity', token('duration-normal'), token('easing-decelerate')],
+              ['translate', token('duration-normal'), token('easing-decelerate')],
+            ),
+          },
+        ),
+        rule(
+          { part: { 'data-arriving': true }, startingStyle: true },
+          { opacity: 0, translate: [0, token('space-sm')] },
+        ),
+        rule({ part: { 'data-arriving': true }, reducedMotion: true }, { transition: 'none' }),
+      ]),
     ]),
     on('resume', [
       rule({
