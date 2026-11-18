@@ -149,8 +149,8 @@ graph's frame, that stops it where the notes stand.
 ## Rows, tags, and items that move
 
 When you sort, add, remove, or hide the rows of a `List`, the tags of a
-`Tag.Group`, or the items of a `Tree`, each one slides from where it was to
-where it is now. A tree's branch carries its rows with it. A `Table` or a Data
+`Tag.Group`, the items of a `Tree`, the rows of `Notifications`, or the entries
+of a `Timeline`, each one slides from where it was to where it is now. A tree's branch carries its rows with it. A `Table` or a Data
 Table that sorts moves its rows the same way, each row's cells together, and a
 Data Table needs `row-key` to know a row across the change. A row, a tag, or an
 item you add fades in. A list you render again with all new elements appears
@@ -161,8 +161,8 @@ sets from the tokens:
 
 | Hook | Default |
 | --- | --- |
-| `--list-move-duration`, `--tag-group-move-duration`, `--tree-move-duration`, `--table-move-duration`, `--data-table-move-duration` | `--helix-duration-normal` |
-| `--list-move-easing`, `--tag-group-move-easing`, `--tree-move-easing`, `--table-move-easing`, `--data-table-move-easing` | `--helix-easing-standard` |
+| `--list-move-duration`, `--tag-group-move-duration`, `--tree-move-duration`, `--table-move-duration`, `--data-table-move-duration`, `--notifications-move-duration`, `--timeline-move-duration` | `--helix-duration-normal` |
+| `--list-move-easing`, `--tag-group-move-easing`, `--tree-move-easing`, `--table-move-easing`, `--data-table-move-easing`, `--notifications-move-easing`, `--timeline-move-easing` | `--helix-easing-standard` |
 
 Set them on the element to change one list, or on a selector to change many:
 
@@ -199,6 +199,12 @@ default, along `--stat-count-easing` or `--trend-count-easing`,
 `--helix-easing-decelerate` by default, so the figure slows as it arrives.
 `0ms` changes the figure at once, as reduced motion does. A figure you put in
 the slot changes at once.
+
+The number a `Progress` or a `Meter` shows under `show-value` counts the same
+way, at the pace of the fill, from `--progress-count-duration` and
+`--meter-count-duration`, which the styled tier sets from the fill's own
+duration. A `Badge` whose count changes swells and settles over
+`--badge-bump-duration`.
 
 ## Charts that follow their readings
 
