@@ -38,8 +38,7 @@
         - treeitem "Preview" [level=2] [selected]
         - treeitem "Chevron at the start" [level=2]
         - treeitem "Events" [level=2]
-        - treeitem "Outlined" [level=2]
-        - treeitem "Plain" [level=2]
+        - treeitem "Separation" [level=2]
         - treeitem "Single" [level=2]
     - treeitem "Announcement Announcement documentation" [level=1]:
       - text: Announcement
@@ -156,6 +155,11 @@
       - text: Copy Button
       - link "Copy Button documentation":
         - /url: /helix/components/copy-button
+    - treeitem "Cursor Cursor documentation Experimental" [level=1]:
+      - text: Cursor
+      - link "Cursor documentation":
+        - /url: /helix/components/cursor
+      - img "Experimental"
     - treeitem "Data Table Data Table documentation" [level=1]:
       - text: Data Table
       - link "Data Table documentation":
@@ -239,6 +243,16 @@
       - text: Heatmap
       - link "Heatmap documentation":
         - /url: /helix/components/heatmap
+    - treeitem "Highlighter Highlighter documentation Experimental" [level=1]:
+      - text: Highlighter
+      - link "Highlighter documentation":
+        - /url: /helix/components/highlighter
+      - img "Experimental"
+    - treeitem "Hover Card Hover Card documentation Experimental" [level=1]:
+      - text: Hover Card
+      - link "Hover Card documentation":
+        - /url: /helix/components/hover-card
+      - img "Experimental"
     - treeitem "Icon Icon documentation" [level=1]:
       - text: Icon
       - link "Icon documentation":
@@ -288,6 +302,11 @@
       - link "Log documentation":
         - /url: /helix/components/log
       - img "Experimental"
+    - treeitem "Magnetic Magnetic documentation Experimental" [level=1]:
+      - text: Magnetic
+      - link "Magnetic documentation":
+        - /url: /helix/components/magnetic
+      - img "Experimental"
     - treeitem "Map Map documentation" [level=1]:
       - text: Map
       - link "Map documentation":
@@ -296,6 +315,11 @@
       - text: Markdown
       - link "Markdown documentation":
         - /url: /helix/components/markdown
+      - img "Experimental"
+    - treeitem "Marquee Marquee documentation Experimental" [level=1]:
+      - text: Marquee
+      - link "Marquee documentation":
+        - /url: /helix/components/marquee
       - img "Experimental"
     - treeitem "Megamenu Megamenu documentation" [level=1]:
       - text: Megamenu
@@ -346,6 +370,11 @@
       - text: Pagination
       - link "Pagination documentation":
         - /url: /helix/components/pagination
+    - treeitem "Pattern Pattern documentation Experimental" [level=1]:
+      - text: Pattern
+      - link "Pattern documentation":
+        - /url: /helix/components/pattern
+      - img "Experimental"
     - treeitem "Pin Input Pin Input documentation" [level=1]:
       - text: Pin Input
       - link "Pin Input documentation":
@@ -379,6 +408,16 @@
       - text: Rating
       - link "Rating documentation":
         - /url: /helix/components/rating
+    - treeitem "Reveal Reveal documentation Experimental" [level=1]:
+      - text: Reveal
+      - link "Reveal documentation":
+        - /url: /helix/components/reveal
+      - img "Experimental"
+    - treeitem "Rotating Text Rotating Text documentation Experimental" [level=1]:
+      - text: Rotating Text
+      - link "Rotating Text documentation":
+        - /url: /helix/components/rotating-text
+      - img "Experimental"
     - treeitem "Sandbox Sandbox documentation" [level=1]:
       - text: Sandbox
       - link "Sandbox documentation":
@@ -391,6 +430,11 @@
       - text: Scroll Area
       - link "Scroll Area documentation":
         - /url: /helix/components/scroll-area
+    - treeitem "Scroll Progress Scroll Progress documentation Experimental" [level=1]:
+      - text: Scroll Progress
+      - link "Scroll Progress documentation":
+        - /url: /helix/components/scroll-progress
+      - img "Experimental"
     - treeitem "Select Select documentation" [level=1]:
       - text: Select
       - link "Select documentation":
@@ -399,6 +443,16 @@
       - text: Selection Bar
       - link "Selection Bar documentation":
         - /url: /helix/components/selection-bar
+      - img "Experimental"
+    - treeitem "Shimmer Text Shimmer Text documentation Experimental" [level=1]:
+      - text: Shimmer Text
+      - link "Shimmer Text documentation":
+        - /url: /helix/components/shimmer-text
+      - img "Experimental"
+    - treeitem "Shine Shine documentation Experimental" [level=1]:
+      - text: Shine
+      - link "Shine documentation":
+        - /url: /helix/components/shine
       - img "Experimental"
     - treeitem "Shortcut Overlay Shortcut Overlay documentation Experimental" [level=1]:
       - text: Shortcut Overlay
@@ -417,6 +471,11 @@
       - text: Slider
       - link "Slider documentation":
         - /url: /helix/components/slider
+    - treeitem "Sliding Number Sliding Number documentation Experimental" [level=1]:
+      - text: Sliding Number
+      - link "Sliding Number documentation":
+        - /url: /helix/components/sliding-number
+      - img "Experimental"
     - treeitem "Sparkline Sparkline documentation" [level=1]:
       - text: Sparkline
       - link "Sparkline documentation":
@@ -506,6 +565,16 @@
       - text: Textarea
       - link "Textarea documentation":
         - /url: /helix/components/textarea
+    - treeitem "Theme Toggle Theme Toggle documentation Experimental" [level=1]:
+      - text: Theme Toggle
+      - link "Theme Toggle documentation":
+        - /url: /helix/components/theme-toggle
+      - img "Experimental"
+    - treeitem "Tilt Tilt documentation Experimental" [level=1]:
+      - text: Tilt
+      - link "Tilt documentation":
+        - /url: /helix/components/tilt
+      - img "Experimental"
     - treeitem "Time Input Time Input documentation" [level=1]:
       - text: Time Input
       - link "Time Input documentation":
