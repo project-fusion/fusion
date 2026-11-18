@@ -60,7 +60,7 @@ export default styles(
       triggerPaddingInline: token('space-xs'),
       triggerRadius: token('radii-sm'),
     },
-    own: { megamenuCaret: null },
+    own: { megamenuCaret: null, megamenuDrift: null },
     stylesheet: 'megamenu/root/megamenu-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -161,7 +161,7 @@ export default styles(
         ),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
-      /* The caret on the default trigger, turned while the panel is open. */
+      /* The caret on the default trigger, flipped while the panel is open. */
       /* The caret says the word opens something, as a Select's does. **Sized
          from the word beside it**, which holds at `text-sm` whatever the
          density, so the caret holds too: the tight icon step grew it from 12
@@ -177,10 +177,14 @@ export default styles(
           blockSize: own.megamenuCaret,
           flex: '0 0 auto',
           inlineSize: own.megamenuCaret,
-          transform: 'rotate(0deg)',
-          transition: ['transform', fast, token('easing-standard')],
+          transition: ['scale', token('duration-normal'), token('easing-emphasized')],
         }),
-        rule({ open: true }, { transform: 'rotate(180deg)' }),
+        /* **Flipped open, as Accordion's chevron is**, over the same beat: a
+           half turn swung the caret through a sideways point on its way, which
+           a flip crosses fast along `emphasized`. A phone flips from a written
+           start. */
+        native([rule({ scale: '1 1' })]),
+        rule({ open: true }, { scale: '1 -1' }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
@@ -324,6 +328,125 @@ export default styles(
         ),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
+      /* **One panel handing over to the next, as the reader moves along the
+         bar.** Opened on its own, a panel draws down as a curtain; handed
+         over, a second curtain closing as the next one opens read as the bar
+         flickering. So a panel that takes over skips the curtain, already its
+         full size, and settles in from the side the reader moved from as the
+         one it replaces fades out toward the side they moved to, by the
+         states the headless tier publishes. On `transform`, because the card
+         is placed through `translate`. A band spans the page, so it
+         crossfades where it stands. Only where the reader has not asked for
+         less movement: the panel simply changes there, as an opened one does.
+         Written out: the vocabulary names no `:popover-open`. A phone opens
+         each panel as it opens one on its own. */
+      on('host', [
+        web([
+          rule({ own: { megamenuDrift: token('space-xl') } }),
+          rule({ dir: 'rtl' }, { own: { megamenuDrift: product(token('space-xl'), '-1') } }),
+        ]),
+      ]),
+      on(
+        {
+          part: 'surface',
+          selector:
+            ':host(:is(:state(from-end), :state(from-start), :state(to-end), :state(to-start))) [part="surface"]',
+        },
+        [
+          web([
+            rule(
+              { reducedMotion: false },
+              {
+                transition: list(
+                  ['opacity', slow, token('easing-standard')],
+                  ['transform', slow, token('easing-decelerate')],
+                  ['display', slow, 'allow-discrete'],
+                  ['overlay', slow, 'allow-discrete'],
+                ),
+              },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        {
+          part: 'surface',
+          selector:
+            ':host(:is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open)',
+        },
+        [
+          web([
+            rule(
+              { reducedMotion: false },
+              { clipPath: fn('inset', [0, out, out, out]), opacity: 0 },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        { part: 'surface', selector: ':host(:state(to-start)) [part="surface"]:not(:popover-open)' },
+        [
+          web([
+            rule(
+              { reducedMotion: false },
+              { transform: fn('translateX', product(own.megamenuDrift, '-1')) },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        { part: 'surface', selector: ':host(:state(to-end)) [part="surface"]:not(:popover-open)' },
+        [
+          web([
+            rule({ reducedMotion: false }, { transform: fn('translateX', own.megamenuDrift) }),
+          ]),
+        ],
+      ),
+      on(
+        { part: 'surface', selector: ':host(:state(from-end)) [part="surface"]:popover-open' },
+        [
+          web([
+            rule(
+              { reducedMotion: false, startingStyle: true },
+              { opacity: 0, transform: fn('translateX', own.megamenuDrift) },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        { part: 'surface', selector: ':host(:state(from-start)) [part="surface"]:popover-open' },
+        [
+          web([
+            rule(
+              { reducedMotion: false, startingStyle: true },
+              { opacity: 0, transform: fn('translateX', product(own.megamenuDrift, '-1')) },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        {
+          part: 'surface',
+          selector:
+            ':host([layout="band"]:is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open), :host(:state(narrow):is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open)',
+        },
+        [
+          web([
+            rule(
+              { reducedMotion: false },
+              { clipPath: fn('inset', [0, 0, out, 0]), transform: 'none' },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        {
+          part: 'surface',
+          selector:
+            ':host([layout="band"]:is(:state(from-end), :state(from-start))) [part="surface"]:popover-open, :host(:state(narrow):is(:state(from-end), :state(from-start))) [part="surface"]:popover-open',
+        },
+        [web([rule({ reducedMotion: false, startingStyle: true }, { transform: 'none' })])],
+      ),
       /* Every rule giving the panel a display overrules the UA's own hide. */
       on('surface', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
     ]
