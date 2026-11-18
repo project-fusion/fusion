@@ -26,6 +26,8 @@ describe('the dismissible example', () => {
         await new Promise((done) => setTimeout(done, 50))
       }
       expect(tip.hidden).toBe(true)
+      /* Focus moves on a frame after the callout hides. */
+      await idle()
       expect(document.activeElement?.localName).toBe('helix-button')
       ;(document.getElementById('show-tip') as HTMLElement).click()
       await idle()
