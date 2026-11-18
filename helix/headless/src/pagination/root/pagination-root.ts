@@ -8,7 +8,9 @@ import {
   HelixElement,
   HelixNavigateEvent,
   hostAria,
+  IndicatorController,
   internalsOf,
+  LayoutMotionController,
   MIRROR_RULE,
   numberConverter,
   requestChange,
@@ -117,6 +119,7 @@ const fill = (template: string, page: number, pages: number): string =>
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control in place of hidden pages, which jumps into them.
+ * @csspart indicator - One mark that moves to the page you are on, inside the run. It carries the page's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart list - The run of pages.
@@ -917,6 +920,38 @@ export class HelixHeadlessPagination extends HelixElement {
         </button>`
   }
 
+  /**
+   * The mark that moves to the page you are on, as the selection mark of
+   * `Toggle Group` and `Tabs` moves, so changing page is one mark travelling
+   * along the run. Measured against the run, which scrolls it with the pages.
+   */
+  protected readonly indicator = new IndicatorController(this, {
+    active: () =>
+      this.renderRoot?.querySelector<HTMLElement>('[part~="page"][aria-current="page"]'),
+    indicator: () => this.partNamed('indicator'),
+    observe: () => [...(this.renderRoot?.querySelectorAll('[part~="page"]') ?? [])],
+    surface: () => this.partNamed('list'),
+  })
+
+  /**
+   * Sliding the pages along the run as it moves, so going to the next page
+   * where the run keeps the current one in its middle reads as the numbers
+   * moving along under the mark, and a page coming into the run fades in.
+   * Timed by `--pagination-move-duration` and `--pagination-move-easing`,
+   * which this tier never sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="item"]') ?? [])],
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--pagination-move-duration'),
+        easing: style.getPropertyValue('--pagination-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
+
   protected override render(): TemplateResult {
     if (this.folded) {
       /* **The status in the direction of its own words**, `dir="auto"`.
@@ -930,6 +965,7 @@ export class HelixHeadlessPagination extends HelixElement {
     }
     return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
       <ol part="list" role="list">
+        <li part="indicator" role="none" aria-hidden="true" hidden></li>
         ${
           /* Keyed by page, so a page's control stays that page's as the run
              moves under it, and a reader who chose page 5 is still on page 5.

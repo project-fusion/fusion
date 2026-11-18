@@ -53,6 +53,8 @@ import { styles } from './pagination-root.css.js'
  * @cssproperty --pagination-hover-background-color - Fill behind a control under the pointer.
  * @cssproperty --pagination-hover-foreground-color - Color of a control's number or mark under the pointer.
  * @cssproperty --pagination-icon-size - Size of the mark on a first, previous, next or last control, drawn or slotted.
+ * @cssproperty --pagination-move-duration - How long a page takes to slide along the run, or to fade in as it joins it. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --pagination-move-easing - The curve the pages slide along. Defaults to `--helix-easing-emphasized`.
  * @cssproperty --pagination-padding - Space either side of a control's number or mark.
  * @cssproperty --pagination-radius - Corner radius of every control in the row.
  * @cssproperty --pagination-size - The box every control in the row takes.
