@@ -45,7 +45,9 @@ procedure.
 - Class JSDoc carries the full contract: `@summary`, `@description`, `@since`,
   `@status`, `@documentation`, plus `@slot`, `@csspart`, and
   `@event {EventClass}` where applicable. The linter fails the build without the
-  first five.
+  first five. A family root also says when to use it, with `@use`, `@instead`,
+  and `@anatomy`, the same lines on both tiers. "JSDoc contract" in
+  `helix/CONVENTIONS.md` has the format.
 - Each `@property` gets a one-line description.
 - A numeric attribute reads through core's `numberConverter('name', default)`,
   and one in milliseconds through `timeConverter`, which also takes `0.3s`. A

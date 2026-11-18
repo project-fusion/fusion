@@ -185,6 +185,19 @@ export const GROUPS = ['charts'] as const
 /** One of the groups a component may declare itself part of. */
 export type Group = (typeof GROUPS)[number]
 
+/** Another family to use, and the situation it is for, from `@instead`. */
+export interface Instead {
+  description?: string
+  /** The other family's slug, such as `select`. */
+  family: string
+}
+
+/** One name in a family's anatomy, from `@anatomy`. */
+export interface AnatomyEntry {
+  name: string
+  optional?: boolean
+}
+
 /**
  * Fields Helix adds to the manifest beyond the CEM spec.
  *
@@ -198,6 +211,21 @@ export interface HelixMetadata {
 
   /** The native elements the family stands in for, from `@replaces`. */
   replaces?: string[]
+
+  /** The situations the family is for, one per `@use`, at most three. */
+  use?: string[]
+
+  /**
+   * The families to use in other situations, one per `@instead
+   * <family> - <when>`, at most three. `family` is the other family's slug.
+   */
+  instead?: Instead[]
+
+  /**
+   * The parts, slots, and csspart names that matter most, from `@anatomy`, in
+   * the order they are numbered. `optional` is set where the name ends in `?`.
+   */
+  anatomy?: AnatomyEntry[]
 
   /**
    * The native control the element draws its content inside, from

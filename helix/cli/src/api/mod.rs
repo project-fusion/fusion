@@ -523,6 +523,10 @@ pub fn find(from: &Path, query: &str, limit: usize) -> Outcome<Value> {
             json!({
                 "aliases": family["aliases"],
                 "category": family["category"],
+                /* **When to use the family and what to use instead**, so an
+                agent asking for "dropdown" reads, in the matches themselves,
+                that Menu runs commands and Select holds a value. */
+                "instead": family["instead"],
                 "replaces": family["replaces"],
                 "label": family["label"],
                 "package": family["package"],
@@ -530,6 +534,7 @@ pub fn find(from: &Path, query: &str, limit: usize) -> Outcome<Value> {
                 "status": family["status"],
                 "summary": family["summary"],
                 "tags": tags(family),
+                "use": family["use"],
             })
         })
         .collect();

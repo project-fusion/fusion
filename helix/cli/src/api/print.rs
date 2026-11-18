@@ -6,6 +6,54 @@ use serde_json::Value;
 
 use super::text;
 
+/// A family's guidance under its summary: when to use it, the families to use
+/// instead, and its anatomy. A family that writes none prints nothing here.
+fn guidance(family: &Value) {
+    let uses: Vec<String> = family["use"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(text)
+        .collect();
+    if !uses.is_empty() {
+        say!();
+        say!("use:");
+        for line in &uses {
+            say!("  {line}");
+        }
+    }
+    let instead: Vec<String> = family["instead"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|one| format!("{}: {}", text(&one["slug"]), text(&one["description"])))
+        .collect();
+    if !instead.is_empty() {
+        say!();
+        say!("instead:");
+        for line in &instead {
+            say!("  {line}");
+        }
+    }
+    let anatomy: Vec<String> = family["anatomy"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|one| {
+            let name = text(&one["name"]);
+            if one["optional"] == true {
+                format!("{name}?")
+            } else {
+                name
+            }
+        })
+        .collect();
+    if !anatomy.is_empty() {
+        say!();
+        say!("anatomy: {}", anatomy.join(", "));
+    }
+}
+
 /// Prints one answer in the form `--json` asked for.
 pub fn print(answer: &Value, json: bool) {
     if json {
@@ -71,6 +119,7 @@ pub fn print(answer: &Value, json: bool) {
         say!("{missing}");
     }
     say!("{}", text(&family["summary"]));
+    guidance(family);
     say!();
     let tier = family["elements"][0]["tier"].as_str().unwrap_or("styled");
     for line in family["usage"][tier].as_array().into_iter().flatten() {

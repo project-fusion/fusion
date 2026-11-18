@@ -68,6 +68,7 @@ pub mod glyphs;
 pub mod grafted;
 pub mod grammar;
 pub mod grounds;
+pub mod guidance;
 pub mod hook_names;
 pub mod hooks;
 pub mod installed;
@@ -628,6 +629,12 @@ fn every() -> Vec<Rule> {
             name: "aliases",
             run: Runner::Source(aliases::run),
             summary: "a family's two roots declare one list of aliases, or only one of them does",
+        },
+        Rule {
+            fix: None,
+            name: "guidance",
+            run: Runner::Source(guidance::run),
+            summary: "a family's guidance names real families and parts, and its two roots agree",
         },
         Rule {
             fix: None,

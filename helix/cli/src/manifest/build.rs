@@ -896,6 +896,64 @@ fn slug(word: &str) -> bool {
             .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit() || one == '-')
 }
 
+/// The family's design guidance: when to use it, what to use instead, and its
+/// anatomy.
+///
+/// **Every one of each tag, in the order written**, because each is a list
+/// whose order is the order the reference page reads them in. `@use` is one
+/// situation per tag. `@instead` is `<family> - <when>`, the grammar `@slot`
+/// already uses, and a line with no dash keeps its family and has no
+/// description, so `helix component`'s `guidance` can name the line that is
+/// missing one. `@anatomy` is a comma list of part, slot, and csspart names,
+/// and a trailing `?` marks a name as optional.
+///
+/// Nothing is checked here. A family that is not a family, or a part the
+/// element does not publish, is published as written, and the `guidance` rule
+/// reports it: dropping it here would hide the mistake from the one check that
+/// can name it.
+fn guidance(documented: &Documented, block: &mut serde_json::Map<String, Value>) {
+    let every = |name: &str| -> Vec<String> {
+        documented
+            .tags
+            .iter()
+            .filter(|(tag, _)| tag == name)
+            .map(|(_, text)| text.split_whitespace().collect::<Vec<&str>>().join(" "))
+            .filter(|one| !one.is_empty())
+            .collect()
+    };
+    let uses = every("use");
+    if !uses.is_empty() {
+        block.insert("use".to_owned(), json!(uses));
+    }
+    let instead: Vec<Value> = every("instead")
+        .iter()
+        .map(|text| {
+            let read = entry(text);
+            let mut one = serde_json::Map::new();
+            one.insert("family".to_owned(), json!(read.name));
+            if let Some(description) = read.description {
+                one.insert("description".to_owned(), json!(description));
+            }
+            Value::Object(one)
+        })
+        .collect();
+    if !instead.is_empty() {
+        block.insert("instead".to_owned(), json!(instead));
+    }
+    let anatomy: Vec<Value> = every("anatomy")
+        .iter()
+        .flat_map(|text| text.split(',').map(str::trim).collect::<Vec<&str>>())
+        .filter(|one| !one.is_empty())
+        .map(|name| match name.strip_suffix('?') {
+            Some(name) => json!({ "name": name.trim(), "optional": true }),
+            None => json!({ "name": name }),
+        })
+        .collect();
+    if !anatomy.is_empty() {
+        block.insert("anatomy".to_owned(), json!(anatomy));
+    }
+}
+
 fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) -> Option<Value> {
     let documented = &one.documented;
     let is_component = one.is_element;
@@ -933,6 +991,7 @@ fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) ->
     if !aliases.is_empty() {
         block.insert("aliases".to_owned(), json!(aliases));
     }
+    guidance(documented, &mut block);
     /* **The native elements the family stands in for**, as `button` or
     `input[type=checkbox]`. `helix scan` reports each one a page writes where
     the family is installed, and `helix api find` answers a native name with

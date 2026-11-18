@@ -97,6 +97,47 @@ describe('catalog', () => {
     expect(pagination?.summary).toBe('Moves between pages.')
   })
 
+  test('a family without guidance publishes empty lists', () => {
+    expect(pagination?.use).toEqual([])
+    expect(pagination?.instead).toEqual([])
+    expect(pagination?.anatomy).toEqual([])
+  })
+
+  test('guidance comes from the root that writes it, with each alternative labeled', () => {
+    const [menu] = catalog([
+      {
+        modules: [
+          {
+            declarations: [{ name: 'HelixMenu', tagName: 'helix-menu' }],
+            path: 'src/menu/root/menu-root.ts',
+          },
+          {
+            declarations: [
+              {
+                helix: {
+                  anatomy: [{ name: 'trigger' }, { name: 'header', optional: true }],
+                  instead: [{ description: 'A value a form submits.', family: 'number-input' }],
+                  use: ['Commands that act at once.'],
+                },
+                name: 'HelixHeadlessMenu',
+                tagName: 'helix-headless-menu',
+              },
+            ],
+            path: 'src/menu/root/headless-menu-root.ts',
+          },
+        ],
+      },
+    ])
+    expect(menu?.use).toEqual(['Commands that act at once.'])
+    expect(menu?.instead).toEqual([
+      { description: 'A value a form submits.', label: 'Number Input', slug: 'number-input' },
+    ])
+    expect(menu?.anatomy).toEqual([
+      { name: 'trigger', optional: false },
+      { name: 'header', optional: true },
+    ])
+  })
+
   // Alphabetical order would put the headless tier on top, which is the one
   // most readers never reach for.
   test('elements are styled first, then headless', () => {

@@ -1622,6 +1622,29 @@ nothing to the family's facts.
 **The tag is `@aliases`.** `@alias` is not read by the metadata plugin, and
 `@category` is required: omitting it fails the build.
 
+**A family root says when to use it, in three tags.** They are the family's
+design guidance, and the manifest carries them to the reference, the family's
+`.md` and `.json`, `helix api`, and the MCP server.
+
+- `@use` names one situation the family is for, such as "One value from a short
+  list." At most three.
+- `@instead <family> - <when>` names another family by its slug and the
+  situation it is for: `@instead combobox - A list long enough that you type to
+  find the value.` At most three, and never the family itself.
+- `@anatomy` lists the parts, slots, and csspart names that matter most, in the
+  order they are numbered, with `?` after an optional one: `@anatomy trigger,
+  surface, header?`.
+
+A line names a situation that can be checked against a page, never a quality
+such as emphasis. It never restates an axis, which the Visual axes page
+explains once, and never repeats what the component already does, such as a
+dialog trapping focus. Both roots write the same lines. `helix component`'s
+`guidance` rule checks the counts, that every `@instead` names a real family,
+that every anatomy name is one the family publishes, and that the two roots
+agree. It also counts each alias two families share where neither names the
+other in an `@instead`. Settle such a pair with an `@instead`, or drop the alias
+from the family where the word means something else.
+
 Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
 badge a docs page or warn a consumer.
@@ -1630,7 +1653,8 @@ badge a docs page or warn a consumer.
 
 ```
 @summary  @description  @since  @status  @category  @family  @groups
-@aliases  @documentation  @slot  @event  @csspart  @cssproperty  @cssstate
+@aliases  @use  @instead  @anatomy  @documentation  @slot  @event  @csspart
+@cssproperty  @cssstate
 ```
 
 One blank line between groups and none between the metadata tags, which is what

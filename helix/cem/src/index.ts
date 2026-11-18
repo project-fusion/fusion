@@ -401,6 +401,8 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
 }
 
 export {
+  type Alternative,
+  type AnatomyPart,
   type ApiMember,
   type Contribution,
   catalog,
@@ -417,6 +419,7 @@ export {
 } from './catalog.js'
 export { displayName, familyOf, place, sentenceCase, startCase, tierOf } from './naming.js'
 export type {
+  AnatomyEntry,
   Documented,
   HelixAttribute,
   HelixCssProperty,
@@ -427,5 +430,6 @@ export type {
   HelixMetadata,
   HelixModule,
   InheritedFrom,
+  Instead,
   TypeText,
 } from './types.js'
