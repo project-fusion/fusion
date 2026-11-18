@@ -1,24 +1,31 @@
 import { useState } from 'react'
 
 export function Example() {
-  const [shown, setShown] = useState(true)
+  const [open, setOpen] = useState(true)
 
   return (
     <helix-flex
       direction="column"
       gap="md"
     >
-      {shown ? (
-        <helix-callout
-          dismissible
-          onhelix-dismiss={() => setShown(false)}
-          tone="neutral"
+      <helix-callout
+        dismissible
+        onhelix-dismiss={() => setOpen(false)}
+        open={open}
+        tone="neutral"
+      >
+        <span slot="heading">Tip</span>
+        Press the slash key to search from anywhere.
+      </helix-callout>
+      <helix-flex gap="sm">
+        <helix-button>Open settings</helix-button>
+        <helix-button
+          emphasis="ghost"
+          onClick={() => setOpen(true)}
         >
-          <span slot="heading">Tip</span>
-          Press the slash key to search from anywhere.
-        </helix-callout>
-      ) : null}
-      <helix-button>Open settings</helix-button>
+          Show tip
+        </helix-button>
+      </helix-flex>
     </helix-flex>
   )
 }

@@ -1,4 +1,4 @@
-<!-- @summary A dismissible callout sends `helix-dismiss`, and the page removes it. Focus moves on to the next control. -->
+<!-- @summary A dismissible callout fades and folds away, and the controls under it rise into its place. Focus moves on to the next control, and Show tip brings it back. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -11,11 +11,17 @@
     <span slot="heading">Tip</span>
     Press the slash key to search from anywhere.
   </helix-callout>
-  <helix-button>Open settings</helix-button>
+  <helix-flex gap="sm">
+    <helix-button>Open settings</helix-button>
+    <helix-button
+      emphasis="ghost"
+      id="show-tip"
+    >Show tip</helix-button>
+  </helix-flex>
 </helix-flex>
 
 <script type="module">
-  document.getElementById('tip').addEventListener('helix-dismiss', (event) => {
-    event.currentTarget.remove()
+  document.getElementById('show-tip').addEventListener('click', () => {
+    document.getElementById('tip').open = true
   })
 </script>
