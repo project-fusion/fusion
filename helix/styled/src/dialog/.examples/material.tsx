@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import './material.css'
 
 export function Example() {
+  const [shown, setShown] = useState<string>()
+
   return (
     <>
       <div className="page">
@@ -17,30 +20,17 @@ export function Example() {
           gap="sm"
           wrap
         >
-          <helix-button
-            command="--show"
-            commandfor="opaque-dialog"
-          >
-            Opaque
-          </helix-button>
-          <helix-button
-            command="--show"
-            commandfor="glass-dialog"
-          >
-            Glass
-          </helix-button>
-          <helix-button
-            command="--show"
-            commandfor="frosted-dialog"
-          >
-            Frosted
-          </helix-button>
+          <helix-button onClick={() => setShown('opaque-dialog')}>Opaque</helix-button>
+          <helix-button onClick={() => setShown('glass-dialog')}>Glass</helix-button>
+          <helix-button onClick={() => setShown('frosted-dialog')}>Frosted</helix-button>
         </helix-flex>
       </div>
 
       <helix-dialog
         id="opaque-dialog"
         label="Invite member"
+        onClose={() => setShown(undefined)}
+        open={shown === 'opaque-dialog'}
       >
         <helix-text
           as="h2"
@@ -54,16 +44,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="opaque-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="opaque-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Send invite
@@ -75,6 +59,8 @@ export function Example() {
         id="glass-dialog"
         label="Invite member"
         material="glass"
+        onClose={() => setShown(undefined)}
+        open={shown === 'glass-dialog'}
       >
         <helix-text
           as="h2"
@@ -88,16 +74,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="glass-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="glass-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Send invite
@@ -109,6 +89,8 @@ export function Example() {
         id="frosted-dialog"
         label="Invite member"
         material="frosted"
+        onClose={() => setShown(undefined)}
+        open={shown === 'frosted-dialog'}
       >
         <helix-text
           as="h2"
@@ -122,16 +104,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="frosted-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="frosted-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Send invite

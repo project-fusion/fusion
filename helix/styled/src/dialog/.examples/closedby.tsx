@@ -1,28 +1,24 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [shown, setShown] = useState<string>()
+
   return (
     <>
       <helix-flex
         gap="sm"
         wrap
       >
-        <helix-button
-          command="--show"
-          commandfor="shared"
-        >
-          Share folder
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="unsaved"
-        >
-          Close editor
-        </helix-button>
+        <helix-button onClick={() => setShown('shared')}>Share folder</helix-button>
+        <helix-button onClick={() => setShown('unsaved')}>Close editor</helix-button>
       </helix-flex>
 
       <helix-dialog
         closedby="any"
         id="shared"
         label="Folder shared"
+        onClose={() => setShown(undefined)}
+        open={shown === 'shared'}
         size="sm"
       >
         <helix-text
@@ -40,6 +36,8 @@ export function Example() {
       <helix-dialog
         id="unsaved"
         label="Unsaved changes"
+        onClose={() => setShown(undefined)}
+        open={shown === 'unsaved'}
         persistent
       >
         <helix-text as="p">
@@ -50,16 +48,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Discard changes</helix-button>
           <helix-button
-            command="--close"
-            commandfor="unsaved"
-          >
-            Discard changes
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="unsaved"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Save changes

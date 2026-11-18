@@ -1,39 +1,25 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [shown, setShown] = useState<string>()
+
   return (
     <>
       <helix-flex
         gap="sm"
         wrap
       >
-        <helix-button
-          command="--show"
-          commandfor="small-dialog"
-        >
-          Small
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="medium-dialog"
-        >
-          Medium
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="large-dialog"
-        >
-          Large
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="full-dialog"
-        >
-          Full
-        </helix-button>
+        <helix-button onClick={() => setShown('small-dialog')}>Small</helix-button>
+        <helix-button onClick={() => setShown('medium-dialog')}>Medium</helix-button>
+        <helix-button onClick={() => setShown('large-dialog')}>Large</helix-button>
+        <helix-button onClick={() => setShown('full-dialog')}>Full</helix-button>
       </helix-flex>
 
       <helix-dialog
         id="small-dialog"
         label="Archive project?"
+        onClose={() => setShown(undefined)}
+        open={shown === 'small-dialog'}
         size="sm"
       >
         <helix-text
@@ -48,16 +34,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="small-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="small-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Archive project
@@ -68,6 +48,8 @@ export function Example() {
       <helix-dialog
         id="medium-dialog"
         label="Rename project"
+        onClose={() => setShown(undefined)}
+        open={shown === 'medium-dialog'}
       >
         <helix-text
           as="h2"
@@ -83,16 +65,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="medium-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="medium-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Rename project
@@ -103,6 +79,8 @@ export function Example() {
       <helix-dialog
         id="large-dialog"
         label="Edit profile"
+        onClose={() => setShown(undefined)}
+        open={shown === 'large-dialog'}
         size="lg"
       >
         <helix-text
@@ -120,16 +98,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="large-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="large-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Save changes
@@ -140,6 +112,8 @@ export function Example() {
       <helix-dialog
         id="full-dialog"
         label="Edit project"
+        onClose={() => setShown(undefined)}
+        open={shown === 'full-dialog'}
         size="full"
       >
         <helix-text
@@ -157,16 +131,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setShown(undefined)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="full-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="full-dialog"
             emphasis="solid"
+            onClick={() => setShown(undefined)}
             tone="primary"
           >
             Save changes
