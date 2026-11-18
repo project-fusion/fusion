@@ -7,6 +7,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   internalsOf,
+  LayoutMotionController,
   labelWith,
   MixinField,
   numberConverter,
@@ -20,6 +21,7 @@ import {
 import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
 import { HelixRejectEvent } from '../events/index.js'
 import { type RefusedFile, screenFiles } from '../screen.js'
@@ -178,6 +180,29 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * `registerWords('de', { 'helix-file-input': { triggerLabel: 'Dateien auswählen' } })`.
    */
   static words = 'helix-file-input'
+
+  /**
+   * Sliding the files to their new places as they come and go: one arriving
+   * fades in, one leaving fades where it was, and the rest close up. Timed by
+   * `--file-input-move-duration` and `--file-input-move-easing`, which this tier never
+   * sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    arriveIntoEmpty: true,
+    items: () => [
+      ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="file"]:not([data-leaving])') ??
+        []),
+    ],
+    leaving: () => this.partNamed('list'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--file-input-move-duration'),
+        easing: style.getPropertyValue('--file-input-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
 
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -880,12 +905,15 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
         files.length === 0
           ? nothing
           : html`<ul part="list">
-              ${files.map((file, at) => {
-                const state = this.statuses.get(file)?.state
-                const done = state === 'done'
-                const failed = state === 'error'
-                const sending = state === 'uploading'
-                return html`<li
+              ${repeat(
+                files,
+                (file) => file,
+                (file, at) => {
+                  const state = this.statuses.get(file)?.state
+                  const done = state === 'done'
+                  const failed = state === 'error'
+                  const sending = state === 'uploading'
+                  return html`<li
                   part="file${done ? ' file-done' : ''}${failed ? ' file-error' : ''}${
                     sending ? ' file-uploading' : ''
                   }"
@@ -911,7 +939,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                     ${this.removeMark(at)}
                   </button>
                 </li>`
-              })}
+                },
+              )}
             </ul>`
       }`
   }

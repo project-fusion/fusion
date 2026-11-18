@@ -1,3 +1,11 @@
+:host {
+  /* **An attachment arriving fades in, one leaving fades where it was, and the rest
+     slide into place**, at the pace and on the curve rows and tags move by
+     everywhere. */
+  --chat-composer-move-duration: var(--helix-duration-normal);
+  --chat-composer-move-easing: var(--helix-easing-standard);
+}
+
 /*
  *  The field, and a row of tools under it. The whole thing is one box with one
  *    edge, so a consumer's attachment control and the send control read as parts of
@@ -547,4 +555,10 @@
   content: "";
   inset: calc((var(--helix-size-target) - 100%) / -2);
   position: absolute;
+}
+
+/* **Where a leaving attachment's copy fades**, so the box the copy is placed
+   against: `LayoutMotionController` lays it there. */
+[part="attachments"] {
+  position: relative;
 }

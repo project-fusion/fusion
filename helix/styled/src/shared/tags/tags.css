@@ -36,6 +36,12 @@
   display: contents;
 }
 
+/* **The field is where a removed tag's copy fades**, so it is the box the copy
+   is placed against: `LayoutMotionController` lays it there. */
+[part="field"]:has([part="tags"]) {
+  position: relative;
+}
+
 /* **Zeroed before the look below, not after it.** With `expandable` the count is
    a `<button>` and arrives carrying the UA's border, background and font, and
    those have to go before anything here is legible. `:where()` holds this at the

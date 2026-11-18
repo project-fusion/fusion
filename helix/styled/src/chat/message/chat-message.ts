@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { arrive, customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessChatMessage } from '@fusion.dev/helix-headless/chat/message'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -47,6 +47,22 @@ export class HelixChatMessage extends HelixHeadlessChatMessage {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [typingStyles, styles]
+
+  /**
+   * **A message arriving rises into place and fades in**, where it joins one already drawn: a frame
+   * later, since the parent assigns it its slot only once it has arrived,
+   * and until then it has no style for `@starting-style` to start from.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.arriving) {
+      arrive(this, {
+        duration: '--helix-duration-normal',
+        easing: '--helix-easing-decelerate',
+        from: { opacity: 0, translate: '0 var(--helix-space-sm)' },
+      })
+    }
+  }
 
   /**
    * How the turn is set apart. `filled` draws a bubble, and `plain` draws the

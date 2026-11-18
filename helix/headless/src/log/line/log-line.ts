@@ -71,10 +71,27 @@ const elapsed = (seconds: number): string => {
  * @cssproperty --log-run-background-color - Written on a `run` with a background, in the same form as `--log-run-color`.
  * @cssproperty --log-run-color - Written on a `run` with a text color: one of the sixteen `--log-ansi-*` colors the log publishes, or the color itself.
  *
+ * @cssstate arriving - The line was written into a log already drawn, rather than coming with the page.
  * @cssstate filtered - The log's `query` does not match the line, or its `level` is quieter than the log shows, so it draws nothing.
  */
 @customElement('helix-headless-log-line')
 export class HelixHeadlessLogLine extends HelixElement {
+  /**
+   * **Arriving, where it joins a log already drawn**: `:state(arriving)`,
+   * which a stylesheet can bring it in by. Not where it was there as the
+   * log first drew, which is what the page came with, and not inside a
+   * log that draws its lines from data, which marks its own.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    const parent = this.parentElement as (HTMLElement & { hasUpdated?: boolean }) | null
+    this.arriving = parent?.hasUpdated === true
+    this.toggleState('arriving', this.arriving)
+  }
+
+  /** Whether it joined one already drawn, as `:state(arriving)` says, for the tier above to bring it in by. */
+  protected arriving = false
+
   /** The key this family's words are registered under, its styled tag. */
   static words = 'helix-log'
 

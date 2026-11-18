@@ -205,6 +205,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
   /** Sliding each tag to its new place when the page adds, removes or hides tags. */
   protected readonly motion = new LayoutMotionController(this, {
     items: () => this.tags,
+    leaving: () => this.renderRoot as ShadowRoot | undefined,
     timing: () => {
       const style = getComputedStyle(this)
       return {

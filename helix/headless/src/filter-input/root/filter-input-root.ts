@@ -11,6 +11,7 @@ import {
   holdCaret,
   howToRegister,
   internalsOf,
+  LayoutMotionController,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -301,6 +302,28 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * `registerWords('de', { 'helix-filter-input': { clearLabel: 'Leeren' } })`.
    */
   static words = 'helix-filter-input'
+
+  /**
+   * Sliding the filters to their new places as they come and go: one arriving
+   * fades in, one leaving fades where it was, and the rest close up. Timed by
+   * `--filter-input-move-duration` and `--filter-input-move-easing`, which this tier never
+   * sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    arriveIntoEmpty: true,
+    items: () =>
+      (this.tokens?.assignedElements() ?? []).filter(
+        (one): one is HTMLElement => one instanceof HTMLElement,
+      ),
+    leaving: () => this.partNamed('field'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--filter-input-move-duration'),
+        easing: style.getPropertyValue('--filter-input-move-easing'),
+      }
+    },
+  })
 
   /* The description names ids in the consumer's tree and the control is in this
      shadow root, so it is carried down as an element. See `Input`. */

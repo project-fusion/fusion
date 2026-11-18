@@ -40,6 +40,8 @@ import { styles } from './file-input-root.css.js'
  * @cssproperty --file-input-file-padding-block - Padding above and below each chosen file.
  * @cssproperty --file-input-file-padding-inline - Padding at each side of each chosen file.
  * @cssproperty --file-input-file-radius - Corner radius of each chosen file.
+ * @cssproperty --file-input-move-duration - How long a file takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --file-input-move-easing - The curve a file fades and slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --file-input-padding - Padding inside the field.
  * @cssproperty --file-input-progress-color - The filled part of a file's upload bar.
  * @cssproperty --file-input-progress-track-color - The unfilled part of a file's upload bar.

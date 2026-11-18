@@ -33,6 +33,8 @@ import { styles } from './combobox-root.css.js'
  * @cssproperty --combobox-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --combobox-control-size - Smallest the text field shrinks to once tags share its line.
+ * @cssproperty --combobox-move-duration - How long a tag takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --combobox-move-easing - The curve a tag fades and slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --combobox-panel-size - Width of the panel. Follows the field by default.
  * @cssproperty --combobox-shadow - Shadow under the panel. Follows `--helix-shadow-floating`.
  *   A floating panel can sit over any content, so it has a shadow by default.

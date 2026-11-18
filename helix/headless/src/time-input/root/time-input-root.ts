@@ -13,6 +13,7 @@ import {
   handedLocale,
   hostWords,
   isClockValue,
+  LayoutMotionController,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -31,6 +32,7 @@ import {
 import { clock, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 /* Base elements here, styled ones in the styled file. The arrangement Date
@@ -211,6 +213,29 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * `registerWords('de', { 'helix-time-input': { triggerLabel: 'Uhrzeit auswählen' } })`.
    */
   static words = 'helix-time-input'
+
+  /**
+   * Sliding the times chosen to their new places as they come and go: one arriving
+   * fades in, one leaving fades where it was, and the rest close up. Timed by
+   * `--time-input-move-duration` and `--time-input-move-easing`, which this tier never
+   * sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    arriveIntoEmpty: true,
+    items: () => [
+      ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="time"]:not([data-leaving])') ??
+        []),
+    ],
+    leaving: () => this.partNamed('field'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--time-input-move-duration'),
+        easing: style.getPropertyValue('--time-input-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
 
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -890,7 +915,11 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         ${
           this.mode === 'multiple'
             ? this.renderTokenRow(
-                this.shownTimes.map((at) => this.renderTag(at)),
+                repeat(
+                  this.shownTimes,
+                  (at) => at,
+                  (at) => this.renderTag(at),
+                ),
                 this.restCount,
               )
             : nothing

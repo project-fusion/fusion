@@ -326,6 +326,29 @@
   padding-block-start: var(--chat-gap, var(--helix-space-md));
 }
 
+/* **A turn arriving rises into place**, a step below where it lands, and
+   fades in. Only a turn added at the end, which the headless tier marks
+   `data-arriving` for the render it arrives in: not the conversation the page
+   came with, not history loaded above, not a turn scrolled back into view. */
+[part="turn"][data-arriving] {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    translate var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  [part="turn"][data-arriving] {
+    opacity: 0;
+    translate: 0 var(--helix-space-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="turn"][data-arriving] {
+    transition: none;
+  }
+}
+
 @media print {
   :host {
     max-block-size: none;

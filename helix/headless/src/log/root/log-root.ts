@@ -1543,14 +1543,38 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const stop = this.interactive ? this.stopAmong(drawn) : 0
     /* `flex: none` inline, because the room is only room if it keeps its size,
        as `Chat` measured. */
+    const arriving = this.arrivingAfter()
     return html`<div part="before" role="presentation" style="block-size: ${before}px; flex: none"></div>
       ${repeat(
         this.view.rows.slice(first, last),
         (row) => (row.kind === 'group' ? `group:${row.group.id}` : `line:${row.number}`),
         (row, offset) =>
-          html`<div part="row" data-index=${first + offset}>${this.renderRow(row, marks, start, stop)}</div>`,
+          html`<div part="row" data-index=${first + offset} ?data-arriving=${row.kind === 'line' && row.number > arriving}>${this.renderRow(row, marks, start, stop)}</div>`,
       )}
       <div part="after" role="presentation" style="block-size: ${after}px; flex: none"></div>`
+  }
+
+  /** The highest line number drawn at the last render, to tell a line written since. */
+  private lastLine: number | undefined
+
+  /**
+   * The line number after which the lines are new this render, or none: a
+   * line written since the last render, not one scrolled back into view.
+   * Those take `data-arriving` for this render, which a stylesheet can bring
+   * them in by.
+   */
+  private arrivingAfter(): number {
+    let highest = 0
+    for (const row of this.view.rows) {
+      if (row.kind === 'line' && row.number > highest) {
+        highest = row.number
+      }
+    }
+    const was = this.lastLine
+    this.lastLine = highest
+    /* **Not the first lines read**, which are the log the page came with,
+       read a render after the first. */
+    return this.hasUpdated && was !== undefined && was > 0 ? was : Number.POSITIVE_INFINITY
   }
 
   /**

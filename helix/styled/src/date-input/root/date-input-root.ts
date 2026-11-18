@@ -44,6 +44,8 @@ import { styles } from './date-input-root.css.js'
  *   follows `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --date-input-ghost-align - Where a `ghost` value sits in its field at rest: `start`, `center`, or `end`. A `DataTable` sets it to its column's edge.
  * @cssproperty --date-input-ghost-underline - The color of the round dots under a `ghost` value at rest, which say it can be edited. None by default, and the subtle foreground on a touch screen. A `DataTable` sets it on every editable cell.
+ * @cssproperty --date-input-move-duration - How long a date takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --date-input-move-easing - The curve a date fades and slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --date-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --date-input-segment-focus-color - The text of the segment with

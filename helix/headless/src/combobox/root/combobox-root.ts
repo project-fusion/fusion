@@ -15,6 +15,7 @@ import {
   HelixFormElement,
   handedLocale,
   internalsOf,
+  LayoutMotionController,
   ListedController,
   MixinControllerOpen,
   MixinControllerValue,
@@ -33,6 +34,7 @@ import {
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
@@ -217,6 +219,29 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * `registerWords('de', { 'helix-combobox': { noResultsText: 'Keine Treffer' } })`.
    */
   static words = 'helix-combobox'
+
+  /**
+   * Sliding the tags to their new places as they come and go: one arriving
+   * fades in, one leaving fades where it was, and the rest close up. Timed by
+   * `--combobox-move-duration` and `--combobox-move-easing`, which this tier never
+   * sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    arriveIntoEmpty: true,
+    items: () => [
+      ...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="tag"]:not([data-leaving])') ??
+        []),
+    ],
+    leaving: () => this.partNamed('field'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--combobox-move-duration'),
+        easing: style.getPropertyValue('--combobox-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
 
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -1683,7 +1708,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         ${
           this.multiple && this.chosen.length > 0
             ? this.renderTokenRow(
-                this.shown.map((option) => this.renderTag(option)),
+                repeat(
+                  this.shown,
+                  (option) => option.value,
+                  (option) => this.renderTag(option),
+                ),
                 this.restCount,
               )
             : nothing

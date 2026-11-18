@@ -5,6 +5,7 @@ import {
   HelixFormElement,
   hostAria,
   internalsOf,
+  LayoutMotionController,
   MixinVoice,
   markRegion,
   motionPaused,
@@ -873,6 +874,30 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       exportparts="arrow: reason-arrow, arrow-bottom: reason-arrow-bottom, arrow-left: reason-arrow-left, arrow-right: reason-arrow-right, arrow-top: reason-arrow-top, surface: reason-surface, surface-bottom: reason-surface-bottom, surface-left: reason-surface-left, surface-right: reason-surface-right, surface-top: reason-surface-top"
       >${control}</${this.tag('tooltip')}>`
   }
+
+  /**
+   * Sliding what the draft carries to their new places as they come and go: one arriving
+   * fades in, one leaving fades where it was, and the rest close up. Timed by
+   * `--chat-composer-move-duration` and `--chat-composer-move-easing`, which this tier never
+   * sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    arriveIntoEmpty: true,
+    items: () =>
+      (
+        this.renderRoot
+          ?.querySelector<HTMLSlotElement>('slot[name="attachments"]')
+          ?.assignedElements() ?? []
+      ).filter((one): one is HTMLElement => one instanceof HTMLElement),
+    leaving: () => this.partNamed('attachments'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--chat-composer-move-duration'),
+        easing: style.getPropertyValue('--chat-composer-move-easing'),
+      }
+    },
+  })
 
   /**
    * What the draft carries, the field, and a row of tools under it.
