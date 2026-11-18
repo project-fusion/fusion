@@ -134,6 +134,11 @@ export default styles(
       rule({ orientation: 'vertical' }, { alignItems: 'stretch', flexDirection: 'column' }),
       /* The same set, spaced. */
       rule({ layout: 'spaced' }, { gap: hook.gap }),
+      /* **On a phone a spaced set wraps** where its buttons do not fit, as a
+         dialog's two actions do at the largest text size. A phone's button
+         does not shrink to cut its label as the web's does, so in one row the
+         first was pushed off the screen. A joined set stays one shape. */
+      native([rule({ layout: 'spaced' }, { flexWrap: 'wrap' })]),
       /* A control is not printed. */
       rule({ print: true }, { display: 'none' }),
     ]),

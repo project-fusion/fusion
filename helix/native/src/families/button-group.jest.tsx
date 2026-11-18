@@ -169,6 +169,16 @@ describe('the generated Button Group', () => {
     }
   })
 
+  test('wraps a spaced set where its buttons do not fit', async () => {
+    await render(<Calendar layout="spaced" />)
+    expect(styleOf(group('Calendar view')).flexWrap).toBe('wrap')
+  })
+
+  test('keeps a joined set in its one row', async () => {
+    await render(<Calendar />)
+    expect(styleOf(group('Calendar view')).flexWrap).toBeUndefined()
+  })
+
   test('flattens an icon button’s corners as it flattens a button’s', async () => {
     await render(
       themed(
