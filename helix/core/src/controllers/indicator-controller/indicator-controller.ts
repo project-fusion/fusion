@@ -158,6 +158,38 @@ export class IndicatorController implements ReactiveController {
     this.place()
   }
 
+  /** Whether a placement is waiting for the marked item's move to end. */
+  private held = false
+
+  /**
+   * **The moves the marked item is in**, its own and those of the boxes
+   * around it: finite animations of `transform`, `translate` or `scale`, such
+   * as a row sliding to its new place or an item settling as it arrives. Its
+   * box is wherever the move has it, so a mark measured then lands off its
+   * item and stays there, nothing moving the item again to place it anew.
+   */
+  private movesOf(active: HTMLElement): Animation[] {
+    const moves: Animation[] = []
+    for (let up: Element | null = active; up; up = up.parentElement) {
+      for (const one of up.getAnimations?.() ?? []) {
+        const effect = one.effect as KeyframeEffect | null
+        const end = effect?.getComputedTiming().endTime
+        const moving = effect
+          ?.getKeyframes()
+          .some((frame) => 'transform' in frame || 'translate' in frame || 'scale' in frame)
+        if (
+          one.playState === 'running' &&
+          moving &&
+          typeof end === 'number' &&
+          Number.isFinite(end)
+        ) {
+          moves.push(one)
+        }
+      }
+    }
+    return moves
+  }
+
   /** Where the mark was last put, so a placement can tell a move from a resize. */
   private last: { x: string; y: string } | undefined
 
@@ -197,6 +229,21 @@ export class IndicatorController implements ReactiveController {
       // Nothing is marked, so there is nothing to point at. The attribute goes
       // and the stylesheet takes the mark away with it.
       indicator.removeAttribute('data-placed')
+      return
+    }
+
+    /* **Once the item has come to rest**, where it is moving: placed from
+       where a move has it, the mark sat six pixels above a page number that
+       was still settling into Pagination's run. */
+    const moves = this.movesOf(active)
+    if (moves.length > 0) {
+      if (!this.held) {
+        this.held = true
+        void Promise.all(moves.map((one) => one.finished.catch(() => undefined))).then(() => {
+          this.held = false
+          this.place()
+        })
+      }
       return
     }
 
