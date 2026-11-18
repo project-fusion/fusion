@@ -47,7 +47,7 @@ onFlowComplete:
     optional: true
     text: Ada Okonjo
 - takeScreenshot: rtl-description-list
-- openLink: helix://breadcrumbs/links/preview
+- openLink: helix://breadcrumbs/preview/preview
 - extendedWaitUntil:
     visible: .*Projects.*
     timeout: 15000
@@ -57,7 +57,7 @@ onFlowComplete:
     visible: .*Payment.*
     timeout: 15000
 - takeScreenshot: rtl-steps
-- openLink: helix://meter/low-high-optimum/preview
+- openLink: helix://meter/ranges/preview
 - extendedWaitUntil:
     visible: .*Disk used.*
     timeout: 15000

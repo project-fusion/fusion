@@ -56,7 +56,10 @@ tags:
           text: Send me release notes.*
 - takeScreenshot: checkbox-events-cleared
 # The dash of a mixed box, through react-native-svg, and its state.
-- openLink: helix://checkbox/indeterminate/preview
+- openLink: helix://checkbox/states/preview
+- extendedWaitUntil:
+    visible: States
+    timeout: 15000
 - extendedWaitUntil:
     visible: Select all.*
     timeout: 15000
@@ -67,5 +70,5 @@ tags:
       - assertVisible:
           optional: true
           text: checkbox, mixed
-- takeScreenshot: checkbox-indeterminate
+- takeScreenshot: checkbox-states
 - stopRecording

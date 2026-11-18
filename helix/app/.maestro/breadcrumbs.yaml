@@ -17,7 +17,7 @@ tags:
 - runFlow:
     file: open.yaml
     env:
-      LINK: helix://breadcrumbs/links/preview
+      LINK: helix://breadcrumbs/preview/preview
       SHOWS: .*Projects.*
 # The first touch on a new screen is lost on the iOS simulator, as
 # `button.yaml` says.
@@ -33,10 +33,10 @@ tags:
           optional: true
           text: Current page
 - tapOn: .*Projects.*
-- assertVisible: 'Opens #design'
+- assertVisible: 'Opens #projects'
 - takeScreenshot: breadcrumbs-opens-projects
 - tapOn: OK
-- assertNotVisible: 'Opens #design'
+- assertNotVisible: 'Opens #projects'
 - tapOn: .*Home.*
 - assertVisible: 'Opens #home'
 - tapOn: OK

@@ -7,7 +7,7 @@ appId: dev.fusion.helix.app
 name: Tabs from a keyboard
 ---
 - stopApp
-- openLink: helix://tabs/underlined/preview
+- openLink: helix://tabs/preview/preview
 - extendedWaitUntil:
     visible: A summary of the project and the people on it.
     timeout: 30000

@@ -8,7 +8,7 @@ tags:
 - runFlow:
     file: open.yaml
     env:
-      LINK: helix://tabs/underlined
+      LINK: helix://tabs/preview
       SHOWS: A summary of the project and the people on it.
 # The first touch on a screen that has just opened is lost on the iOS
 # simulator, a drag's as well: three times in three on October 11, 2026. A tap

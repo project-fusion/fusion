@@ -30,10 +30,17 @@ tags:
 - tapOn:
     point: 50%, 30%
 - assertNotVisible: .*This removes the project.*
-- openLink: helix://dialog/persistent/preview
+- openLink: helix://dialog/closedby/preview
+- extendedWaitUntil:
+    visible: Close editor
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Close editor
 - extendedWaitUntil:
     visible: .*two unsaved changes.*
-    timeout: 15000
+    timeout: 5000
 - tapOn:
     text: .*two unsaved changes.*
     retryTapIfNoChange: false
