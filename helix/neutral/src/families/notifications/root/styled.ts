@@ -30,6 +30,8 @@ export default styles(
       errorColor: token('color-danger'),
       itemGap: token('space-xs'),
       maxBlockSize: 'none',
+      moveDuration: null,
+      moveEasing: null,
       paddingInline: token('space-lg'),
       rule: token('color-border'),
     },
@@ -41,6 +43,19 @@ export default styles(
   },
   ({ hook, include, on, own, rule }) => [
     include(densitySm),
+    /* Rows slide to their new places, and a leaving row fades where it was, at
+       the pace of a change that answers a hand. The list reads these from its
+       script, so they are set here rather than read with a fallback, and a page
+       setting either on the element wins over this rule. A phone moves nothing:
+       its rows stand in their new places at once, and a leaving row goes. */
+    on('host', [
+      web([
+        rule({
+          '--notifications-move-duration': token('duration-normal'),
+          '--notifications-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('host', [
       rule({
         '--helix-size-avatar': token('size-avatar-sm'),
@@ -76,7 +91,9 @@ export default styles(
       rule({ part: { 'data-empty': true } }, { display: 'none' }),
     ]),
     on('list', [
-      rule({ overflowY: 'auto' }),
+      /* Relative where a leaving row's copy fades, so the box the copy is placed
+         against: the web's layout motion lays it there. */
+      rule({ overflowY: 'auto', web: { position: 'relative' } }),
       /* Boxed, the gap stands before the first box and at the sides too. */
       rule(
         { separation: ['filled', 'outlined'] },

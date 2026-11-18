@@ -170,20 +170,25 @@ export default styles(
         ]),
       ]),
       on({ before: 'item' }, [
+        /* Drawn on every row and shrunk away once it is read, so marking a row
+           read, or all of them, shows each dot going. A phone draws the dot only
+           while the row is unread, so there it goes at once. */
         web([
-          rule(
-            { read: false },
-            {
-              backgroundColor: hook.unreadMark,
-              blockSize: own.notificationsUnread,
-              borderRadius: hook.unreadRadius,
-              content: '""',
-              inlineSize: hook.unreadInlineSize,
-              insetBlockStart: hook.unreadOffset(unreadTop),
-              insetInlineStart: hook.unreadInset(unreadStart),
-              position: 'absolute',
-            },
-          ),
+          rule({
+            backgroundColor: hook.unreadMark,
+            blockSize: own.notificationsUnread,
+            borderRadius: hook.unreadRadius,
+            content: '""',
+            inlineSize: hook.unreadInlineSize,
+            insetBlockStart: hook.unreadOffset(unreadTop),
+            insetInlineStart: hook.unreadInset(unreadStart),
+            position: 'absolute',
+            transition: list(
+              ['opacity', token('duration-normal'), token('easing-standard')],
+              ['scale', token('duration-normal'), token('easing-standard')],
+            ),
+          }),
+          rule({ read: true }, { opacity: 0, scale: 0 }),
           rule({ print: true, read: false }, { display: 'none' }),
         ]),
       ]),
