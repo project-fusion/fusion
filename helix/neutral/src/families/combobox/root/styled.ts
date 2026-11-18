@@ -126,7 +126,6 @@ export default styles(
             minBlockSize: token('size-control'),
             paddingBlock: token('space-2xs'),
             paddingInlineEnd: sum(token('space-field'), token('size-icon-tight')),
-            position: 'relative',
           }),
         ]),
       ]),
