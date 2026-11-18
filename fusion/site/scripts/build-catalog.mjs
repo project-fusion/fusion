@@ -224,6 +224,40 @@ for (const family of families) {
     ['Source', family.source],
   ].filter(([, value]) => value)
 
+  /* **The guidance, after the facts and before the API**, which is where the
+     family page puts its Guidelines section: what the family is, then when to
+     choose it, then how to configure it. Each alternative links to the other
+     family's `.md`, so an agent reading this file follows the link to the
+     family it should have used. */
+  const lowered = (text) =>
+    /^[A-Z][a-z]/.test(text) ? text[0].toLowerCase() + text.slice(1) : text
+  const guidance = [
+    ...(family.use.length > 0
+      ? ['### When to use', '', ...family.use.map((line) => `- ${line}`), '']
+      : []),
+    ...(family.instead.length > 0
+      ? [
+          '### When to use something else',
+          '',
+          ...family.instead.map(
+            (one) =>
+              `- [${one.label}](/helix/components/${one.slug}.md): ${lowered(one.description)}`,
+          ),
+          '',
+        ]
+      : []),
+    ...(family.anatomy.length > 0
+      ? [
+          '### Anatomy',
+          '',
+          ...family.anatomy.map(
+            (one, at) => `${at + 1}. \`${one.name}\`${one.optional ? ' (optional)' : ''}`,
+          ),
+          '',
+        ]
+      : []),
+  ]
+
   /* The manifests the page is printed from: the styled tier's, and each
      other package's that adds a styled element to the family. */
   const from = DOCUMENTED.filter(
@@ -246,7 +280,10 @@ for (const family of families) {
         ['path', `/helix/components/${family.slug}`],
         ['source', `${from.join(', ')}, and ${family.source}`],
       ],
-      lede: facts.length > 0 ? [...facts.map(([key, value]) => `- **${key}:** ${value}`), ''] : [],
+      lede: [
+        ...(facts.length > 0 ? [...facts.map(([key, value]) => `- **${key}:** ${value}`), ''] : []),
+        ...(guidance.length > 0 ? ['## Guidelines', '', ...guidance] : []),
+      ],
       title: family.label,
       /* The styled block, as the page shows by default: the `.md` documents
          the styled elements, and the headless block is in the `.json`. */

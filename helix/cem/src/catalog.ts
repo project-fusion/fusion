@@ -218,8 +218,36 @@ export const rendersOf = (slug: string, files: readonly string[]): Render[] =>
     })
     .sort((a, b) => a.file.localeCompare(b.file))
 
+/**
+ * Another family to use, as a family's guidance names it: its slug, its label,
+ * and the situation it is for.
+ */
+export interface Alternative {
+  description: string
+  label: string
+  slug: string
+}
+
+/** One name in a family's anatomy, and whether the part is optional. */
+export interface AnatomyPart {
+  name: string
+  optional: boolean
+}
+
 export interface Family {
   aliases: string[]
+  /**
+   * The parts, slots, and csspart names that matter most, from `@anatomy`, in
+   * the order they are numbered.
+   */
+  anatomy: AnatomyPart[]
+  /**
+   * The families to use in other situations, from `@instead`, each with the
+   * situation it is for.
+   */
+  instead: Alternative[]
+  /** The situations the family is for, from `@use`, at most three. */
+  use: string[]
   /**
    * The native elements the family stands in for, from `@replaces`: `button`,
    * or `input[type=checkbox]`. `helix scan` reports each one a page writes.
@@ -619,9 +647,20 @@ export const catalog = (
          element to a family the facts of that element. Where no manifest read
          holds the root, the facts are empty. */
       const root = roots[0]
+      /* **Guidance from the first root that writes it, styled first.** The
+         two roots write the same lines, which `helix component`'s `guidance`
+         holds them to, so either one is the family's answer. A family that
+         writes its guidance on the headless root alone still publishes it. */
+      const guided = roots.find(
+        (entry) => entry.helix?.use || entry.helix?.instead || entry.helix?.anatomy,
+      )?.helix
 
       return {
         aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
+        anatomy: (guided?.anatomy ?? []).map((one) => ({
+          name: one.name,
+          optional: one.optional === true,
+        })),
         category: root?.helix?.category ?? '',
         documentation: root?.helix?.documentation ?? '',
         elements: entries
@@ -675,6 +714,13 @@ export const catalog = (
           entries,
           new Set(entries.map((entry) => entryOf.get(entry) ?? slug)),
         ),
+        instead: (guided?.instead ?? []).map((one) => ({
+          description: one.description ?? '',
+          /* The other family's label, which is its slug in start case, as
+             every family's own label is. */
+          label: startCase(one.family),
+          slug: one.family,
+        })),
         label: startCase(slug),
         package: root ? published(root) : '',
         replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
@@ -684,6 +730,7 @@ export const catalog = (
         status: root?.helix?.status ?? '',
         summary: root?.summary ?? '',
         usage: { headless: [], styled: [] },
+        use: guided?.use ?? [],
       }
     })
     .sort((a, b) => a.label.localeCompare(b.label))
