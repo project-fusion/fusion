@@ -303,6 +303,77 @@
   rotate: 180deg;
 }
 
+/* **One panel handing over to the next, as the reader moves along the bar.**
+ *
+ * Opened on its own, a panel draws down as a curtain; handed over, a second
+ * curtain closing as the next one opens read as the bar flickering. So a panel
+ * that takes over skips the curtain, already its full size, and settles in from
+ * the side the reader moved from as the one it replaces fades out toward the
+ * side they moved to, by the states the headless tier publishes. On `transform`,
+ * because the card is placed through `translate`. A band spans the page, so it
+ * crossfades where it stands. */
+:host {
+  --_megamenu-drift: var(--helix-space-xl);
+}
+
+:host(:dir(rtl)) {
+  --_megamenu-drift: calc(var(--helix-space-xl) * -1);
+}
+
+/* Only where the reader has not asked for less movement: the panel simply
+   changes there, as an opened one does. */
+@media (prefers-reduced-motion: no-preference) {
+  :host(:is(:state(from-end), :state(from-start), :state(to-end), :state(to-start)))
+    [part="surface"] {
+    transition:
+      opacity var(--megamenu-duration, var(--helix-duration-slow)) var(--helix-easing-standard),
+      transform var(--megamenu-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate),
+      display var(--megamenu-duration, var(--helix-duration-slow)) allow-discrete,
+      overlay var(--megamenu-duration, var(--helix-duration-slow)) allow-discrete;
+  }
+
+  :host(:is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open) {
+    clip-path: inset(
+      0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
+        calc(var(--helix-space-xl) * -1)
+    );
+    opacity: 0;
+  }
+
+  :host(:state(to-start)) [part="surface"]:not(:popover-open) {
+    transform: translateX(calc(var(--_megamenu-drift) * -1));
+  }
+
+  :host(:state(to-end)) [part="surface"]:not(:popover-open) {
+    transform: translateX(var(--_megamenu-drift));
+  }
+
+  @starting-style {
+    :host(:state(from-end)) [part="surface"]:popover-open {
+      opacity: 0;
+      transform: translateX(var(--_megamenu-drift));
+    }
+
+    :host(:state(from-start)) [part="surface"]:popover-open {
+      opacity: 0;
+      transform: translateX(calc(var(--_megamenu-drift) * -1));
+    }
+  }
+
+  :host([layout="band"]:is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open),
+  :host(:state(narrow):is(:state(to-end), :state(to-start))) [part="surface"]:not(:popover-open) {
+    clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
+    transform: none;
+  }
+
+  @starting-style {
+    :host([layout="band"]:is(:state(from-end), :state(from-start))) [part="surface"]:popover-open,
+    :host(:state(narrow):is(:state(from-end), :state(from-start))) [part="surface"]:popover-open {
+      transform: none;
+    }
+  }
+}
+
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. */
 [part="trigger"] {
