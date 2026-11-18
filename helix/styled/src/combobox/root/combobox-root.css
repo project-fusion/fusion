@@ -43,11 +43,12 @@
 }
 
 /*
- *  And it turns over as the panel opens, saying which way the panel is going.
+ *  And it flips as the panel opens, saying which way the panel is going, as
+ *  Select's does.
  */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
-  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
 /*
@@ -132,7 +133,7 @@
 
 :host(:state(open)) [part="indicator"],
 :host(:state(open)) ::slotted([slot="indicator"]) {
-  rotate: 180deg;
+  scale: 1 -1;
 }
 
 /* The color goes on the slot, where whatever is assigned inherits it. Written
