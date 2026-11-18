@@ -19,10 +19,11 @@ import { styles } from './lightbox-root.css.js'
  * When there is no input, the chrome fades out and keeps its place in the
  * layout, so the picture does not change size.
  *
- * **It opens from what was pressed.** The viewer fades in over the page, and
- * the picture grows from the thumbnail or button that had focus as it
- * opened, so the reader sees where it came from; opened from code, the
- * picture settles in from a little smaller. It fades out as it closes. The
+ * **It opens from the thumbnail pressed.** The viewer fades in over the page,
+ * and where what had focus as it opened shows a picture, the picture grows
+ * from that thumbnail, so the reader sees where it came from. Opened from a
+ * button of words or from code, the picture settles in from a little
+ * smaller. It fades out as it closes. The
  * next item slides in from the side the reader is going, and the previous
  * one from the other. Under `prefers-reduced-motion` each change is at once.
  *
@@ -44,7 +45,7 @@ import { styles } from './lightbox-root.css.js'
 export class HelixLightbox extends HelixHeadlessLightbox {
   static override styles: CSSResultGroup = [liveStyles, styles]
 
-  /** Where the viewer is opening from: the box of what had focus as it opened. */
+  /** The thumbnail the viewer is opening from, where what had focus as it opened shows one. */
   private openedFrom: DOMRect | undefined
 
   /** The item shown before this update, to tell which way the reader went. */
@@ -56,12 +57,7 @@ export class HelixLightbox extends HelixHeadlessLightbox {
       return
     }
     if (changed.has('open') && this.open) {
-      const from = deepActiveElement()
-      const box =
-        from && from !== document.body && !this.contains(from)
-          ? from.getBoundingClientRect()
-          : undefined
-      this.openedFrom = box && box.width > 0 && box.height > 0 ? box : undefined
+      this.openedFrom = this.thumbnailBox(deepActiveElement())
     }
     this.shownBefore = this.shownItem()
   }
@@ -88,6 +84,30 @@ export class HelixLightbox extends HelixHeadlessLightbox {
     if (this.open && before && now && before !== now) {
       this.slideIn(before, now)
     }
+  }
+
+  /**
+   * **The thumbnail the viewer opened from**: a picture that is what had
+   * focus as it opened, or inside it, or inside what holds it, found through
+   * shadow roots. Its own box, not the control's. Nothing where what opened
+   * the viewer shows no picture, such as a button of words, which a picture
+   * growing from it would make look like its words flying to the middle.
+   */
+  private thumbnailBox(from: Element | null): DOMRect | undefined {
+    const pictures = 'img, picture, video, canvas, helix-image'
+    let at: Element | null = from
+    for (let step = 0; at && at !== document.body && step < 4; step += 1) {
+      if (this.contains(at)) {
+        return undefined
+      }
+      const picture = at.matches(pictures) ? at : at.querySelector(pictures)
+      const box = picture?.getBoundingClientRect()
+      if (box && box.width > 0 && box.height > 0) {
+        return box
+      }
+      at = at.parentElement ?? (at.getRootNode() as ShadowRoot).host ?? null
+    }
+    return undefined
   }
 
   /** The item showing, as the headless tier marks it. */
@@ -120,15 +140,16 @@ export class HelixLightbox extends HelixHeadlessLightbox {
    * size to its own, as the viewer fades in around it. With nothing to grow
    * from, it settles in from a little smaller.
    */
-  private growIn(from: DOMRect | undefined): void {
+  private growIn(thumbnail: DOMRect | undefined): void {
     const item = this.shownItem()
     const duration = this.time('--helix-duration-slow') || this.time('--helix-duration-normal')
     if (!item || duration === 0) {
       return
     }
     /* **The picture, or the box it shows in where the picture has no box
-       yet**, as an image still loading has none: the viewport, which the
-       picture is centered in, grows from the same place. */
+       yet**, as an image still loading has none. Only the picture grows from
+       a thumbnail: the viewport holds the caption too, which would fly from
+       the thumbnail with it, so it settles in from a little smaller. */
     const own = this.pictureOf(item)
     const sized = (one: Element | null | undefined): one is HTMLElement => {
       const rect = one?.getBoundingClientRect()
@@ -139,6 +160,7 @@ export class HelixLightbox extends HelixHeadlessLightbox {
     if (!picture || typeof picture.animate !== 'function') {
       return
     }
+    const from = picture === own ? thumbnail : undefined
     const to = picture.getBoundingClientRect()
     const easing =
       getComputedStyle(this).getPropertyValue('--helix-easing-emphasized').trim() || 'ease-out'
