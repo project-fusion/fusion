@@ -271,7 +271,9 @@ export default styles(
          pencil at an angle. The web draws the plus as a glyph with no part of
          its own; a phone turns its mark from a written start. */
       on({ part: 'trigger', selector: '[part="trigger"] [data-glyph]' }, [
-        web([rule({ transition: ['rotate', token('duration-normal'), token('easing-emphasized')] })]),
+        web([
+          rule({ transition: ['rotate', token('duration-normal'), token('easing-emphasized')] }),
+        ]),
       ]),
       on({ part: 'trigger', selector: ':host(:state(open)) [part="trigger"] [data-glyph]' }, [
         web([rule({ rotate: '45deg' })]),

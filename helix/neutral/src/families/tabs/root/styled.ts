@@ -152,7 +152,10 @@ export default styles(
       web([
         rule(
           { gliding: true },
-          { '--tabs-tab-hover-background-color': 'transparent', own: { tabHoverSurface: 'transparent' } },
+          {
+            '--tabs-tab-hover-background-color': 'transparent',
+            own: { tabHoverSurface: 'transparent' },
+          },
         ),
       ]),
     ]),

@@ -214,10 +214,7 @@ export default styles(
       on({ region: 'indicator', slotted: '*' }, [rule(caret)]),
       /* Flipped, as Accordion's chevron and Select's caret are. A phone flips
          from a written start. */
-      on('indicator', [
-        native([rule({ scale: '1 1' })]),
-        rule({ open: true }, { scale: '1 -1' }),
-      ]),
+      on('indicator', [native([rule({ scale: '1 1' })]), rule({ open: true }, { scale: '1 -1' })]),
       on({ region: 'indicator', slotted: '*' }, [rule({ open: true }, { scale: '1 -1' })]),
       /* Read-only, and the caret says the panel does not open. */
       on('indicator', [rule({ readonly: true }, { opacity: token('opacity-disabled') })]),

@@ -384,7 +384,10 @@ export default styles(
         ],
       ),
       on(
-        { part: 'surface', selector: ':host(:state(to-start)) [part="surface"]:not(:popover-open)' },
+        {
+          part: 'surface',
+          selector: ':host(:state(to-start)) [part="surface"]:not(:popover-open)',
+        },
         [
           web([
             rule(
@@ -396,34 +399,24 @@ export default styles(
       ),
       on(
         { part: 'surface', selector: ':host(:state(to-end)) [part="surface"]:not(:popover-open)' },
-        [
-          web([
-            rule({ reducedMotion: false }, { transform: fn('translateX', own.megamenuDrift) }),
-          ]),
-        ],
+        [web([rule({ reducedMotion: false }, { transform: fn('translateX', own.megamenuDrift) })])],
       ),
-      on(
-        { part: 'surface', selector: ':host(:state(from-end)) [part="surface"]:popover-open' },
-        [
-          web([
-            rule(
-              { reducedMotion: false, startingStyle: true },
-              { opacity: 0, transform: fn('translateX', own.megamenuDrift) },
-            ),
-          ]),
-        ],
-      ),
-      on(
-        { part: 'surface', selector: ':host(:state(from-start)) [part="surface"]:popover-open' },
-        [
-          web([
-            rule(
-              { reducedMotion: false, startingStyle: true },
-              { opacity: 0, transform: fn('translateX', product(own.megamenuDrift, '-1')) },
-            ),
-          ]),
-        ],
-      ),
+      on({ part: 'surface', selector: ':host(:state(from-end)) [part="surface"]:popover-open' }, [
+        web([
+          rule(
+            { reducedMotion: false, startingStyle: true },
+            { opacity: 0, transform: fn('translateX', own.megamenuDrift) },
+          ),
+        ]),
+      ]),
+      on({ part: 'surface', selector: ':host(:state(from-start)) [part="surface"]:popover-open' }, [
+        web([
+          rule(
+            { reducedMotion: false, startingStyle: true },
+            { opacity: 0, transform: fn('translateX', product(own.megamenuDrift, '-1')) },
+          ),
+        ]),
+      ]),
       on(
         {
           part: 'surface',

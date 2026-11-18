@@ -537,7 +537,10 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     })
     /* A single reading is a point rather than a line, and a mark on the end of
        something with no length is a mark on nothing. */
-    return lineEnds(series, shows, { x, y }).map((end, at) => ({ ...end, jumped: jumped[at] ?? false }))
+    return lineEnds(series, shows, { x, y }).map((end, at) => ({
+      ...end,
+      jumped: jumped[at] ?? false,
+    }))
   }
 
   protected override render(): TemplateResult {

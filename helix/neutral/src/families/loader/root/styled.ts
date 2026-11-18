@@ -161,7 +161,11 @@ export default styles(
        up mid-task arrives instead of flashing on. */
     on(
       ['svg', 'mark'],
-      [web([rule({ transition: ['opacity', token('duration-normal'), token('easing-standard')] })])],
+      [
+        web([
+          rule({ transition: ['opacity', token('duration-normal'), token('easing-standard')] }),
+        ]),
+      ],
     ),
     on('svg', [
       web([
@@ -169,7 +173,9 @@ export default styles(
       ]),
     ]),
     on('mark', [
-      web([rule({ part: { hidden: true } }, { display: 'flex', opacity: 0, visibility: 'hidden' })]),
+      web([
+        rule({ part: { hidden: true } }, { display: 'flex', opacity: 0, visibility: 'hidden' }),
+      ]),
     ]),
     keyframes('helix-loader-breathe', {
       '0%, 100%': { opacity: 0.12 },
