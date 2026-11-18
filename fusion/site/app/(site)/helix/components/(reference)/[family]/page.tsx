@@ -732,7 +732,7 @@ export default async function FamilyDocs({
                   lists, since each line is a sentence to read. */}
               <div className={api.guidelines}>
                 {family.use.length > 0 && (
-                  <helix-flex direction="column" gap="sm">
+                  <helix-flex direction="column" gap="xs">
                     <helix-text as="h3" scale="body-strong">
                       When to use
                     </helix-text>
@@ -748,7 +748,7 @@ export default async function FamilyDocs({
                   </helix-flex>
                 )}
                 {family.instead.length > 0 && (
-                  <helix-flex direction="column" gap="sm">
+                  <helix-flex direction="column" gap="xs">
                     <helix-text as="h3" scale="body-strong">
                       When to use something else
                     </helix-text>
