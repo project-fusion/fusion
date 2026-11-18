@@ -164,6 +164,15 @@
 /* The block menu's button holds every block type's name, one shown and the
    rest kept in the same cell unseen, so it is as wide as the longest name and
    the tools after it stay put as the selection moves. */
+/* **The block button's caret flips as its menu opens**, as Select's does. */
+[part="block"] > [slot="end"] {
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+[part="block-menu"]:state(open) [part="block"] > [slot="end"] {
+  scale: 1 -1;
+}
+
 [part="block-name"] {
   display: inline-grid;
   justify-items: start;

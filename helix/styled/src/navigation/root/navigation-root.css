@@ -169,6 +169,13 @@
   block-size: var(--helix-size-icon-tight);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
+  transition: scale var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+/* **The caret flips as its menu opens**, as Select's and Megamenu's do. */
+[part="more"][aria-expanded="true"] [part="more-mark"],
+[part="more"][aria-expanded="true"] ::slotted([slot="more-icon"]) {
+  scale: 1 -1;
 }
 
 /* Too narrow for words, the button is a square around a glyph, as App
