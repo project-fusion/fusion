@@ -175,10 +175,10 @@
     - status
     - paragraph: Triggers an action, submits a form, or navigates.
     - text: Stable Since 0.1.0 Actions
-    - heading "Usage Link to Usage" [level=2]:
-      - text: Usage
-      - link "Link to Usage":
-        - /url: "#usage"
+    - heading "Import Link to Import" [level=2]:
+      - text: Import
+      - link "Link to Import":
+        - /url: "#import"
     - code: import '@fusion.dev/helix/button'
     - button "Copy code"
     - heading "Preview Link to Preview" [level=2]:
@@ -339,8 +339,8 @@
     - navigation "On this page":
       - list:
         - listitem:
-          - link "Usage":
-            - /url: "#usage"
+          - link "Import":
+            - /url: "#import"
         - listitem:
           - link "Preview":
             - /url: "#preview"
