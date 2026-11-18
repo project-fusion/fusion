@@ -6,6 +6,11 @@
  * column, so nothing runs past the page.
  */
 :host {
+  /* **The pages slide along the run as it moves**, at the pace and on the
+     curve the chip moves by. */
+  --pagination-move-duration: var(--helix-duration-normal);
+  --pagination-move-easing: var(--helix-easing-emphasized);
+
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -113,6 +118,51 @@
   border-color: var(--pagination-current-border-color, var(--helix-color-border));
   color: var(--pagination-current-foreground-color, var(--helix-color-foreground));
   font-weight: var(--pagination-current-font-weight, var(--helix-weight-semibold));
+}
+
+/* **One chip that travels to the page you are on**, drawn as the current
+ * page's own was, so changing page moves one thing along the run, as Toggle
+ * Group's selection does. Once it is placed the current page's own fill and
+ * edge stand aside for it; until then, and in a server's first paint, the
+ * page draws its own. Behind the pages, which sit above it. */
+[part="list"] {
+  position: relative;
+}
+
+[part="item"] {
+  position: relative;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="indicator"] {
+  background-color: var(--pagination-current-background-color, var(--helix-color-surface-raised));
+  block-size: var(--indicator-block-size, 0);
+  border: var(--helix-border-thin) solid
+    var(--pagination-current-border-color, var(--helix-color-border));
+  border-radius: var(--pagination-radius, var(--helix-radii-sm));
+  box-sizing: border-box;
+  display: block;
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
+  z-index: var(--helix-layer-base);
+}
+
+[part="indicator"][data-placed] {
+  opacity: 1;
+}
+
+[part="indicator"][data-placed] ~ [part="item"] [part~="page"][aria-current="page"] {
+  background-color: transparent;
+  border-color: transparent;
 }
 
 /* Both shapes of spent step, and they need both selectors: the button form
@@ -253,6 +303,13 @@
    and a chosen control looks like the others. Measured in Chromium on October
    31, 2026. */
 @media (forced-colors: active) {
+  /* The page draws its own there, at the weight that would have handed it
+     to the traveling chip, which a Canvas fill would hide. */
+  [part="indicator"] {
+    display: none;
+  }
+
+  [part="indicator"][data-placed] ~ [part="item"] [part~="page"][aria-current="page"],
   [part~="page"][aria-current="page"],
   [part~="page"][aria-current="page"]:hover {
     background-color: Highlight;

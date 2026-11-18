@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, PLOT_WIDTH, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessLineChart } from '@fusion.dev/helix-headless/line-chart'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
@@ -132,6 +132,66 @@ export class HelixLineChart extends HelixHeadlessLineChart {
     sonifyStyles,
     statusMarkStyles,
   ]
+
+  /** The readings' names at the last render, to tell a window that moved along from new data. */
+  private namesBefore: string[] | undefined
+
+  /**
+   * **A window of readings that moves along slides.** Where the new readings
+   * are the old ones less the first one, two or three, with as many new ones
+   * after, as a live feed's are, the line is drawn where it now belongs and
+   * slid there from one step per reading to the right, so it moves along
+   * the time axis as the feed does. Its points do not each travel up or down
+   * to the next reading's height, which is what a change of shape draws, and
+   * which is what any other change still draws.
+   */
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    const names = this.sourceRows.map((row) => row.label)
+    const before = this.namesBefore
+    this.namesBefore = names
+    if (!before || before.length !== names.length || names.length < 3 || reducedMotion()) {
+      return
+    }
+    let moved = 0
+    for (let by = 1; by <= Math.min(3, names.length - 2) && moved === 0; by += 1) {
+      if (before.slice(by).every((name, at) => names[at] === name)) {
+        moved = by
+      }
+    }
+    if (moved === 0) {
+      return
+    }
+    const style = getComputedStyle(this)
+    const written = style.getPropertyValue('--helix-duration-normal').trim()
+    const amount = Number.parseFloat(written)
+    const duration = written.endsWith('ms') ? amount : amount * 1000
+    if (!(duration >= 1)) {
+      return
+    }
+    const slot = PLOT_WIDTH / names.length
+    const step = (PLOT_WIDTH - slot) / (names.length - 1)
+    const easing = style.getPropertyValue('--helix-easing-standard').trim() || 'ease'
+    for (const one of this.renderRoot.querySelectorAll<SVGElement>(
+      '[part~="line"], [part="area"], [part~="marker"], [part="marker-ring"]',
+    )) {
+      /* The shape is the new one at once: a change of `d` would otherwise
+         run its own transition under the slide. */
+      one.style.transition = 'none'
+      const slide = one.animate?.(
+        [{ transform: `translateX(${step * moved}px)` }, { transform: 'none' }],
+        { duration, easing },
+      )
+      const done = (): void => {
+        one.style.removeProperty('transition')
+      }
+      if (slide) {
+        void slide.finished.then(done, done)
+      } else {
+        done()
+      }
+    }
+  }
 }
 
 declare global {

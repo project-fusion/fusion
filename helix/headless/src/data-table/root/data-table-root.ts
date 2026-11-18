@@ -505,6 +505,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart pagination - The built-in pagination, when it is shown.
  * @csspart pagination-first - The pagination's button that goes to the first page, shown with `ends`.
  * @csspart pagination-gap - The pagination's marker for pages that are not shown.
+ * @csspart pagination-indicator - The pagination's mark that moves to the page you are on.
  * @csspart pagination-item - One item in the pagination's list, holding a page or a gap.
  * @csspart pagination-last - The pagination's button that goes to the last page, shown with `ends`.
  * @csspart pagination-list - The pagination's list of pages.
@@ -4533,7 +4534,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           this.paginated
             ? html`<${pagination}
               part="pagination"
-              exportparts="first: pagination-first, gap: pagination-gap, item: pagination-item,
+              exportparts="first: pagination-first, gap: pagination-gap, indicator: pagination-indicator, item: pagination-item,
                 last: pagination-last, list: pagination-list, live: pagination-live,
                 mark: pagination-mark, next: pagination-next, page: pagination-page,
                 page-current: pagination-page-current, previous: pagination-previous,
