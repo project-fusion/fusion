@@ -1,0 +1,23 @@
+<!-- @summary Options in the `neutral` tone, and a last option in the `danger` tone for an action that cannot be undone. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-listbox
+  class="listbox"
+  label="Token actions"
+>
+  <helix-option
+    tone="neutral"
+    value="copy"
+  >Copy token</helix-option>
+  <helix-option
+    tone="neutral"
+    value="rename"
+  >Rename token</helix-option>
+  <helix-option
+    tone="danger"
+    value="revoke"
+  >Revoke token</helix-option>
+</helix-listbox>

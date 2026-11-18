@@ -1,0 +1,70 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-checkbox
+        default-checked
+        disabled
+        name="a"
+      >
+        Email notifications
+      </helix-checkbox>
+
+      {/* The disabled fieldset disables this checkbox. */}
+      <fieldset disabled>
+        <helix-checkbox name="b">SMS notifications</helix-checkbox>
+      </fieldset>
+
+      <helix-flex
+        direction="column"
+        gap="sm"
+      >
+        <helix-checkbox indeterminate>Select all</helix-checkbox>
+        <helix-checkbox default-checked>Drafts</helix-checkbox>
+        <helix-checkbox>Published</helix-checkbox>
+      </helix-flex>
+
+      <helix-checkbox
+        default-checked
+        hint="Your organization requires it."
+        label="Two-step sign-in"
+        name="two-step"
+        readonly
+        value="on"
+      ></helix-checkbox>
+
+      <helix-checkbox
+        feedback="Accept the terms to continue."
+        hint="Read the terms before you accept."
+        label="I accept the terms"
+        name="terms"
+        value="accepted"
+      ></helix-checkbox>
+
+      {/* The form does not submit in the preview. */}
+      <form onSubmit={(event) => event.preventDefault()}>
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-checkbox
+            hint="Read the policy before you continue."
+            label="I agree to the privacy policy"
+            name="option"
+            required
+            value="accepted"
+          ></helix-checkbox>
+          <helix-button
+            emphasis="solid"
+            tone="primary"
+            type="submit"
+          >
+            Create account
+          </helix-button>
+        </helix-flex>
+      </form>
+    </helix-flex>
+  )
+}

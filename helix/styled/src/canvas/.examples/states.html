@@ -1,0 +1,38 @@
+<!-- @summary A board while its document loads, with a progress bar, and a board with no cards, with a line that says so. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-canvas
+    grid="dots"
+    label="Release plan"
+    loading
+  >
+    <div
+      class="status"
+      slot="loading"
+    >
+      <helix-progress
+        indeterminate
+        label="Loading the board"
+      ></helix-progress>
+    </div>
+  </helix-canvas>
+
+  <helix-canvas
+    grid="dots"
+    label="Retrospective"
+  >
+    <div
+      class="status"
+      slot="empty"
+    >
+      <helix-text emphasis="muted">No cards on the board yet</helix-text>
+    </div>
+  </helix-canvas>
+</helix-flex>

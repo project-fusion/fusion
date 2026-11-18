@@ -1,0 +1,48 @@
+<!-- @summary A disabled field with a time in it, a read-only field, a time outside the allowed range with the message the field shows, and a required field in a form. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-time-input
+    default-value="09:30"
+    disabled
+    hint="Managed by your admin"
+    label="Starts"
+    name="starts"
+  ></helix-time-input>
+  <helix-time-input
+    default-value="18:00"
+    hint="Set by your store"
+    label="Closes"
+    name="closes"
+    readonly
+  ></helix-time-input>
+  <helix-time-input
+    default-value="08:30"
+    feedback="Choose a time at or after 9:00 AM"
+    hint="Between 9:00 AM and 5:00 PM"
+    label="Appointment"
+    max="17:00"
+    min="09:00"
+    name="appointment"
+  ></helix-time-input>
+  <!-- The form does not submit in the preview. -->
+  <form onsubmit="event.preventDefault()">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-time-input
+        hint="When you will arrive"
+        label="Arrival"
+        name="arrival"
+        required
+      ></helix-time-input>
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+        type="submit"
+      >Save</helix-button>
+    </helix-flex>
+  </form>
+</helix-flex>

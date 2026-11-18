@@ -1,0 +1,11 @@
+.stack helix-toast-item:nth-last-child(2)::part(item) {
+  animation-delay: 150ms;
+}
+
+.stack helix-toast-item:nth-last-child(3)::part(item) {
+  animation-delay: 300ms;
+}
+
+.stack helix-toast-item:nth-last-child(4)::part(item) {
+  animation-delay: 450ms;
+}

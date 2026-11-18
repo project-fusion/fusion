@@ -1,11 +1,11 @@
-<!-- @summary Picking values builds a chip, and the field's usual comparison is not shown. -->
+<!-- @summary Picking values, or typing a filter and pressing Enter, builds the same chip, and the field's usual comparison is not shown. -->
 <!-- @min 520 -->
 
 <helix-filter-input
-  hint="Choose a filter, then choose one or more values"
+  hint="Pick a filter and its values, or type one such as disposition:refunded, -disposition:settled, or refund assignee:ada tuesday"
   id="filter"
   label="Filter the queue"
-  placeholder="Search, or pick a filter"
+  placeholder="Search, or pick or type a filter"
 >
   <helix-filter-menu
     label="Filter"
@@ -43,13 +43,20 @@
       <helix-option value="week">This week</helix-option>
     </helix-filter-field>
   </helix-filter-menu>
+
+  <!-- A field with no values to list goes here, outside the picker. -->
+  <helix-filter-field
+    label="Assignee"
+    name="assignee"
+  ></helix-filter-field>
 </helix-filter-input>
 
 <script type="module">
   const filter = document.getElementById('filter')
 
-  /* A checked value, a changed comparison, and a removed chip all send
-     `helix-facet`, so no `helix-dismiss` handler is needed. */
+  /* Typed text, a checked value, a changed comparison, and a removed chip all
+     send `helix-facet`, so no `helix-dismiss` handler is needed. Typing also
+     checks the value in the menu. */
   filter.addEventListener('helix-facet', (event) => {
     const { field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)

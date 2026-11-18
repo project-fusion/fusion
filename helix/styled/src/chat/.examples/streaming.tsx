@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import './streaming.css'
 
 const WORDS =
   'Three things. The settings page loads faster, invoices export as CSV, and deleted projects are not tracked any more.'.split(
@@ -64,6 +65,29 @@ export function Example() {
       direction="column"
       gap="md"
     >
+      <helix-chat
+        className="waiting"
+        label="Research assistant"
+      >
+        <strong slot="header">Research assistant</strong>
+
+        <helix-chat-message
+          author="them"
+          state="streaming"
+        ></helix-chat-message>
+
+        <helix-chat-message
+          author="them"
+          state="streaming"
+        >
+          <helix-orb
+            size="sm"
+            slot="indicator"
+            state="thinking"
+          ></helix-orb>
+        </helix-chat-message>
+      </helix-chat>
+
       <helix-chat
         className="streaming"
         label="Assistant"

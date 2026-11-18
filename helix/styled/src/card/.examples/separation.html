@@ -1,0 +1,89 @@
+<!-- @summary Cards at the resting separation, a surface color inside a hairline, then `outlined`, `elevated`, `filled`, and `plain`. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="grid">
+  <helix-card aria-labelledby="resting-title">
+    <helix-text
+      as="h3"
+      id="resting-title"
+      scale="title"
+      slot="header"
+    >Billing</helix-text>
+    Your next invoice is due on October 1, 2026.
+    <helix-button
+      emphasis="ghost"
+      slot="footer"
+    >View invoices</helix-button>
+  </helix-card>
+
+  <helix-card
+    aria-labelledby="outlined-title"
+    separation="outlined"
+  >
+    <helix-text
+      as="h3"
+      id="outlined-title"
+      scale="title"
+      slot="header"
+    >Notifications</helix-text>
+    Choose which emails you receive about activity in your projects.
+    <helix-button
+      emphasis="ghost"
+      slot="footer"
+    >Edit settings</helix-button>
+  </helix-card>
+
+  <helix-card
+    aria-labelledby="elevated-title"
+    separation="elevated"
+  >
+    <helix-text
+      as="h3"
+      id="elevated-title"
+      scale="title"
+      slot="header"
+    >Team plan</helix-text>
+    Invite up to 10 people and share projects with your team.
+    <helix-button
+      emphasis="ghost"
+      slot="footer"
+    >Upgrade plan</helix-button>
+  </helix-card>
+
+  <helix-card
+    aria-labelledby="filled-title"
+    separation="filled"
+  >
+    <helix-text
+      as="h3"
+      id="filled-title"
+      scale="title"
+      slot="header"
+    >Storage</helix-text>
+    You have used 8 GB of your 10 GB of storage.
+    <helix-button
+      emphasis="ghost"
+      slot="footer"
+    >Manage storage</helix-button>
+  </helix-card>
+
+  <helix-card
+    aria-labelledby="plain-title"
+    separation="plain"
+  >
+    <helix-text
+      as="h3"
+      id="plain-title"
+      scale="title"
+      slot="header"
+    >Profile</helix-text>
+    Update your name, photo, and contact details.
+    <helix-button
+      emphasis="ghost"
+      slot="footer"
+    >Edit profile</helix-button>
+  </helix-card>
+</div>

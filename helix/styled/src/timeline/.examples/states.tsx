@@ -1,0 +1,37 @@
+export function Example() {
+  return (
+    <helix-timeline
+      label="Deployment history"
+      loading
+      loading-text="Loading older events"
+    >
+      <helix-timeline-item
+        datetime="2026-08-19T09:12"
+        tone="success"
+      >
+        <helix-icon
+          name="check"
+          slot="marker"
+        ></helix-icon>
+        <span slot="time">09:12</span>
+        <helix-text scale="body-strong">Deployed to production</helix-text>
+        <helix-text
+          emphasis="muted"
+          scale="caption"
+        >
+          Version 4.2.0, by the release job.
+        </helix-text>
+      </helix-timeline-item>
+      <helix-timeline-item datetime="2026-08-19T08:30">
+        <span slot="time">08:30</span>
+        <helix-text scale="body-strong">Build passed</helix-text>
+        <helix-text
+          emphasis="muted"
+          scale="caption"
+        >
+          1,089 tests across 75 packages.
+        </helix-text>
+      </helix-timeline-item>
+    </helix-timeline>
+  )
+}

@@ -1,4 +1,4 @@
-<!-- @summary The events a pin input sends as you type, including `helix-complete` when the last box is filled. -->
+<!-- @summary The boxes advance as you type and the last one completes the code, with each event the pin input sends logged, including `helix-complete`. -->
 <!-- @layout hug -->
 <helix-flex
   direction="column"
@@ -56,6 +56,7 @@
   })
   code.addEventListener('helix-complete', (event) => {
     say('helix-complete', `Entered "${event.detail.value}"`)
+    code.hint = `Checking ${event.detail.value}`
   })
   code.addEventListener('change', (event) => {
     say('change', `Changed to "${event.currentTarget.value}"`)

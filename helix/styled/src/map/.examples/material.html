@@ -1,0 +1,41 @@
+<!-- @summary The pan and zoom buttons on solid, glass, frosted, and transparent backgrounds, each over a map. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="materials">
+  <helix-map label="Edinburgh city center">
+    <!-- Put your map here, drawn by MapLibre, Leaflet, an image, or a canvas. -->
+    <div class="stand-in">Solid</div>
+
+    <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+  </helix-map>
+
+  <helix-map
+    label="Glasgow city center"
+    material="glass"
+  >
+    <div class="stand-in">Glass</div>
+
+    <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+  </helix-map>
+
+  <helix-map
+    label="Aberdeen city center"
+    material="frosted"
+  >
+    <div class="stand-in">Frosted</div>
+
+    <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+  </helix-map>
+
+  <helix-map
+    label="Dundee city center"
+    material="transparent"
+  >
+    <div class="stand-in">Transparent</div>
+
+    <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+  </helix-map>
+</div>

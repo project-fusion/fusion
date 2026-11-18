@@ -1,33 +1,71 @@
 export function Example() {
   return (
-    <helix-menu
-      context
-      label="Edit"
+    <helix-flex
+      direction="column"
+      gap="lg"
     >
-      <helix-textarea
-        default-value="Right-click in this field."
-        label="Notes"
-        slot="trigger"
-      ></helix-textarea>
+      <helix-menu
+        context
+        label="Edit"
+      >
+        <helix-textarea
+          default-value="Right-click in this field."
+          label="Notes"
+          slot="trigger"
+        ></helix-textarea>
 
-      <helix-menu-item
-        shortcut="mod+x"
-        value="cut"
+        <helix-menu-item
+          shortcut="mod+x"
+          value="cut"
+        >
+          Cut
+        </helix-menu-item>
+        <helix-menu-item
+          shortcut="mod+c"
+          value="copy"
+        >
+          Copy
+        </helix-menu-item>
+        <helix-menu-item
+          shortcut="mod+v"
+          value="paste"
+        >
+          Paste
+        </helix-menu-item>
+      </helix-menu>
+
+      {/* `data-prose` sets the table as the docs set one: a rule under each row and the heading row muted. */}
+      <div data-prose="">
+        <table id="context-files">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tabIndex={0}>
+              <td>Quarterly report.pdf</td>
+              <td>2.4 MB</td>
+            </tr>
+            <tr tabIndex={0}>
+              <td>Roadmap.key</td>
+              <td>8.1 MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <helix-menu
+        context
+        for="context-files"
+        label="File"
+        targets="tbody tr"
       >
-        Cut
-      </helix-menu-item>
-      <helix-menu-item
-        shortcut="mod+c"
-        value="copy"
-      >
-        Copy
-      </helix-menu-item>
-      <helix-menu-item
-        shortcut="mod+v"
-        value="paste"
-      >
-        Paste
-      </helix-menu-item>
-    </helix-menu>
+        <helix-menu-item value="open">Open</helix-menu-item>
+        <helix-menu-item value="rename">Rename</helix-menu-item>
+        <helix-menu-item value="archive">Archive</helix-menu-item>
+      </helix-menu>
+    </helix-flex>
   )
 }

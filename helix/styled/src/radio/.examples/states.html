@@ -1,0 +1,73 @@
+<!-- @summary A disabled group, a group disabled by its `fieldset`, a read-only group, a group with an error because nothing was chosen, and a required group in a form. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-radio-group
+    default-value="one"
+    disabled
+    hint="Managed by your admin"
+    label="Plan"
+    name="a"
+  >
+    <helix-radio value="one">Free</helix-radio>
+    <helix-radio value="two">Pro</helix-radio>
+  </helix-radio-group>
+
+  <!-- The fieldset around this group disables it. -->
+  <fieldset disabled>
+    <helix-radio-group
+      default-value="two"
+      hint="Managed by your admin"
+      label="Billing cycle"
+      name="b"
+    >
+      <helix-radio value="one">Monthly</helix-radio>
+      <helix-radio value="two">Yearly</helix-radio>
+    </helix-radio-group>
+  </fieldset>
+
+  <helix-radio-group
+    default-value="eu"
+    hint="Set when the workspace was created"
+    label="Data region"
+    name="region"
+    readonly
+  >
+    <helix-radio value="us">United States</helix-radio>
+    <helix-radio value="eu">European Union</helix-radio>
+  </helix-radio-group>
+
+  <helix-radio-group
+    feedback="Choose one to continue"
+    hint="You can change this later"
+    label="Deploy target"
+    name="target"
+  >
+    <helix-radio value="preview">Preview</helix-radio>
+    <helix-radio value="production">Production</helix-radio>
+  </helix-radio-group>
+
+  <!-- The form does not submit in the preview. -->
+  <form onsubmit="event.preventDefault()">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-radio-group
+        hint="You can change this later"
+        label="Account type"
+        name="choice"
+        required
+      >
+        <helix-radio value="one">Personal</helix-radio>
+        <helix-radio value="two">Business</helix-radio>
+      </helix-radio-group>
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+        type="submit"
+      >Create account</helix-button>
+    </helix-flex>
+  </form>
+</helix-flex>

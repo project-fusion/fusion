@@ -6,7 +6,6 @@ import events from '../.examples/events.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import movingRows from '../.examples/moving-rows.html' with { type: 'text' }
 import nestedRows from '../.examples/nested-rows.html' with { type: 'text' }
-import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
 import arranging from '../.examples/selecting-and-arranging.html' with { type: 'text' }
@@ -103,18 +102,6 @@ describe('the arranging example', () => {
   )
 })
 
-describe('the paging example', () => {
-  run('forty rows are five pages of eight, and the next page starts at the ninth', async () => {
-    await example(paging)
-    const assets = document.getElementById('assets') as HTMLElement
-    expect(rows(assets)).toHaveLength(8)
-    expect(first(assets)).toBe('asset-001.webp')
-    next(assets)
-    await idle()
-    expect(first(assets)).toBe('asset-009.webp')
-  })
-})
-
 describe('the searching example', () => {
   run('typing in the toolbar narrows the rows to what matches', async () => {
     await example(searching)
@@ -169,6 +156,16 @@ describe('the preview example', () => {
     expect(rows(files)).toHaveLength(4)
     expect(first(files)).toBe('archive.tar.gz')
     expect(files.shadowRoot?.textContent).not.toContain('4823100')
+  })
+
+  run('eight rows are two pages of four, and the next page starts at the fifth', async () => {
+    await example(preview)
+    const files = document.getElementById('files') as HTMLElement
+    await idle()
+    next(files)
+    await idle()
+    expect(rows(files)).toHaveLength(4)
+    expect(first(files)).toBe('profile.bin')
   })
 })
 

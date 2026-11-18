@@ -1,14 +1,13 @@
-<!-- @summary The path to the current page, ending with the page you are on. -->
+<!-- @summary The path to the current page as linked crumbs with an icon on the first, ending with the page you are on. -->
 <helix-breadcrumbs aria-label="Breadcrumb">
-  <helix-breadcrumb><a
-    data-link="quiet"
-    href="#home"
-  >Home</a></helix-breadcrumb>
-  <helix-breadcrumb>
-    <a
-      data-link="quiet"
-      href="#section"
-    >Projects</a>
+  <helix-breadcrumb href="#home">
+    <helix-icon
+      name="house"
+      slot="start"
+    ></helix-icon>
+    Home
   </helix-breadcrumb>
-  <helix-breadcrumb current>Website redesign</helix-breadcrumb>
+  <helix-breadcrumb href="#projects">Projects</helix-breadcrumb>
+  <helix-breadcrumb href="#website-redesign">Website redesign</helix-breadcrumb>
+  <helix-breadcrumb current>Settings</helix-breadcrumb>
 </helix-breadcrumbs>

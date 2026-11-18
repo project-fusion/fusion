@@ -1,3 +1,11 @@
 .standard {
   --button-inline-size: var(--helix-size-button);
 }
+
+.column {
+  max-inline-size: 20rem;
+}
+
+.hug {
+  align-self: start;
+}

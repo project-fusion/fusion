@@ -1,7 +1,20 @@
-<!-- @summary Two thumbs on one track, for choosing a span. -->
-<helix-slider
-  default-value="20,70"
-  label="Price"
-  range
-  show-value
-></helix-slider>
+<!-- @summary Two thumbs on one track for choosing a span, and three thumbs, one for each value, each stopping at its neighbors. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-slider
+    default-value="20,70"
+    label="Price"
+    range
+    show-value
+  ></helix-slider>
+
+  <helix-slider
+    default-value="20,50,80"
+    label="Fade stops"
+    range
+    show-value
+    thumb-label="stop {index}"
+  ></helix-slider>
+</helix-flex>

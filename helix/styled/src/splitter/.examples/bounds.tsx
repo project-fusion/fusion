@@ -18,6 +18,15 @@ export function Example() {
         <div slot="start">Filters for status, date, and owner</div>
         <div slot="end">Showing 24 of 120 orders.</div>
       </helix-splitter>
+
+      <helix-splitter
+        collapsed-size="8"
+        default-collapsed="end"
+        default-position="60"
+      >
+        <div slot="start">Project overview and recent activity for your team.</div>
+        <div slot="end">Terminal</div>
+      </helix-splitter>
     </helix-flex>
   )
 }

@@ -1,0 +1,21 @@
+<!-- @summary A code in a brand color over a background that keeps it scannable, and a code with its three corner squares in a brand color, set with `--qr-code-finder-color`. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  align-items="center"
+  gap="lg"
+>
+  <helix-qr-code
+    class="brand"
+    label="Company website"
+    value="https://fusion.dev"
+  ></helix-qr-code>
+  <helix-qr-code
+    class="finders"
+    shape="rounded"
+    value="https://fusion.dev"
+  ></helix-qr-code>
+</helix-flex>

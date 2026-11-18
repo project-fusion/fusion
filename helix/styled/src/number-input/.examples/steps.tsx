@@ -1,12 +1,31 @@
 export function Example() {
   return (
-    <helix-number-input
-      hint="Arrows move by one, Page keys by ten"
-      label="Seats"
-      large-step="10"
-      max={500}
-      min={0}
-      step={1}
-    ></helix-number-input>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-number-input
+        default-value="50"
+        hint="Between 0 and 100"
+        label="Percentage"
+        max={100}
+        min={0}
+        step={5}
+      ></helix-number-input>
+      <helix-number-input
+        default-value="1.5"
+        label="Rate"
+        min={0}
+        step={0.25}
+      ></helix-number-input>
+      <helix-number-input
+        hint="Arrows move by one, Page keys by ten"
+        label="Seats"
+        large-step="10"
+        max={500}
+        min={0}
+        step={1}
+      ></helix-number-input>
+    </helix-flex>
   )
 }

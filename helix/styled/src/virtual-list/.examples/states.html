@@ -1,0 +1,25 @@
+<!-- @summary A list while its items load, and a list with no items, each with its own words. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-virtual-list
+    class="statusList"
+    label="Files"
+    loading
+    loading-text="Loading files"
+  ></helix-virtual-list>
+
+  <helix-virtual-list
+    class="statusList"
+    empty-text="No files in the trash"
+    label="Trash"
+  ></helix-virtual-list>
+</helix-flex>
+
+<style>
+  .statusList {
+    --virtual-list-block-size: 6em;
+  }
+</style>

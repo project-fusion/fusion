@@ -1,4 +1,4 @@
-<!-- @summary Buttons at their own width, at a standard width set by `--button-inline-size`, and at full width with `width`. -->
+<!-- @summary Buttons at their own width, at a standard width set by `--button-inline-size`, and at full width with `width`, then a narrow column with one button as wide as the column and one as wide as its label. -->
 <link
   href="styles.css"
   rel="stylesheet"
@@ -48,4 +48,16 @@
     tone="primary"
     width="full"
   >Continue</helix-button>
+
+  <helix-flex
+    class="column"
+    direction="column"
+    gap="sm"
+  >
+    <helix-button
+      emphasis="solid"
+      tone="primary"
+    >Save changes</helix-button>
+    <helix-button class="hug">Cancel</helix-button>
+  </helix-flex>
 </helix-flex>

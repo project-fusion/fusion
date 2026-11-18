@@ -1,4 +1,4 @@
-<!-- @summary A sequence with the middle step current, showing a finished step and a step still ahead. -->
+<!-- @summary A sequence with the second step current, showing a finished step, a disabled step, and a step still ahead. -->
 <helix-steps
   default-active="two"
   label="Checkout"
@@ -8,5 +8,9 @@
     value="one"
   >Cart</helix-step>
   <helix-step value="two">Shipping</helix-step>
-  <helix-step value="three">Payment</helix-step>
+  <helix-step
+    disabled
+    value="three"
+  >Gift wrap</helix-step>
+  <helix-step value="four">Payment</helix-step>
 </helix-steps>

@@ -1,0 +1,28 @@
+<!-- @summary A conversation loading its first turns, drawn in outline, and a conversation with no turns yet. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-chat
+    class="conversation"
+    label="Support"
+    loading
+    loading-text="Loading messages"
+  >
+    <strong slot="header">Support</strong>
+  </helix-chat>
+
+  <helix-chat
+    class="conversation"
+    empty-text="No messages yet"
+    label="Assistant"
+  >
+    <strong slot="header">Assistant</strong>
+  </helix-chat>
+</helix-flex>

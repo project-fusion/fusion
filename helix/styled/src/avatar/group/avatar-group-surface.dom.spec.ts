@@ -8,8 +8,8 @@ import {
   settle,
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
-import onASurfaceStyles from '../.examples/on-a-surface.css' with { type: 'text' }
-import onASurface from '../.examples/on-a-surface.html' with { type: 'text' }
+import groupStyles from '../.examples/group.css' with { type: 'text' }
+import groupExample from '../.examples/group.html' with { type: 'text' }
 
 /* The gap between one avatar and the next. It was a ring in the page color, a
    halo on any other surface; it is a cutout now, which shows the surface the
@@ -20,6 +20,7 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../button/index.js')
+  await import('../../flex/index.js')
 })
 
 const geometry = hasLayout() ? test : (): void => {}
@@ -27,8 +28,8 @@ const geometry = hasLayout() ? test : (): void => {}
 type Group = HTMLElement & Updatable
 
 const panel = async (): Promise<Group> => {
-  await example(onASurface, onASurfaceStyles)
-  const group = document.querySelector('helix-avatar-group') as Group
+  await example(groupExample, groupStyles)
+  const group = document.querySelector('.panel helix-avatar-group') as Group
   await settle(group)
   for (const avatar of group.querySelectorAll('helix-avatar')) {
     await settle(avatar as Updatable)

@@ -1,0 +1,71 @@
+<!-- @summary Two hundred tracks running down with the resting `vertical`, and running across as a strip of cards with `horizontal`. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-virtual-list
+    estimate="40"
+    id="playlist"
+    label="Playlist"
+  >
+    <template>
+      <div class="trackRow">
+        <strong data-field="name"></strong>
+        <span data-field="length"></span>
+      </div>
+    </template>
+  </helix-virtual-list>
+
+  <helix-virtual-list
+    estimate="128"
+    id="recent"
+    label="Recently played"
+    orientation="horizontal"
+  >
+    <template>
+      <div class="trackCard">
+        <span class="trackCover"></span>
+        <strong data-field="name"></strong>
+        <span data-field="length"></span>
+      </div>
+    </template>
+  </helix-virtual-list>
+</helix-flex>
+
+<script>
+  const tracks = Array.from({ length: 200 }, (_, index) => ({
+    length: `${3 + (index % 3)}:${String((index * 17) % 60).padStart(2, '0')}`,
+    name: `Track ${index + 1}`,
+  }))
+  document.getElementById('playlist').items = tracks
+  document.getElementById('recent').items = tracks
+</script>
+
+<style>
+  #playlist {
+    --virtual-list-block-size: 12em;
+  }
+
+  .trackRow {
+    align-items: center;
+    block-size: max(40px, var(--helix-size-target));
+    display: flex;
+    justify-content: space-between;
+    padding-inline: var(--helix-space-sm);
+  }
+
+  .trackCard {
+    box-sizing: border-box;
+    display: grid;
+    gap: var(--helix-space-2xs);
+    inline-size: 128px;
+    padding: var(--helix-space-2xs);
+  }
+
+  .trackCover {
+    aspect-ratio: 1;
+    background-color: color-mix(in oklab, var(--helix-color-primary) 18%, transparent);
+    border-radius: var(--helix-radii-sm);
+  }
+</style>

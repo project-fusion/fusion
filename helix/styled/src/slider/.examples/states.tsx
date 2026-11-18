@@ -1,0 +1,71 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-slider
+        default-value="40"
+        disabled
+        hint="Managed by your admin"
+        label="Volume"
+        show-value
+      ></helix-slider>
+
+      {/* The fieldset around this slider disables it. */}
+      <fieldset disabled>
+        <helix-slider
+          default-value="70"
+          hint="Managed by your admin"
+          label="Brightness"
+          show-value
+        ></helix-slider>
+      </fieldset>
+
+      <helix-slider
+        default-value="20,70"
+        hint="Set by your plan"
+        label="Price"
+        name="price"
+        range
+        readonly
+        show-value
+      ></helix-slider>
+
+      <helix-slider
+        default-value="95"
+        feedback="Set a limit of 80 or lower to avoid throttling"
+        hint="Requests per second"
+        label="Rate limit"
+        max={100}
+        name="rate"
+        show-value
+      ></helix-slider>
+
+      {/* The form does not submit in the preview. */}
+      <form onSubmit={(event) => event.preventDefault()}>
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-slider
+            default-value="60"
+            hint="Applies to every upload"
+            label="Image quality"
+            name="quality"
+            required
+            show-value
+          ></helix-slider>
+
+          <helix-button
+            emphasis="solid"
+            tone="primary"
+            type="submit"
+          >
+            Save
+          </helix-button>
+        </helix-flex>
+      </form>
+    </helix-flex>
+  )
+}
