@@ -370,6 +370,9 @@
     var(--helix-shadow-md);
   inline-size: var(--_slider-thumb-length);
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
+  /* The halo grows round the thumb under the pointer and while it is held,
+     instead of switching on. */
+  transition: box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* Under the pointer, the halo at half its strength, so the thumb answers a
@@ -420,6 +423,9 @@
     0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
   inline-size: var(--_slider-thumb-length);
+  /* The halo grows round the thumb under the pointer and while it is held,
+     instead of switching on. */
+  transition: box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="control"]:focus-visible {
