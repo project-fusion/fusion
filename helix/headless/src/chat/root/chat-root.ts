@@ -1623,9 +1623,33 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /** The turns fed as data, a window of them, between the room the rest would take. */
+  /** The last turn's key and how many turns there were, at the last render, to tell a turn arriving from history loading. */
+  private lastTurn: { count: number; key: unknown } | undefined
+
+  /**
+   * From which turn on the turns are new at the end of the conversation this
+   * render, or none: a turn added after the last one, not history loaded
+   * above it and not a turn scrolled back into view. Those take
+   * `data-arriving` for this render, which a stylesheet can bring in by.
+   */
+  private arrivingFrom(): number {
+    const turns = this.turns
+    const keyOf = (at: number): unknown => turns[at]?.key ?? at
+    const was = this.lastTurn
+    this.lastTurn =
+      turns.length > 0 ? { count: turns.length, key: keyOf(turns.length - 1) } : undefined
+    /* **Not the first turns read**, which are the conversation the page
+       came with, read from the slot a render after the first. */
+    if (!this.hasUpdated || was === undefined || turns.length <= was.count) {
+      return Number.POSITIVE_INFINITY
+    }
+    return keyOf(was.count - 1) === was.key ? was.count : Number.POSITIVE_INFINITY
+  }
+
   private renderTurns(): TemplateResult {
     const { after, before, first, last } = this.virtualize.window
     const message = this.tag('chat-message')
+    const arriving = this.arrivingFrom()
     /* `flex: none` inline, because the room is only room if it keeps its size:
        an empty flex item in a log that is a flex column shrinks to nothing, and
        with the spacers gone the window grew until it had drawn every turn. */
@@ -1634,7 +1658,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         this.turns.slice(first, last),
         (turn, offset) => turn.key ?? first + offset,
         (turn, offset) =>
-          html`<div part="turn" data-index=${first + offset}>
+          html`<div part="turn" data-index=${first + offset} ?data-arriving=${first + offset >= arriving}>
             <${message}
               exportparts="actions: message-actions, attachments: message-attachments, avatar: message-avatar, body: message-body,
                 content: message-content, indicator: message-indicator, mark: message-mark, message,

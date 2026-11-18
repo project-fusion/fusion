@@ -1,3 +1,11 @@
+:host {
+  /* **A file arriving fades in, one leaving fades where it was, and the rest
+     slide into place**, at the pace and on the curve rows and tags move by
+     everywhere. */
+  --file-input-move-duration: var(--helix-duration-normal);
+  --file-input-move-easing: var(--helix-easing-standard);
+}
+
 /* The stack, the hover edge, the focus ring, the invalid state and the stripped
    control are `shared/field/field-frame`'s. The field is the drop target, so it
    is a box with room in it rather than a line.
@@ -105,13 +113,6 @@
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized);
-}
-
-@starting-style {
-  [part~="file"] {
-    opacity: 0;
-    scale: 1 0.9;
-  }
 }
 
 /* The name and its readings on one line where they fit, and stacked where they
@@ -260,6 +261,12 @@
   --icon-size: var(--helix-size-icon-loose);
 
   color: var(--helix-color-foreground-muted);
+}
+
+/* **Where a leaving file's copy fades**, so the box the copy is placed
+   against: `LayoutMotionController` lays it there. */
+[part="list"] {
+  position: relative;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a

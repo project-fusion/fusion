@@ -116,6 +116,8 @@ export function lapOf(w: number, h: number): Keyframe[] {
  * @cssproperty --chat-composer-border-width - Width of the composer's edge, so your theme can remove it.
  * @cssproperty --chat-composer-glow-color - Color of the focus glow under `glow`. Defaults to the primary color.
  * @cssproperty --chat-composer-max-block-size - Maximum height the field grows to.
+ * @cssproperty --chat-composer-move-duration - How long an attachment takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --chat-composer-move-easing - The curve an attachment fades and slides along. Defaults to `--helix-easing-standard`.
  */
 @customElement('helix-chat-composer')
 export class HelixChatComposer extends HelixHeadlessChatComposer {

@@ -1,3 +1,11 @@
+:host {
+  /* **A filter arriving fades in, one leaving fades where it was, and the rest
+     slide into place**, at the pace and on the curve rows and tags move by
+     everywhere. */
+  --filter-input-move-duration: var(--helix-duration-normal);
+  --filter-input-move-easing: var(--helix-easing-standard);
+}
+
 /* The stack, the hover edge, the focus ring, the invalid state and the stripped
    control are `shared/field/field-frame`'s. What is here is what is particular
    to a filter input. */

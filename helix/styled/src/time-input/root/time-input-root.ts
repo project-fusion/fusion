@@ -38,6 +38,8 @@ import { styles } from './time-input-root.css.js'
  * @cssproperty --time-input-border-color - Color of the panel's edge.
  * @cssproperty --time-input-border-width - Width of the panel's edge. Defaults to
  *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
+ * @cssproperty --time-input-move-duration - How long a time takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --time-input-move-easing - The curve a time fades and slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --time-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --time-input-segment-focus-color - The text of the segment with

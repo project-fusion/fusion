@@ -21,3 +21,9 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* **Where a leaving tag's copy fades**, so the box the copy is placed
+   against: `LayoutMotionController` lays it there. */
+:host {
+  position: relative;
+}

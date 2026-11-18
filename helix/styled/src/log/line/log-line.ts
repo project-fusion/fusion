@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { arrive, customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLogLine } from '@fusion.dev/helix-headless/log'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './log-line.css.js'
@@ -26,6 +26,22 @@ export class HelixLogLine extends HelixHeadlessLogLine {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = styles
+
+  /**
+   * **A line arriving fades in**, where it joins one already drawn: a frame
+   * later, since the parent assigns it its slot only once it has arrived,
+   * and until then it has no style for `@starting-style` to start from.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.arriving) {
+      arrive(this, {
+        duration: '--helix-duration-fast',
+        easing: '--helix-easing-decelerate',
+        from: { opacity: 0 },
+      })
+    }
+  }
 }
 
 declare global {

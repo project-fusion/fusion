@@ -281,6 +281,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   protected readonly motion = new LayoutMotionController(this, {
     items: () => this.rows.filter((row): row is HTMLElement => row instanceof HTMLElement),
+    leaving: () => this.partNamed('list'),
     timing: () => {
       const style = getComputedStyle(this)
       return {

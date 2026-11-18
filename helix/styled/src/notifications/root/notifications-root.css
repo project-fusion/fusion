@@ -226,6 +226,12 @@ slot[name="error"]::slotted(*) {
   position: absolute;
 }
 
+/* **Where a leaving row's copy fades**, so the box the copy is placed
+   against: `LayoutMotionController` lays it there. */
+[part="list"] {
+  position: relative;
+}
+
 @media print {
   :host {
     max-block-size: none;

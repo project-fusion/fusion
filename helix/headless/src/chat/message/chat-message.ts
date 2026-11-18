@@ -86,9 +86,27 @@ export const FAILED_LABEL = 'Not sent'
  * @csspart state - The text that names the turn's state, when there is one to show.
  * @csspart time - The turn's time.
  * @csspart work - The box around the `work` slot, above the content.
+ *
+ * @cssstate arriving - The message joined a conversation already drawn, rather than coming with the page.
  */
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
+  /**
+   * **Arriving, where it joins a conversation already drawn**: `:state(arriving)`,
+   * which a stylesheet can bring it in by. Not where it was there as the
+   * conversation first drew, which is what the page came with, and not inside a
+   * conversation that draws its turns from data, which marks its own.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    const parent = this.parentElement as (HTMLElement & { hasUpdated?: boolean }) | null
+    this.arriving = parent?.hasUpdated === true
+    this.toggleState('arriving', this.arriving)
+  }
+
+  /** Whether it joined one already drawn, as `:state(arriving)` says, for the tier above to bring it in by. */
+  protected arriving = false
+
   /**
    * The key this part's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-chat-message': { retryLabel: 'Erneut versuchen' } })`.

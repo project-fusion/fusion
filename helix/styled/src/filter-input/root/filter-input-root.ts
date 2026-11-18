@@ -50,6 +50,8 @@ import '../../voice-level/index.js'
  * @cssproperty --filter-input-control-size - The smallest width the text keeps as tokens fill the line. Below it, the text wraps to its own line.
  * @cssproperty --filter-input-field-border-color - The field's edge at rest. Hover, focus, and an error still draw their own.
  * @cssproperty --filter-input-lead-border-color - The color of the line between the leading box and the text.
+ * @cssproperty --filter-input-move-duration - How long a filter takes to fade in, to fade as it leaves, or to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --filter-input-move-easing - The curve a filter fades and slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --filter-input-padding-inline - Space at each side of the field, inside its edge.
  * @cssproperty --filter-input-panel-size - The width of the suggestion panel. It matches the field by default.
  * @cssproperty --filter-input-radius - Corner radius of the field.
