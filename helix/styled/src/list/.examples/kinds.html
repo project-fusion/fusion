@@ -1,4 +1,4 @@
-<!-- @summary An ordered list, an unordered list, and a description list, one for each `kind`. -->
+<!-- @summary An ordered list, an unordered list, and a description list, one for each `kind`, and an ordered list that counts down from five, as a ranking does. -->
 <helix-flex
   direction="column"
   gap="lg"
@@ -10,6 +10,19 @@
     <helix-list-item>Create a project</helix-list-item>
     <helix-list-item>Invite your team</helix-list-item>
     <helix-list-item>Share your first file</helix-list-item>
+  </helix-list>
+
+  <helix-list
+    kind="ordered"
+    label="Top languages"
+    reversed
+    start="5"
+  >
+    <helix-list-item>Rust</helix-list-item>
+    <helix-list-item>Go</helix-list-item>
+    <helix-list-item>Python</helix-list-item>
+    <helix-list-item>TypeScript</helix-list-item>
+    <helix-list-item>Kotlin</helix-list-item>
   </helix-list>
 
   <helix-list

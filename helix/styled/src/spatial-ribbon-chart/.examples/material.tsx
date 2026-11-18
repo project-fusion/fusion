@@ -1,0 +1,92 @@
+import './material.css'
+
+export function Example() {
+  return (
+    <>
+      <table
+        data-hidden-visually
+        id="latency"
+      >
+        <caption>Response time by region, first week of September</caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Frankfurt (ms)</th>
+            <th scope="col">Virginia (ms)</th>
+            <th scope="col">Singapore (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1 Sep</th>
+            <td>120</td>
+            <td>110</td>
+            <td>196</td>
+          </tr>
+          <tr>
+            <th scope="row">2 Sep</th>
+            <td>128</td>
+            <td>113</td>
+            <td>191</td>
+          </tr>
+          <tr>
+            <th scope="row">3 Sep</th>
+            <td>134</td>
+            <td>112</td>
+            <td>184</td>
+          </tr>
+          <tr>
+            <th scope="row">4 Sep</th>
+            <td>138</td>
+            <td>108</td>
+            <td>176</td>
+          </tr>
+          <tr>
+            <th scope="row">5 Sep</th>
+            <td>137</td>
+            <td>101</td>
+            <td>169</td>
+          </tr>
+          <tr>
+            <th scope="row">6 Sep</th>
+            <td>134</td>
+            <td>93</td>
+            <td>164</td>
+          </tr>
+          <tr>
+            <th scope="row">7 Sep</th>
+            <td>127</td>
+            <td>85</td>
+            <td>202</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="panel">
+        <figure>
+          <figcaption>Opaque</figcaption>
+          <helix-spatial-ribbon-chart
+            for="latency"
+            label="Response time by region"
+          ></helix-spatial-ribbon-chart>
+        </figure>
+        <figure>
+          <figcaption>Frosted</figcaption>
+          <helix-spatial-ribbon-chart
+            for="latency"
+            label="Response time by region"
+            material="frosted"
+          ></helix-spatial-ribbon-chart>
+        </figure>
+        <figure>
+          <figcaption>Glass</figcaption>
+          <helix-spatial-ribbon-chart
+            for="latency"
+            label="Response time by region"
+            material="glass"
+          ></helix-spatial-ribbon-chart>
+        </figure>
+      </div>
+    </>
+  )
+}

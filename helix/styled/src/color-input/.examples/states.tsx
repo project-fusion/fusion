@@ -1,0 +1,51 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-color-input
+        default-value="#3366ff"
+        disabled
+        hint="Managed by your admin"
+        label="Brand color"
+        name="brand"
+      ></helix-color-input>
+      <helix-color-input
+        default-value="#22c55e"
+        hint="Set by your theme"
+        label="Success color"
+        name="success"
+        readonly
+      ></helix-color-input>
+      <helix-color-input
+        default-value="not-a-color"
+        feedback="Enter a valid color, such as #ff0000."
+        hint="Use hex, rgb(), or hsl()."
+        label="Accent color"
+        name="accent"
+      ></helix-color-input>
+      {/* The form does not submit in the preview. */}
+      <form onSubmit={(event) => event.preventDefault()}>
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-color-input
+            hint="Use hex, rgb(), or hsl()."
+            label="Link color"
+            name="link"
+            required
+          ></helix-color-input>
+          <helix-button
+            emphasis="solid"
+            tone="primary"
+            type="submit"
+          >
+            Save
+          </helix-button>
+        </helix-flex>
+      </form>
+    </helix-flex>
+  )
+}

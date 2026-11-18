@@ -11,9 +11,10 @@ import {
 import ansiColors from '../.examples/ansi-colors.html' with { type: 'text' }
 import exited from '../.examples/exited.html' with { type: 'text' }
 import inAPane from '../.examples/in-a-pane.html' with { type: 'text' }
-import plain from '../.examples/plain.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
+import separation from '../.examples/separation.html' with { type: 'text' }
 import transcript from '../.examples/transcript.html' with { type: 'text' }
+import withoutAHeader from '../.examples/without-a-header.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -150,14 +151,36 @@ describe('the pane example', () => {
   })
 })
 
-describe('the plain example', () => {
+describe('the without a header example', () => {
   run('writes a shell into a frame whose header is hidden', async () => {
-    await example(plain)
+    await example(withoutAHeader)
     const { frame, written } = await attached()
     expect(written.join('')).toContain('localhost:3000')
     expect(part(frame, 'header')?.hasAttribute('hidden')).toBe(true)
     expect(part(frame, 'find')).toBeNull()
     expect(part(frame, 'clear')).toBeNull()
+  })
+})
+
+describe('the separation example', () => {
+  run('writes a shell into a framed terminal and into a plain one', async () => {
+    await example(separation)
+    for (const [id, words] of [
+      ['framed-shell', 'built'],
+      ['plain-shell', 'guides'],
+    ] as const) {
+      const frame = document.getElementById(id) as Frame
+      await settle(frame)
+      const written: string[] = []
+      frame.attach({
+        write: (data, done) => {
+          written.push(typeof data === 'string' ? data : new TextDecoder().decode(data))
+          done()
+        },
+      })
+      expect(written.join('')).toContain(words)
+    }
+    expect(document.getElementById('plain-shell')?.getAttribute('separation')).toBe('plain')
   })
 })
 

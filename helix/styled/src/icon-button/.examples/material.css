@@ -1,0 +1,25 @@
+.band {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  background-image:
+    radial-gradient(
+      60% 120% at 15% 20%,
+      color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 110% at 85% 80%,
+      color-mix(in oklab, var(--helix-color-accent) 18%, transparent),
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 0.5rem,
+      color-mix(in oklab, var(--helix-color-foreground) 26%, transparent) 0.5rem 0.625rem
+    );
+  border-radius: var(--helix-radii-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-lg);
+  padding: var(--helix-space-lg);
+}

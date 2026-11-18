@@ -1,6 +1,10 @@
-/* A conversation has to be given a height and a ground by whatever holds it,
-   which is the page's job here and the reason the other examples reach for a
-   popover or a drawer. */
+.waiting {
+  --chat-max-block-size: 12rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+}
+
 .streaming {
   --chat-max-block-size: 18rem;
   background-color: var(--helix-color-surface);

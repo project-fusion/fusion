@@ -1,0 +1,16 @@
+helix-canvas {
+  --canvas-block-size: 14rem;
+}
+
+.status {
+  align-items: center;
+  block-size: 100%;
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  padding: var(--helix-space-lg);
+}
+
+.status helix-progress {
+  inline-size: min(16rem, 100%);
+}

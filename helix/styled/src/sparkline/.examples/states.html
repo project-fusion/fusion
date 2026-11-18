@@ -1,0 +1,15 @@
+<!-- @summary A sparkline while its readings load, and a sparkline with no readings, with its own `empty-text`. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-sparkline
+    label="Sessions over seven days"
+    loading
+  ></helix-sparkline>
+  <helix-sparkline
+    empty-text="No orders this week"
+    label="Orders over seven days"
+  ></helix-sparkline>
+</helix-flex>

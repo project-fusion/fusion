@@ -12,10 +12,11 @@ export function Example() {
 
   return (
     <helix-filter-input
-      hint="Choose a filter, then choose one or more values"
+      hint="Pick a filter and its values, or type one such as disposition:refunded, -disposition:settled, or refund assignee:ada tuesday"
       label="Filter the queue"
-      /* A checked value, a changed comparison, and a removed chip all send
-         `helix-facet`, so no `onhelix-dismiss` handler is needed. */
+      /* Typed text, a checked value, a changed comparison, and a removed chip
+         all send `helix-facet`, so no `onhelix-dismiss` handler is needed.
+         Typing also checks the value in the menu. */
       onhelix-facet={(event) => {
         const { field, label, operatorLabel, values } = event.detail
         setChips((held) => {
@@ -23,7 +24,7 @@ export function Example() {
           return values.length === 0 ? rest : [...rest, { field, label, operatorLabel, values }]
         })
       }}
-      placeholder="Search, or pick a filter"
+      placeholder="Search, or pick or type a filter"
     >
       <helix-filter-menu
         label="Filter"
@@ -61,6 +62,12 @@ export function Example() {
           <helix-option value="week">This week</helix-option>
         </helix-filter-field>
       </helix-filter-menu>
+
+      {/* A field with no values to list goes here, outside the picker. */}
+      <helix-filter-field
+        label="Assignee"
+        name="assignee"
+      ></helix-filter-field>
 
       {chips.map((chip) => (
         <helix-filter-chip

@@ -1,0 +1,19 @@
+<!-- @summary A list loading more rows after its last, and a list with no rows, each with its own words. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-list
+    label="Recent activity"
+    loading
+    loading-text="Loading older activity"
+  >
+    <helix-list-item>Maya merged the pricing branch</helix-list-item>
+    <helix-list-item>Jonas opened an issue about exports</helix-list-item>
+  </helix-list>
+
+  <helix-list
+    empty-text="No pinned items"
+    label="Pinned"
+  ></helix-list>
+</helix-flex>

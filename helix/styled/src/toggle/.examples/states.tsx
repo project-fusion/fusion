@@ -26,6 +26,29 @@ export function Example() {
         <helix-toggle value="one">Light</helix-toggle>
         <helix-toggle value="two">Dark</helix-toggle>
       </helix-toggle-group>
+
+      <helix-toggle-group
+        disabled
+        label="Layout"
+      >
+        <helix-toggle
+          selected
+          value="list"
+        >
+          List
+        </helix-toggle>
+        <helix-toggle value="grid">Grid</helix-toggle>
+      </helix-toggle-group>
+
+      <helix-toggle-group
+        feedback="Choose a view"
+        hint="How the results are laid out"
+        label="View"
+        required
+      >
+        <helix-toggle value="list">List</helix-toggle>
+        <helix-toggle value="grid">Grid</helix-toggle>
+      </helix-toggle-group>
     </helix-flex>
   )
 }

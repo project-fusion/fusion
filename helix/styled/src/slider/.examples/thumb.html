@@ -3,10 +3,11 @@
   rel="stylesheet"
 >
 
-<!-- @summary A grip drawn on each thumb through the `thumb` and `thumb-end` slots. -->
+<!-- @summary A grip drawn on each thumb through the `thumb` and `thumb-end` slots, a slider at its resting proportions, and a thicker track with a thumb of a different width and height, across and upright. -->
+<!-- @layout hug -->
 <helix-flex
   direction="column"
-  gap="lg"
+  gap="2xl"
 >
   <helix-slider
     class="grip"
@@ -36,4 +37,59 @@
       slot="thumb-end"
     ></helix-icon>
   </helix-slider>
+
+  <helix-slider
+    default-value="60"
+    label="Gain"
+    max="100"
+    min="0"
+    show-value
+  ></helix-slider>
+
+  <helix-flex
+    class="thick"
+    direction="column"
+    gap="2xl"
+  >
+    <helix-slider
+      default-value="60"
+      label="Brightness"
+      max="100"
+      min="0"
+      show-value
+    ></helix-slider>
+
+    <helix-slider
+      default-value="35"
+      label="Contrast"
+      markers="5"
+      max="100"
+      min="0"
+      show-value
+    ></helix-slider>
+  </helix-flex>
+
+  <helix-flex
+    align-items="end"
+    class="thick"
+    gap="2xl"
+  >
+    <helix-slider
+      default-value="70"
+      label="Bass"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
+
+    <helix-slider
+      default-value="30"
+      label="Treble"
+      max="100"
+      min="0"
+      orientation="vertical"
+      show-value
+    ></helix-slider>
+  </helix-flex>
 </helix-flex>

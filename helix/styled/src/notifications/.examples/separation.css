@@ -1,0 +1,21 @@
+.feeds {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+}
+
+.feed {
+  max-inline-size: 28rem;
+}
+
+.quote {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-style: italic;
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+}

@@ -1,7 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
-import complete from '../.examples/complete.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -35,12 +34,10 @@ describe('the events example', () => {
     await enter(document.getElementById('code') as HTMLElement, '482913')
     expect(logged().slice(-2)).toEqual(['helix-complete', 'change'])
   })
-})
 
-describe('the complete example', () => {
   run('filling every box is what the page hears about', async () => {
-    await example(complete)
-    const host = document.querySelector('helix-pin-input') as HTMLElement & { hint: string }
+    await example(events)
+    const host = document.getElementById('code') as HTMLElement & { hint: string }
     await enter(host, '482913')
     expect(host.hint).toBe('Checking 482913')
   })

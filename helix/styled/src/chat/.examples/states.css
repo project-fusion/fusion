@@ -1,0 +1,6 @@
+.conversation {
+  --chat-max-block-size: 12rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+}

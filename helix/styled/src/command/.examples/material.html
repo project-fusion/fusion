@@ -1,0 +1,56 @@
+<!-- @summary A palette on the opaque default surface, on glass, and on frosted glass, each opened by its own button. -->
+<!-- @min 320 -->
+<helix-flex
+  gap="sm"
+  wrap
+>
+  <helix-button id="open-opaque">Opaque</helix-button>
+  <helix-button id="open-glass">Glass</helix-button>
+  <helix-button id="open-frosted">Frosted</helix-button>
+</helix-flex>
+
+<helix-command
+  hotkey=""
+  id="opaque-palette"
+  label="Commands"
+>
+  <helix-option value="new">New file</helix-option>
+  <helix-option value="open">Open folder</helix-option>
+  <helix-option value="save">Save all</helix-option>
+</helix-command>
+
+<helix-command
+  hotkey=""
+  id="glass-palette"
+  label="Commands"
+  material="glass"
+>
+  <helix-option value="new">New file</helix-option>
+  <helix-option value="open">Open folder</helix-option>
+  <helix-option value="save">Save all</helix-option>
+</helix-command>
+
+<helix-command
+  hotkey=""
+  id="frosted-palette"
+  label="Commands"
+  material="frosted"
+>
+  <helix-option value="new">New file</helix-option>
+  <helix-option value="open">Open folder</helix-option>
+  <helix-option value="save">Save all</helix-option>
+</helix-command>
+
+<script type="module">
+  document.getElementById('open-opaque').addEventListener('click', () => {
+    document.getElementById('opaque-palette').open = true
+  })
+
+  document.getElementById('open-glass').addEventListener('click', () => {
+    document.getElementById('glass-palette').open = true
+  })
+
+  document.getElementById('open-frosted').addEventListener('click', () => {
+    document.getElementById('frosted-palette').open = true
+  })
+</script>

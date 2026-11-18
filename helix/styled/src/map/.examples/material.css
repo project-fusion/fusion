@@ -1,0 +1,22 @@
+.materials {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+helix-map {
+  --map-block-size: 16rem;
+}
+
+.stand-in {
+  align-items: center;
+  background-image:
+    linear-gradient(var(--helix-color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--helix-color-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+  block-size: 100%;
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  font-size: var(--helix-text-sm);
+  justify-content: center;
+}

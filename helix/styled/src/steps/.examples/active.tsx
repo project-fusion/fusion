@@ -11,7 +11,13 @@ export function Example() {
         Cart
       </helix-step>
       <helix-step value="two">Shipping</helix-step>
-      <helix-step value="three">Payment</helix-step>
+      <helix-step
+        disabled
+        value="three"
+      >
+        Gift wrap
+      </helix-step>
+      <helix-step value="four">Payment</helix-step>
     </helix-steps>
   )
 }

@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import material from '../.examples/material.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -36,5 +37,27 @@ describe('the events example', () => {
       'helix-before-close',
       'toggle',
     ])
+  })
+})
+
+describe('the material example', () => {
+  run('each button opens the palette on its own surface', async () => {
+    await example(material)
+    for (const [name, surface] of [
+      ['opaque', undefined],
+      ['glass', 'glass'],
+      ['frosted', 'frosted'],
+    ] as const) {
+      const palette = document.getElementById(`${name}-palette`) as HTMLElement & {
+        material?: string
+        open: boolean
+      }
+      ;(document.getElementById(`open-${name}`) as HTMLElement).click()
+      await idle()
+      expect(palette.open).toBe(true)
+      expect(palette.material).toBe(surface)
+      palette.open = false
+      await idle()
+    }
   })
 })

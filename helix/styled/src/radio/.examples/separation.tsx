@@ -1,0 +1,185 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-radio-group
+        default-value="team"
+        hint="You can change your plan at any time"
+        label="Plain"
+        name="plan-plain"
+      >
+        <helix-radio value="solo">
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Personal
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              One seat with every feature.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+        <helix-radio value="team">
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Team
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Up to 10 seats, with shared billing.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+      </helix-radio-group>
+
+      <helix-radio-group
+        default-value="team"
+        hint="You can change your plan at any time"
+        label="Outlined"
+        name="plan-outlined"
+      >
+        <helix-radio
+          separation="outlined"
+          value="solo"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Personal
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              One seat with every feature.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+        <helix-radio
+          separation="outlined"
+          value="team"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Team
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Up to 10 seats, with shared billing.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+      </helix-radio-group>
+
+      <helix-radio-group
+        default-value="team"
+        hint="You can change your plan at any time"
+        label="Filled"
+        name="plan-filled"
+      >
+        <helix-radio
+          separation="filled"
+          value="solo"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Personal
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              One seat with every feature.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+        <helix-radio
+          separation="filled"
+          value="team"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Team
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Up to 10 seats, with shared billing.
+            </helix-text>
+          </helix-flex>
+        </helix-radio>
+      </helix-radio-group>
+
+      <helix-radio-group
+        default-value="monthly"
+        label="Billing"
+        orientation="horizontal"
+      >
+        <helix-radio
+          hide-control
+          separation="outlined"
+          value="monthly"
+        >
+          Monthly
+        </helix-radio>
+        <helix-radio
+          hide-control
+          separation="outlined"
+          value="yearly"
+        >
+          Yearly
+        </helix-radio>
+      </helix-radio-group>
+    </helix-flex>
+  )
+}

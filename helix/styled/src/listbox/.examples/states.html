@@ -1,0 +1,63 @@
+<!-- @summary A disabled list, a list disabled by its `fieldset`, a list with feedback that says no option is chosen, and a required list in a form. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-listbox
+    default-value="two"
+    disabled
+    hint="Managed by your admin"
+    label="Plan"
+    name="a"
+  >
+    <helix-option value="one">Free</helix-option>
+    <helix-option value="two">Pro</helix-option>
+  </helix-listbox>
+
+  <!-- The fieldset around this list disables it. -->
+  <fieldset disabled>
+    <helix-listbox
+      default-value="one"
+      hint="Managed by your admin"
+      label="Billing cycle"
+      name="b"
+    >
+      <helix-option value="one">Monthly</helix-option>
+      <helix-option value="two">Yearly</helix-option>
+    </helix-listbox>
+  </fieldset>
+
+  <helix-listbox
+    feedback="Pick a role before inviting"
+    hint="What they will be able to do"
+    label="Role"
+    name="role"
+  >
+    <helix-option value="viewer">Viewer</helix-option>
+    <helix-option value="editor">Editor</helix-option>
+    <helix-option value="owner">Owner</helix-option>
+  </helix-listbox>
+
+  <!-- Preview frame: the submit is swallowed. -->
+  <form onsubmit="event.preventDefault()">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-listbox
+        hint="Where they will work"
+        label="Team"
+        name="team"
+        required
+      >
+        <helix-option value="design">Design</helix-option>
+        <helix-option value="engineering">Engineering</helix-option>
+      </helix-listbox>
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+        type="submit"
+      >Send invitation</helix-button>
+    </helix-flex>
+  </form>
+</helix-flex>

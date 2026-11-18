@@ -1,0 +1,39 @@
+.scenes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-lg);
+}
+
+.scene {
+  border-radius: var(--helix-radii-md);
+  overflow: hidden;
+}
+
+.scene helix-app-header {
+  position: relative;
+  z-index: 1;
+}
+
+.band {
+  background-color: var(--helix-color-primary-subtle);
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 3rem,
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 3rem,
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
+    );
+  display: grid;
+  gap: var(--helix-space-sm);
+  margin-block-start: calc(var(--helix-size-header) * -1);
+  padding: var(--helix-space-lg);
+  padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
+}
+
+.band helix-text {
+  color: var(--helix-color-foreground);
+}

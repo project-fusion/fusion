@@ -1,0 +1,20 @@
+export function Example() {
+  return (
+    <helix-flex
+      gap="lg"
+      wrap
+    >
+      <helix-time-picker
+        default-value="09:00"
+        max="17:00"
+        min="09:00"
+        step={30}
+      ></helix-time-picker>
+      <helix-time-picker
+        disable-times="09:30,10:00,11:15,13:00,14:30"
+        max="16:00"
+        min="09:00"
+      ></helix-time-picker>
+    </helix-flex>
+  )
+}

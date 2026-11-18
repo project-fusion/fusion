@@ -1,0 +1,57 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-flex
+        gap="lg"
+        wrap
+      >
+        <helix-time-picker
+          default-value="09:30"
+          disabled
+          hint="Managed by your admin"
+          label="Starts"
+        ></helix-time-picker>
+        <helix-time-picker
+          default-value="18:00"
+          hint="Set by your store"
+          label="Closes"
+          name="closes"
+          readonly
+        ></helix-time-picker>
+        <helix-time-picker
+          default-value="09:30"
+          feedback="Choose a time after 10:00 AM"
+          hint="Orders are ready from 10:00 AM"
+          label="Pickup"
+          max="12:00"
+          min="09:00"
+          name="pickup"
+        ></helix-time-picker>
+      </helix-flex>
+      {/* The form does not submit in the preview. */}
+      <form onSubmit={(event) => event.preventDefault()}>
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-time-picker
+            hint="When you will arrive"
+            label="Arrival"
+            name="arrival"
+            required
+          ></helix-time-picker>
+          <helix-button
+            emphasis="solid"
+            tone="primary"
+            type="submit"
+          >
+            Save
+          </helix-button>
+        </helix-flex>
+      </form>
+    </helix-flex>
+  )
+}

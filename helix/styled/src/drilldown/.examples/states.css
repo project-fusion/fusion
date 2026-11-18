@@ -1,0 +1,7 @@
+.panel {
+  border: var(--helix-border-surface) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-surface);
+  flex: 1 1 14rem;
+  max-inline-size: 18rem;
+}

@@ -1,0 +1,33 @@
+<!-- @summary A popover on the opaque default surface, on glass, and on frosted glass, each over the page. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-flex
+    gap="sm"
+    wrap
+  >
+    <helix-popover label="File details">
+      <helix-button slot="trigger">Opaque</helix-button>
+      <helix-text as="p">Last edited by Alex Kim on August 27.</helix-text>
+    </helix-popover>
+    <helix-popover
+      label="File details"
+      material="glass"
+    >
+      <helix-button slot="trigger">Glass</helix-button>
+      <helix-text as="p">Last edited by Alex Kim on August 27.</helix-text>
+    </helix-popover>
+    <helix-popover
+      label="File details"
+      material="frosted"
+    >
+      <helix-button slot="trigger">Frosted</helix-button>
+      <helix-text as="p">Last edited by Alex Kim on August 27.</helix-text>
+    </helix-popover>
+  </helix-flex>
+  <helix-text as="p">
+    Track progress, share files, and invite team members to your projects. Recent
+    activity from your team appears here.
+  </helix-text>
+</helix-flex>

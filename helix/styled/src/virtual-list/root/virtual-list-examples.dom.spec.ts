@@ -4,6 +4,7 @@ import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing
 import choosing from '../.examples/choosing.html' with { type: 'text' }
 import grid from '../.examples/grid.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
+import orientation from '../.examples/orientation.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import waterfall from '../.examples/waterfall.html' with { type: 'text' }
 
@@ -23,6 +24,20 @@ describe('the preview example', () => {
     expect(drawn.length).toBeGreaterThan(0)
     expect(drawn.length).toBeLessThan(200)
     expect(drawn[0]?.textContent).toContain('Row 1')
+  })
+})
+
+describe('the orientation example', () => {
+  run('the playlist runs down and the recent tracks run across, each windowed', async () => {
+    await example(orientation)
+    await idle()
+    const item = (id: string, at: number) =>
+      document.getElementById(id)?.querySelector(`[data-index="${at}"]`) as HTMLElement
+    const box = (id: string, at: number) => item(id, at).getBoundingClientRect()
+    expect(Math.round(box('playlist', 1).top)).toBeGreaterThan(Math.round(box('playlist', 0).top))
+    expect(Math.round(box('recent', 1).top)).toBe(Math.round(box('recent', 0).top))
+    expect(Math.round(box('recent', 1).left)).toBeGreaterThan(Math.round(box('recent', 0).left))
+    expect(document.querySelectorAll('#recent .trackCard').length).toBeLessThan(200)
   })
 })
 

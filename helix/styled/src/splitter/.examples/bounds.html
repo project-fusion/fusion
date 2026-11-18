@@ -1,4 +1,4 @@
-<!-- @summary Limits on where the divider can go, the step each key press moves it, and a collapsed pane. -->
+<!-- @summary Limits on where the divider can go, the step each key press moves it, a collapsed pane, and a pane collapsed to a narrow strip. -->
 
 <helix-flex
   direction="column"
@@ -17,5 +17,14 @@
   <helix-splitter default-collapsed="start">
     <div slot="start">Filters for status, date, and owner</div>
     <div slot="end">Showing 24 of 120 orders.</div>
+  </helix-splitter>
+
+  <helix-splitter
+    collapsed-size="8"
+    default-collapsed="end"
+    default-position="60"
+  >
+    <div slot="start">Project overview and recent activity for your team.</div>
+    <div slot="end">Terminal</div>
   </helix-splitter>
 </helix-flex>

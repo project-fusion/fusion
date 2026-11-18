@@ -1,0 +1,38 @@
+<!-- @summary A terminal with its resting fill and edge, and a plain terminal with no edge or corners, for a pane that draws its own. -->
+<!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-terminal
+    data-preview-terminal
+    id="framed-shell"
+    label="~/project"
+  >
+    <div data-preview-terminal-canvas></div>
+  </helix-terminal>
+
+  <helix-terminal
+    data-preview-terminal
+    id="plain-shell"
+    label="~/docs"
+    separation="plain"
+  >
+    <div data-preview-terminal-canvas></div>
+  </helix-terminal>
+</helix-flex>
+
+<script type="module">
+  const prompt = (folder) => `\x1b[36m${folder}\x1b[0m \x1b[32m❯\x1b[0m `
+
+  document.getElementById('framed-shell').write(
+    [
+      `${prompt('~/project')}bun run build`,
+      '\x1b[32mbuilt\x1b[0m in 1.4s',
+      prompt('~/project'),
+    ].join('\r\n'),
+  )
+  document.getElementById('plain-shell').write(
+    [`${prompt('~/docs')}ls`, 'guides  reference', prompt('~/docs')].join('\r\n'),
+  )
+</script>

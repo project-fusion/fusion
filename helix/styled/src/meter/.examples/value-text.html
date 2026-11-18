@@ -1,11 +1,26 @@
-<!-- @summary A reading shown as words you write with `value-text`. -->
-<helix-meter
-  high="28"
-  label="Storage"
-  low="16"
-  max="32"
-  optimum="0"
-  show-value
-  value="18"
-  value-text="18 GB of 32 GB"
-></helix-meter>
+<!-- @summary A reading shown as words you write with `value-text`, and a reading written in a unit with `format-options`, which takes `Intl.NumberFormat` options. -->
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-meter
+    high="28"
+    label="Storage"
+    low="16"
+    max="32"
+    optimum="0"
+    show-value
+    value="18"
+    value-text="18 GB of 32 GB"
+  ></helix-meter>
+  <helix-meter
+    format-options='{"style":"unit","unit":"gigabyte"}'
+    high="28"
+    label="Storage"
+    low="16"
+    max="32"
+    optimum="0"
+    show-value
+    value="18"
+  ></helix-meter>
+</helix-flex>
