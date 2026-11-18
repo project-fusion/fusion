@@ -1034,8 +1034,11 @@ helix-toggle:not([disabled])::part(item):hover {
   color: var(--helix-color-foreground);
 }
 
-/* In a group, the thumb is the only surface. */
-helix-toggle-group helix-toggle::part(item):hover {
+/* **In a group, the group's highlight draws the hover wash**, gliding from item
+   to item as segmented `Tabs` does, so an item's own would be a second one.
+   **At the weight of the rule that draws an item's own**, which it follows:
+   at less, the item's wash won and drew a second one under the pointer. */
+helix-toggle-group helix-toggle:not([disabled])::part(item):hover {
   background-color: transparent;
 }
 

@@ -34,6 +34,7 @@ import { styles } from './toggle-group.css.js'
  *
  * @cssproperty --toggle-group-background-color - The groove behind the items, when the group is framed.
  * @cssproperty --toggle-group-border-color - The edge of the groove, when the group is framed.
+ * @cssproperty --toggle-group-hover-background-color - The wash under the pointer, which glides from item to item.
  * @cssproperty --toggle-group-indicator-color - The fill of the moving marker, and of each pressed item under `selection-mode="multiple"`.
  * @cssproperty --toggle-group-indicator-shadow - The shadow of the moving marker and of each pressed item.
  * @cssproperty --toggle-group-item-radius - Corner radius of each item, the marker, and a pressed item's fill. Without it, the curve stays concentric with the groove.

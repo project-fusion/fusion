@@ -578,3 +578,58 @@ describe('a toggle whose definition loads after it was added', () => {
     expect(part(first, 'item')?.getAttribute('tabindex')).toBe('-1')
   })
 })
+
+describe('the wash under the pointer', () => {
+  const over = (target: HTMLElement): void => {
+    target.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+  }
+
+  /* Laid out by hand, since there is no layout here to place a mark by. */
+  const laidOut = (group: HTMLElement): void => {
+    const box = (left: number, width: number) => () =>
+      ({
+        bottom: 30,
+        height: 30,
+        left,
+        right: left + width,
+        top: 0,
+        width,
+        x: left,
+        y: 0,
+      }) as DOMRect
+    ;(part(group, 'track') as HTMLElement).getBoundingClientRect = box(0, 180)
+    for (const [index, item] of items(group).entries()) {
+      item.getBoundingClientRect = box(index * 60, 60)
+    }
+  }
+
+  test('goes to the item a mouse is over, and the group holds the gliding state', async () => {
+    const group = await mount(markup)
+    laidOut(group)
+    const highlight = part(group, 'highlight') as HTMLElement
+    expect(highlight.hidden).toBe(true)
+    over(items(group)[2] as HTMLElement)
+    expect(highlight.hasAttribute('data-placed')).toBe(true)
+    expect(hasState(group, 'gliding')).toBe(true)
+    group.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }))
+    expect(highlight.hasAttribute('data-placed')).toBe(false)
+    expect(hasState(group, 'gliding')).toBe(false)
+  })
+
+  test('takes no disabled item, and follows no touch', async () => {
+    const group = await mount(markup)
+    laidOut(group)
+    const highlight = part(group, 'highlight') as HTMLElement
+    const [first, second] = items(group) as [HTMLElement, HTMLElement]
+    second.setAttribute('disabled', '')
+    await (second as Updatable).updateComplete
+    over(second)
+    expect(highlight.hasAttribute('data-placed')).toBe(false)
+    first.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'touch' }),
+    )
+    expect(highlight.hasAttribute('data-placed')).toBe(false)
+  })
+})
