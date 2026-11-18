@@ -76,7 +76,7 @@ import '@fusion.dev/helix/option'
 ```
 
 Without the second line, the options are unknown elements and the Select offers
-nothing. Each family's Usage block and each example list the lines to import.
+nothing. Each family's Import block and each example list the lines to import.
 Copy them with the markup.
 
 #### 2. Blocking a change without `preventDefault()`
