@@ -61,6 +61,7 @@
     "helix/cli/src/component/events.rs",
     "helix/cli/src/component/examples.rs",
     "helix/cli/src/component/grammar.rs",
+    "helix/cli/src/component/guidance.rs",
     "helix/cli/src/component/hooks.rs",
     "helix/cli/src/component/mod.rs",
     "helix/cli/src/component/platform_fidelity.rs",
