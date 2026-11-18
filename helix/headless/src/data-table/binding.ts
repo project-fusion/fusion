@@ -63,6 +63,12 @@ type BoundHost = ReactiveControllerHost & HTMLElement & { for: string }
  *
  * **Looked up on every read**, so a table defined after the tool, or one that
  * replaces another under the same id, is found the next time the tool draws.
+ * **And watched for until it is there.** A tool parsed before its table, on a
+ * page whose elements are defined before the parser reaches the table, found
+ * nothing when it connected and had no reason to draw again: November 17,
+ * 2026, a Table Export written above its table read "Export 0 rows" for good.
+ * So while the id names nothing, the binding watches the tool's tree for it,
+ * and stops once it appears.
  *
  * **A controller on the table, and no events.** A page that sets `view` or
  * `selected` fires nothing, and a table that leaves a column out at a narrow
@@ -75,6 +81,12 @@ export class TableBinding implements ReactiveController {
 
   /** Whether the tool has drawn once, after which it looks for the table. */
   private drawn = false
+
+  /** Watches the tool's tree while its `for` names nothing in it. */
+  private watching: MutationObserver | undefined
+
+  /** The tag the binding is waiting to see defined, so it asks once. */
+  private defining = ''
 
   /** What the binding adds to the table it follows. */
   private readonly watcher: ReactiveController = {
@@ -108,24 +120,83 @@ export class TableBinding implements ReactiveController {
 
   hostConnected(): void {
     this.listen()
-    /* A table defined after the tool upgrades with no event the tool can
-       hear, so the tool asks once the page has defined it. */
-    if (!this.table && this.host.for !== '' && typeof customElements !== 'undefined') {
-      const scope = this.host.getRootNode() as Document | ShadowRoot
-      const tag = scope.getElementById?.(this.host.for)?.localName
-      if (tag?.includes('-')) {
-        customElements.whenDefined(tag).then(() => this.host.requestUpdate())
-      }
-    }
+    this.await()
   }
 
   hostDisconnected(): void {
+    this.stopWatching()
     this.follow(null)
   }
 
   hostUpdated(): void {
     this.drawn = true
     this.listen()
+    if (!this.heard) {
+      this.await()
+    }
+  }
+
+  /**
+   * Asks the tool to draw again once the table it names is there and defined:
+   * when the id appears in its tree, and when the table's tag is defined. A
+   * table defined after the tool upgrades with no event the tool can hear.
+   */
+  private await(): void {
+    if (
+      this.host.for === '' ||
+      typeof customElements === 'undefined' ||
+      typeof MutationObserver === 'undefined'
+    ) {
+      return
+    }
+    const scope = this.host.getRootNode() as Document | ShadowRoot
+    const target = scope.getElementById?.(this.host.for)
+    /* There already: the draw under way reads it, or its tag's definition is
+       awaited. Drawing again here, on every update, would never stop where
+       the id names something that is not a table. */
+    if (target) {
+      this.stopWatching()
+      this.awaitDefined(target, false)
+      return
+    }
+    if (this.watching) {
+      return
+    }
+    this.watching = new MutationObserver(() => {
+      const found = scope.getElementById?.(this.host.for)
+      if (found) {
+        this.stopWatching()
+        this.awaitDefined(found, true)
+      }
+    })
+    this.watching.observe(scope, { childList: true, subtree: true })
+  }
+
+  /**
+   * Draws the tool again once the table's tag is defined, or now where it
+   * just appeared already defined.
+   */
+  private awaitDefined(target: Element, appeared: boolean): void {
+    const tag = target.localName
+    if (!tag.includes('-') || customElements.get(tag)) {
+      if (appeared) {
+        this.host.requestUpdate()
+      }
+      return
+    }
+    if (this.defining === tag) {
+      return
+    }
+    this.defining = tag
+    void customElements.whenDefined(tag).then(() => {
+      this.defining = ''
+      this.host.requestUpdate()
+    })
+  }
+
+  private stopWatching(): void {
+    this.watching?.disconnect()
+    this.watching = undefined
   }
 
   private listen(): void {

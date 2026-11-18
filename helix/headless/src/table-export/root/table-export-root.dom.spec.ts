@@ -113,6 +113,24 @@ describe('a table export panel', () => {
     expect(choices(panel, 'format')).toContain('XLSX')
   })
 
+  test('finds a table written after it, once the table arrives', async () => {
+    const root = await mountMarkup(
+      '<div><helix-headless-table-export for="later"></helix-headless-table-export></div>',
+    )
+    const panel = root.querySelector('helix-headless-table-export') as Panel
+    await panel.updateComplete
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(button(panel, 'export').disabled).toBe(true)
+    const table = document.createElement('helix-headless-data-table') as Table
+    table.id = 'later'
+    table.innerHTML =
+      '<helix-headless-table-column field="id">Invoice</helix-headless-table-column>'
+    root.append(table)
+    table.rows = [{ id: 'A' }, { id: 'B' }, { id: 'C' }]
+    await settle(panel, table)
+    expect(button(panel, 'export').textContent?.trim()).toBe('Export 3 rows')
+  })
+
   test('copies the rows as TSV and says so', async () => {
     const { panel, table } = await page()
     const written: string[] = []
