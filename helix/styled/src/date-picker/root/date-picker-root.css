@@ -421,10 +421,14 @@
    keeps the quieter look above rather than this one. **Not on a filler day**,
    which carries `day-disabled` as well: this rule came later at the same
    weight, so a filler day and a barred day of the month were one color, 191 on
-   white and 64 on black. */
+   white and 64 on black. **And a line through it**: the lighter ink alone sat
+   close to a filler day's, so a blocked 17th read as any other day, and a
+   press on it chose nothing. The line also holds under forced colors, which
+   drop the opacity and repaint the ink. */
 :host(:not(:disabled)) [part~="cell"]:not([data-outside]) [part~="day-disabled"] {
   color: var(--helix-color-foreground-subtle);
   opacity: var(--helix-opacity-disabled);
+  text-decoration: line-through;
 }
 
 [part~="cell"]:focus-visible {
