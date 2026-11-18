@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, deepActiveElement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessLightbox } from '@fusion.dev/helix-headless/lightbox'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './lightbox-root.css.js'
 
@@ -19,6 +19,13 @@ import { styles } from './lightbox-root.css.js'
  * When there is no input, the chrome fades out and keeps its place in the
  * layout, so the picture does not change size.
  *
+ * **It opens from what was pressed.** The viewer fades in over the page, and
+ * the picture grows from the thumbnail or button that had focus as it
+ * opened, so the reader sees where it came from; opened from code, the
+ * picture settles in from a little smaller. It fades out as it closes. The
+ * next item slides in from the side the reader is going, and the previous
+ * one from the other. Under `prefers-reduced-motion` each change is at once.
+ *
  * @since 0.100.0
  * @status stable
  * @category media
@@ -36,6 +43,147 @@ import { styles } from './lightbox-root.css.js'
 @customElement('helix-lightbox')
 export class HelixLightbox extends HelixHeadlessLightbox {
   static override styles: CSSResultGroup = [liveStyles, styles]
+
+  /** Where the viewer is opening from: the box of what had focus as it opened. */
+  private openedFrom: DOMRect | undefined
+
+  /** The item shown before this update, to tell which way the reader went. */
+  private shownBefore: HTMLElement | undefined
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    if (!this.hasUpdated) {
+      return
+    }
+    if (changed.has('open') && this.open) {
+      const from = deepActiveElement()
+      const box =
+        from && from !== document.body && !this.contains(from)
+          ? from.getBoundingClientRect()
+          : undefined
+      this.openedFrom = box && box.width > 0 && box.height > 0 ? box : undefined
+    }
+    this.shownBefore = this.shownItem()
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    if (!this.hasUpdated || reducedMotion() || typeof document === 'undefined') {
+      return
+    }
+    if (changed.has('open') && this.open) {
+      const from = this.openedFrom
+      this.openedFrom = undefined
+      /* **Once the item showing has drawn itself**: it is marked current in
+         this update and shows its picture in its own, a microtask later, so
+         measured now the picture has no box. Still before the frame paints. */
+      const item = this.shownItem() as
+        | (HTMLElement & { updateComplete?: Promise<unknown> })
+        | undefined
+      void (item?.updateComplete ?? Promise.resolve()).then(() => this.growIn(from))
+      return
+    }
+    const before = this.shownBefore
+    const now = this.shownItem()
+    if (this.open && before && now && before !== now) {
+      this.slideIn(before, now)
+    }
+  }
+
+  /** The item showing, as the headless tier marks it. */
+  private shownItem(): HTMLElement | undefined {
+    return [...this.children].find(
+      (one): one is HTMLElement =>
+        one instanceof HTMLElement && (one as { current?: boolean }).current === true,
+    )
+  }
+
+  /** What an item shows: the first thing slotted in it, or its own box. */
+  private pictureOf(item: HTMLElement): HTMLElement {
+    const own = item.shadowRoot?.querySelector<HTMLElement>('[part="item"]')
+    const slotted = [...item.children].find(
+      (one): one is HTMLElement => one instanceof HTMLElement && one.slot === '',
+    )
+    return slotted ?? own ?? item
+  }
+
+  /** A duration token in milliseconds, read off the host, or 0. */
+  private time(name: string): number {
+    const written = getComputedStyle(this).getPropertyValue(name).trim()
+    const amount = Number.parseFloat(written)
+    const ms = written.endsWith('ms') ? amount : amount * 1000
+    return ms >= 1 ? ms : 0
+  }
+
+  /**
+   * **The picture grows from what was pressed**, from that box's place and
+   * size to its own, as the viewer fades in around it. With nothing to grow
+   * from, it settles in from a little smaller.
+   */
+  private growIn(from: DOMRect | undefined): void {
+    const item = this.shownItem()
+    const duration = this.time('--helix-duration-slow') || this.time('--helix-duration-normal')
+    if (!item || duration === 0) {
+      return
+    }
+    /* **The picture, or the box it shows in where the picture has no box
+       yet**, as an image still loading has none: the viewport, which the
+       picture is centered in, grows from the same place. */
+    const own = this.pictureOf(item)
+    const sized = (one: Element | null | undefined): one is HTMLElement => {
+      const rect = one?.getBoundingClientRect()
+      return one instanceof HTMLElement && rect !== undefined && rect.width > 0 && rect.height > 0
+    }
+    const viewport = this.renderRoot.querySelector<HTMLElement>('[part="viewport"]')
+    const picture = sized(own) ? own : sized(viewport) ? viewport : undefined
+    if (!picture || typeof picture.animate !== 'function') {
+      return
+    }
+    const to = picture.getBoundingClientRect()
+    const easing =
+      getComputedStyle(this).getPropertyValue('--helix-easing-emphasized').trim() || 'ease-out'
+    const start = from
+      ? `translate(${from.left + from.width / 2 - (to.left + to.width / 2)}px, ${
+          from.top + from.height / 2 - (to.top + to.height / 2)
+        }px) scale(${Math.min(from.width / to.width, from.height / to.height)})`
+      : 'scale(0.94)'
+    picture.animate([{ transform: start }, { transform: 'none' }], { duration, easing })
+  }
+
+  /**
+   * **The next item slides in from the end the reader is going toward**, and
+   * the previous one from the start, fading in on the way. Which way is the
+   * order of the two in the set, so a set that loops from its last item to
+   * its first still reads as going on.
+   */
+  private slideIn(before: HTMLElement, now: HTMLElement): void {
+    const items = [...this.children].filter((one) => one.localName === now.localName)
+    const was = items.indexOf(before)
+    const is = items.indexOf(now)
+    if (was === -1 || is === -1) {
+      return
+    }
+    const onward =
+      is === (was + 1) % items.length || (is > was && !(was === 0 && is === items.length - 1))
+    const duration = this.time('--helix-duration-normal')
+    const picture = this.pictureOf(now)
+    if (duration === 0 || typeof picture.animate !== 'function') {
+      return
+    }
+    const style = getComputedStyle(this)
+    const travel = style.getPropertyValue('--helix-space-xl').trim() || '2rem'
+    const sign = (onward ? 1 : -1) * (style.direction === 'rtl' ? -1 : 1)
+    picture.animate(
+      [
+        { opacity: 0, transform: `translateX(calc(${travel} * ${sign}))` },
+        { opacity: 1, transform: 'none' },
+      ],
+      {
+        duration,
+        easing: style.getPropertyValue('--helix-easing-decelerate').trim() || 'ease-out',
+      },
+    )
+  }
 }
 
 declare global {

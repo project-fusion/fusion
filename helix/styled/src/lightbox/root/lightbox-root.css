@@ -49,6 +49,52 @@
   display: none;
 }
 
+/* **The viewer fades in and out**, with its room going dark and light around
+   it, on `normal`: in on `standard`, out accelerating, as `Dialog` arrives and
+   leaves. The picture grows from what was pressed, which the element moves. */
+[part="dialog"],
+[part="dialog"]::backdrop {
+  opacity: 0;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-accelerate),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+}
+
+[part="dialog"][open],
+[part="dialog"][open]::backdrop {
+  opacity: 1;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
+}
+
+@starting-style {
+  [part="dialog"][open],
+  [part="dialog"][open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* Where `overlay` cannot be transitioned, as in WebKit, it closes at once and
+   still fades in, for `Dialog`'s reason. */
+@supports not (overlay: auto) {
+  [part="dialog"],
+  [part="dialog"]::backdrop {
+    transition-behavior: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="dialog"],
+  [part="dialog"]::backdrop,
+  [part="dialog"][open],
+  [part="dialog"][open]::backdrop {
+    transition: none;
+  }
+}
+
 /* **Opaque where a dialog's scrim is a wash**, because what is behind a lightbox
    is not meant to be read: this is a room with the lights off rather than a
    panel over a page somebody is still in. `--helix-color-overlay` is the same
