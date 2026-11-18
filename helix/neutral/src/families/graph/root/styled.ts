@@ -4,6 +4,7 @@ import {
   first,
   fn,
   inherited,
+  list,
   measured,
   mix,
   native,
@@ -217,6 +218,33 @@ export default styles(
           },
         ),
         rule({ noPanel: true, hidden: true }, { display: 'none' }),
+        /* The floating notes settle in and fade out, as a popover's panel does,
+           instead of appearing in one frame over the graph. */
+        web([
+          rule(
+            { noPanel: true },
+            {
+              transition: list(
+                ['opacity', token('duration-normal'), token('easing-decelerate')],
+                ['scale', token('duration-normal'), token('easing-decelerate')],
+                ['display', token('duration-fast'), 'allow-discrete'],
+              ),
+            },
+          ),
+          rule(
+            { noPanel: true, hidden: true },
+            {
+              opacity: 0,
+              scale: 0.96,
+              transition: list(
+                ['opacity', token('duration-fast'), token('easing-accelerate')],
+                ['scale', token('duration-fast'), token('easing-accelerate')],
+                ['display', token('duration-fast'), 'allow-discrete'],
+              ),
+            },
+          ),
+          rule({ noPanel: true, startingStyle: true }, { opacity: 0, scale: 0.96 }),
+        ]),
       ]),
       on(
         {
