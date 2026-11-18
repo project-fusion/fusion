@@ -30,6 +30,8 @@ export default styles(
     hooks: ({ own }) => ({
       betterColor: token('color-success'),
       color: own.trendColor,
+      countDuration: null,
+      countEasing: null,
       downColor: token('color-fall'),
       gap: token('space-2xs'),
       /* **An even size, the em rounded to two pixels**: 14 beside the 13 of the
@@ -126,5 +128,17 @@ export default styles(
       }),
     ]),
     include(printEconomy),
+    /* **A new `value` counts to the new change, slowing as it arrives**, as a
+       Stat's figure does. The trend reads these from its script, so they are
+       set here rather than read with a fallback, and a page setting either on
+       the element wins over this rule. */
+    on('host', [
+      web([
+        rule({
+          '--trend-count-duration': token('duration-slow'),
+          '--trend-count-easing': token('easing-decelerate'),
+        }),
+      ]),
+    ]),
   ],
 )

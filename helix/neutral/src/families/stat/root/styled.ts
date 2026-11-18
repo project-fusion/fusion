@@ -26,6 +26,8 @@ export default styles(
   {
     prefix: 'stat',
     hooks: {
+      countDuration: null,
+      countEasing: null,
       gap: null,
       labelColor: token('color-foreground-muted'),
       labelSize: product(quotient(token('text-xs'), token('text-md')), '1em'),
@@ -162,5 +164,17 @@ export default styles(
     ]),
     on({ region: 'label' }, [rule({ direction: 'row-reverse' }, { order: 1 })]),
     include(printEconomy),
+    /* **A new `value` counts to the new number, slowing as it arrives**, at
+       the pace of a panel arriving. The stat reads these from its script, so
+       they are set here rather than read with a fallback, and a page setting
+       either on the element wins over this rule. */
+    on('host', [
+      web([
+        rule({
+          '--stat-count-duration': token('duration-slow'),
+          '--stat-count-easing': token('easing-decelerate'),
+        }),
+      ]),
+    ]),
   ],
 )

@@ -43,6 +43,8 @@ export default styles(
     prefix: 'meter',
     hooks: {
       color: null,
+      countDuration: null,
+      countEasing: null,
       labelColor: token('color-foreground'),
       labelGap: token('space-2xs'),
       labelSize: token('text-sm'),
@@ -62,6 +64,14 @@ export default styles(
   },
   ({ hook, include, on, own, rule, variants }) => [
     on('host', [
+      /* The number under `show-value` counts at the fill's pace and along its
+         curve, so the two arrive together. The script reads these. */
+      web([
+        rule({
+          '--meter-count-duration': hook.transitionDuration,
+          '--meter-count-easing': token('easing-decelerate'),
+        }),
+      ]),
       rule({ display: 'block' }),
       rule(
         { showValue: true },

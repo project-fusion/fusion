@@ -30,6 +30,7 @@ export default styles(
     hooks: ({ own }) => ({
       attentionDuration: null,
       backgroundColor: null,
+      bumpDuration: null,
       color: null,
       fontWeight: token('weight-semibold'),
       gap: token('space-2xs'),
@@ -73,6 +74,9 @@ export default styles(
           badgeFill: token('color-primary-surface'),
         },
       }),
+      /* The swell a changed count gives the mark, over the time the script
+         reads here. */
+      web([rule({ '--badge-bump-duration': token('duration-normal') })]),
       /* The fills, which are Tag's, each with the ink its family's fill takes. */
       variants('tone', {
         primary: { own: { badgeFill: token('color-primary-surface') } },

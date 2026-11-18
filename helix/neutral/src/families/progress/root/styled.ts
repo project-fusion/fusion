@@ -33,6 +33,8 @@ export default styles(
     prefix: 'progress',
     hooks: {
       color: token('color-primary-surface'),
+      countDuration: null,
+      countEasing: null,
       labelColor: token('color-foreground'),
       labelGap: token('space-2xs'),
       labelSize: token('text-sm'),
@@ -56,6 +58,14 @@ export default styles(
   },
   ({ hook, include, keyframes, on, own, rule }) => [
     on('host', [
+      /* The number under `show-value` counts at the fill's pace and along its
+         curve, so the two arrive together. The script reads these. */
+      web([
+        rule({
+          '--progress-count-duration': hook.transitionDuration,
+          '--progress-count-easing': token('easing-decelerate'),
+        }),
+      ]),
       rule({ display: 'block' }),
       rule(
         { showValue: true },
