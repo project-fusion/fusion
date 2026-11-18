@@ -3,6 +3,7 @@ import {
   formatWords,
   type HelixBeforeCheckEvent,
   HelixElement,
+  LayoutMotionController,
   words,
 } from '@fusion.dev/helix-core'
 import { dotsSixVertical, pushPin, pushPinSlash } from '@fusion.dev/helix-icons'
@@ -179,6 +180,25 @@ export class HelixHeadlessColumnManager extends HelixElement {
   private first: ViewColumns | undefined = undefined
 
   protected readonly binding = new TableBinding(this)
+
+  /**
+   * Sliding each column's row to its new place as the order changes, by a
+   * drop, by Alt with an arrow, by a pin, or by Reset, so the reader sees
+   * where a column went rather than the list redrawn in a new order. Timed by
+   * `--column-manager-move-duration` and `--column-manager-move-easing`,
+   * which this tier never sets, so it moves nothing until a stylesheet does.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="item"]') ?? [])],
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--column-manager-move-duration'),
+        easing: style.getPropertyValue('--column-manager-move-easing'),
+      }
+    },
+    watch: 'updates',
+  })
 
   /** The bound table, once it is in the tree. */
   get table(): ToolTable | null {

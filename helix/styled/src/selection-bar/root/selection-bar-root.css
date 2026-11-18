@@ -14,8 +14,15 @@
 
 [part="count"] {
   flex: 1 1 auto;
+  /* Its beat grows from where the words start, so the number does not
+     shift toward the actions. */
+  transform-origin: left center;
   font-weight: var(--helix-weight-medium);
   font-variant-numeric: tabular-nums;
+}
+
+:host(:dir(rtl)) [part="count"] {
+  transform-origin: right center;
 }
 
 [part="actions"] {

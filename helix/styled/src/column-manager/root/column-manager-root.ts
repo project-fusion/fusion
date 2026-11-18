@@ -22,6 +22,8 @@ import '../../checkbox/index.js'
  *
  * @cssproperty --column-manager-gap - The space between the parts of a row.
  * @cssproperty --column-manager-item-hover-background-color - The fill of a row under the pointer.
+ * @cssproperty --column-manager-move-duration - How long a column's row takes to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.
+ * @cssproperty --column-manager-move-easing - The curve a column's row slides along. Defaults to `--helix-easing-standard`.
  * @cssproperty --column-manager-pinned-color - The ink of a pinned column's pin.
  */
 @customElement('helix-column-manager')
