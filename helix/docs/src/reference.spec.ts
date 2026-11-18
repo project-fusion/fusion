@@ -178,6 +178,18 @@ describe('reference', () => {
     expect(withLede).toStartWith('# Elements\n\nRead me first.\n')
   })
 
+  test('the guidelines follow the import block, a level below their heading', () => {
+    const one = reference(manifest, {
+      families: ['accordion'],
+      guidelines: { accordion: ['# When to use', '', '- Sections you open one at a time.', ''] },
+      title: 'Accordion',
+      usage: { accordion: ["import '@fusion.dev/helix/accordion'"] },
+    })
+    expect(one).toContain(
+      "## Import\n\n```js\nimport '@fusion.dev/helix/accordion'\n```\n\n## Guidelines\n\n### When to use\n\n- Sections you open one at a time.\n",
+    )
+  })
+
   // One title-caser, so the reference and the site agree. A second one spells
   // the family `Qr Code` where the site says `QR Code`.
   test('a heading knows an initialism', () => {

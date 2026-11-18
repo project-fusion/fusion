@@ -144,13 +144,20 @@ export interface ReferenceOptions {
    * a reader scans the first line and `title` is what they want there.
    */
   frontmatter?: Array<[string, string]>
+  /**
+   * Each family's guidelines, keyed by family slug: the lines under a
+   * Guidelines heading, printed after the Import block, where the family page
+   * puts them. A line that opens with `#` is a heading one level below
+   * Guidelines, whatever depth the family's own headings are at.
+   */
+  guidelines?: Record<string, string[]>
   /** Prose under the heading, already wrapped. Omitted where absent. */
   lede?: string[]
   /** Top-level heading. */
   title?: string
   /**
-   * The import block for each family, keyed by family slug, printed under a
-   * Usage heading before the first element. The catalog's `usage` is it.
+   * The import block for each family, keyed by family slug, printed under an
+   * Import heading before the first element. The catalog's `usage` is it.
    */
   usage?: Record<string, string[]>
 }
@@ -431,7 +438,15 @@ export const reference = (manifest: ReferenceManifest, options: ReferenceOptions
     }
     const usage = options.usage?.[family] ?? []
     if (usage.length > 0) {
-      lines.push(`${'#'.repeat(depth)} Usage`, '', '```js', ...usage, '```', '')
+      lines.push(`${'#'.repeat(depth)} Import`, '', '```js', ...usage, '```', '')
+    }
+    const guidelines = options.guidelines?.[family] ?? []
+    if (guidelines.length > 0) {
+      lines.push(
+        `${'#'.repeat(depth)} Guidelines`,
+        '',
+        ...guidelines.map((line) => (line.startsWith('#') ? `${'#'.repeat(depth)}${line}` : line)),
+      )
     }
     const status = parts.find((entry) => entry.part === 'root')?.declaration.helix?.status
     for (const { declaration, part } of parts) {
