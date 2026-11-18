@@ -53,6 +53,8 @@ export default styles(
       dragPreviewShadow: token('shadow-floating'),
       errorColor: token('color-danger'),
       headingBackgroundColor: token('color-background'),
+      moveDuration: null,
+      moveEasing: null,
       titleColor: token('color-foreground'),
       titleGap: token('space-sm'),
       titleText: token('text-md'),
@@ -252,6 +254,19 @@ export default styles(
             borderRadius: hook.dragPreviewRadius,
             boxShadow: hook.dragPreviewShadow,
             opacity: hook.dragPreviewOpacity,
+          }),
+        ]),
+      ]),
+      /* Rows slide to their new places at the pace of a change that answers a
+         hand, a sort included. The table reads these from its script, so they are set here
+         rather than read with a fallback, and a page setting either on the element
+         wins over this rule. A phone moves nothing: its rows stand in their new
+         places at once. */
+      on('host', [
+        web([
+          rule({
+            '--table-move-duration': token('duration-normal'),
+            '--table-move-easing': token('easing-standard'),
           }),
         ]),
       ]),

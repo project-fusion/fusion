@@ -1,7 +1,6 @@
 import {
   difference,
   first,
-  fn,
   inherited,
   list,
   measured,
@@ -55,7 +54,6 @@ export default styles(
       tableHeadingBackgroundColor: null,
       tableHeadingLayer: null,
       tableHeadingPosition: null,
-      tableSortMark: null,
     },
     stylesheet: 'table/column/table-column.generated.css',
   },
@@ -71,7 +69,10 @@ export default styles(
     ]
     /* The quiet ink. The web's chevrons carry the rest as attributes on the element. */
     const chevron = [
-      rule({ stroke: token('color-foreground-subtle') }),
+      rule({
+        stroke: token('color-foreground-subtle'),
+        transition: ['stroke', token('duration-fast'), token('easing-standard')],
+      }),
       native([
         rule({ fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 1.9 }),
       ]),
@@ -169,15 +170,14 @@ export default styles(
       /* Two chevrons, quiet until one of them is the current direction. The box is
          wider than the chevrons so the hover has room to draw behind them. */
       on('sort-mark', [
-        /* Button's icon step, an even size, so the chevrons' center lands on a whole
-           pixel. */
-        web([rule({ own: { tableSortMark: fn('round', 'down', '1.15em', '2px') } })]),
-        native([rule({ own: { tableSortMark: '1.15em' } })]),
+        /* At the small icon step, the size of the grip's and the menu button's
+           marks, so the heading's three marks are one size. At a step past the
+           heading's words they read as too small to aim at. */
         rule({
-          blockSize: own.tableSortMark,
+          blockSize: token('size-icon-sm'),
           borderRadius: token('radii-sm'),
           flex: 'none',
-          inlineSize: own.tableSortMark,
+          inlineSize: token('size-icon-sm'),
         }),
         /* The whole heading is the button, so the highlight answers a pointer anywhere
            on it. */
@@ -185,23 +185,15 @@ export default styles(
           rule({ within: { sort: { hover: true } } }, { backgroundColor: token('color-hover') }),
         ]),
       ]),
-      /* Sorted, the current direction's chevron alone, moved to the middle of the box. */
-      on('sort-up', [
-        ...chevron,
-        rule({ sortedAscending: true }, { stroke: token('color-foreground') }),
-        rule({ sortedDescending: true }, { visibility: 'hidden' }),
-        web([
-          rule({ sortedAscending: true }, { transformBox: 'view-box', translate: [0, '19.72%'] }),
-        ]),
-      ]),
-      on('sort-down', [
-        ...chevron,
-        rule({ sortedDescending: true }, { stroke: token('color-foreground') }),
-        rule({ sortedAscending: true }, { visibility: 'hidden' }),
-        web([
-          rule({ sortedDescending: true }, { transformBox: 'view-box', translate: [0, '-19.72%'] }),
-        ]),
-      ]),
+      /* Sorted, both chevrons stay and the one it sorts by is lit, so every
+         sortable heading carries the same mark. The other half falls back a step,
+         to the ink a border takes under a pointer, so a sorted heading does not
+         read alike with an unsorted one. */
+      on(['sort-up', 'sort-down'], chevron),
+      on('sort-up', [rule({ sortedAscending: true }, { stroke: token('color-foreground') })]),
+      on('sort-down', [rule({ sortedDescending: true }, { stroke: token('color-foreground') })]),
+      on('sort-up', [rule({ sortedDescending: true }, { stroke: token('color-border-hover') })]),
+      on('sort-down', [rule({ sortedAscending: true }, { stroke: token('color-border-hover') })]),
       /* The same quiet ink and hover as the chevrons, so the two marks read as one
          group and neither competes with the words. */
       on('menu-button', [
@@ -251,7 +243,7 @@ export default styles(
         ]),
       ]),
       on('menu-mark', [
-        web([rule({ blockSize: token('text-control'), inlineSize: token('text-control') })]),
+        web([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
          drawn moves. */
@@ -332,10 +324,9 @@ export default styles(
       on({ part: 'menu-button', selector: '[part="menu-button"][aria-expanded="true"]' }, [
         web([rule({ canHover: true }, { opacity: 1 })]),
       ]),
-      /* The row's and the list item's grip, which the heading's smaller type
-         would otherwise draw a pixel smaller. */
+      /* At the small icon step, as the menu button's mark and the chevrons are. */
       on('grip-mark', [
-        rule({ blockSize: token('text-control'), inlineSize: token('text-control') }),
+        rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') }),
       ]),
       on('resizer', [
         rule({
