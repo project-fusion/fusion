@@ -55,12 +55,12 @@ tags:
 - tapOn:
     point: 50%, 40%
     retryTapIfNoChange: false
-- assertNotVisible: A comment was added to Roadmap.
+- assertNotVisible: Two files were skipped.
 - tapOn:
     text: Dismiss
     index: 0
 - extendedWaitUntil:
-    visible: A comment was added to Roadmap.
+    visible: Two files were skipped.
     timeout: 5000
 - takeScreenshot: toast-queue-next
 - openLink: helix://toast/events/preview

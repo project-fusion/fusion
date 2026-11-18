@@ -1,5 +1,7 @@
 # Callout: a press on the dismiss button of the dismissible example hides
-# the callout, as the web callout hides itself. Recorded.
+# the callout, as the web callout hides itself, and Show tip brings it back.
+# Recorded. The waits read the callout's sentence, since `.*Tip.*` also
+# matches the Show tip button that stays.
 appId: dev.fusion.helix.app
 name: Callout
 tags:
@@ -9,7 +11,7 @@ tags:
     file: open.yaml
     env:
       LINK: helix://callout/dismissible/preview
-      SHOWS: .*Tip.*
+      SHOWS: .*Press the slash key.*
 # The first touch on a new screen is lost on the iOS simulator, as
 # `button.yaml` says.
 - tapOn:
@@ -17,6 +19,12 @@ tags:
     retryTapIfNoChange: false
 - startRecording: callout
 - tapOn: Dismiss Tip
-- assertNotVisible: .*Tip.*
+- extendedWaitUntil:
+    notVisible: .*Press the slash key.*
+    timeout: 5000
 - takeScreenshot: callout-dismissed
+- tapOn: Show tip
+- extendedWaitUntil:
+    visible: .*Press the slash key.*
+    timeout: 5000
 - stopRecording

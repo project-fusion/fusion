@@ -46,7 +46,7 @@ name: "Screens: Toast"
 - takeScreenshot: toast-events-${MODE}-${SIZE}
 - openLink: helix://toast/queue/preview
 - extendedWaitUntil:
-    visible: Two files were uploaded.
+    visible: Two devices are now signed in.
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000

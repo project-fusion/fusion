@@ -52,7 +52,7 @@ name: "Screens: Filter Input"
 - takeScreenshot: filter-input-suggesting-chosen-${MODE}-${SIZE}
 - openLink: helix://filter-input/picking/preview
 - extendedWaitUntil:
-    visible: '.*Search, or pick a filter.*'
+    visible: '.*Search, or pick or type a filter.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
