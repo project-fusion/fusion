@@ -94,6 +94,23 @@ describe('orb', () => {
     expect(host.isConnected).toBe(true)
   })
 
+  test('a new state departs from the shape on the screen, and a first state is where it starts', async () => {
+    type Morphing = Upgraded & { paramsNow(): typeof ORB_PARAMS.thinking }
+    const first = (await mount('<helix-orb state="working"></helix-orb>')) as Morphing
+    await first.updateComplete
+    expect(first.paramsNow()).toEqual(ORB_PARAMS.working)
+
+    const host = (await mount('<helix-orb></helix-orb>')) as Morphing
+    await host.updateComplete
+    host.state = 'working'
+    await host.updateComplete
+    /* At the start of the change the cloud is still the sash it was. Read off
+       `state`, the change began at `working` and jumped there. */
+    const now = host.paramsNow()
+    expect(now.ring).toBeCloseTo(ORB_PARAMS.thinking.ring, 1)
+    expect(now.ring).not.toBe(ORB_PARAMS.working.ring)
+  })
+
   test('names itself from the state, through internals rather than an attribute', async () => {
     const host = (await mount('<helix-orb state="fetching"></helix-orb>')) as Upgraded
     await host.updateComplete
