@@ -41,7 +41,9 @@ export default headless('chat-message', {
   events: {
     send: cancelable(['value']),
   },
-  states: ['settled'],
+  /* `arriving` once a message joins a conversation already drawn, which
+     the web brings in. A phone shows it in place at once. */
+  states: ['arriving', 'settled'],
   chatMessage: {
     actionsEmpty: 'actionsEmpty',
     at: 'at',

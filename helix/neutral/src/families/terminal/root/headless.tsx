@@ -267,6 +267,7 @@ export default headless('terminal', {
           'find-replace-toggle': true,
           'find-replace-toggle-button': true,
           'find-replace-toggle-live': true,
+          'find-replace-toggle-mark': true,
           'find-replace-toggle-spinner': true,
           'find-replace-toggle-text': true,
           'find-whole-word': true,

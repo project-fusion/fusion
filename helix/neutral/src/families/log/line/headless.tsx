@@ -42,7 +42,9 @@ export default headless('log-line', {
     logRow: property(object()),
     timesLabel: '{count} times',
   },
-  states: ['filtered', 'settled'],
+  /* `arriving` once a line joins a log already drawn, which the web
+     fades in. A phone shows it in place at once. */
+  states: ['arriving', 'filtered', 'settled'],
   logLine: {
     at: 'at',
     countHidden: 'countHidden',
