@@ -189,6 +189,42 @@
   opacity: 0;
 }
 
+/* **The hover wash, one element that glides from item to item** as segmented
+   `Tabs` and `Navigation` draw theirs, in place of each item's own, which
+   `base.css` takes away inside a group. Placed where the pointer arrives and
+   faded in; it slides only once `data-gliding` says it has arrived, so it never
+   slides in from where it was last. Behind the thumb, which comes after it. */
+[part="highlight"] {
+  background-color: var(
+    --toggle-group-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  block-size: var(--indicator-block-size, 0);
+  border-radius: var(--_toggle-radius);
+  display: block;
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
+  z-index: var(--helix-layer-base);
+}
+
+[part="highlight"][data-placed] {
+  opacity: 1;
+}
+
+[part="highlight"][data-gliding] {
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* Wrong, and the strip says so. */
 :host(:state(invalid)) [part="track"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);

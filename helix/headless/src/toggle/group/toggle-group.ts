@@ -3,6 +3,7 @@ import {
   customElement,
   DisabledCascadeController,
   HelixFormElement,
+  HoverMarkController,
   hostAria,
   IndicatorController,
   internalsOf,
@@ -81,6 +82,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart feedback - The error message under the row.
+ * @csspart highlight - The wash under the pointer, which glides from item to item while a mouse or pen moves along them. It carries the item's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart hint - The help text under the row, shown while there is no error.
  * @csspart indicator - The moving marker behind the selected item.
  * @csspart label - The label above the row.
@@ -90,6 +92,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * ships no CSS, so it renders no separate element for the line, which would add
  * an empty child to your layout.
  *
+ * @cssstate gliding - While a mouse or pen is over an item, so the highlight draws the hover wash in place of each item's own.
  * @cssstate invalid - The group has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-toggle-group')
@@ -310,6 +313,21 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
        never fires for that. Read again on every placement, so a group whose
        options arrive with the data has each one watched from the placement
        after it lands. */
+    observe: () => this.items,
+    surface: () => this.partNamed('track'),
+  })
+
+  /** Moves the hover wash to whichever item is under the pointer, as segmented `Tabs` does. A disabled item takes none. */
+  protected readonly highlight = new HoverMarkController(this, {
+    gliding: (on) => this.toggleState('gliding', on),
+    item: (under) => {
+      const items = this.items
+      return under.find(
+        (one): one is HelixHeadlessToggle =>
+          one instanceof HelixHeadlessToggle && items.includes(one) && !one.disabled,
+      )
+    },
+    mark: () => this.partNamed('highlight'),
     observe: () => this.items,
     surface: () => this.partNamed('track'),
   })
@@ -584,7 +602,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 
     return html`${inside ? nothing : label}<div part="row"><slot name="start"></slot><div part="track">${
       inside ? label : nothing
-    }<div part="indicator" aria-hidden="true"></div><slot @slotchange=${this.handleItems}></slot></div><slot name="end"></slot></div>${this.renderHint()}${this.renderFeedback()}`
+    }<span part="highlight" aria-hidden="true" hidden></span><div part="indicator" aria-hidden="true"></div><slot @slotchange=${this.handleItems}></slot></div><slot name="end"></slot></div>${this.renderHint()}${this.renderFeedback()}`
   }
 
   /**
