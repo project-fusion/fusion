@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessDialog } from '@fusion.dev/helix-headless/dialog'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './dialog-root.css.js'
 
@@ -11,6 +11,12 @@ import { styles } from './dialog-root.css.js'
  * The panel uses `surface-overlay` with a shadow, because it sits over the
  * page. The scrim is drawn on `::backdrop`, the platform's element for it,
  * which sits in the top layer with the dialog.
+ *
+ * **The panel grows or shrinks to what it holds while open**, such as a form
+ * moving to its next step, over `normal` along `emphasized`, rather than
+ * jumping to its new height. A change of width, such as the window
+ * narrowing, still lays out at once. Under `prefers-reduced-motion` the
+ * height changes at once too.
  *
  * @since 0.1.0
  * @status stable
@@ -100,6 +106,101 @@ export class HelixDialog extends HelixHeadlessDialog {
   textAlign?: 'center' | 'start'
 
   static override styles: CSSResultGroup = styles
+
+  /** Hears the panel change size, to move it between the two. */
+  private sizes: ResizeObserver | undefined
+
+  /** The panel's size the last time it came to rest while open. */
+  private settled: { block: number; inline: number } | undefined
+
+  /** The move from one height to the next, while it runs. */
+  private resizing: Animation | undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.watchSize()
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.sizes?.disconnect()
+    this.sizes = undefined
+    this.settled = undefined
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.watchSize()
+  }
+
+  private watchSize(): void {
+    const surface = this.partNamed<HTMLDialogElement>('surface')
+    if (!surface || this.sizes || typeof ResizeObserver === 'undefined') {
+      return
+    }
+    this.sizes = new ResizeObserver((entries) => {
+      const box = entries.at(-1)?.borderBoxSize?.[0]
+      if (box) {
+        this.resized(surface, { block: box.blockSize, inline: box.inlineSize })
+      }
+    })
+    this.sizes.observe(surface)
+  }
+
+  /**
+   * **A new height while open moves from the old one**, measured after layout
+   * and before the frame is painted, so the panel never shows at its new size
+   * first. The sizes heard while the move runs are the move's own, and pass.
+   * A new width lays out at once, since that is the window or the page
+   * changing rather than what the panel holds, and the panel scrolls nothing
+   * while it moves, so a growing panel shows no scroll bar on its way.
+   */
+  private resized(surface: HTMLDialogElement, size: { block: number; inline: number }): void {
+    if (!surface.open) {
+      this.settled = undefined
+      return
+    }
+    if (this.resizing) {
+      return
+    }
+    const from = this.settled
+    this.settled = size
+    if (
+      from === undefined ||
+      Math.abs(size.inline - from.inline) >= 1 ||
+      Math.abs(size.block - from.block) < 1 ||
+      typeof surface.animate !== 'function' ||
+      reducedMotion()
+    ) {
+      return
+    }
+    const style = getComputedStyle(surface)
+    const written = style.getPropertyValue('--helix-duration-normal').trim()
+    const amount = Number.parseFloat(written)
+    const duration = written.endsWith('ms') ? amount : amount * 1000
+    if (!(duration >= 1)) {
+      return
+    }
+    const move = surface.animate(
+      [
+        { blockSize: `${from.block}px`, overflowY: 'hidden' },
+        { blockSize: `${size.block}px`, overflowY: 'hidden' },
+      ],
+      {
+        duration,
+        easing: style.getPropertyValue('--helix-easing-emphasized').trim() || 'ease-in-out',
+      },
+    )
+    this.resizing = move
+    const done = (): void => {
+      if (this.resizing === move) {
+        this.resizing = undefined
+      }
+    }
+    void move.finished.then(done, done)
+  }
 }
 
 declare global {
