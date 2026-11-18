@@ -9,8 +9,7 @@ export function Example() {
         Home
       </helix-breadcrumb>
       <helix-breadcrumb href="#projects">Projects</helix-breadcrumb>
-      <helix-breadcrumb href="#website-redesign">Website redesign</helix-breadcrumb>
-      <helix-breadcrumb current>Settings</helix-breadcrumb>
+      <helix-breadcrumb current>Website redesign</helix-breadcrumb>
     </helix-breadcrumbs>
   )
 }
