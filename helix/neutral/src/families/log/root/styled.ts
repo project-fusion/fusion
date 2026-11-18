@@ -273,6 +273,20 @@ export default styles(
         minInlineSize: '100%',
         web: { inlineSize: first(own.logLineSize, 'max-content') },
       }),
+      /* A line written fades in, over `fast`: a log can take many lines a second,
+         so it fades rather than slides, and a column of lines rising would be the
+         whole log moving. Only a line written since the last render, which the
+         web's headless tier marks `data-arriving`: not the log the page came
+         with, not a line scrolled back into view. A phone's line stands in its
+         place at once. */
+      web([
+        rule(
+          { part: { 'data-arriving': true } },
+          { transition: ['opacity', token('duration-fast'), token('easing-decelerate')] },
+        ),
+        rule({ part: { 'data-arriving': true }, startingStyle: true }, { opacity: 0 }),
+        rule({ part: { 'data-arriving': true }, reducedMotion: true }, { transition: 'none' }),
+      ]),
     ]),
     on('resume', [
       rule({
