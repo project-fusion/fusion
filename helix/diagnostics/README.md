@@ -432,6 +432,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `stencil-regions-unused` | A graph stencil's regions could not be used |
 | `stencil-without-inside` | A graph stencil has no inside to place the notes in |
 | `too-many-rows` | A data table is drawing more rows at once than it stays responsive to |
+| `too-many-words` | A rotating text holds more than six words, and only the first six turn |
 | `two-default-operators` | A filter field marks more than one operator as its default |
 | `typed-marks` | A quote's text starts or ends with a typed quotation mark, which the browser's marks double |
 | `unknown-event` | A React `on` prop names an event that no element dispatches. Development builds only (the `development` export condition) |

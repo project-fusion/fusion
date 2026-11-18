@@ -105,6 +105,8 @@ export type RuntimeKind =
   | 'stencil-without-inside'
   /** A Data Table is drawing more rows at once than it stays responsive to. */
   | 'too-many-rows'
+  /** A Rotating Text holds more than six words, and only the first six turn. */
+  | 'too-many-words'
   /** A filter field marks more than one operator as its default. */
   | 'two-default-operators'
   /** A Quote's text starts or ends with a quotation mark, so the browser's marks double it. */

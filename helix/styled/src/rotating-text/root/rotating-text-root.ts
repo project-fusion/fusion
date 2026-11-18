@@ -4,6 +4,7 @@ import {
   motionPaused,
   onMotionChange,
   reducedMotion,
+  reportRuntime,
   timeConverter,
 } from '@fusion.dev/helix-core'
 import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } from 'lit'
@@ -20,7 +21,8 @@ const MOST = 6
  * Put the words inside, each in an element of its own, such as
  * `<span>faster</span><span>simpler</span>`, and the first shows while the
  * rest wait below it. Every `interval`, the word showing rises out and the next
- * rises in, and after the last comes the first again, up to six words.
+ * rises in, and after the last comes the first again, up to six words. A
+ * seventh never shows, and the console says so once.
  *
  * **It takes the width of its widest word**, so the line around it never
  * shifts as the words turn.
@@ -74,6 +76,9 @@ export class HelixRotatingText extends HelixElement {
 
   private timer: ReturnType<typeof setInterval> | undefined
 
+  /** Whether more than six words have been reported, which is said once. */
+  private warnedAboutCount = false
+
   /** What stops hearing the page's pause. */
   private stop: (() => void) | undefined
 
@@ -112,6 +117,18 @@ export class HelixRotatingText extends HelixElement {
   /** Counts the words, and starts or stops turning through them. */
   private readonly counted = (): void => {
     this.count = Math.min(this.children.length, MOST)
+    /* **Said, since the words past the sixth never show.** Each word takes a
+       state of its own in the sheet, and the sheet writes out six. */
+    if (this.children.length > MOST && !this.warnedAboutCount) {
+      this.warnedAboutCount = true
+      reportRuntime({
+        kind: 'too-many-words',
+        message:
+          `<helix-rotating-text> holds ${this.children.length} words and turns through the ` +
+          `first ${MOST} only. Keep it to ${MOST} or fewer.`,
+        tag: this.localName,
+      })
+    }
     if (this.showing > this.count) {
       this.show(1, undefined)
     }
