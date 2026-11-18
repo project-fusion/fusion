@@ -109,7 +109,15 @@ export default styles(
       rule({
         backgroundColor: hook.connectorColor,
         content: '""',
+        /* The line takes its done ink over the marker's own pace and a little after
+         it, so finishing a step reads as the progress reaching the next. */
         position: 'absolute',
+        transition: [
+          'background-color',
+          token('duration-slow'),
+          token('easing-standard'),
+          token('duration-fast'),
+        ],
         zIndex: token('layer-base'),
       }),
       /* The way already traveled is drawn in the mark ink. */
@@ -154,6 +162,12 @@ export default styles(
         backgroundColor: hook.connectorColor,
         content: '""',
         position: 'absolute',
+        transition: [
+          'background-color',
+          token('duration-slow'),
+          token('easing-standard'),
+          token('duration-fast'),
+        ],
         zIndex: token('layer-base'),
       }),
       rule(
