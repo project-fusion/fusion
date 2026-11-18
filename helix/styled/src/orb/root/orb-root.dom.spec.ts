@@ -4,6 +4,7 @@ import type {
   readColor as ReadColor,
   readColorAlpha as ReadColorAlpha,
 } from '@fusion.dev/helix-core'
+import { ORB_PARAMS, type OrbClock } from '@fusion.dev/helix-core/orb'
 import {
   framesBooked,
   hasLayout,
@@ -86,10 +87,12 @@ describe('orb', () => {
   })
 
   test('a new state departs from the shape on the screen, and a first state is where it starts', async () => {
-    type Morphing = Upgraded & { paramsNow(): typeof ORB_PARAMS.thinking }
+    /* The shape drawn, as the element's core clock gives it now. */
+    type Morphing = Upgraded & { clock: OrbClock }
+    const drawn = (one: Morphing) => one.clock.params(performance.now())
     const first = (await mount('<helix-orb state="working"></helix-orb>')) as Morphing
     await first.updateComplete
-    expect(first.paramsNow()).toEqual(ORB_PARAMS.working)
+    expect(drawn(first)).toEqual(ORB_PARAMS.working)
 
     const host = (await mount('<helix-orb></helix-orb>')) as Morphing
     await host.updateComplete
@@ -97,7 +100,7 @@ describe('orb', () => {
     await host.updateComplete
     /* At the start of the change the cloud is still the sash it was. Read off
        `state`, the change began at `working` and jumped there. */
-    const now = host.paramsNow()
+    const now = drawn(host)
     expect(now.ring).toBeCloseTo(ORB_PARAMS.thinking.ring, 1)
     expect(now.ring).not.toBe(ORB_PARAMS.working.ring)
   })
