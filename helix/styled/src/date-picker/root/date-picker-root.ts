@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessDatePicker } from '@fusion.dev/helix-headless/date-picker'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { styles } from './date-picker-root.css.js'
 
 /**
@@ -8,7 +8,9 @@ import { styles } from './date-picker-root.css.js'
  *
  * @description
  * The grid always has six week rows, so it keeps one height and a month change
- * does not move the content below it.
+ * does not move the content below it. The next month slides in from the end
+ * the reader pages toward, and an earlier one from the start; under
+ * `prefers-reduced-motion` it changes at once.
  *
  * Each column track is wider than a day, with the day centered in it. The space
  * between days belongs to the track and is not set with `gap`, so a range can
@@ -39,6 +41,48 @@ import { styles } from './date-picker-root.css.js'
 @customElement('helix-date-picker')
 export class HelixDatePicker extends HelixHeadlessDatePicker {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * When the first month on show began at the last render. Kept from then,
+   * because by the next update the month asked for is already the one on
+   * show.
+   */
+  private monthBefore: number | undefined
+
+  /**
+   * **The next month slides in from the end the reader is paging toward**,
+   * and an earlier one from the start, fading in on the way, so paging reads
+   * as moving along the year rather than as the grid's numbers changing. The
+   * grid keeps its six rows, so nothing around it moves.
+   */
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    const before = this.monthBefore
+    const now = this.shownTime
+    this.monthBefore = now
+    if (before === undefined || before === now || reducedMotion()) {
+      return
+    }
+    const style = getComputedStyle(this)
+    const written = style.getPropertyValue('--helix-duration-normal').trim()
+    const amount = Number.parseFloat(written)
+    const duration = written.endsWith('ms') ? amount : amount * 1000
+    if (!(duration >= 1)) {
+      return
+    }
+    const travel = style.getPropertyValue('--helix-space-lg').trim() || '1.5rem'
+    const sign = (now > before ? 1 : -1) * (style.direction === 'rtl' ? -1 : 1)
+    const easing = style.getPropertyValue('--helix-easing-decelerate').trim() || 'ease-out'
+    for (const month of this.renderRoot.querySelectorAll<HTMLElement>('[part="month"]')) {
+      month.animate?.(
+        [
+          { opacity: 0, transform: `translateX(calc(${travel} * ${sign}))` },
+          { opacity: 1, transform: 'none' },
+        ],
+        { duration, easing },
+      )
+    }
+  }
 }
 
 declare global {
