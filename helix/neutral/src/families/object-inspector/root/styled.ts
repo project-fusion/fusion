@@ -224,11 +224,17 @@ export default styles(
         color: token('color-foreground-muted'),
         inlineSize: own.objectInspectorToggle,
         marginInlineEnd: token('space-2xs'),
-        web: { verticalAlign: '-0.125em' },
+        /* The caret turns as its row opens and shuts, as a tree's chevron does.
+           A phone draws a caret of its own for each, so it changes at once. */
+        web: {
+          transition: ['rotate', token('duration-fast'), token('easing-standard')],
+          verticalAlign: '-0.125em',
+        },
       }),
-      /* The tree runs left to right on any page, so a shut caret points
-         right there too. */
-      web([rule({ dir: 'rtl', part: { 'data-mirror': true } }, { scale: 'none' })]),
+      /* The tree runs left to right on any page, so a shut caret points right
+         there too: the turn a shut caret takes follows the page, and this one
+         keeps the left-to-right turn. */
+      web([rule({ dir: 'rtl', part: { 'data-shut': true } }, { rotate: '-90deg' })]),
     ]),
     on('key', [
       rule({ color: token('color-syntax-name') }),
