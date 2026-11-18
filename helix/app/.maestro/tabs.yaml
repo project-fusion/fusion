@@ -23,9 +23,10 @@ tags:
 - assertVisible: A summary of the project and the people on it.
 - tapOn: Code
 - assertVisible: The source the sandbox shows.*
-# The screen's title is Preview too, so the tap names the tab beside Code.
+# The screen's title is Preview too, and left of Code as well, so the tap names
+# the tab under the example's summary, which sits between the title and the tabs.
 - tapOn:
     text: Preview
-    leftOf: Code
+    below: .*Panels behind tabs.*
 - assertVisible: A summary of the project and the people on it.
 - stopRecording
