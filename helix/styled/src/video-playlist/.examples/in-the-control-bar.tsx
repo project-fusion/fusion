@@ -11,7 +11,11 @@ export function Example() {
         label="Episode player"
         slot="player"
       >
-        <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
+        <helix-video-playlist-menu
+          label="Episodes"
+          placement="top-end"
+          slot="controls"
+        ></helix-video-playlist-menu>
       </helix-video>
       <helix-video-playlist-item
         poster="/media/sintel-short.jpg"

@@ -1,4 +1,4 @@
-<!-- @summary Every state of a tree's check mark: a branch with all of its items checked, a branch with some, a checked leaf, and an unchecked one. -->
+<!-- @summary Every state of a tree's check mark: a branch with all of its items checked, a branch with some, a checked leaf, an unchecked one, and one that cannot be checked. Checking a folder checks everything in it. -->
 
 <helix-tree
   default-active="guide,reference,logo"
@@ -34,4 +34,8 @@
     >Fonts</helix-tree-item>
   </helix-tree-item>
   <helix-tree-item value="changelog">Changelog</helix-tree-item>
+  <helix-tree-item
+    disabled
+    value="archive"
+  >Archive</helix-tree-item>
 </helix-tree>

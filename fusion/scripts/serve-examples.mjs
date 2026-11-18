@@ -5,7 +5,7 @@
  * **The component and nothing else on the page.** A reference page shows an
  * example inside a sandboxed frame, under the site's header, navigation and
  * prose, and a screen reader walks all of that before it reaches the example.
- * Here `/dialog/persistent` is the example alone, so what the reader hears is
+ * Here `/dialog/closedby` is the example alone, so what the reader hears is
  * what the component says. `.github/SCREEN-READER.md` is the script that
  * uses it.
  *

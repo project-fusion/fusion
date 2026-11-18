@@ -1,0 +1,57 @@
+import './states.css'
+
+export function Example() {
+  return (
+    <>
+      <table
+        data-hidden-visually
+        id="latencyloading"
+      >
+        <caption>Response time by region, first week of September</caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Frankfurt (ms)</th>
+            <th scope="col">Virginia (ms)</th>
+            <th scope="col">Singapore (ms)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <table
+        data-hidden-visually
+        id="latencyempty"
+      >
+        <caption>Response time by region, first week of September</caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Frankfurt (ms)</th>
+            <th scope="col">Virginia (ms)</th>
+            <th scope="col">Singapore (ms)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div className="values">
+        <figure>
+          <figcaption>Loading</figcaption>
+          <helix-spatial-ribbon-chart
+            for="latencyloading"
+            label="Response time by region"
+            loading
+          ></helix-spatial-ribbon-chart>
+        </figure>
+        <figure>
+          <figcaption>Empty</figcaption>
+          <helix-spatial-ribbon-chart
+            for="latencyempty"
+            label="Response time by region"
+          ></helix-spatial-ribbon-chart>
+        </figure>
+      </div>
+    </>
+  )
+}

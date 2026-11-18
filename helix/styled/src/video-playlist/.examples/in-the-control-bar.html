@@ -1,4 +1,4 @@
-<!-- @summary The entries as a menu in the player's control bar, with no list next to the player. -->
+<!-- @summary The entries as a menu in the player's control bar that opens above its trigger, with one entry already playing and no list next to the player. -->
 <link
   href="styles.css"
   rel="stylesheet"
@@ -13,7 +13,11 @@
     label="Episode player"
     slot="player"
   >
-    <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
+    <helix-video-playlist-menu
+      label="Episodes"
+      placement="top-end"
+      slot="controls"
+    ></helix-video-playlist-menu>
   </helix-video>
 
   <helix-video-playlist-item

@@ -10,6 +10,7 @@ const RESTING: Arrival[] = [{ carried: 'Type the six-digit code', name: 'No even
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
+  const [hint, setHint] = useState('Sent to your phone')
 
   const say = (name: string, carried: string) => {
     setHeard((before) => {
@@ -28,6 +29,7 @@ export function Example() {
 
   const whole = (event: CustomEvent<{ value: string }>) => {
     say('helix-complete', `Entered "${event.detail.value}"`)
+    setHint(`Checking ${event.detail.value}`)
   }
 
   const committed = (event: Event & { currentTarget: HelixPinInput }) => {
@@ -40,7 +42,7 @@ export function Example() {
       gap="md"
     >
       <helix-pin-input
-        hint="Sent to your phone"
+        hint={hint}
         label="Verification code"
         onChange={committed}
         onhelix-before-change={proposed}

@@ -1,0 +1,37 @@
+<!-- @summary The orb at each size it comes in, and one sized to the line of text it sits beside. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-flex
+    align-items="center"
+    gap="md"
+  >
+    <helix-orb
+      size="sm"
+      state="working"
+    ></helix-orb>
+    <helix-orb state="working"></helix-orb>
+    <helix-orb
+      size="lg"
+      state="working"
+    ></helix-orb>
+  </helix-flex>
+
+  <helix-flex
+    align-items="center"
+    gap="sm"
+  >
+    <helix-orb
+      class="on-the-line"
+      label="Loading your files"
+      state="fetching"
+    ></helix-orb>
+    Loading your files…
+  </helix-flex>
+</helix-flex>

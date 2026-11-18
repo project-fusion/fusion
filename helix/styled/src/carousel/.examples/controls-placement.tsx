@@ -1,0 +1,73 @@
+import './controls-placement.css'
+
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="xl"
+    >
+      <helix-carousel
+        controls-align="center"
+        controls-placement="top"
+        indicator-align="center"
+        indicator-placement="bottom"
+        label="Announcements"
+      >
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
+      </helix-carousel>
+
+      <helix-carousel
+        controls-align="start"
+        controls-placement="top"
+        indicator-align="end"
+        indicator-placement="top"
+        label="Updates"
+      >
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
+      </helix-carousel>
+
+      <helix-carousel
+        controls-align="start"
+        controls-placement="overlay"
+        indicator-align="end"
+        indicator-placement="bottom"
+        label="Tips"
+      >
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="slide"></div>
+      </helix-carousel>
+
+      <helix-carousel
+        indicator-placement="start"
+        label="Release notes"
+      >
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
+      </helix-carousel>
+
+      <helix-carousel
+        indicator-placement="end"
+        label="Reminders"
+      >
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
+      </helix-carousel>
+
+      <helix-carousel
+        indicator-placement="overlay"
+        label="News"
+      >
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="slide"></div>
+      </helix-carousel>
+    </helix-flex>
+  )
+}

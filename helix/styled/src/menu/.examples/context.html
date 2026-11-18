@@ -1,25 +1,63 @@
-<!-- @summary A context menu that opens where you right-click the field, or press Shift+F10 in it. -->
-<!-- @min 300 -->
-<helix-menu
-  context
-  label="Edit"
+<!-- @summary A context menu on a field, and one context menu shared by every row of a table: right-click, long-press, or press Shift+F10. -->
+<!-- @min 360 -->
+<helix-flex
+  direction="column"
+  gap="lg"
 >
-  <helix-textarea
-    default-value="Right-click in this field."
-    label="Notes"
-    slot="trigger"
-  ></helix-textarea>
+  <helix-menu
+    context
+    label="Edit"
+  >
+    <helix-textarea
+      default-value="Right-click in this field."
+      label="Notes"
+      slot="trigger"
+    ></helix-textarea>
 
-  <helix-menu-item
-    shortcut="mod+x"
-    value="cut"
-  >Cut</helix-menu-item>
-  <helix-menu-item
-    shortcut="mod+c"
-    value="copy"
-  >Copy</helix-menu-item>
-  <helix-menu-item
-    shortcut="mod+v"
-    value="paste"
-  >Paste</helix-menu-item>
-</helix-menu>
+    <helix-menu-item
+      shortcut="mod+x"
+      value="cut"
+    >Cut</helix-menu-item>
+    <helix-menu-item
+      shortcut="mod+c"
+      value="copy"
+    >Copy</helix-menu-item>
+    <helix-menu-item
+      shortcut="mod+v"
+      value="paste"
+    >Paste</helix-menu-item>
+  </helix-menu>
+
+  <!-- `data-prose` sets the table as the docs set one: a rule under each row and the heading row muted. -->
+  <div data-prose>
+    <table id="context-files">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr tabindex="0">
+          <td>Quarterly report.pdf</td>
+          <td>2.4 MB</td>
+        </tr>
+        <tr tabindex="0">
+          <td>Roadmap.key</td>
+          <td>8.1 MB</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <helix-menu
+    context
+    for="context-files"
+    label="File"
+    targets="tbody tr"
+  >
+    <helix-menu-item value="open">Open</helix-menu-item>
+    <helix-menu-item value="rename">Rename</helix-menu-item>
+    <helix-menu-item value="archive">Archive</helix-menu-item>
+  </helix-menu>
+</helix-flex>

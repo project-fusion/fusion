@@ -1,28 +1,62 @@
-<!-- @summary A cap on the tokens shown in a field in a row, with the rest shown as a count. -->
-<helix-filter-input
-  hint="Filters over the limit are shown as a count"
-  label="Filter rows"
-  max-tags="3"
-  placeholder="Add a filter"
+<!-- @summary A cap on the tokens shown in a field in a row, with the rest shown as a count, and a capped row that opens and closes when you press its count. -->
+<helix-flex
+  direction="column"
+  gap="lg"
 >
-  <helix-tag
-    dismissible
-    slot="tags"
-  >design</helix-tag>
-  <helix-tag
-    dismissible
-    slot="tags"
-  >infra</helix-tag>
-  <helix-tag
-    dismissible
-    slot="tags"
-  >docs</helix-tag>
-  <helix-tag
-    dismissible
-    slot="tags"
-  >security</helix-tag>
-  <helix-tag
-    dismissible
-    slot="tags"
-  >billing</helix-tag>
-</helix-filter-input>
+  <helix-filter-input
+    hint="Filters over the limit are shown as a count"
+    label="Filter rows"
+    max-tags="3"
+    placeholder="Add a filter"
+  >
+    <helix-tag
+      dismissible
+      slot="tags"
+    >design</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >infra</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >docs</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >security</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >billing</helix-tag>
+  </helix-filter-input>
+
+  <helix-filter-input
+    expandable
+    hint="Press the count to show every filter"
+    label="Filter issues"
+    max-tags="3"
+    placeholder="Add a filter"
+  >
+    <helix-tag
+      dismissible
+      slot="tags"
+    >design</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >infra</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >docs</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >security</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >billing</helix-tag>
+  </helix-filter-input>
+</helix-flex>

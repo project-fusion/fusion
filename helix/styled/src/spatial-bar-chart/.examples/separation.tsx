@@ -1,0 +1,60 @@
+import './separation.css'
+
+export function Example() {
+  return (
+    <>
+      <table
+        data-hidden-visually
+        id="signups"
+      >
+        <caption>Signups by region and quarter</caption>
+        <thead>
+          <tr>
+            <th scope="col">Region</th>
+            <th scope="col">Q1</th>
+            <th scope="col">Q2</th>
+            <th scope="col">Q3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">North</th>
+            <td>420</td>
+            <td>465</td>
+            <td>510</td>
+          </tr>
+          <tr>
+            <th scope="row">South</th>
+            <td>310</td>
+            <td>355</td>
+            <td>340</td>
+          </tr>
+          <tr>
+            <th scope="row">East</th>
+            <td>520</td>
+            <td>560</td>
+            <td>615</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="values">
+        <figure>
+          <figcaption>Plain</figcaption>
+          <helix-spatial-bar-chart
+            for="signups"
+            label="Signups by region and quarter"
+          ></helix-spatial-bar-chart>
+        </figure>
+        <figure>
+          <figcaption>Filled</figcaption>
+          <helix-spatial-bar-chart
+            for="signups"
+            label="Signups by region and quarter"
+            separation="filled"
+          ></helix-spatial-bar-chart>
+        </figure>
+      </div>
+    </>
+  )
+}

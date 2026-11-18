@@ -1,0 +1,23 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-sparkline
+        label="Sessions per day, thin"
+        values="1240 1318 1102 1291 1244 1180 1102"
+        weight="thin"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Sessions per day"
+        values="1240 1318 1102 1291 1244 1180 1102"
+      ></helix-sparkline>
+      <helix-sparkline
+        label="Sessions per day, thick"
+        values="1240 1318 1102 1291 1244 1180 1102"
+        weight="thick"
+      ></helix-sparkline>
+    </helix-flex>
+  )
+}

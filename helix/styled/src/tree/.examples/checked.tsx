@@ -42,6 +42,12 @@ export function Example() {
         </helix-tree-item>
       </helix-tree-item>
       <helix-tree-item value="changelog">Changelog</helix-tree-item>
+      <helix-tree-item
+        disabled
+        value="archive"
+      >
+        Archive
+      </helix-tree-item>
     </helix-tree>
   )
 }

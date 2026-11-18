@@ -1,0 +1,23 @@
+<!-- @summary A menu while its entries load, and a menu with no entries, each with its own words. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  gap="lg"
+  wrap
+>
+  <helix-drilldown
+    class="panel"
+    label="Settings"
+    loading
+    loading-text="Loading settings"
+  ></helix-drilldown>
+
+  <helix-drilldown
+    class="panel"
+    empty-text="No saved filters"
+    label="Saved filters"
+  ></helix-drilldown>
+</helix-flex>

@@ -1,0 +1,163 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-checkbox-group
+        label="Plain"
+        name="addons-plain"
+      >
+        <helix-checkbox
+          default-checked
+          value="backups"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Backups
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Nightly backups, kept for 30 days.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+        <helix-checkbox value="audit">
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Audit log
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              A record of each change and who made it.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+      </helix-checkbox-group>
+
+      <helix-checkbox-group
+        label="Outlined"
+        name="addons-outlined"
+      >
+        <helix-checkbox
+          default-checked
+          separation="outlined"
+          value="backups"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Backups
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Nightly backups, kept for 30 days.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+        <helix-checkbox
+          separation="outlined"
+          value="audit"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Audit log
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              A record of each change and who made it.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+      </helix-checkbox-group>
+
+      <helix-checkbox-group
+        label="Filled"
+        name="addons-filled"
+      >
+        <helix-checkbox
+          default-checked
+          separation="filled"
+          value="backups"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Backups
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              Nightly backups, kept for 30 days.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+        <helix-checkbox
+          separation="filled"
+          value="audit"
+        >
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-text
+              as="span"
+              scale="body-strong"
+            >
+              Audit log
+            </helix-text>
+            <helix-text
+              as="span"
+              emphasis="muted"
+              scale="caption"
+            >
+              A record of each change and who made it.
+            </helix-text>
+          </helix-flex>
+        </helix-checkbox>
+      </helix-checkbox-group>
+    </helix-flex>
+  )
+}

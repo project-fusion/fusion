@@ -1,4 +1,4 @@
-<!-- @summary An answer that arrives a word at a time, from the wait to the last word. -->
+<!-- @summary The indicator shown while a reply is on its way, the same wait with your own indicator, and an answer that arrives a word at a time. -->
 <!-- @min 420 -->
 <link
   href="styles.css"
@@ -9,6 +9,29 @@
   direction="column"
   gap="md"
 >
+  <helix-chat
+    class="waiting"
+    label="Research assistant"
+  >
+    <strong slot="header">Research assistant</strong>
+
+    <helix-chat-message
+      author="them"
+      state="streaming"
+    ></helix-chat-message>
+
+    <helix-chat-message
+      author="them"
+      state="streaming"
+    >
+      <helix-orb
+        size="sm"
+        slot="indicator"
+        state="thinking"
+      ></helix-orb>
+    </helix-chat-message>
+  </helix-chat>
+
   <helix-chat
     class="streaming"
     id="stream"

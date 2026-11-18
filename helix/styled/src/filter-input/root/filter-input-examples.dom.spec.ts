@@ -7,7 +7,6 @@ import dismissing from '../.examples/dismissing.html' with { type: 'text' }
 import picking from '../.examples/picking.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import suggesting from '../.examples/suggesting.html' with { type: 'text' }
-import typing from '../.examples/typing.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -24,7 +23,7 @@ beforeAll(async () => {
 /**
  * The examples, run: their markup, their script, and a reader's presses.
  *
- * **The component can be right and the example wrong.** These three build the
+ * **The component can be right and the example wrong.** These two build the
  * chips themselves, from `helix-facet`, because the field leaves its tokens to
  * whoever owns the page. One of them added two chips for a single pick, since a
  * reflected `name` lands on the next update and the script's lookup ran before
@@ -68,7 +67,6 @@ const settled = async (): Promise<void> => {
 const EXAMPLES = [
   ['arity', arity],
   ['picking', picking],
-  ['typing', typing],
 ] as const
 
 for (const [name, file] of EXAMPLES) {
@@ -116,9 +114,9 @@ describe('the arity example', () => {
   })
 })
 
-describe('the typing example', () => {
+describe('the picking example', () => {
   run('Enter builds the chip the picker would have, and ticks it', async () => {
-    await example(typing)
+    await example(picking)
     const control = part(filter(), 'control') as HTMLInputElement
     control.value = 'disposition:refunded'
     control.dispatchEvent(

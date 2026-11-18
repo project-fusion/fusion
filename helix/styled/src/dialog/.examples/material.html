@@ -1,0 +1,115 @@
+<!-- @summary A dialog on the opaque default surface, on glass, and on frosted glass, each over the page. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="page">
+  <helix-text
+    as="h1"
+    scale="display"
+  >Projects</helix-text>
+  <helix-text as="p">
+    Track progress, share files, and invite team members to your projects.
+  </helix-text>
+  <helix-flex
+    gap="sm"
+    wrap
+  >
+    <helix-button
+      command="--show"
+      commandfor="opaque-dialog"
+    >Opaque</helix-button>
+    <helix-button
+      command="--show"
+      commandfor="glass-dialog"
+    >Glass</helix-button>
+    <helix-button
+      command="--show"
+      commandfor="frosted-dialog"
+    >Frosted</helix-button>
+  </helix-flex>
+</div>
+
+<helix-dialog
+  id="opaque-dialog"
+  label="Invite member"
+>
+  <helix-text
+    as="h2"
+    slot="header"
+  >Invite member</helix-text>
+  <helix-text>New members can view and edit every project in the workspace.</helix-text>
+  <helix-button-group
+    label="Dialog actions"
+    layout="spaced"
+    slot="footer"
+  >
+    <helix-button
+      command="--close"
+      commandfor="opaque-dialog"
+    >Cancel</helix-button>
+    <helix-button
+      command="--close"
+      commandfor="opaque-dialog"
+      emphasis="solid"
+      tone="primary"
+    >Send invite</helix-button>
+  </helix-button-group>
+</helix-dialog>
+
+<helix-dialog
+  id="glass-dialog"
+  label="Invite member"
+  material="glass"
+>
+  <helix-text
+    as="h2"
+    slot="header"
+  >Invite member</helix-text>
+  <helix-text>New members can view and edit every project in the workspace.</helix-text>
+  <helix-button-group
+    label="Dialog actions"
+    layout="spaced"
+    slot="footer"
+  >
+    <helix-button
+      command="--close"
+      commandfor="glass-dialog"
+    >Cancel</helix-button>
+    <helix-button
+      command="--close"
+      commandfor="glass-dialog"
+      emphasis="solid"
+      tone="primary"
+    >Send invite</helix-button>
+  </helix-button-group>
+</helix-dialog>
+
+<helix-dialog
+  id="frosted-dialog"
+  label="Invite member"
+  material="frosted"
+>
+  <helix-text
+    as="h2"
+    slot="header"
+  >Invite member</helix-text>
+  <helix-text>New members can view and edit every project in the workspace.</helix-text>
+  <helix-button-group
+    label="Dialog actions"
+    layout="spaced"
+    slot="footer"
+  >
+    <helix-button
+      command="--close"
+      commandfor="frosted-dialog"
+    >Cancel</helix-button>
+    <helix-button
+      command="--close"
+      commandfor="frosted-dialog"
+      emphasis="solid"
+      tone="primary"
+    >Send invite</helix-button>
+  </helix-button-group>
+</helix-dialog>

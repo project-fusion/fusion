@@ -1,0 +1,54 @@
+<!-- @summary A dialog that closes on a press outside it, with `closedby` set to `any`, and a persistent dialog that Escape and a press outside do not close. -->
+<helix-flex
+  gap="sm"
+  wrap
+>
+  <helix-button
+    command="--show"
+    commandfor="shared"
+  >Share folder</helix-button>
+  <helix-button
+    command="--show"
+    commandfor="unsaved"
+  >Close editor</helix-button>
+</helix-flex>
+
+<helix-dialog
+  closedby="any"
+  id="shared"
+  label="Folder shared"
+  size="sm"
+>
+  <helix-text
+    as="h2"
+    slot="header"
+  >Folder shared</helix-text>
+  <helix-text>
+    Anyone with the link can view Quarterly reports. Files you add to the folder
+    later are shared too.
+  </helix-text>
+</helix-dialog>
+
+<helix-dialog
+  id="unsaved"
+  label="Unsaved changes"
+  persistent
+>
+  <helix-text as="p">You have two unsaved changes. Save or discard them to continue.</helix-text>
+  <helix-button-group
+    label="Dialog actions"
+    layout="spaced"
+    slot="footer"
+  >
+    <helix-button
+      command="--close"
+      commandfor="unsaved"
+    >Discard changes</helix-button>
+    <helix-button
+      command="--close"
+      commandfor="unsaved"
+      emphasis="solid"
+      tone="primary"
+    >Save changes</helix-button>
+  </helix-button-group>
+</helix-dialog>

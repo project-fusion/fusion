@@ -1,0 +1,29 @@
+<!-- @summary A donut chart while its readings load, and a donut chart whose table has no readings, with its own `empty-text`. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <table
+    data-hidden-visually
+    id="traffic"
+  >
+    <caption>Sessions by source</caption>
+    <tbody></tbody>
+  </table>
+  <helix-donut-chart
+    for="traffic"
+    loading
+  ></helix-donut-chart>
+  <table
+    data-hidden-visually
+    id="spend"
+  >
+    <caption>Spend by category</caption>
+    <tbody></tbody>
+  </table>
+  <helix-donut-chart
+    empty-text="No spend this month"
+    for="spend"
+  ></helix-donut-chart>
+</helix-flex>

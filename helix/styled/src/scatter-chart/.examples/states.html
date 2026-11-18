@@ -1,0 +1,29 @@
+<!-- @summary A scatter chart while its readings load, and a scatter chart whose table has no readings, with its own `empty-text`. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <table
+    data-hidden-visually
+    id="pages"
+  >
+    <caption>Page weight and load time</caption>
+    <tbody></tbody>
+  </table>
+  <helix-scatter-chart
+    for="pages"
+    loading
+  ></helix-scatter-chart>
+  <table
+    data-hidden-visually
+    id="images"
+  >
+    <caption>Image weight and load time</caption>
+    <tbody></tbody>
+  </table>
+  <helix-scatter-chart
+    empty-text="No images measured yet"
+    for="images"
+  ></helix-scatter-chart>
+</helix-flex>

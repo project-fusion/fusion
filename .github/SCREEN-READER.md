@@ -117,7 +117,7 @@ place.
 
 ## Dialog
 
-**D1. Opening.** Open `/dialog/small`. Tab to "Open dialog" and press Enter.
+**D1. Opening.** Open `/dialog/size`. Tab to "Small" and press Enter.
 Expect "Archive project?" and that it is a dialog, and focus on its first
 button, "Archive project".
 
@@ -126,10 +126,10 @@ Expect focus to move between "Archive project" and "Cancel" and never reach
 the page behind the dialog.
 
 **D3. Closing.** Press Escape.
-Expect the dialog to close and focus to return to "Open dialog".
+Expect the dialog to close and focus to return to "Small".
 
-**D4. A dialog that refuses.** Open `/dialog/persistent`, where the dialog
-opens with the page. Press Escape. Expect the dialog to stay open. Tab to
+**D4. A dialog that refuses.** Open `/dialog/closedby`. Tab to "Close editor"
+and press Enter. Press Escape. Expect the dialog to stay open. Tab to
 "Discard changes" and press Enter, and expect it to close.
 
 ## Combobox
@@ -150,7 +150,7 @@ Expect "No matches" to be spoken.
 Expect the list to close, the field to say it is collapsed, and "TypeScript" to
 be its value. Press Escape and expect nothing to change.
 
-**C5. A field with a message.** Open `/combobox/invalid`. Press Tab.
+**C5. A field with a message.** Open `/combobox/states`. Tab to "Region".
 Expect "Region", that it is invalid, then "That region is not available on
 your plan".
 
@@ -168,7 +168,7 @@ Expect "French" to be chosen, the list to close, and focus to return to the
 trigger, which now says "French". This is how a single select behaves here:
 each arrow in the open list chooses.
 
-**S4. A field with a message.** Open `/select/invalid`. Press Tab.
+**S4. A field with a message.** Open `/select/states`. Tab to "Region".
 Expect "Region", that it is invalid, then "That region is not available on
 your plan".
 
@@ -217,14 +217,14 @@ project and the people on it."
 
 ## Input
 
-**I1. A required field.** Open `/input/required`. Press Tab.
-Expect "Email", an edit text that is required, then "We only use this to
-reply". The asterisk after the label is drawn and should not be spoken; record
+**I1. A required field.** Open `/input/states`. Tab to "Full name".
+Expect "Full name", an edit text that is required, then "We print this on your
+invoices". The asterisk after the label is drawn and should not be spoken; record
 "star" if it is.
 
 **I2. Submitting it empty.** Tab to "Submit" and press Enter.
-Expect focus to return to "Email", that it is invalid, and the browser's
-message for an empty required field. Type an address and press Tab, and expect
+Expect focus to return to "Full name", that it is invalid, and the browser's
+message for an empty required field. Type a name and press Tab, and expect
 the field to stop being invalid.
 
 **I3. Showing a password.** Open `/input/reveal`. Press Tab twice.
