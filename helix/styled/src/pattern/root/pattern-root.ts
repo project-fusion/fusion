@@ -2,6 +2,7 @@ import { customElement, HelixElement, motionPaused, onMotionChange } from '@fusi
 import { type CSSResultGroup, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { contourTile } from '../contours.js'
+import { BRIGHT_STARS, SHOOTING_STARS, starTiles } from '../stars.js'
 import { styles } from './pattern-root.css.js'
 
 /** What a `Pattern` draws. */
@@ -16,7 +17,8 @@ export type PatternMotif = 'contours' | 'hexagons' | 'stars'
  *
  * - **`hexagons`**, the default: a honeycomb of fine lines that holds still,
  *   with a glow in the primary color that follows a mouse or pen across it.
- * - **`stars`**: three layers of points that twinkle and drift.
+ * - **`stars`**: a night sky of faint and bright points, its brightest stars
+ *   twinkling each on its own beat and a shooting star crossing now and then.
  * - **`contours`**: the lines of a map's relief, drifting slowly sideways.
  *
  * **Behind the content, and nothing to a screen reader.** The drawing is a
@@ -39,9 +41,11 @@ export type PatternMotif = 'contours' | 'hexagons' | 'stars'
  *
  * @csspart content - The box holding the content, drawn over the pattern.
  * @csspart glow - The glow that follows the pointer over `hexagons`.
+ * @csspart meteor - A shooting star over `stars`.
  * @csspart motif - The drawing, behind the content.
+ * @csspart star - A bright star over `stars`, which twinkles.
  *
- * @cssproperty --pattern-color - The color of the lines and points. Defaults to `--helix-color-border` for lines and `--helix-color-foreground-muted` for stars.
+ * @cssproperty --pattern-color - The color of the lines and points. Defaults to `--helix-color-border` for lines and `--helix-color-foreground-muted` for stars in light and `--helix-color-foreground` in dark, which draw most of their points at a share of it.
  * @cssproperty --pattern-glow-color - The color of the glow under the pointer. Defaults to `--helix-color-primary`.
  *
  * @cssstate paused - The page's motion is paused, so stars and contours hold where they are.
@@ -60,6 +64,10 @@ export class HelixPattern extends HelixElement {
   /** The contour tile, drawn on the client the first time it is asked for. */
   @state()
   private tile: string | undefined
+
+  /** The star tiles, drawn on the client the first time they are asked for. */
+  @state()
+  private sky: { halos: string; points: string } | undefined
 
   /** Where a mouse or pen is over the host, in pixels from its top left, for the glow. */
   @state()
@@ -97,6 +105,9 @@ export class HelixPattern extends HelixElement {
     if (changed.has('motif') && this.motif === 'contours' && this.tile === undefined) {
       this.tile = contourTile()
     }
+    if (changed.has('motif') && this.motif === 'stars' && this.sky === undefined) {
+      this.sky = starTiles()
+    }
   }
 
   private readonly move = (event: PointerEvent): void => {
@@ -122,10 +133,16 @@ export class HelixPattern extends HelixElement {
 
   protected override render(): TemplateResult {
     const tile = this.motif === 'contours' && this.tile ? `--_pattern-tile: url(${this.tile})` : ''
+    const sky =
+      this.motif === 'stars' && this.sky
+        ? `--_pattern-points: url(${this.sky.points}); --_pattern-halos: url(${this.sky.halos})`
+        : ''
     const at = this.pointer
       ? `--_pattern-x: ${Math.round(this.pointer.x)}px; --_pattern-y: ${Math.round(this.pointer.y)}px`
       : ''
-    return html`<div part="motif" aria-hidden="true" style=${tile || nothing}></div>
+    return html`<div part="motif" aria-hidden="true" style=${tile || sky || nothing}>
+        ${this.motif === 'stars' ? this.stars() : nothing}
+      </div>
       <div
         part="glow"
         aria-hidden="true"
@@ -133,6 +150,23 @@ export class HelixPattern extends HelixElement {
         style=${at || nothing}
       ></div>
       <div part="content"><slot></slot></div>`
+  }
+
+  /** The bright stars and the shooting stars, at the same places on the server as on the client. */
+  private stars(): TemplateResult {
+    return html`${BRIGHT_STARS.map(
+      (star) =>
+        html`<span
+          part="star"
+          style="--_star-x: ${star.x}%; --_star-y: ${star.y}%; --_star-size: ${star.size}; --_star-beat: ${star.beat}; --_star-phase: ${star.phase}"
+        ></span>`,
+    )}${SHOOTING_STARS.map(
+      (meteor) =>
+        html`<span
+          part="meteor"
+          style="--_meteor-x: ${meteor.x}%; --_meteor-y: ${meteor.y}%; --_meteor-beat: ${meteor.beat}; --_meteor-phase: ${meteor.phase}"
+        ></span>`,
+    )}`
   }
 }
 
