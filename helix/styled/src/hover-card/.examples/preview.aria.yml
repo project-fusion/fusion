@@ -1,0 +1,5 @@
+- paragraph:
+  - text: The release notes were written by
+  - link "Ada Lovelace":
+    - /url: "#ada"
+  - text: and reviewed by the whole team.

@@ -1,0 +1,8 @@
+- paragraph: Scroll this box and the bar above it fills.
+- paragraph: A long article reads better with a sense of how much is left, and the bar says it without a number.
+- paragraph: It follows the box its for attribute names, and the page when there is none.
+- paragraph: It moves under reduced motion too, as a scrollbar does, because it follows the reader's own hand.
+- paragraph: On paper it is hidden, since a printed page is not scrolled.
+- paragraph: A box with nothing to scroll reads as full, as a page that fits on one screen has been read to its end.
+- paragraph: The bar scales rather than resizing, so following a scroll moves no layout.
+- paragraph: Place it yourself, such as at the top of a sticky header.
