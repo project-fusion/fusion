@@ -14,6 +14,11 @@ import { fragment } from '../table.js'
  */
 export default fragment('tags', { parts: ['tags', 'rest'] }, ({ on, rule }) => [
   on('tags', [rule({ display: web('contents') })]),
+  /* Written out: the field is where a removed tag's copy fades, so it is the box
+     the copy is placed against, which the web's layout motion lays there. */
+  on({ part: 'tags', selector: '[part="field"]:has([part="tags"])' }, [
+    web([rule({ position: 'relative' })]),
+  ]),
   /* Written out: zeroed at the weight of the rule under it, so the order decides. */
   on({ part: 'rest', selector: ':where(button)[part="rest"]' }, [
     web([rule({ all: 'unset', boxSizing: 'border-box' })]),
