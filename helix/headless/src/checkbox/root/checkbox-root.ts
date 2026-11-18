@@ -47,6 +47,8 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Tickbox
+ * @use A choice submitted with a form, or a set of independent choices.
+ * @instead switch - A setting that applies at once.
  * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @slot - The label.

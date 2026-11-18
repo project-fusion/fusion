@@ -79,6 +79,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category feedback
  * @aliases Banner, Notification bar, Alert bar
+ * @use A message for every page of a site, shown above its header, such as planned downtime.
+ * @instead callout - A message about one section.
+ * @instead toast - A reply to an action.
  * @documentation https://fusion.dev/helix/components/announcement
  *
  * @slot - The message.

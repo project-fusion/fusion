@@ -58,7 +58,7 @@ const TAGS: Record<string, StaticValue> = {
  * @since 0.1.0
  * @status stable
  * @category typography
- * @aliases Paragraph, Copy, Label, Caption, Heading, Title
+ * @aliases Paragraph, Caption, Heading, Title
  * @documentation https://fusion.dev/helix/components/text
  *
  * @slot - The text.

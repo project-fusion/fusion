@@ -69,7 +69,7 @@ export interface MapPointsCollection {
  * @since 0.105.0
  * @status stable
  * @category media
- * @aliases Data layer, GeoJSON layer, Point cloud, Point layer
+ * @aliases Data layer, GeoJSON layer, Point layer
  * @documentation https://fusion.dev/helix/components/map
  *
  * @event {HelixActivateEvent} helix-activate - A point in view was pressed. The value is its id, or its name if it has no id.

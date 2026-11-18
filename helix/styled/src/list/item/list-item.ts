@@ -12,7 +12,7 @@ import { styles } from './list-item.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @aliases Row, Entry
+ * @aliases Entry
  * @documentation https://fusion.dev/helix/components/list
  *
  * @csspart rail - The cell that holds the number in a railed list.

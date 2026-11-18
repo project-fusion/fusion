@@ -105,7 +105,7 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  * @since 0.8.0
  * @status stable
  * @category feedback
- * @aliases Thinking, Activity, Agent, Status
+ * @aliases Thinking, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
  *
  * @slot - A shape of your own, drawn over the orb's box in place of the dots.

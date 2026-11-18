@@ -12,7 +12,7 @@ import { styles } from './pagination-summary.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @aliases Result count, Range
+ * @aliases Result count
  * @documentation https://fusion.dev/helix/components/pagination
  *
  * @cssproperty --pagination-font-size - Size of the text, the same hook that sizes the page numbers.

@@ -17,7 +17,7 @@ import { styles } from './list-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Rows, Stack, Menu
+ * @aliases Rows, Menu
  * @documentation https://fusion.dev/helix/components/list
  *
  * @cssproperty --list-bleed - How far a row's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.

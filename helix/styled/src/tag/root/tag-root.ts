@@ -20,6 +20,9 @@ import { styles } from './tag-root.css.js'
  * @status stable
  * @category markers
  * @aliases Chip, Pill, Label
+ * @use A word that classifies content, such as a status or a topic.
+ * @instead badge - A count pinned to another element.
+ * @instead button - A word that performs an action.
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.

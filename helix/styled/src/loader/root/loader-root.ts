@@ -23,7 +23,7 @@ import { styles } from './loader-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category feedback
- * @aliases Spinner, Busy, Activity
+ * @aliases Spinner, Busy, Activity indicator
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.

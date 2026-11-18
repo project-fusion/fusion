@@ -28,7 +28,7 @@ const HEADING_ID = 'heading'
  *
  * @since 0.1.0
  * @status stable
- * @aliases Day, Section, Date group
+ * @aliases Day, Date group
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - The entries.

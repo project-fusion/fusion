@@ -28,6 +28,9 @@ import { styles } from './callout-root.css.js'
  * @status stable
  * @category markers
  * @aliases Admonition, Notice, Note, Alert
+ * @use A note, a warning, or an error about the content around it.
+ * @instead toast - A confirmation that leaves on its own.
+ * @instead announcement - A message for the whole site.
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.

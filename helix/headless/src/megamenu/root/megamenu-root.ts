@@ -90,6 +90,9 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @status stable
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
+ * @use A section of a site's main navigation that opens a panel of links.
+ * @instead popover - Content other than navigation.
+ * @instead navigation - Links that fit in one row.
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @slot - The panel's contents, such as your own lists of links and their headings.

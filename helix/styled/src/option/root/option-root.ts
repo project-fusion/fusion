@@ -15,7 +15,7 @@ import { styles } from './option-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category forms
- * @aliases Item, Choice
+ * @aliases Item
  * @documentation https://fusion.dev/helix/components/option
  *
  * @cssproperty --option-active-background-color - The background of the option the keyboard is on.

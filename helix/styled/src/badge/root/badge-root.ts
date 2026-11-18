@@ -22,6 +22,9 @@ import { styles } from './badge-root.css.js'
  * @status stable
  * @category markers
  * @aliases Count, Indicator, Pip
+ * @use A count on an icon, a tab, or a button, or a dot that marks something new.
+ * @instead tag - A word that describes the content.
+ * @instead stat - A number that is the content itself.
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @cssproperty --badge-attention-duration - How long one beat of `attention` takes.

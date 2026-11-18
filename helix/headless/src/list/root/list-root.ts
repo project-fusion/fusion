@@ -141,7 +141,7 @@ import {
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Rows, Stack, Menu
+ * @aliases Rows, Menu
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.

@@ -22,6 +22,9 @@ import { styles } from './megamenu-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
+ * @use A section of a site's main navigation that opens a panel of links.
+ * @instead popover - Content other than navigation.
+ * @instead navigation - Links that fit in one row.
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - The filter behind the panel. Inside an App Header it is the

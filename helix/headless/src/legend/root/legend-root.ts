@@ -45,7 +45,7 @@ import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
  * @since 0.1.0
  * @status stable
  * @category charts
- * @aliases Key, Series Key
+ * @aliases Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
  * @event {Event} change - Fired once a toggle has hidden or shown a series.

@@ -29,6 +29,9 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Option, Choice
+ * @use One choice from up to five options, each with a label or a sentence of its own.
+ * @instead toggle - A compact choice of view or mode.
+ * @instead select - More options than fit on the page.
  * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radio's label.

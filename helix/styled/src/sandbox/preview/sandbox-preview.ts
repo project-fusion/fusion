@@ -237,7 +237,7 @@ export type PreviewMessage =
  *
  * @since 0.1.0
  * @status stable
- * @aliases Result, Output
+ * @aliases Result
  * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @event {HelixConsoleEvent} helix-console - Fired once per console call in the frame.

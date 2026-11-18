@@ -50,7 +50,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @since 0.1.0
  * @status stable
  * @category forms
- * @aliases Item, Choice
+ * @aliases Item
  * @documentation https://fusion.dev/helix/components/option
  *
  * @slot - The option's label.

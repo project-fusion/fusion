@@ -85,6 +85,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @status stable
  * @category feedback
  * @aliases Notification feed, Inbox, Activity
+ * @use A record of events you can return to and mark read.
+ * @instead toast - A message that leaves on its own.
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications.

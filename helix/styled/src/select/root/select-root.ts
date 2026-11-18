@@ -28,6 +28,10 @@ import '../../listbox/index.js'
  * @status stable
  * @category forms
  * @aliases Dropdown, Picker
+ * @use One value from a short list.
+ * @instead combobox - A list long enough that you type to find the value.
+ * @instead radio - Up to five options you should see without opening anything.
+ * @instead menu - An action that runs when you choose it.
  * @documentation https://fusion.dev/helix/components/select
  *
  * @cssproperty --select-border-color - Color of the panel's edge.
