@@ -187,6 +187,9 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @status stable
  * @category overlays
  * @aliases Dropdown, Action menu
+ * @use Commands that act at once, such as Rename, Duplicate, and Delete.
+ * @instead select - A value a form submits.
+ * @instead command - Commands you find by typing, from anywhere on the page.
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.

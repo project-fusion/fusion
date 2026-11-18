@@ -14,6 +14,8 @@ import { styles } from './quote-root.css.js'
  * @status stable
  * @category typography
  * @aliases Q, InlineQuote
+ * @use A quotation inside a sentence.
+ * @instead blockquote - A passage set apart, including a pull quote.
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @cssproperty --quote-color - Color of the quoted text.

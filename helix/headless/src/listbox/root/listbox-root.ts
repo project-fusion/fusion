@@ -164,6 +164,8 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @status stable
  * @category forms
  * @aliases Options, Select list
+ * @use A list of options that stays open on the page.
+ * @instead select - A list that opens only when you need it.
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.

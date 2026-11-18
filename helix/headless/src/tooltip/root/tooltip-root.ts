@@ -99,6 +99,8 @@ const warmth = (): Warmth => {
  * @status stable
  * @category overlays
  * @aliases Hint, Popup label
+ * @use A short text that names an icon-only control or adds a detail to it.
+ * @instead popover - Anything you click, type in, or select.
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @slot - The trigger, in the wrapping form. The tooltip describes it, as it

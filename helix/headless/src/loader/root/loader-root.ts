@@ -57,7 +57,7 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * @since 0.1.0
  * @status stable
  * @category feedback
- * @aliases Spinner, Busy, Activity
+ * @aliases Spinner, Busy, Activity indicator
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @slot - An icon or logo that stays still at the center. Empty by default.

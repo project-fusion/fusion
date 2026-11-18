@@ -22,18 +22,20 @@ import { typedMarks } from '../marks.js'
  * element, and its marks follow it: `lang="de"` sets „…“ and `lang="fr"` «…»
  * inside an English page.
  *
- * **`no-marks` leaves the marks off**, for a quotation set where the page draws
- * its own, such as a pull quote with a large decorative mark beside it or a
- * table of sayings. The quotation still counts toward nesting, so a quote
+ * **`no-marks` leaves the marks off**, for a quotation whose marks the page
+ * draws itself, such as marks set in an accent color. The quotation still counts toward nesting, so a quote
  * inside it takes the inner marks it would have had. Text with marks typed
  * into it raises no warning under `no-marks`.
  *
- * For a passage set off from the surrounding text, use a blockquote.
+ * For a passage set off from the surrounding text, including a pull quote, use
+ * a blockquote.
  *
  * @since 0.1.0
  * @status stable
  * @category typography
  * @aliases Q, InlineQuote
+ * @use A quotation inside a sentence.
+ * @instead blockquote - A passage set apart, including a pull quote.
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @slot - The quoted text.

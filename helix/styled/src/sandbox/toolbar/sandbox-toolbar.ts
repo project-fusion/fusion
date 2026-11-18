@@ -20,7 +20,6 @@ import { styles } from './sandbox-toolbar.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @aliases Action bar
  * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot - Items at the start, usually the files.

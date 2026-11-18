@@ -14,7 +14,7 @@ import { styles } from './stat-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Metric, KPI, Figure
+ * @aliases Metric, KPI
  * @documentation https://fusion.dev/helix/components/stat
  *
  * @csspart value - The slot the value is written in, or the figure the stat writes from `value` or from slotted text. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.

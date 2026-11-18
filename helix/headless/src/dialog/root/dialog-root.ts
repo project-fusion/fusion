@@ -95,6 +95,9 @@ const holds = (outer: Element, inner: Element): boolean => {
  * @status stable
  * @category overlays
  * @aliases Modal, Sheet
+ * @use A decision or a short task that blocks the page until it is done.
+ * @instead drawer - Details or settings beside the page's content.
+ * @instead popover - Content tied to one trigger, with the page still in use.
  * @documentation https://fusion.dev/helix/components/dialog
  *
  * @slot - The dialog's content.

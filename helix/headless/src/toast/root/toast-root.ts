@@ -111,6 +111,9 @@ import { joinSaid, messageWords } from '../words.js'
  * @status stable
  * @category overlays
  * @aliases Toaster, Snackbar
+ * @use A confirmation of something you just did, such as "Saved".
+ * @instead callout - A message that must stay until it is read.
+ * @instead announcement - News for the whole site.
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The messages.

@@ -26,7 +26,7 @@ import { styles } from './legend-root.css.js'
  * @status stable
  * @category charts
  * @groups charts
- * @aliases Key, Series Key
+ * @aliases Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
  * @cssproperty --legend-color - The color of the series names.

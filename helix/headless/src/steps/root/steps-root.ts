@@ -107,6 +107,9 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  * @status stable
  * @category navigation
  * @aliases Stepper, Wizard, Progress steps
+ * @use Progress through a fixed sequence of stages, such as a checkout.
+ * @instead tabs - Sections you visit in any order.
+ * @instead number-input - A number you type, such as a quantity.
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The steps.

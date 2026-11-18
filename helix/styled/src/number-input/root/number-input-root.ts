@@ -27,6 +27,9 @@ import { styles } from './number-input-root.css.js'
  * @status stable
  * @category forms
  * @aliases NumberField, Stepper, InputNumber
+ * @use A number you type or nudge with step buttons, such as a quantity.
+ * @instead slider - A value picked from a range by eye.
+ * @instead steps - Progress through stages.
  * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot decrement-icon - Replaces the icon on the step down button.

@@ -71,7 +71,6 @@ const stop = (event: Event): void => event.stopPropagation()
  *
  * @since 0.1.0
  * @status stable
- * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @event {Event} change - Fired after the reader chose another level in the filter. `level` holds it.

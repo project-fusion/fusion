@@ -15,6 +15,8 @@ import { styles } from './empty-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Placeholder, NoResults, Blank
+ * @use A region with nothing in it, and the next step to take.
+ * @instead skeleton - Content that has not arrived yet.
  * @documentation https://fusion.dev/helix/components/empty
  *
  * @cssproperty --empty-actions-gap - Space added above the actions.

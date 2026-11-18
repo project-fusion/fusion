@@ -25,6 +25,10 @@ import { styles } from './popover-root.css.js'
  * @status stable
  * @category overlays
  * @aliases Popper, Flyout, Overlay
+ * @use Content you act on, anchored to a trigger, such as a short form.
+ * @instead tooltip - A short text that names its trigger.
+ * @instead menu - A list of commands.
+ * @instead megamenu - A site's navigation sections.
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.

@@ -28,6 +28,8 @@ import { styles } from './tooltip-root.css.js'
  * @category overlays
  * @groups charts
  * @aliases Hint, Popup label
+ * @use A short text that names an icon-only control or adds a detail to it.
+ * @instead popover - Anything you click, type in, or select.
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - The size of the arrow on the bubble's edge.

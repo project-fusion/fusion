@@ -76,7 +76,7 @@ interface StepSharing {
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Metric, KPI, Figure
+ * @aliases Metric, KPI
  * @documentation https://fusion.dev/helix/components/stat
  *
  * @slot - The value.

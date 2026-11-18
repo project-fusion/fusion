@@ -26,6 +26,9 @@ import { styles } from './combobox-root.css.js'
  * @status stable
  * @category forms
  * @aliases Autocomplete, Typeahead, Search select
+ * @use One value from a long list, found by typing.
+ * @instead select - A short list you scan.
+ * @instead filter-input - Several values that narrow a list.
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @cssproperty --combobox-background-color - Fill behind the field.

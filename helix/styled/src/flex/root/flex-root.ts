@@ -50,7 +50,7 @@ const wrapConverter = {
  * @since 0.1.0
  * @status stable
  * @category layout
- * @aliases Stack, Row, Column, HStack, VStack
+ * @aliases Stack, Column, HStack, VStack
  * @documentation https://fusion.dev/helix/components/flex
  *
  * @slot - The items to lay out.
