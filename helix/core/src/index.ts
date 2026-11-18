@@ -456,6 +456,7 @@ export {
   unregisterControl,
 } from './utils/controls/controls.js'
 export { countLabel } from './utils/count-label/count-label.js'
+export { type CountToOptions, countTo } from './utils/count-to/count-to.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {
   type Color,
@@ -539,6 +540,7 @@ export {
   type LinkModifiers,
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
+export { type FollowPointerOptions, followPointer } from './utils/follow-pointer/follow-pointer.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { glyphPath } from './utils/glyph-path/glyph-path.js'
 export {
@@ -577,6 +579,7 @@ export {
   type MediaCopy,
   sameCopies,
 } from './utils/media-copy/media-copy.js'
+export { type MoveItemsOptions, moveItems } from './utils/move-items/move-items.js'
 export { nameText } from './utils/name-text/name-text.js'
 export { nearest } from './utils/nearest/nearest.js'
 export { numberConverter, timeConverter } from './utils/number-converter/number-converter.js'
@@ -795,6 +798,11 @@ export {
   toneMark,
 } from './utils/tone-marks/tone-marks.js'
 export { toolbarAround, toolbarAxis } from './utils/toolbar-around/toolbar-around.js'
+export {
+  type TrackedIndicator,
+  type TrackIndicatorOptions,
+  trackIndicator,
+} from './utils/track-indicator/track-indicator.js'
 export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
 export {
   Typeahead,
