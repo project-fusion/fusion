@@ -422,3 +422,43 @@ describe('under a transformed ancestor', () => {
     })
   })
 })
+
+describe('an item that is moving', () => {
+  /** A finite move of the item's transform, which ends when `end` is called. */
+  const moving = (keyframes: Keyframe[], endTime = 200) => {
+    let end = (): void => {}
+    const finished = new Promise<Animation>((resolve) => {
+      end = () => resolve({} as Animation)
+    })
+    const animation = {
+      effect: { getComputedTiming: () => ({ endTime }), getKeyframes: () => keyframes },
+      finished,
+      playState: 'running',
+    } as unknown as Animation
+    return { animation, end }
+  }
+
+  test('is marked once it comes to rest, not from where the move has it', async () => {
+    const { active, indicator, place } = scene()
+    const { animation, end } = moving([{ transform: 'translate(0, -6px)' }, { transform: 'none' }])
+    let animations = [animation]
+    active.getAnimations = () => animations
+    place()
+    expect(indicator.hasAttribute('data-placed')).toBe(false)
+    animations = []
+    end()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(at(indicator).x).toBe('40px')
+    expect(indicator.hasAttribute('data-placed')).toBe(true)
+  })
+
+  test('is marked at once where its animation moves nothing, or never ends', () => {
+    const { active, indicator, place } = scene()
+    active.getAnimations = () => [
+      moving([{ opacity: 0 }, { opacity: 1 }]).animation,
+      moving([{ transform: 'scale(1.1)' }], Number.POSITIVE_INFINITY).animation,
+    ]
+    place()
+    expect(indicator.hasAttribute('data-placed')).toBe(true)
+  })
+})
