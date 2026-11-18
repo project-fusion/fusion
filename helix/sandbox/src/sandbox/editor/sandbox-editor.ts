@@ -16,7 +16,6 @@ import {
   type DecorationSet,
   EditorView,
   keymap,
-  lineNumbers,
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view'
@@ -108,6 +107,62 @@ const hangingIndent = ViewPlugin.fromClass(
   { decorations: (plugin) => plugin.decorations },
 )
 
+/**
+ * Each line's number, as an attribute the sheet draws at the start of the
+ * line, in the line's own box.
+ *
+ * **Each number is drawn by its own line.** CodeMirror's gutter is a column of
+ * its own, and CodeMirror sets each of its numbers to a height it measured or
+ * estimated for the line beside it. A height taken before the lines settled
+ * stayed until the next measure: pictures of the Button page at 390 caught the
+ * numbers above their lines on November 17, 2026, and higher and closer
+ * together on November 18, after the editor had been made to measure again
+ * once a face loaded. A number drawn by its line sits at that line's top, in
+ * its face and leading, whatever loads late, and nothing is measured to put it
+ * there. Only the lines on screen are decorated, rebuilt as they change.
+ */
+const numberedLines = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet
+
+    constructor(view: EditorView) {
+      this.decorations = this.number(view)
+    }
+
+    update(update: ViewUpdate): void {
+      if (update.docChanged || update.viewportChanged) {
+        this.decorations = this.number(update.view)
+      }
+    }
+
+    number(view: EditorView): DecorationSet {
+      const builder = new RangeSetBuilder<Decoration>()
+      for (const { from, to } of view.visibleRanges) {
+        for (let at = from; at <= to; ) {
+          const line = view.state.doc.lineAt(at)
+          builder.add(
+            line.from,
+            line.from,
+            Decoration.line({ attributes: { 'data-line': String(line.number) } }),
+          )
+          at = line.to + 1
+        }
+      }
+      return builder.finish()
+    }
+  },
+  { decorations: (plugin) => plugin.decorations },
+)
+
+/**
+ * How many digits the last line's number has, which the sheet reserves room
+ * for at the start of every line, so a short file's numbers line up with a long
+ * one's as CodeMirror's gutter lined them up.
+ */
+const numberDigits: Extension = EditorView.editorAttributes.compute(['doc'], (state) => ({
+  style: `--_sandbox-editor-digits: ${String(state.doc.lines).length}`,
+}))
+
 /** sh, through the same mode the highlighter runs, so a pane and a block agree. */
 const shellLanguage = StreamLanguage.define({ ...shellMode, tokenTable: shellTokens })
 
@@ -133,12 +188,12 @@ const LANGUAGES = {
  * **CodeMirror measures its lines once more when `document.fonts.ready`
  * resolves, and that can be before the code face has started loading**: the
  * face is asked for when the editor first draws text in it, after the promise
- * has settled. The lines were then drawn in the code face while the gutter kept
- * the heights measured in the fallback, so the line numbers drifted from their
- * lines: a picture of the Button page at 390 on November 17, 2026 caught the
- * fourth number about half a line above its line. A face that arrives changes
- * the content's height, and CodeMirror measures again when asked, so it is
- * asked. The Code Editor's engine writes the same plugin: the two share no
+ * has settled. The lines were then drawn in the code face while CodeMirror kept
+ * the heights and positions it measured in the fallback. The line numbers no
+ * longer read them, being drawn by the lines themselves, and the cursor, the
+ * selection and the heights CodeMirror scrolls by still do. A face that
+ * arrives changes the content, and CodeMirror measures again when asked, so it
+ * is asked. The Code Editor's engine writes the same plugin: the two share no
  * module that loads CodeMirror's view and still imports on a server.
  */
 const remeasureOnFonts: Extension = ViewPlugin.fromClass(
@@ -346,7 +401,8 @@ export class HelixSandboxEditor extends HelixElement {
       state: EditorState.create({
         doc: this.value,
         extensions: [
-          lineNumbers(),
+          numberedLines,
+          numberDigits,
           remeasureOnFonts,
           history(),
           /* Two spaces, and Tab types them.

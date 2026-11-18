@@ -121,9 +121,9 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
  * The packages that connect a family to someone else's renderer, by the
  * family they serve: `connectEditor` and its schema for Editor,
  * `connectGraph` and its drivers for Graph, `connectMap` and its drivers for
- * Map, `connectTerminal` and its driver for Terminal, and
- * from the plot package, which serves six families, the folder of each one's
- * connector. Their DOM specs run with the family's in a browser, where a
+ * Map, `connectTerminal` and its driver for Terminal, the Sandbox's editor,
+ * which draws the Sandbox's source in CodeMirror, and from the plot package,
+ * which serves six families, the folder of each one's connector. Their DOM specs run with the family's in a browser, where a
  * driver meets a real canvas, a real WebGL context, and a layout, none of
  * which happy-dom has, and where an input method's composition reaches a
  * real editor.
@@ -132,6 +132,7 @@ export const CONNECTORS = {
   editor: SOURCE.editor,
   graph: SOURCE.graph,
   map: SOURCE.map,
+  sandbox: `${SOURCE.sandbox}/sandbox`,
   'spatial-bar-chart': `${SOURCE.plot}/connect-spatial-bar-chart`,
   'spatial-heatmap': `${SOURCE.plot}/connect-spatial-heatmap`,
   'spatial-ribbon-chart': `${SOURCE.plot}/connect-spatial-ribbon-chart`,
