@@ -380,6 +380,13 @@ export default styles(
           color: token('color-foreground-muted'),
           inlineSize: token('size-control-tight'),
           justifyContent: 'center',
+          /* Hover, press, and the end of the slides, eased as Button's are, so
+             reaching the last slide dims the control that can go no further. */
+          transition: list(
+            ['background-color', token('duration-fast'), token('easing-standard')],
+            ['color', token('duration-fast'), token('easing-standard')],
+            ['opacity', token('duration-fast'), token('easing-standard')],
+          ),
         }),
         native([rule({ display: 'flex' })]),
         /* At an end a stepper keeps focus and says so with `aria-disabled`, so
