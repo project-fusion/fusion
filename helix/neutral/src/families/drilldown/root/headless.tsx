@@ -121,6 +121,14 @@ export default headless('drilldown', {
           </View>
         )}
       </View>
+      {/* A copy of the page going away, which slides out and fades as the
+          next one arrives. The web element fills it as a move begins; empty
+          but during a move. A phone has no copy to make of a page. */}
+      <View
+        ariaHidden
+        part="leaving"
+        platform="web"
+      />
       <Announce
         follows="status"
         part="live"

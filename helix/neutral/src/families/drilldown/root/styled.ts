@@ -32,7 +32,7 @@ export default styles(
       titleFontWeight: token('weight-medium'),
       travel: '12%',
     },
-    own: { drilldownSign: null },
+    own: { drilldownLeavingTop: null, drilldownSign: null },
     stylesheet: 'drilldown/root/drilldown-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => {
@@ -125,10 +125,52 @@ export default styles(
       keyframes('drilldown-back', {
         from: { opacity: 0, translate: [product(travel, '-1'), 0] },
       }),
+      /* **The page leaving**, a copy laid over the place it was, slides out
+         the way the reader is going and fades as the next one arrives.
+         `both`, so it holds its last frame until the element is taken away.
+         A phone has no copy to make of a page, so its page simply arrives. */
+      on('host', [web([rule({ position: 'relative' })])]),
+      on('leaving', [
+        web([
+          rule({
+            /* Where the page was, which the element writes as the move begins. */
+            own: { drilldownLeavingTop: '0px', drilldownSign: 1 },
+            insetBlockStart: own.drilldownLeavingTop,
+            insetInline: 0,
+            paddingBlock: hook.pagePaddingBlock,
+            pointerEvents: 'none',
+            position: 'absolute',
+          }),
+          rule({ dir: 'rtl' }, { own: { drilldownSign: '-1' } }),
+          rule(
+            { forward: true },
+            {
+              animation: ['drilldown-leave-forward', duration, token('easing-decelerate'), 'both'],
+            },
+          ),
+          rule(
+            { back: true },
+            { animation: ['drilldown-leave-back', duration, token('easing-decelerate'), 'both'] },
+          ),
+        ]),
+      ]),
+      on({ part: 'leaving', selector: '[part="leaving"]:empty' }, [
+        web([rule({ display: 'none' })]),
+      ]),
+      keyframes('drilldown-leave-forward', {
+        to: { opacity: 0, translate: [product(travel, '-1'), 0] },
+      }),
+      keyframes('drilldown-leave-back', { to: { opacity: 0, translate: [travel, 0] } }),
       /* The instant swap: the header and the title still say where you are. */
       on('page', [
         rule({ reducedMotion: true, forward: true }, { animation: 'none' }),
         rule({ reducedMotion: true, back: true }, { animation: 'none' }),
+      ]),
+      on('leaving', [
+        web([
+          rule({ reducedMotion: true, forward: true }, { animation: 'none', display: 'none' }),
+          rule({ reducedMotion: true, back: true }, { animation: 'none', display: 'none' }),
+        ]),
       ]),
       /* What a collection says in place of rows, quiet and centered. */
       on(
