@@ -580,7 +580,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return this.selected.includes(iso)
   }
 
-  /** The month being shown, resolved from `month`, then `value`, then today. */
   /**
    * When the first month on show begins, as a time, for a tier above that
    * moves between two months: it changes only as the calendar pages.
@@ -589,6 +588,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     return this.shown.getTime()
   }
 
+  /** The month being shown, resolved from `month`, then `value`, then today. */
   private get shown(): Date {
     const explicit = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(this.monthState ?? this.defaultMonth)
     if (explicit) {

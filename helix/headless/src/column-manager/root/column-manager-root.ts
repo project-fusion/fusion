@@ -72,7 +72,6 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @documentation https://fusion.dev/helix/components/column-manager
  *
  * @csspart checkbox - The `Checkbox` that shows or hides a column.
- * @csspart drop - The line that marks where a dragged row will land. It carries `data-at` while it marks a gap, and that gap's place down the element as `--_column-manager-drop-y`. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart checkbox-box - The box drawn for a row's checkbox.
  * @csspart checkbox-control - The native input inside a row's checkbox.
  * @csspart checkbox-feedback - Forwarded from the checkbox. Not shown, since a column's box is never wrong.
@@ -83,6 +82,7 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while the column shows.
  * @csspart checkbox-mark-dash - Forwarded from the checkbox. Not shown, since a column is shown or hidden.
  * @csspart checkbox-mark-indeterminate - Forwarded from the checkbox. Not shown, since a column is shown or hidden.
+ * @csspart drop - The line that marks where a dragged row will land. It carries `data-at` while it marks a gap, and that gap's place down the element as `--_column-manager-drop-y`. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart grip - The button that moves a column.
  * @csspart grip-mark - The icon on the grip.
  * @csspart header - The row above the list that holds the title and the reset button.

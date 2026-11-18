@@ -922,7 +922,7 @@ export class HelixHeadlessPagination extends HelixElement {
 
   /**
    * The mark that moves to the page you are on, as the selection mark of
-   * `Toggle Group` and `Tabs` moves, so changing page is one mark travelling
+   * `Toggle Group` and `Tabs` moves, so changing page is one mark traveling
    * along the run. Measured against the run, which scrolls it with the pages.
    */
   protected readonly indicator = new IndicatorController(this, {
