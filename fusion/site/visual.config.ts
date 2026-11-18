@@ -52,8 +52,16 @@ export default defineConfig({
      the same reason: MapLibre adds its "Map" region only once the map starts,
      which a run reaches or not by when the whole-page picture grows the
      viewport, so the snapshot held the region on one run and lost it on the
-     next. */
-  aria: { hide: ['[inert]:has([data-skeleton])', '[data-site-points-canvas]'] },
+     next. And its points layer, whose count buttons are written once the map
+     settles: a run where the map did not start lost the "Food and drink"
+     group and its 30 counts. */
+  aria: {
+    hide: [
+      '[inert]:has([data-skeleton])',
+      '[data-site-points-canvas]',
+      'helix-map-points[cluster]',
+    ],
+  },
   /* The page check that needs no baseline: a code block the highlighter left
      in one color, which is the October 8 fault on any page, pictured or not.
      A highlighted block is a `helix-code-block` holding the highlighter's one
