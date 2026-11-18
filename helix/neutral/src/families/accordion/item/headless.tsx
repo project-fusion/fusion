@@ -38,7 +38,7 @@ import { derive } from '../../../tree.js'
  * another opens. Its detail is `newState` and `oldState`, `open` or
  * `closed`.
  *
- * **The chevron turns with the section**, at the end of the trigger, at its
+ * **The chevron flips with the section**, at the end of the trigger, at its
  * start under `chevron-placement="start"`, and not at all under `none`. An
  * icon passed into `chevron` takes its place.
  *

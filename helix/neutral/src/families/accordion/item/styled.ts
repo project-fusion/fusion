@@ -10,7 +10,7 @@ import item from './headless.js'
  * without measuring it, and a phone measures what the content holds and
  * moves to that height. The motion is off under reduced motion on both.
  *
- * **The chevron turns rather than changing glyph**: opening is a short
+ * **The chevron flips rather than changing glyph**: opening is a short
  * movement, not a substitution. At the end of the row it is found once at
  * the edge, and every summary starts at the same place.
  *
@@ -40,7 +40,7 @@ export default styles(
     stylesheet: 'accordion/item/accordion-item.generated.css',
   },
   ({ hook, on, own, rule }) => {
-    /* Where the chevron stands, how it turns, and its color under the pointer. */
+    /* Where the chevron stands, how it flips, and its color under the pointer. */
     const inset = sum(token('space-field'), token('space-2xs'))
     const tight = token('size-icon-tight')
     const placed = [
@@ -53,10 +53,13 @@ export default styles(
           marginInlineStart: 'auto',
         },
       ),
-      /* Turned, as Tree's and Megamenu's are, so it never passes through a
-         flat line on its way over. A phone turns from a written start. */
-      native([rule({ rotate: '0deg' })]),
-      rule({ open: true }, { rotate: '180deg' }),
+      /* Flipped over its own middle as the panel opens, from pointing down to
+         pointing up: a short movement, and no swapped glyph. The owner chose
+         the flip on November 17, 2026, over the half turn Tree and Megamenu
+         take. Along `emphasized`, which leaves the flat middle of the flip
+         quickly. A phone flips from a written start. */
+      native([rule({ scale: '1 1' })]),
+      rule({ open: true }, { scale: '1 -1' }),
       rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
     /* Centered on the first line, from the top of the row it shares with
@@ -151,19 +154,19 @@ export default styles(
           color: hook.chevronColor,
           flex: '0 0 auto',
           inlineSize: tight,
-          transition: ['rotate', token('duration-normal'), token('easing-standard')],
+          transition: ['scale', token('duration-normal'), token('easing-emphasized')],
         }),
         firstLine,
         ...placed,
       ]),
-      /* An icon passed in its place is sized, colored and turned the same way. */
+      /* An icon passed in its place is sized, colored and flipped the same way. */
       on({ region: 'chevron', slotted: '*' }, [
         rule({
           blockSize: tight,
           color: hook.chevronColor,
           flex: '0 0 auto',
           inlineSize: tight,
-          transition: ['rotate', token('duration-normal'), token('easing-standard')],
+          transition: ['scale', token('duration-normal'), token('easing-emphasized')],
         }),
         firstLine,
         ...placed,

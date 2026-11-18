@@ -99,14 +99,14 @@ const press = async (words: string) => {
   await act(async () => undefined)
 }
 
-/** How a chevron is turned: the last rotation on it. */
-const turned = (chevron: Drawn): string | undefined =>
+/** How a chevron is flipped: the last vertical scale on it, `-1` pointing up. */
+const flipped = (chevron: Drawn): number | undefined =>
   (styleOf(chevron).transform as readonly Readonly<Record<string, unknown>>[])
-    .map((one) => one.rotate)
-    .filter((one): one is string => typeof one === 'string')
+    .map((one) => one.scaleY)
+    .filter((one): one is number => typeof one === 'number')
     .at(-1)
 
-/** The chevrons drawn: the boxes turned by a transform. */
+/** The chevrons drawn: the boxes flipped by a transform. */
 const chevrons = (): Drawn[] =>
   nodes(screen.toJSON()).filter((node) => styleOf(node).transform !== undefined)
 
@@ -167,9 +167,9 @@ describe('the generated Accordion', () => {
     expect(heard).not.toHaveBeenCalled()
   })
 
-  test('turns the chevron as a section opens, at the end unless placed at the start', async () => {
+  test('flips the chevron as a section opens, at the end unless placed at the start', async () => {
     const view = await render(drawn({}))
-    expect(chevrons().map(turned)).toEqual(['180deg', '0deg', '0deg'])
+    expect(chevrons().map(flipped)).toEqual([-1, 1, 1])
     expect(styleOf(chevrons()[1] ?? { props: {} }).marginStart).toBe('auto')
     await view.rerender(drawn({}, undefined, { chevronPlacement: 'start' }))
     expect(styleOf(chevrons()[1] ?? { props: {} }).marginStart).toBeUndefined()
