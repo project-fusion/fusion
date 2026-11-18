@@ -1,4 +1,4 @@
-import { difference, fn, native, safeArea, sum, token, web } from '../../../style.js'
+import { difference, fn, list, native, safeArea, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import stop from './headless.js'
 
@@ -90,6 +90,36 @@ export default styles(
       ]),
       /* A panel that is not shown draws nothing, which the rules above outrank. */
       on('surface', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
+      /* **A stop settles in and fades out**, as `Popover`'s panel does, on
+         opacity and scale alone: the floating controller places a bubble
+         through `translate`, which a transition here would drag from the
+         corner. Leaving, it accelerates away and is drawn until it has gone. */
+      on('surface', [
+        web([
+          rule({
+            transition: list(
+              ['opacity', token('duration-normal'), token('easing-decelerate')],
+              ['scale', token('duration-normal'), token('easing-decelerate')],
+              ['display', token('duration-fast'), 'allow-discrete'],
+              ['overlay', token('duration-fast'), 'allow-discrete'],
+            ),
+          }),
+          rule(
+            { part: { hidden: true } },
+            {
+              opacity: 0,
+              scale: 0.96,
+              transition: list(
+                ['opacity', token('duration-fast'), token('easing-accelerate')],
+                ['scale', token('duration-fast'), token('easing-accelerate')],
+                ['display', token('duration-fast'), 'allow-discrete'],
+                ['overlay', token('duration-fast'), 'allow-discrete'],
+              ),
+            },
+          ),
+          rule({ startingStyle: true }, { opacity: 0, scale: 0.96 }),
+        ]),
+      ]),
       /* The title, and the line under it, when they are passed in on their own. */
       on({ region: 'heading', slotted: '*' }, [
         rule({

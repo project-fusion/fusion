@@ -1,4 +1,4 @@
-import { list, measured, native, token } from '../../../style.js'
+import { list, measured, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -43,9 +43,13 @@ export default styles(
             ['top', normal, standard],
             ['block-size', normal, standard],
             ['inline-size', normal, standard],
+            ['opacity', normal, standard],
           ),
           zIndex: token('layer-overlay'),
         }),
+        /* **The tint fades in as the tour starts**, over the page, rather
+           than landing on it in one frame. */
+        web([rule({ startingStyle: true }, { opacity: 0 })]),
         /* The lit box the tour measures, which the web writes on the part. */
         native([
           rule({
@@ -63,8 +67,10 @@ export default styles(
           inset: 0,
           pointerEvents: 'none',
           web: { position: 'fixed' },
+          transition: ['opacity', normal, standard],
           zIndex: token('layer-overlay'),
         }),
+        web([rule({ startingStyle: true }, { opacity: 0 })]),
         native([rule({ position: 'absolute' })]),
       ]),
     ]
