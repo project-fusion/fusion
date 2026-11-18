@@ -194,7 +194,14 @@ export default styles(
         pointerEvents: 'none',
         position: 'absolute',
         translate: '0 -50%',
-        transition: ['translate', token('duration-fast'), token('easing-emphasized')],
+        /* The thumb's fill, edge and icon change over the travel, so it
+           arrives in its new colors. */
+        transition: list(
+          ['translate', token('duration-fast'), token('easing-emphasized')],
+          ['background-color', token('duration-fast'), token('easing-standard')],
+          ['border-color', token('duration-fast'), token('easing-standard')],
+          ['color', token('duration-fast'), token('easing-standard')],
+        ),
       }),
       /* No hairline once it is on: the thumb on the fill is distinct already. */
       rule(

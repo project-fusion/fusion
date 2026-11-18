@@ -5,6 +5,7 @@ import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
+  list,
   measured,
   mix,
   native,
@@ -120,6 +121,15 @@ export default styles(
         insetInlineStart: 0,
         overflow: 'hidden',
         position: 'absolute',
+        /* **The fill follows the pointer across the marks** rather than
+           jumping from one to the next, and takes the preview's color the same
+           way. */
+        web: {
+          transition: list(
+            ['color', token('duration-fast'), token('easing-standard')],
+            ['inline-size', token('duration-fast'), token('easing-standard')],
+          ),
+        },
       }),
       /* A previewed score is drawn apart from a chosen one, a step toward the
          ink, and a press takes the chosen color. */

@@ -190,6 +190,9 @@ export default styles(
     )
     /* Where the track stands inside the thumb's height, on a phone. */
     const inset = quotient(difference(own.sliderThumb, own.sliderTrack), 2)
+    /* The halo grows round the thumb under the pointer and while it is held,
+       instead of switching on. */
+    const halo = ['box-shadow', token('duration-fast'), token('easing-standard')]
     const thumbLook = {
       backgroundColor: hook.thumbColor,
       blockSize: own.sliderThumb,
@@ -542,6 +545,7 @@ export default styles(
             appearance: 'none',
             ...thumbLook,
             marginBlockStart: quotient(difference(own.sliderTrack, own.sliderThumb), 2),
+            transition: halo,
           }),
         ]),
       ]),
@@ -578,7 +582,7 @@ export default styles(
       ),
       /* Written out: Firefox's thumb, whose own border is stated away. */
       on({ part: 'control', selector: '[part="control"]::-moz-range-thumb' }, [
-        web([rule(thumbLook)]),
+        web([rule({ ...thumbLook, transition: halo })]),
       ]),
       /* Written out: the ring on the thumb where the keyboard brought focus. */
       on({ part: 'control', selector: '[part="control"]:focus-visible::-webkit-slider-thumb' }, [
