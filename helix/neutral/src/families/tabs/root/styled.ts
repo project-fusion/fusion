@@ -1,6 +1,18 @@
 import tabsEdges from '../../../fragments/tabs-edges.js'
 import { oneOf } from '../../../render.js'
-import { difference, fn, list, measured, mix, product, scheme, sum, token } from '../../../style.js'
+import {
+  difference,
+  fn,
+  hookOf,
+  list,
+  measured,
+  mix,
+  product,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import tabs from './headless.js'
 
@@ -135,6 +147,56 @@ export default styles(
          evenly**, as a segmented control does across a phone. After the
          markers, which keep the strip as wide as its tabs. */
       rule({ width: 'full' }, { flex: 1, own: { tabInlineSize: '100%' } }),
+      /* Each tab's own wash goes while the shape draws it. Set on the tabs, so
+         the shape, which reads the strip's value, keeps it. */
+      web([
+        rule(
+          { gliding: true },
+          { '--tabs-tab-hover-background-color': 'transparent', own: { tabHoverSurface: 'transparent' } },
+        ),
+      ]),
+    ]),
+    /* **The hover wash, as one shape that glides** from tab to tab while a
+       mouse or pen moves along the strip, in place of each tab's own, which
+       goes while the set is gliding. Placed where the pointer arrives and
+       faded in; it slides only once `data-gliding` says it has arrived, so it
+       never slides in from where it was last. Before the tabs, so it draws
+       behind them. A phone has no pointer to follow. */
+    on('highlight', [
+      web([
+        rule({
+          backgroundColor: hookOf(
+            'tabs-tab',
+            'hover-background-color',
+            own.tabHoverSurface(token('color-hover')),
+          ),
+          blockSize: measured('indicator-block-size', 0),
+          borderRadius: hookOf('tabs-tab', 'radius', own.tabRadius(token('radii-none'))),
+          /* Shown here: the headless tier keeps it hidden, out of the strip's layout. */
+          display: 'block',
+          inlineSize: measured('indicator-inline-size', 0),
+          insetBlockStart: 0,
+          insetInlineStart: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+          position: 'absolute',
+          transition: ['opacity', token('duration-fast'), token('easing-standard')],
+          translate: [measured('indicator-x', '0px'), measured('indicator-y', '0px')],
+          zIndex: token('layer-base'),
+        }),
+        rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+        rule(
+          { part: { 'data-gliding': true } },
+          {
+            transition: list(
+              ['translate', token('duration-normal'), token('easing-emphasized')],
+              ['inline-size', token('duration-normal'), token('easing-emphasized')],
+              ['block-size', token('duration-normal'), token('easing-emphasized')],
+              ['opacity', token('duration-fast'), token('easing-standard')],
+            ),
+          },
+        ),
+      ]),
     ]),
     on('tabs', [
       /* The rule is a background, which is what lets a tab sit on it. */

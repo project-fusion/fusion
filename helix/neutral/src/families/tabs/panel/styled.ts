@@ -8,6 +8,9 @@ export default styles(
   {
     prefix: 'tabs-panel',
     hooks: ({ own }) => ({
+      enterDistance: null,
+      enterDuration: null,
+      enterEasing: null,
       paddingBlockStart: own.tabsPanelPaddingBlockStart(token('space-md')),
     }),
     own: { tabsPanelPaddingBlockStart: null, tabsPanelPaddingInlineStart: null },
@@ -19,6 +22,19 @@ export default styles(
        grid item, so a tab set with four files divided its height four ways and
        the one panel a reader could see got a quarter of it. */
     on('host', [rule({ display: 'contents' })]),
+    /* **A panel that comes into view settles in**, rising a short way as it
+       fades in. The web element reads these from its script, so they are set
+       here rather than read with a fallback, and a page setting one on the
+       element wins over this rule. A phone shows the chosen panel at once. */
+    on('host', [
+      web([
+        rule({
+          '--tabs-panel-enter-distance': token('space-2xs'),
+          '--tabs-panel-enter-duration': token('duration-normal'),
+          '--tabs-panel-enter-easing': token('easing-decelerate'),
+        }),
+      ]),
+    ]),
     on('panel', [
       rule({
         minBlockSize: 0,

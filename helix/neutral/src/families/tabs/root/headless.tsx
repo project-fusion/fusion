@@ -10,7 +10,8 @@ import { cancelable, headless, oneOf, Pressable, Slot, string, View, web } from 
  *
  * **The indicator marks the chosen tab.** It is measured from the chosen
  * tab's box, which sets `indicator-x`, `indicator-y`, and its size, and
- * `data-placed` once it has been placed.
+ * `data-placed` once it has been placed. **The highlight is the hover wash**,
+ * placed the same way under the tab the pointer is over, on the web.
  *
  * **Held to `helix-tabs`.** `helix system check` compares the props, events,
  * states, regions, and parts with what the manifest says the element has.
@@ -33,7 +34,9 @@ export default headless('tabs', {
     /* A tab's choice, which reaches the set before the set acts on it. */
     beforeSelect: cancelable(['value']),
   },
-  states: ['settled'],
+  /* `gliding` while a mouse or pen is over a tab, so the highlight draws the
+     hover wash in place of each tab's own. */
+  states: ['gliding', 'settled'],
   collection: {
     defaultProp: 'defaultActive',
     /* **The keys come round from the last tab, and choose where they
@@ -70,6 +73,15 @@ export default headless('tabs', {
             </Slot>
           </Pressable>
         )}
+        {/* The hover wash that glides from tab to tab under a mouse or pen.
+              Hidden until a stylesheet shows it, so the headless tier lays out
+              as it did without it. A phone has no pointer to follow. */}
+        <View
+          ariaHidden
+          hidden
+          part="highlight"
+          platform="web"
+        />
         <Slot />
         <View
           ariaHidden
