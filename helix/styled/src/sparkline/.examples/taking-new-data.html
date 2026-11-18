@@ -1,0 +1,24 @@
+<!-- @summary A line given a new day's number, moving to its new shape with its end mark. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-sparkline
+    id="visitors"
+    label="Daily visitors"
+    values="1240 1318 1102 1291 1244 1180 1408"
+  ></helix-sparkline>
+  <helix-button id="next-day">Next day</helix-button>
+</helix-flex>
+
+<!-- The oldest day drops off and a new one joins at the end, so the line keeps
+     its count of points and moves to its new shape. -->
+<script type="module">
+  const visitors = document.getElementById('visitors')
+
+  document.getElementById('next-day').addEventListener('click', () => {
+    const days = visitors.getAttribute('values').split(' ').slice(1)
+    days.push(String(1000 + Math.round(Math.random() * 500)))
+    visitors.setAttribute('values', days.join(' '))
+  })
+</script>

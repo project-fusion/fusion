@@ -1,0 +1,63 @@
+<!-- @summary New events joining at the top, the others sliding down to make room and the oldest leaving. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-timeline
+    id="history"
+    label="Deployment history"
+  >
+    <helix-timeline-item
+      datetime="2026-08-19T09:12"
+      tone="success"
+    >
+      <span slot="time">09:12</span>
+      <helix-text scale="body-strong">Deployed version 4.2.0</helix-text>
+    </helix-timeline-item>
+    <helix-timeline-item
+      datetime="2026-08-19T08:47"
+      tone="danger"
+    >
+      <span slot="time">08:47</span>
+      <helix-text scale="body-strong">Rolled back</helix-text>
+    </helix-timeline-item>
+    <helix-timeline-item
+      datetime="2026-08-19T08:30"
+      tone="primary"
+    >
+      <span slot="time">08:30</span>
+      <helix-text scale="body-strong">Build passed</helix-text>
+    </helix-timeline-item>
+  </helix-timeline>
+  <helix-button id="deploy">Deploy</helix-button>
+</helix-flex>
+
+<!-- Each deploy joins at the top, five minutes after the one before. Past four
+     events the oldest leaves. -->
+<script type="module">
+  const history = document.getElementById('history')
+  let minutes = 9 * 60 + 12
+  let version = 0
+
+  document.getElementById('deploy').addEventListener('click', () => {
+    minutes += 5
+    version += 1
+    const time = `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
+    const item = document.createElement('helix-timeline-item')
+    item.setAttribute('datetime', `2026-08-19T${time}`)
+    item.setAttribute('tone', 'success')
+    const stamp = document.createElement('span')
+    stamp.slot = 'time'
+    stamp.textContent = time
+    const title = document.createElement('helix-text')
+    title.setAttribute('scale', 'body-strong')
+    title.textContent = `Deployed version 4.2.${version}`
+    item.append(stamp, title)
+    history.prepend(item)
+    const items = history.querySelectorAll('helix-timeline-item')
+    if (items.length > 4) {
+      items[items.length - 1].remove()
+    }
+  })
+</script>
