@@ -31,9 +31,10 @@ name: "Screens: Filter Input"
 - tapOn:
     text: '.*owner:ada status:open.*'
     retryTapIfNoChange: false
+# The suggestions can come after the keyboard settles, slower at the largest text size.
 - extendedWaitUntil:
     visible: '.*area.*'
-    timeout: 10000
+    timeout: 20000
 - inputText: st
 - extendedWaitUntil:
     notVisible: '.*area.*'
