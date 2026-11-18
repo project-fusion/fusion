@@ -1,6 +1,6 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, type Placement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessPopover } from '@fusion.dev/helix-headless/popover'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './popover-root.css.js'
 
@@ -15,6 +15,11 @@ import { styles } from './popover-root.css.js'
  * The panel animates in from the side it opened on. The positioning writes
  * `data-placement`, so the panel animates from the trigger's side, including
  * after it flips.
+ *
+ * **Moved while open, it glides.** A panel the page's scrolling sends to the
+ * other side of its trigger, or to its other end, travels there over `normal`
+ * along `emphasized` rather than jumping. Under `prefers-reduced-motion` it
+ * jumps.
  *
  * @since 0.1.0
  * @status stable
@@ -71,6 +76,48 @@ export class HelixPopover extends HelixHeadlessPopover {
   separation?: 'plain'
 
   static override styles: CSSResultGroup = styles
+
+  /** Where the panel was last placed while open, and on which side. */
+  private lastPlace: { placement: Placement; translate: string } | undefined
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    if (changed.has('open') && !this.open) {
+      this.lastPlace = undefined
+    }
+  }
+
+  protected override placed(placement: Placement): void {
+    super.placed(placement)
+    const surface = this.partNamed('surface')
+    if (!surface) {
+      return
+    }
+    const translate = surface.style.translate
+    const before = this.lastPlace
+    this.lastPlace = { placement, translate }
+    if (
+      !this.open ||
+      before === undefined ||
+      before.placement === placement ||
+      before.translate === translate ||
+      typeof surface.animate !== 'function' ||
+      reducedMotion()
+    ) {
+      return
+    }
+    const style = getComputedStyle(surface)
+    const written = style.getPropertyValue('--helix-duration-normal').trim()
+    const amount = Number.parseFloat(written)
+    const duration = written.endsWith('ms') ? amount : amount * 1000
+    if (!(duration >= 1)) {
+      return
+    }
+    surface.animate([{ translate: before.translate }, { translate }], {
+      duration,
+      easing: style.getPropertyValue('--helix-easing-emphasized').trim() || 'ease-in-out',
+    })
+  }
 }
 
 declare global {

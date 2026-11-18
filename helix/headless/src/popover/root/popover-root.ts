@@ -277,12 +277,20 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
       this.toggleState('placed-right', side === 'right')
       this.toggleState('placed-top', side === 'top')
       this.side = side
+      this.placed(placement)
     },
     open: () => this.open,
     padding: () => this.containerPadding,
     placement: () => this.placement,
     surface: () => this.partNamed('surface'),
   })
+
+  /**
+   * Heard each time the panel is placed, after its new place is written, for
+   * a subclass that moves between two places: the styled tier glides the
+   * panel when it moves to another side or alignment while open. Nothing here.
+   */
+  protected placed(_placement: Placement): void {}
 
   /**
    * The side of its trigger the panel last landed on, which names the arrow's
