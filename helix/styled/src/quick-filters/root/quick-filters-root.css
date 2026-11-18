@@ -3,21 +3,79 @@
   max-inline-size: 100%;
 }
 
+/* **One row that scrolls, never two.** Wrapped, a preset or Save view fell
+   under the others inside the pill, and the track became a lozenge: on a 390
+   touch screen the example's presets and Save view came to about 348 in a 342
+   column, owner's call of November 17, 2026. */
 [part="list"] {
   align-items: center;
   background-color: var(--quick-filters-background-color, var(--helix-color-surface-sunken));
   border-radius: var(--helix-radii-full);
   display: inline-flex;
-  flex-wrap: wrap;
   gap: var(--helix-space-2xs);
   max-inline-size: 100%;
+  overflow-x: auto;
   padding: var(--helix-space-2xs);
+  scrollbar-width: none;
+}
+
+/* **The track says when it scrolls**, as Tabs' strip does: the edge with more
+   behind it fades, and a track with nothing to scroll is never masked. */
+[part="list"] {
+  --_quick-filters-fade: to right;
+  mask-image: linear-gradient(
+    var(--_quick-filters-fade),
+    transparent,
+    #000 var(--_quick-filters-fade-start, 0rem),
+    #000 calc(100% - var(--_quick-filters-fade-end, 0rem)),
+    transparent
+  );
+}
+
+:host(:dir(rtl)) [part="list"] {
+  --_quick-filters-fade: to left;
+}
+
+/* Only where scroll timelines exist: elsewhere the animation would finish at
+   once and hold its last keyframe, masking a track with nothing to scroll. */
+@supports (animation-timeline: scroll()) {
+  [part="list"] {
+    animation: quick-filters-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
+}
+
+@keyframes quick-filters-edges {
+  0% {
+    --_quick-filters-fade-end: var(--helix-space-xl);
+    --_quick-filters-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_quick-filters-fade-end: var(--helix-space-xl);
+    --_quick-filters-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_quick-filters-fade-end: 0rem;
+    --_quick-filters-fade-start: var(--helix-space-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="list"] {
+    animation: none;
+  }
 }
 
 [part~="preset"],
 [part="save"],
 [part="remove"] {
   all: unset;
+  /* Kept whole in a track that scrolls, rather than squeezed to wrap. */
+  flex: none;
+  white-space: nowrap;
   box-sizing: border-box;
   align-items: center;
   border-radius: var(--helix-radii-full);
@@ -70,6 +128,35 @@
 [part="remove"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **A touch target of 44 in a track that scrolls.** A scroll container clips
+   a press box that passes its edge, so the box cannot grow past the pill as a
+   Tab's does. The track takes the target's height instead, as Tabs' segmented
+   strip does on touch, and each control fills it: 36 tall in a 44 track. The
+   remove button, which draws no ground, takes the target's width too. Each
+   one's press reaches over the track's own padding in a transparent box, so
+   the whole 44 takes it and nothing drawn moves. */
+@media (pointer: coarse) {
+  [part~="preset"],
+  [part="save"],
+  [part="remove"] {
+    min-block-size: calc(var(--helix-size-target) - var(--helix-space-2xs) * 2);
+    position: relative;
+  }
+
+  [part~="preset"]::after,
+  [part="save"]::after,
+  [part="remove"]::after {
+    content: "";
+    inset: calc(var(--helix-space-2xs) * -1) 0;
+    position: absolute;
+  }
+
+  [part="remove"] {
+    justify-content: center;
+    min-inline-size: var(--helix-size-target);
+  }
 }
 
 /* A tool that arranges a table on screen has nothing to say on paper, where
