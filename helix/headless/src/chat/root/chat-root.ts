@@ -1622,7 +1622,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     </div>`
   }
 
-  /** The turns fed as data, a window of them, between the room the rest would take. */
   /** The last turn's key and how many turns there were, at the last render, to tell a turn arriving from history loading. */
   private lastTurn: { count: number; key: unknown } | undefined
 
@@ -1646,6 +1645,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return keyOf(was.count - 1) === was.key ? was.count : Number.POSITIVE_INFINITY
   }
 
+  /** The turns fed as data, a window of them, between the room the rest would take. */
   private renderTurns(): TemplateResult {
     const { after, before, first, last } = this.virtualize.window
     const message = this.tag('chat-message')

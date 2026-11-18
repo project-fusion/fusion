@@ -87,20 +87,25 @@ export const FAILED_LABEL = 'Not sent'
  * @csspart time - The turn's time.
  * @csspart work - The box around the `work` slot, above the content.
  *
- * @cssstate arriving - The message joined a conversation already drawn, rather than coming with the page.
+ * @cssstate arriving - The message was added at the end of a conversation already drawn.
  */
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
   /**
-   * **Arriving, where it joins a conversation already drawn**: `:state(arriving)`,
-   * which a stylesheet can bring it in by. Not where it was there as the
-   * conversation first drew, which is what the page came with, and not inside a
-   * conversation that draws its turns from data, which marks its own.
+   * **Arriving, where it joins the end of a conversation already drawn**:
+   * `:state(arriving)`, which a stylesheet can bring it in by. Not where it
+   * was there as the conversation first drew, which is what the page came with, not
+   * history loaded above, and not inside a conversation that draws its turns from
+   * data, which marks its own.
    */
   override connectedCallback(): void {
     super.connectedCallback()
     const parent = this.parentElement as (HTMLElement & { hasUpdated?: boolean }) | null
-    this.arriving = parent?.hasUpdated === true
+    /* **At the end only**: one with another message after it is history
+       loaded above the reader, which holds still. */
+    const later = (one: Element | null): boolean =>
+      one !== null && (one.localName === this.localName || later(one.nextElementSibling))
+    this.arriving = parent?.hasUpdated === true && !later(this.nextElementSibling)
     this.toggleState('arriving', this.arriving)
   }
 
