@@ -37,6 +37,8 @@ export default styles(
       dropIndicatorSize: token('border-thick'),
       gripColor: token('color-foreground-muted'),
       gripDisabledOpacity: token('opacity-disabled'),
+      moveDuration: null,
+      moveEasing: null,
       rowBackgroundColor: null,
       rowHoverBackgroundColor: mix(token('color-foreground'), 4, token('color-background'), 'srgb'),
       selectedBackgroundColor: token('color-primary-subtle'),
@@ -419,6 +421,19 @@ export default styles(
         ]),
       ]),
       include(dataTableEditing),
+      /* Rows slide to their new places at the pace of a change that answers a
+         hand, a sort included. The table reads these from its script, so they are set here
+         rather than read with a fallback, and a page setting either on the element
+         wins over this rule. A phone moves nothing: its rows stand in their new
+         places at once. */
+      on('host', [
+        web([
+          rule({
+            '--data-table-move-duration': token('duration-normal'),
+            '--data-table-move-easing': token('easing-standard'),
+          }),
+        ]),
+      ]),
     ]
   },
 )

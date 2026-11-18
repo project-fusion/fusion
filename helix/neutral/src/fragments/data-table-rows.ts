@@ -118,7 +118,16 @@ export default fragment(
         { part: 'table', selector: ':host(:not(:defined))::before, :host(:not(:defined))::after' },
         [web([rule({ content: 'none !important' })])],
       ),
-      on('toggle-mark', [web([rule({ blockSize: '100%', inlineSize: '100%' })])]),
+      /* The caret turns as its row opens and shuts, as a tree's chevron does. */
+      on('toggle-mark', [
+        web([
+          rule({
+            blockSize: '100%',
+            inlineSize: '100%',
+            transition: ['rotate', token('duration-fast'), token('easing-standard')],
+          }),
+        ]),
+      ]),
       on('more', [web([rule({ display: 'contents' })])]),
       on(['before', 'after'], [web([rule({ gridColumn: '1 / -1' })])]),
       keyframes('data-table-edges', {
