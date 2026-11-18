@@ -215,6 +215,26 @@ describe('a host whose items move', () => {
     expect(start(b)).toBe('translate(0px, -40px)')
   })
 
+  test('a row that draws itself is measured once it has drawn, so the rows below it still make room', async () => {
+    const element = host('a', 'b')
+    moving(element)
+    const [a] = rows(element) as [HTMLElement, HTMLElement]
+    const arrived = row('new')
+    let drawn: (value: boolean) => void = () => {}
+    Object.defineProperty(arrived, 'isUpdatePending', { value: true })
+    Object.defineProperty(arrived, 'updateComplete', {
+      value: new Promise<boolean>((resolve) => {
+        drawn = resolve
+      }),
+    })
+    element.prepend(arrived)
+    await settle()
+    expect(asked.get(a)).toBeUndefined()
+    drawn(true)
+    await settle()
+    expect(start(a)).toBe('translate(0px, -40px)')
+  })
+
   test('a list replaced with new rows arrives at once, as a page that renders it again would', async () => {
     const element = host('a', 'b')
     moving(element)

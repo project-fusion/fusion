@@ -1,4 +1,11 @@
-import { customElement, HelixElement, hostAria, internalsOf, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  internalsOf,
+  LayoutMotionController,
+  words,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -45,6 +52,9 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart loading - The entry after the last while `loading` is set.
  *
+ * @cssproperty --timeline-move-duration - How long an entry or a group takes to slide to its new place when one before it arrives or goes, or to fade in. Unset, nothing moves.
+ * @cssproperty --timeline-move-easing - The curve an entry slides and fades in along.
+ *
  * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-timeline')
@@ -75,6 +85,26 @@ export class HelixHeadlessTimeline extends HelixElement {
    */
   @property({ attribute: 'loading-label' })
   loadingLabel?: string
+
+  /**
+   * Slides the entries and groups to their places when one arrives or goes,
+   * and fades in one that arrives, as `List` does, timed from
+   * `--timeline-move-duration` and `--timeline-move-easing`.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () =>
+      [...this.children].filter(
+        (child): child is HTMLElement =>
+          child instanceof HTMLElement && child.getAttribute('slot') !== 'loading',
+      ),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--timeline-move-duration'),
+        easing: style.getPropertyValue('--timeline-move-easing'),
+      }
+    },
+  })
 
   /** The text of the entry drawn while `loading` is set, where the `loading` slot is empty. */
   @words

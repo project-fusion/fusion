@@ -3,6 +3,9 @@
    and the mark-all control sliding away as a reader scrolls is the control they
    were reaching for. */
 :host {
+  --notifications-move-duration: var(--helix-duration-normal);
+  --notifications-move-easing: var(--helix-easing-standard);
+
   /* Dense by nature, and it says so once, the way the toolbar and the app header
      already do. A feed is a list of rows: a control put in one takes the row's
      height without being told, so a row cannot end up with one member the wrong
