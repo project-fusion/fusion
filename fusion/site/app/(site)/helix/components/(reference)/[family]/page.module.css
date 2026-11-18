@@ -283,3 +283,12 @@
 .description {
   white-space: pre-line;
 }
+
+/* **The two guidance lists side by side where each has 18rem**, and one under
+   the other on a phone. Each column holds at most three short lines, so two
+   columns at the article's width read as one choice between them. */
+.guidelines {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}

@@ -34,12 +34,33 @@ export function generateStaticParams() {
   return getFamilies().map((family) => ({ family: family.slug }))
 }
 
-/** The sections every family has, in the order the page renders them. */
+/**
+ * The sections a family has, in the order the page renders them. Guidelines is
+ * there only where the family writes guidance.
+ */
 const SECTIONS = [
-  { id: 'usage', label: 'Usage' },
+  { id: 'import', label: 'Import' },
   { id: 'preview', label: 'Preview' },
+  { id: 'guidelines', label: 'Guidelines' },
   { id: 'api', label: 'API reference' },
 ] as const
+
+/**
+ * Words in a list as a sentence reads them: "Chip", "Chip and Pill", and
+ * "Chip, Pill, and Label", with the serial comma.
+ */
+const listed = (words: readonly string[]): string =>
+  words.length < 3
+    ? words.join(' and ')
+    : `${words.slice(0, -1).join(', ')}, and ${words[words.length - 1]}`
+
+/**
+ * A situation as it reads after a family's name and a colon: "Select: a value a
+ * form submits." The guidance writes each one as a sentence, so its first
+ * letter is lowered, unless the first word is a name such as "HTML".
+ */
+const after = (text: string): string =>
+  /^[A-Z][a-z]/.test(text) ? text[0]?.toLowerCase() + text.slice(1) : text
 
 /**
  * **The description column: one share of the table, the same in every table.**
@@ -554,6 +575,9 @@ export default async function FamilyDocs({
   /* The catalog writes the block, so this page, the family's `.md`, and its
      `.json` import the same lines. */
   const imports = (tier: 'headless' | 'styled'): string => family.usage[tier].join('\n')
+  /* The Guidelines section, and its entry in the rail, where the family says
+     when to use it or what to use instead. */
+  const guided = family.use.length > 0 || family.instead.length > 0
 
   return (
     /* The shell and the rail are the layout's, so the nav survives a navigation
@@ -573,7 +597,7 @@ export default async function FamilyDocs({
       )}
       <article className={docsShell.docsMain}>
         {/* `3xl`, the top of the scale, because a section break should be the
-            largest space on the page: at `2xl` Usage sits as far from Preview as
+            largest space on the page: at `2xl` Import sits as far from Preview as
             Root sits from Group, so the page has one rhythm and no hierarchy.
             Said on the element rather than in `site.css`, which overrides this
             very attribute from the document and wins silently. */}
@@ -602,9 +626,20 @@ export default async function FamilyDocs({
               </helix-flex>
             </helix-flex>
 
-            <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
-              <CodeText>{first(prose)}</CodeText>
-            </helix-text>
+            {/* **The other names under the summary**, so you arriving from
+                another system's word sees at once that this is the family it
+                meant. Tight against the summary, because the two are one
+                statement of what the component is. */}
+            <helix-flex direction="column" gap="2xs">
+              <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
+                <CodeText>{first(prose)}</CodeText>
+              </helix-text>
+              {family.aliases.length > 0 && (
+                <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
+                  Also called {listed(family.aliases)}.
+                </helix-text>
+              )}
+            </helix-flex>
 
             {/* Three facts about the component, in the same register: a tag
                 each, so none of the three reads as a different kind of thing
@@ -616,9 +651,9 @@ export default async function FamilyDocs({
             </helix-flex>
           </helix-flex>
 
-          <helix-flex direction="column" gap="md" id="usage">
-            <SectionHeading as="h2" label="Usage" target="usage">
-              Usage
+          <helix-flex direction="column" gap="md" id="import">
+            <SectionHeading as="h2" label="Import" target="import">
+              Import
             </SectionHeading>
             {/* The import, and only the import: a block holding the tag the
                 heading two lines above already says teaches nothing and is
@@ -683,6 +718,56 @@ export default async function FamilyDocs({
               </helix-empty>
             )}
           </helix-flex>
+
+          {guided && (
+            <helix-flex direction="column" gap="md" id="guidelines">
+              <SectionHeading as="h2" label="Guidelines" target="guidelines">
+                Guidelines
+              </SectionHeading>
+              {/* **Two columns where there is room**, the case for the family
+                  beside the cases for another, so the two lists are read as
+                  one choice. Each alternative opens with the other family's
+                  name as a link, because the answer to "use something else"
+                  is a family you can open. */}
+              <div className={api.guidelines}>
+                {family.use.length > 0 && (
+                  <helix-flex direction="column" gap="sm">
+                    <helix-text as="h3" scale="body-strong">
+                      When to use
+                    </helix-text>
+                    <helix-list kind="unordered" label="When to use">
+                      {family.use.map((line) => (
+                        <helix-list-item key={line}>
+                          <span data-item-text>
+                            <CodeText>{line}</CodeText>
+                          </span>
+                        </helix-list-item>
+                      ))}
+                    </helix-list>
+                  </helix-flex>
+                )}
+                {family.instead.length > 0 && (
+                  <helix-flex direction="column" gap="sm">
+                    <helix-text as="h3" scale="body-strong">
+                      When to use something else
+                    </helix-text>
+                    <helix-list kind="unordered" label="When to use something else">
+                      {family.instead.map((one) => (
+                        <helix-list-item key={one.slug}>
+                          <span data-item-text>
+                            <Link data-link="" href={`/helix/components/${one.slug}`}>
+                              {one.label}
+                            </Link>
+                            : <CodeText>{after(one.description)}</CodeText>
+                          </span>
+                        </helix-list-item>
+                      ))}
+                    </helix-list>
+                  </helix-flex>
+                )}
+              </div>
+            </helix-flex>
+          )}
 
           {/* Wide between one element and the next, tight inside each, or there
               is no seam between one element's API and another's. `2xl` because
@@ -768,7 +853,7 @@ export default async function FamilyDocs({
           On this page
         </helix-text>
         <helix-outline label="On this page">
-          {SECTIONS.map((section) => (
+          {SECTIONS.filter((section) => section.id !== 'guidelines' || guided).map((section) => (
             <a href={`#${section.id}`} key={section.id} suppressHydrationWarning>
               {section.label}
             </a>

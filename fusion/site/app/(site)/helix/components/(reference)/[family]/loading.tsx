@@ -35,7 +35,7 @@ export default function Loading() {
               </div>
             </div>
 
-            {/* Usage: a heading and the install block under it. */}
+            {/* Import: a heading and the import block under it. */}
             <div className={loading.section}>
               <div className={loading.heading}>
                 <div className={loading.headingText} data-skeleton="text" />
@@ -73,7 +73,7 @@ export default function Loading() {
           <div className={loading.railHead}>
             <div className={loading.railHeadText} data-skeleton="text" />
           </div>
-          {/* Usage, Preview, API reference and Examples, which every family
+          {/* Import, Preview, API reference and Examples, which every family
               has, and the element under API reference that most have one of. */}
           <div className={loading.rail}>
             {[0, 1, 2, 3, 4].map((entry) => (
