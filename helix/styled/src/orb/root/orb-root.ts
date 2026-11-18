@@ -274,6 +274,14 @@ export class HelixOrb extends HelixElement {
    * approached, and either one is a jump the reader sees.
    */
   private from: OrbParams = paramsFor('thinking')
+  /**
+   * The shape the cloud is heading for, kept rather than read off `state`.
+   *
+   * **`willUpdate` already holds the new state**, so a blend read off it
+   * departed from the state arriving: `from` came out equal to where it was
+   * going, and every change of state was a jump with nothing to cross.
+   */
+  private to: OrbParams = paramsFor('thinking')
   private morphAt = 0
   /** How far the current change travels, `0` to `1`. */
   private reach = 0
@@ -314,8 +322,13 @@ export class HelixOrb extends HelixElement {
     this.toggleState('waiting', state === 'waiting')
     this.toggleState('working', state === 'working')
 
-    if (changed.has('state') && changed.get('state') !== undefined) {
-      this.turn()
+    if (changed.has('state')) {
+      if (changed.get('state') === undefined) {
+        /* The first state is where the cloud starts, with nothing to cross. */
+        this.from = this.to = paramsFor(this.state)
+      } else {
+        this.turn()
+      }
     }
   }
 
@@ -476,7 +489,8 @@ export class HelixOrb extends HelixElement {
   /** Begins a transition from whatever is on the screen right now. */
   private turn(): void {
     this.from = this.paramsNow()
-    this.reach = stateDistance(this.from, paramsFor(this.state))
+    this.to = paramsFor(this.state)
+    this.reach = stateDistance(this.from, this.to)
     this.morphAt = performance.now()
     if (!this.gate.running) {
       this.paint(0)
@@ -502,7 +516,7 @@ export class HelixOrb extends HelixElement {
   }
 
   private paramsNow(): OrbParams {
-    const to = paramsFor(this.state)
+    const to = this.to
     const k = this.progress
     if (k >= 1) {
       return to
