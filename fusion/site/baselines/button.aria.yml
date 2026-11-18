@@ -53,6 +53,7 @@
           - treeitem "Combobox" [level=2]
           - treeitem "Command" [level=2]
           - treeitem "Copy Button" [level=2]
+          - treeitem "Cursor" [level=2]
           - treeitem "Data Table" [level=2]
           - treeitem "Date Input" [level=2]
           - treeitem "Date Picker" [level=2]
@@ -73,6 +74,8 @@
           - treeitem "Graph" [level=2]
           - treeitem "Grid" [level=2]
           - treeitem "Heatmap" [level=2]
+          - treeitem "Highlighter" [level=2]
+          - treeitem "Hover Card" [level=2]
           - treeitem "Icon" [level=2]
           - treeitem "Icon Button" [level=2]
           - treeitem "Image" [level=2]
@@ -85,8 +88,10 @@
           - treeitem "Listbox" [level=2]
           - treeitem "Loader" [level=2]
           - treeitem "Log" [level=2]
+          - treeitem "Magnetic" [level=2]
           - treeitem "Map" [level=2]
           - treeitem "Markdown" [level=2]
+          - treeitem "Marquee" [level=2]
           - treeitem "Megamenu" [level=2]
           - treeitem "Menu" [level=2]
           - treeitem "Meter" [level=2]
@@ -99,6 +104,7 @@
           - treeitem "Orb" [level=2]
           - treeitem "Outline" [level=2]
           - treeitem "Pagination" [level=2]
+          - treeitem "Pattern" [level=2]
           - treeitem "Pin Input" [level=2]
           - treeitem "Popover" [level=2]
           - treeitem "Progress" [level=2]
@@ -107,15 +113,21 @@
           - treeitem "Quote" [level=2]
           - treeitem "Radio" [level=2]
           - treeitem "Rating" [level=2]
+          - treeitem "Reveal" [level=2]
+          - treeitem "Rotating Text" [level=2]
           - treeitem "Sandbox" [level=2]
           - treeitem "Scatter Chart" [level=2]
           - treeitem "Scroll Area" [level=2]
+          - treeitem "Scroll Progress" [level=2]
           - treeitem "Select" [level=2]
           - treeitem "Selection Bar" [level=2]
+          - treeitem "Shimmer Text" [level=2]
+          - treeitem "Shine" [level=2]
           - treeitem "Shortcut Overlay" [level=2]
           - treeitem "Skeleton" [level=2]
           - treeitem "Skip Link" [level=2]
           - treeitem "Slider" [level=2]
+          - treeitem "Sliding Number" [level=2]
           - treeitem "Sparkline" [level=2]
           - treeitem "Spatial Bar Chart" [level=2]
           - treeitem "Spatial Heatmap" [level=2]
@@ -136,6 +148,8 @@
           - treeitem "Terminal" [level=2]
           - treeitem "Text" [level=2]
           - treeitem "Textarea" [level=2]
+          - treeitem "Theme Toggle" [level=2]
+          - treeitem "Tilt" [level=2]
           - treeitem "Time Input" [level=2]
           - treeitem "Time Picker" [level=2]
           - treeitem "Timeline" [level=2]
@@ -294,25 +308,24 @@
       - link "Form overrides":
         - /url: /helix/sandbox?e=button.form-overrides
       - text: Three submit buttons on one form, each setting where and how its own submission goes.
-      - link "Hugging":
-        - /url: /helix/sandbox?e=button.hugging
-      - text: Buttons in a narrow column, one as wide as the column and one as wide as its label.
       - link "Pending":
         - /url: /helix/sandbox?e=button.pending
       - text: "A button that waits after a press: it keeps focus, refuses another press, and says Saving to a screen reader."
       - link "Preview":
         - /url: /helix/sandbox?e=button.preview
-      - text: Buttons in each appearance and tone, the two settings that style a button.
-      - link "Tones":
-        - /url: /helix/sandbox?e=button.tones
-      - text: The seven tones, which mark what an action means. A status reads the same on a button as on a tag.
+      - text: A solid primary button.
+      - link "Tone":
+        - /url: /helix/sandbox?e=button.tone
+      - text: Each tone at the resting emphasis and at
+      - code: solid
+      - text: .
       - link "Width":
         - /url: /helix/sandbox?e=button.width
       - text: Buttons at their own width, at a standard width set by
       - code: "--button-inline-size"
       - text: ", and at full width with"
       - code: width
-      - text: .
+      - text: ", then a narrow column with one button as wide as the column and one as wide as its label."
       - link "With slots":
         - /url: /helix/sandbox?e=button.with-slots
       - text: Icons at either end of the label, placed in the
