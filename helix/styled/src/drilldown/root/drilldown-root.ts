@@ -1,6 +1,9 @@
 import { customElement, reducedMotion } from '@fusion.dev/helix-core'
-import { HelixHeadlessDrilldown } from '@fusion.dev/helix-headless/drilldown'
-import type { CSSResultGroup, PropertyValues } from 'lit'
+import {
+  HelixHeadlessDrilldown,
+  HelixHeadlessDrilldownItem,
+} from '@fusion.dev/helix-headless/drilldown'
+import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './drilldown-root.css.js'
@@ -10,7 +13,9 @@ import { styles } from './drilldown-root.css.js'
  *
  * @description
  * Pages slide in the direction of travel, so you can tell whether you went
- * deeper or came back. Without motion, the panel only shows different text.
+ * deeper or came back. The page leaving slides on out the other way as it
+ * fades, so the two pass as one move. Without motion, the panel only shows
+ * different text.
  *
  * The slide is a CSS animation, because the arriving page was not in the DOM on
  * the previous frame, so there is nothing to transition from. Under
@@ -21,6 +26,8 @@ import { styles } from './drilldown-root.css.js'
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
  * @documentation https://fusion.dev/helix/components/drilldown
+ *
+ * @csspart leaving - A copy of the page going away, which slides out and fades as the next one arrives. Empty but during a move, and hidden from assistive technology and the pointer.
  *
  * @cssproperty --drilldown-back-color - Color of the back button's icon.
  * @cssproperty --drilldown-back-hover-background-color - Fill of the back button under the pointer.
@@ -45,7 +52,20 @@ export class HelixDrilldown extends HelixHeadlessDrilldown {
   /** The move from one height to the next, ended where it is if another starts. */
   private resizing: Animation | undefined
 
+  /** The rows on the page showing before this update, and where that page sat. */
+  private pageBefore: { rows: HelixHeadlessDrilldownItem[]; top: number } | undefined
+
+  /** Which move is the latest, so only its copy is emptied when its slide ends. */
+  private turn = 0
+
+  /** The page that showed after the last update, so a move is a change from it. */
+  private shownPage: string | undefined
+
   protected override willUpdate(changed: PropertyValues<this>): void {
+    /* Read before the headless tier's own, which can move to a page `page`
+       names: the rows still carry the marks of the page they are on until
+       `updated` writes the new ones. */
+    this.pageBefore = this.hasUpdated ? this.showing() : undefined
     super.willUpdate(changed)
     this.heightBefore = this.hasUpdated ? this.getBoundingClientRect().height : undefined
   }
@@ -53,6 +73,93 @@ export class HelixDrilldown extends HelixHeadlessDrilldown {
   protected override updated(changed: PropertyValues<this>): void {
     super.updated(changed)
     this.resize()
+    this.leave()
+  }
+
+  /** The page, and after it the `leaving` part, empty but during a move. */
+  protected override render(): TemplateResult {
+    return html`${super.render()}<div part="leaving" aria-hidden="true" inert></div>`
+  }
+
+  /** The rows drawn on the page showing, and how far down the box that page starts. */
+  private showing(): { rows: HelixHeadlessDrilldownItem[]; top: number } {
+    const rows: HelixHeadlessDrilldownItem[] = []
+    const walk = (parent: Element): void => {
+      for (const child of parent.children) {
+        if (child instanceof HelixHeadlessDrilldownItem) {
+          /* Drawn as a row, which a row off the page and the row whose page
+             shows are not: they render no `item`. */
+          if (child.shadowRoot?.querySelector('[part="item"]')) {
+            rows.push(child)
+          }
+          walk(child)
+        }
+      }
+    }
+    walk(this)
+    const page = this.renderRoot.querySelector<HTMLElement>('[part="page"]')
+    return { rows, top: page?.offsetTop ?? 0 }
+  }
+
+  /**
+   * **The page leaving slides out the other way as the next slides in**, so
+   * the two pass as one move rather than the old page vanishing in a frame.
+   * Its rows are the page's own children, which the next page's marks take
+   * off the screen, so what leaves is a copy: the rows cloned, as they were,
+   * into the `leaving` part laid over the place the page was, which the
+   * stylesheet animates by the same `data-direction` the arriving page reads,
+   * and which is emptied once its animation ends. Inert and hidden from
+   * assistive technology, so nothing in it can be reached.
+   */
+  private leave(): void {
+    const before = this.pageBefore
+    this.pageBefore = undefined
+    /* **A move is the page changing**, not the rows: each row draws its new
+       state in an update of its own, after this one, so here they still
+       draw the old page. */
+    const moved = this.shownPage !== undefined && this.shownPage !== this.page
+    this.shownPage = this.page
+    if (
+      !moved ||
+      before === undefined ||
+      before.rows.length === 0 ||
+      !this.hasAttribute('data-direction') ||
+      typeof document === 'undefined' ||
+      reducedMotion()
+    ) {
+      return
+    }
+    const copy = this.renderRoot.querySelector<HTMLElement>('[part="leaving"]')
+    if (!copy) {
+      return
+    }
+    this.turn += 1
+    const turn = this.turn
+    copy.style.setProperty('--_drilldown-leaving-top', `${before.top}px`)
+    copy.replaceChildren(
+      ...before.rows.map((row) => {
+        const clone = row.cloneNode(true) as HTMLElement
+        clone.removeAttribute('slot')
+        clone.removeAttribute('id')
+        return clone
+      }),
+    )
+    /* Emptied once its slide ends, or at once where the stylesheet draws
+       none, so the copy never stays. Only by this move: an earlier one
+       ending as a later one starts leaves the later copy alone. */
+    const done = (): void => {
+      if (turn === this.turn) {
+        copy.replaceChildren()
+      }
+    }
+    /* The style read first: WebKit lists no animation for an element whose
+       style it has not recomputed since the copy filled it. */
+    const running = getComputedStyle(copy).animationName === 'none' ? [] : copy.getAnimations()
+    if (running.length === 0) {
+      done()
+      return
+    }
+    void Promise.all(running.map((one) => one.finished)).then(done, done)
   }
 
   /**
