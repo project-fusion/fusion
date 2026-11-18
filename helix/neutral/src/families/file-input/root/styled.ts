@@ -40,6 +40,8 @@ export default styles(
       filePaddingBlock: token('space-xs'),
       filePaddingInline: token('space-sm'),
       fileRadius: token('radii-sm'),
+      moveDuration: null,
+      moveEasing: null,
       padding: token('space-field'),
       progressColor: token('color-primary'),
       progressTrackColor: token('color-border'),
@@ -52,6 +54,18 @@ export default styles(
     stylesheet: 'file-input/root/file-input-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
+    /* A file arriving fades in, one leaving fades where it was, and the rest
+       slide into place, at the pace and on the curve rows and tags move by
+       everywhere. A phone moves nothing: its files stand in their new places at
+       once. */
+    on('host', [
+      web([
+        rule({
+          '--file-input-move-duration': token('duration-normal'),
+          '--file-input-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     include(field),
     include(fieldStacked),
     on('field', [
@@ -118,9 +132,13 @@ export default styles(
         marginBlock: [token('space-2xs'), 0],
         padding: token('space-none'),
       }),
+      /* Where a leaving file's copy fades, so the box the copy is placed
+         against: the web's layout motion lays it there. */
+      web([rule({ position: 'relative' })]),
     ]),
     /* A card that joins the stack from its top edge, as the stack grows
-       downward. */
+       downward. On the web the layout motion fades a file in, so the starting
+       style is a phone's alone. */
     on('file', [
       rule({
         alignItems: 'center',
@@ -139,7 +157,7 @@ export default styles(
           ['scale', token('duration-fast'), token('easing-emphasized')],
         ),
       }),
-      rule({ startingStyle: true }, { opacity: 0, scale: '1 0.9' }),
+      native([rule({ startingStyle: true }, { opacity: 0, scale: '1 0.9' })]),
     ]),
     /* The name and its tags share a line where they fit. */
     on('detail', [
