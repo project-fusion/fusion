@@ -173,6 +173,19 @@ driver_lost() {
     grep -qs "Device became unreachable" "$out/reports/$1.xml"
 }
 
+# Starts the iOS simulator again, which keeps its appearance, text size and
+# the gallery. **A driver that missed its start stayed stuck on that
+# simulator**: the rerun on the same one timed out too, in two jobs of run
+# 44214044810, and the next pass read nothing of the screen but the status
+# bar. A driver lost once was lost again a few screens into its rerun on the
+# same simulator, in run 44223714237.
+restart_simulator() {
+  say "Starting the simulator again"
+  xcrun simctl shutdown "$device" > /dev/null 2>&1 || true
+  xcrun simctl boot "$device" > /dev/null 2>&1 || true
+  xcrun simctl bootstatus "$device" -b > /dev/null 2>&1 || true
+}
+
 # Whether a link the iOS pass named by the argument opened timed out in
 # `simctl openurl` (error 60, ETIMEDOUT), which the links pass did on a new
 # simulator's first link in run 44014347190, and every screen after it passed.
@@ -367,21 +380,11 @@ pass() {
       say "Maestro's driver did not start; running $name again"
       driver=--reinstall-driver
       rm -rf "$out/debug/$name"
-      # **A driver that missed its start stayed stuck on that simulator**: the
-      # rerun on the same simulator timed out too, in two jobs of run
-      # 44214044810, and the next pass read nothing of the screen but the
-      # status bar. The simulator starts again first, which keeps its
-      # appearance, text size and the gallery.
-      if [[ $platform == ios ]]; then
-        say "Starting the simulator again"
-        xcrun simctl shutdown "$device" > /dev/null 2>&1 || true
-        xcrun simctl boot "$device" > /dev/null 2>&1 || true
-        xcrun simctl bootstatus "$device" -b > /dev/null 2>&1 || true
-      fi
+      [[ $platform == ios ]] && restart_simulator
       run_maestro "$name" "$@" || result=failed
     elif driver_lost "$name"; then
       say "Maestro lost the simulator; running $name again"
-      xcrun simctl terminate "$device" "$package" > /dev/null 2>&1 || true
+      restart_simulator
       driver=--reinstall-driver
       interrupted+=("$name-first")
       mv "$out/debug/$name" "$out/debug/$name-first"
