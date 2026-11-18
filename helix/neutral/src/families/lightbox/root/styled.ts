@@ -120,6 +120,48 @@ export default styles(
     on({ part: 'dialog', selector: '[part="dialog"]:not([open])' }, [
       web([rule({ display: 'none' })]),
     ]),
+    /* **The viewer fades in and out**, with its room going dark and light
+       around it, on `normal`: in on `standard`, out accelerating, as `Dialog`
+       arrives and leaves. The picture grows from what was pressed, which the
+       element moves. Written out, for the dialog's own `open`. Where
+       `overlay` cannot be transitioned, as in WebKit, it closes at once and
+       still fades in, for `Dialog`'s reason. */
+    on({ part: 'dialog', selector: '[part="dialog"], [part="dialog"]::backdrop' }, [
+      web([
+        rule({
+          opacity: 0,
+          transition: list(
+            ['opacity', token('duration-normal'), token('easing-accelerate')],
+            ['display', token('duration-normal'), 'allow-discrete'],
+            ['overlay', token('duration-normal'), 'allow-discrete'],
+          ),
+        }),
+      ]),
+    ]),
+    on({ part: 'dialog', selector: '[part="dialog"][open], [part="dialog"][open]::backdrop' }, [
+      web([
+        rule({
+          opacity: 1,
+          transition: list(
+            ['opacity', token('duration-normal'), token('easing-standard')],
+            ['display', token('duration-normal'), 'allow-discrete'],
+            ['overlay', token('duration-normal'), 'allow-discrete'],
+          ),
+        }),
+        rule({ startingStyle: true }, { opacity: 0 }),
+      ]),
+    ]),
+    on({ part: 'dialog', selector: '[part="dialog"], [part="dialog"]::backdrop' }, [
+      web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
+    ]),
+    on(
+      {
+        part: 'dialog',
+        selector:
+          '[part="dialog"], [part="dialog"]::backdrop, [part="dialog"][open], [part="dialog"][open]::backdrop',
+      },
+      [web([rule({ reducedMotion: true }, { transition: 'none' })])],
+    ),
     on({ backdrop: 'dialog' }, [rule({ backgroundColor: hook.scrim })]),
     on(['header', 'footer'], [rule({ display: 'grid', gap: hook.gap })]),
     on('viewport', [
