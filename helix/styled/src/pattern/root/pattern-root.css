@@ -75,10 +75,12 @@
 
 /* **Stars: a night sky.** A tile drawn once a page, many faint points and
    fewer, stronger ones, as a mask over the ink, so the points take any token.
-   Round the stronger ones a soft halo, in dark only: a glow reads as light on
-   a dark ground and as a smudge on a light one. Over them, the bright stars
-   twinkle each on its own beat, and now and then a shooting star crosses.
-   Muted ink in light, where the full foreground read as specks of dirt. */
+   In dark, round the stronger ones a soft halo, and across the box the band
+   of the Milky Way: a mottled glow, with the field's points drawn a second
+   time inside it, offset, so the band is denser with stars as the real one
+   is. A glow reads as light on a dark ground and as a smudge on a light one,
+   so light draws the points alone, in muted ink, where the full foreground
+   read as specks of dirt. */
 :host([motif="stars"]) [part="motif"] {
   --_pattern-ink: var(
     --pattern-color,
@@ -99,56 +101,165 @@
   mask: var(--_pattern-points, none) 0 0 / 704px 704px;
 }
 
+/* The halos, and the band: the dust and the offset points, kept to a soft
+   diagonal. Read bottom up: the dust, the points added to it, both cut to the
+   band, and the halos added over everything. */
 :host([motif="stars"]) [part="motif"]::after {
   background-color: light-dark(transparent, var(--_pattern-ink));
-  mask: var(--_pattern-halos, none) 0 0 / 704px 704px;
+  mask:
+    var(--_pattern-halos, none) 0 0 / 704px 704px add,
+    linear-gradient(
+      118deg,
+      transparent 18%,
+      rgb(0 0 0 / 0.35) 34%,
+      black 46%,
+      rgb(0 0 0 / 0.6) 56%,
+      transparent 74%
+    )
+    0 0 / 100% 100% no-repeat intersect,
+    var(--_pattern-points, none) 352px 176px / 704px 704px add,
+    var(--_pattern-dust, none) 0 0 / 704px 704px;
 }
 
-/* **A bright star: four points round a soft core**, its size a share of
-   `space-md`, swelling and fading on its own beat. The beat and how far into
-   it each starts come from the star, so no two keep time. */
+/* **A bright star: a small hot core in a soft glow**, its size a share of
+   `space-md`, as a star looks to an eye or a lens. The glow is drawn in dark
+   only, for the halos' reason. The four largest show the thin spikes a
+   telescope's lens draws, in dark too, at twice the box so they reach past
+   the glow. */
 [part="star"] {
+  --_star-ink: var(--_pattern-ink);
+  --_star-reach: 1;
+
   aspect-ratio: 1;
-  animation: helix-pattern-twinkle calc(var(--helix-duration-crawl) * var(--_star-beat, 1))
-    var(--helix-easing-standard)
+  animation: helix-pattern-twinkle calc(var(--helix-duration-crawl) * var(--_star-beat, 1)) linear
     calc(var(--helix-duration-crawl) * var(--_star-beat, 1) * var(--_star-phase, 0) * -1) infinite;
-  background-color: var(--_pattern-ink);
-  inline-size: calc(var(--helix-space-md) * var(--_star-size, 1));
+  background-image: radial-gradient(
+    closest-side,
+    var(--_star-ink) 0 calc(14% / var(--_star-reach)),
+    light-dark(transparent, color-mix(in oklab, var(--_star-ink) 30%, transparent))
+      calc(26% / var(--_star-reach)),
+    transparent calc(70% / var(--_star-reach))
+  );
+  inline-size: calc(var(--helix-space-md) * var(--_star-size, 1) * var(--_star-reach));
   inset-block-start: var(--_star-y, 50%);
   inset-inline-start: var(--_star-x, 50%);
-  mask:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-opacity='.9'/%3E%3Cstop offset='1' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='6' fill='url(%23g)'/%3E%3Cpath d='M12 0C12.4 8 16 11.6 24 12 16 12.4 12.4 16 12 24 11.6 16 8 12.4 0 12 8 11.6 11.6 8 12 0Z'/%3E%3C/svg%3E")
-    center / contain no-repeat;
   position: absolute;
   translate: -50% -50%;
 }
 
+[part="star"][data-spikes] {
+  --_star-reach: 2.4;
+
+  background-image:
+    radial-gradient(
+      closest-side,
+      var(--_star-ink) 0 calc(14% / var(--_star-reach)),
+      light-dark(transparent, color-mix(in oklab, var(--_star-ink) 30%, transparent))
+        calc(26% / var(--_star-reach)),
+      transparent calc(70% / var(--_star-reach))
+    ),
+    linear-gradient(
+      to right,
+      transparent,
+      light-dark(transparent, color-mix(in oklab, var(--_star-ink) 45%, transparent)),
+      transparent
+    ),
+    linear-gradient(
+      transparent,
+      light-dark(transparent, color-mix(in oklab, var(--_star-ink) 45%, transparent)),
+      transparent
+    );
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:
+    100% 100%,
+    100% var(--helix-border-thin),
+    var(--helix-border-thin) 100%;
+}
+
+/* **A hot star blue-white and a cool one orange**, in dark, a quarter of the
+   way from the ink toward the tone, as a sky's colors are: there, never
+   strong. */
+[part="star"][data-tint="cool"] {
+  --_star-ink: light-dark(
+    var(--_pattern-ink),
+    color-mix(in oklab, var(--_pattern-ink) 72%, var(--helix-color-info))
+  );
+}
+
+[part="star"][data-tint="warm"] {
+  --_star-ink: light-dark(
+    var(--_pattern-ink),
+    color-mix(in oklab, var(--_pattern-ink) 72%, var(--helix-color-warning))
+  );
+}
+
+/* **The twinkle is the air, not the star**: its light flickers, unevenly and
+   only in strength, never in size or turn. */
 @keyframes helix-pattern-twinkle {
   0%,
   100% {
-    opacity: 0.35;
-    rotate: 0deg;
-    scale: 0.55;
+    opacity: 1;
   }
 
-  50% {
+  11% {
+    opacity: 0.78;
+  }
+
+  19% {
+    opacity: 0.95;
+  }
+
+  33% {
+    opacity: 0.62;
+  }
+
+  46% {
+    opacity: 0.9;
+  }
+
+  58% {
+    opacity: 0.74;
+  }
+
+  72% {
     opacity: 1;
-    rotate: 20deg;
-    scale: 1;
+  }
+
+  87% {
+    opacity: 0.68;
   }
 }
 
-/* **A shooting star**: a streak bright at its head, falling down and to the
-   left over a sixteenth of its beat and out of sight for the rest. The sky is
-   not a line of text, so it falls the same way on a right-to-left page. */
+/* **A shooting star**: a fine streak with a bright head, falling down and to
+   the left over a sixteenth of its beat and out of sight for the rest, its
+   tail drawing out as it falls and its light going as it burns up. The sky
+   is not a line of text, so it falls the same way on a right-to-left page. */
 [part="meteor"] {
   animation: helix-pattern-meteor calc(var(--helix-duration-crawl) * var(--_meteor-beat, 3)) linear
     calc(var(--helix-duration-crawl) * var(--_meteor-beat, 3) * var(--_meteor-phase, 0) * -1)
     infinite;
-  background-image: linear-gradient(to right, transparent, var(--_pattern-ink));
-  block-size: var(--helix-border-thin);
-  border-radius: var(--helix-radii-full);
-  inline-size: calc(var(--helix-space-3xl) * 1.5);
+  background-image:
+    radial-gradient(
+      closest-side,
+      var(--_pattern-ink),
+      color-mix(in oklab, var(--_pattern-ink) 40%, transparent) 50%,
+      transparent
+    ),
+    linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, var(--_pattern-ink) 70%, transparent)
+    );
+  background-position:
+    right center,
+    left center;
+  background-repeat: no-repeat;
+  background-size:
+    calc(var(--helix-border-thin) * 4) 100%,
+    calc(100% - var(--helix-border-thin) * 2) var(--helix-border-thin);
+  block-size: calc(var(--helix-border-thin) * 3);
+  inline-size: calc(var(--helix-space-3xl) * 2);
   inset-block-start: var(--_meteor-y, 0%);
   inset-inline-start: var(--_meteor-x, 50%);
   opacity: 0;
@@ -159,21 +270,26 @@
 @keyframes helix-pattern-meteor {
   0% {
     opacity: 0;
-    transform: rotate(150deg) translateX(0);
+    transform: rotate(150deg) translateX(0) scaleX(0.2);
   }
 
   1% {
     opacity: 1;
   }
 
+  4% {
+    opacity: 0.8;
+    transform: rotate(150deg) translateX(calc(var(--helix-space-3xl) * 4)) scaleX(1);
+  }
+
   6% {
     opacity: 0;
-    transform: rotate(150deg) translateX(calc(var(--helix-space-3xl) * 6));
+    transform: rotate(150deg) translateX(calc(var(--helix-space-3xl) * 6)) scaleX(0.6);
   }
 
   100% {
     opacity: 0;
-    transform: rotate(150deg) translateX(calc(var(--helix-space-3xl) * 6));
+    transform: rotate(150deg) translateX(calc(var(--helix-space-3xl) * 6)) scaleX(0.6);
   }
 }
 
@@ -196,8 +312,7 @@
   }
 
   [part="star"] {
-    opacity: 0.7;
-    scale: 0.8;
+    opacity: 0.85;
   }
 
   [part="meteor"] {

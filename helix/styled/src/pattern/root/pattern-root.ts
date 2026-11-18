@@ -2,7 +2,7 @@ import { customElement, HelixElement, motionPaused, onMotionChange } from '@fusi
 import { type CSSResultGroup, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { contourTile } from '../contours.js'
-import { BRIGHT_STARS, SHOOTING_STARS, starTiles } from '../stars.js'
+import { BRIGHT_STARS, SHOOTING_STARS, type StarTiles, starTiles } from '../stars.js'
 import { styles } from './pattern-root.css.js'
 
 /** What a `Pattern` draws. */
@@ -19,6 +19,8 @@ export type PatternMotif = 'contours' | 'hexagons' | 'stars'
  *   with a glow in the primary color that follows a mouse or pen across it.
  * - **`stars`**: a night sky of faint and bright points, its brightest stars
  *   twinkling each on its own beat and a shooting star crossing now and then.
+ *   In dark, the band of the Milky Way crosses it, and a few stars take a
+ *   cool or a warm color.
  * - **`contours`**: the lines of a map's relief, drifting slowly sideways.
  *
  * **Behind the content, and nothing to a screen reader.** The drawing is a
@@ -67,7 +69,7 @@ export class HelixPattern extends HelixElement {
 
   /** The star tiles, drawn on the client the first time they are asked for. */
   @state()
-  private sky: { halos: string; points: string } | undefined
+  private sky: StarTiles | undefined
 
   /** Where a mouse or pen is over the host, in pixels from its top left, for the glow. */
   @state()
@@ -153,7 +155,7 @@ export class HelixPattern extends HelixElement {
     const tile = this.motif === 'contours' && this.tile ? `--_pattern-tile: url(${this.tile})` : ''
     const sky =
       this.motif === 'stars' && this.sky
-        ? `--_pattern-points: url(${this.sky.points}); --_pattern-halos: url(${this.sky.halos})`
+        ? `--_pattern-points: url(${this.sky.points}); --_pattern-halos: url(${this.sky.halos}); --_pattern-dust: url(${this.sky.dust})`
         : ''
     const at = this.pointer
       ? `--_pattern-x: ${Math.round(this.pointer.x)}px; --_pattern-y: ${Math.round(this.pointer.y)}px`
@@ -176,6 +178,8 @@ export class HelixPattern extends HelixElement {
       (star) =>
         html`<span
           part="star"
+          data-tint=${star.tint ?? nothing}
+          ?data-spikes=${star.spikes}
           style="--_star-x: ${star.x}%; --_star-y: ${star.y}%; --_star-size: ${star.size}; --_star-beat: ${star.beat}; --_star-phase: ${star.phase}"
         ></span>`,
     )}${SHOOTING_STARS.map(
