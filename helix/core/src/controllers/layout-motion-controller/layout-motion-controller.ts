@@ -224,9 +224,27 @@ export class LayoutMotionController implements ReactiveController {
               [...one.removedNodes].some((node) => this.places.has(node as HTMLElement))))
         : items.has(one.target) || one.target.parentNode === this.host,
     )
-    if (changed) {
-      this.move()
+    if (!changed) {
+      return
     }
+    /* **An element arriving that draws itself has not drawn yet**: its first
+       render is a microtask behind this callback, so measured now it has no
+       height, and the items after it measured exactly where they were and did
+       not move. A Timeline item draws its whole height in its shadow root.
+       Measured once it has rendered, still before the frame is painted. */
+    const pending = records
+      .flatMap((one) => [...one.addedNodes])
+      .filter(
+        (node): node is HTMLElement & { updateComplete: Promise<unknown> } =>
+          node instanceof HTMLElement &&
+          'updateComplete' in node &&
+          (node as { isUpdatePending?: boolean }).isUpdatePending === true,
+      )
+    if (pending.length > 0) {
+      void Promise.all(pending.map((node) => node.updateComplete)).then(() => this.move())
+      return
+    }
+    this.move()
   }
 
   /** Records where every item is drawn now, with no move started. */

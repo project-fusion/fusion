@@ -5,6 +5,9 @@
  * The spacing is the entry's own padding instead, which the line runs through.
  * `Toast` records the same about a stack whose members collapse. */
 :host {
+  --timeline-move-duration: var(--helix-duration-normal);
+  --timeline-move-easing: var(--helix-easing-standard);
+
   display: flex;
   flex-direction: column;
 }

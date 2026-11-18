@@ -10,6 +10,7 @@ import {
   HelixLoadMoreEvent,
   hostAria,
   internalsOf,
+  LayoutMotionController,
   MixinCollection,
   markRegion,
   numberConverter,
@@ -107,6 +108,9 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
  * @csspart more - The button after the list that asks for more, while `load-more` is set. It is `aria-disabled` while the feed is loading.
+ *
+ * @cssproperty --notifications-move-duration - How long a row or a group takes to slide to its new place when one before it arrives or goes, or to fade in. Unset, nothing moves.
+ * @cssproperty --notifications-move-easing - The curve a row slides and fades in along.
  *
  * @cssstate empty - While the feed holds no notification and is not loading, and `error-text` is not set. Never on the server, which cannot count the rows.
  * @cssstate error - While `error-text` is set.
@@ -269,6 +273,22 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
         'isNotificationGroup' in child,
     )
   }
+
+  /**
+   * Slides the rows and groups to their places when one arrives or goes, and
+   * fades in a row that arrives, as `List` does, timed from
+   * `--notifications-move-duration` and `--notifications-move-easing`.
+   */
+  protected readonly motion = new LayoutMotionController(this, {
+    items: () => this.rows.filter((row): row is HTMLElement => row instanceof HTMLElement),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--notifications-move-duration'),
+        easing: style.getPropertyValue('--notifications-move-easing'),
+      }
+    },
+  })
 
   /**
    * The groups written into the feed, in the order they are written.
