@@ -622,9 +622,12 @@ describe('the wash under the pointer', () => {
     const group = await mount(markup)
     laidOut(group)
     const highlight = part(group, 'highlight') as HTMLElement
-    const [first, second] = items(group) as [HTMLElement, HTMLElement]
+    const [first, second] = items(group)
+    if (!first || !second) {
+      throw new Error('the group has two items')
+    }
     second.setAttribute('disabled', '')
-    await (second as Updatable).updateComplete
+    await (second as unknown as Updatable).updateComplete
     over(second)
     expect(highlight.hasAttribute('data-placed')).toBe(false)
     first.dispatchEvent(
