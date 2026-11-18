@@ -95,6 +95,7 @@ export type TagSelectionMode = SelectionMode
  *
  * @cssproperty --tag-group-move-duration - How long a tag takes to slide to its new place, or to fade in. Unset, nothing moves.
  * @cssproperty --tag-group-move-easing - The curve a tag slides and fades in along.
+ *
  * @cssstate empty - The group holds no tags, and draws its `empty` part.
  */
 @customElement('helix-headless-tag-group')
