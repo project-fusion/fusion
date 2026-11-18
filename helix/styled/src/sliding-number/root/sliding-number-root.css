@@ -1,4 +1,7 @@
 :host {
+  /* A figure's step, read where it is used, so `1lh` and `em` are the
+     figure's own line and type. */
+  --_sliding-number-step: max(1lh, 1.35em);
   display: inline-block;
   font-variant-numeric: tabular-nums;
 }
@@ -19,9 +22,9 @@
    The negative block margins give back what the step adds, so the number
    still takes one line in the layout and nothing beside it moves. */
 [part="digit"] {
-  block-size: max(1lh, 1.35em);
+  block-size: var(--_sliding-number-step);
   display: inline-block;
-  margin-block: calc((1lh - max(1lh, 1.35em)) / 2);
+  margin-block: calc((1lh - var(--_sliding-number-step)) / 2);
   overflow: hidden;
 }
 
@@ -30,13 +33,13 @@
   flex-direction: column;
   transition: translate var(--sliding-number-duration, var(--helix-duration-slow))
     var(--sliding-number-easing, var(--helix-easing-emphasized));
-  translate: 0 calc(var(--_figure, 0) * max(1lh, 1.35em) * -1);
+  translate: 0 calc(var(--_figure, 0) * var(--_sliding-number-step) * -1);
 }
 
 /* Each figure centered in its step, as it sat centered in its line. */
 [part="strip"] > span {
   align-items: center;
-  block-size: max(1lh, 1.35em);
+  block-size: var(--_sliding-number-step);
   display: flex;
   justify-content: center;
 }
