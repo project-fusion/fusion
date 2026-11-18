@@ -9,10 +9,19 @@
 }
 
 /* **One figure showing in each column**, the rest of the strip clipped above
-   and below it. */
+   and below it.
+
+   **A figure's step is the taller of the line and 1.35em**, because a font's
+   text box is taller than a tight line: at display size it measured 1.262em
+   against a line of 1.19em, so a window one line tall cut 3 pixels off the
+   figure showing, and its neighbors, one line away, reached into the window.
+   At 1.35em the figure showing fits and its neighbors stay wholly outside.
+   The negative block margins give back what the step adds, so the number
+   still takes one line in the layout and nothing beside it moves. */
 [part="digit"] {
-  block-size: 1lh;
+  block-size: max(1lh, 1.35em);
   display: inline-block;
+  margin-block: calc((1lh - max(1lh, 1.35em)) / 2);
   overflow: hidden;
 }
 
@@ -21,12 +30,15 @@
   flex-direction: column;
   transition: translate var(--sliding-number-duration, var(--helix-duration-slow))
     var(--sliding-number-easing, var(--helix-easing-emphasized));
-  translate: 0 calc(var(--_figure, 0) * -1lh);
+  translate: 0 calc(var(--_figure, 0) * max(1lh, 1.35em) * -1);
 }
 
+/* Each figure centered in its step, as it sat centered in its line. */
 [part="strip"] > span {
-  block-size: 1lh;
-  text-align: center;
+  align-items: center;
+  block-size: max(1lh, 1.35em);
+  display: flex;
+  justify-content: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
