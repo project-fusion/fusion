@@ -56,6 +56,8 @@ export default styles(
       controlSize: '6ch',
       fieldBorderColor: token('color-border'),
       leadBorderColor: token('color-border'),
+      moveDuration: null,
+      moveEasing: null,
       paddingInline: token('space-field'),
       panelSize: measured('floating-anchor-inline-size', '100%'),
       radius: token('radii-sm'),
@@ -87,6 +89,17 @@ export default styles(
       include(floatingPanel),
       include(floatingEntrance),
       include(collectionState),
+      /* A filter arriving fades in, one leaving fades where it was, and the
+         rest slide into place, at the pace and on the curve rows and tags
+         move by everywhere. The web element's motion controller reads these. */
+      on('host', [
+        web([
+          rule({
+            '--filter-input-move-duration': token('duration-normal'),
+            '--filter-input-move-easing': token('easing-standard'),
+          }),
+        ]),
+      ]),
       on('host', [
         rule({
           own: {

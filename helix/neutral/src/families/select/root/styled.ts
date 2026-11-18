@@ -39,7 +39,7 @@ import root from './headless.js'
  * frame of its own.
  *
  * **The value stays on one line**, so a long answer does not make the closed control
- * taller than the fields beside it. **The indicator turns over** as the panel opens.
+ * taller than the fields beside it. **The indicator flips** as the panel opens.
  */
 export default styles(
   root,
@@ -254,19 +254,22 @@ export default styles(
       on({ backdrop: 'surface' }, [
         native([rule({ sheet: true }, { backgroundColor: token('color-overlay') })]),
       ]),
-      /* Turned rather than flipped, so it never passes through a flat line. */
+      /* Flipped as the panel opens, as Accordion's chevron and Megamenu's
+         caret are, over `normal` along `emphasized`, which crosses the flat
+         middle of the flip in a few milliseconds. A down caret that turns
+         and one that flips beside it read as two answers to one gesture. */
       on('indicator', [
         rule({
-          transition: web(['rotate', token('duration-fast'), token('easing-standard')]),
+          transition: web(['scale', token('duration-normal'), token('easing-emphasized')]),
         }),
-        native([rule({ rotate: '0deg' })]),
-        rule({ open: true }, { rotate: '180deg' }),
+        native([rule({ scale: '1 1' })]),
+        rule({ open: true }, { scale: '1 -1' }),
       ]),
       on({ region: 'indicator', slotted: '*' }, [
         rule({
-          transition: web(['rotate', token('duration-fast'), token('easing-standard')]),
+          transition: web(['scale', token('duration-normal'), token('easing-emphasized')]),
         }),
-        rule({ open: true }, { rotate: '180deg' }),
+        rule({ open: true }, { scale: '1 -1' }),
       ]),
       on('indicator', [rule({ readonly: true }, { opacity: token('opacity-disabled') })]),
       on({ region: 'indicator', slotted: '*' }, [

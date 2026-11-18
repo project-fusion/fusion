@@ -47,6 +47,8 @@ export default styles(
       borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       controlSize: '4ch',
+      moveDuration: null,
+      moveEasing: null,
       panelSize: 'max-content',
       shadow: token('shadow-floating'),
     },
@@ -66,8 +68,10 @@ export default styles(
       flex: '0 0 auto',
       inlineSize: token('size-icon-tight'),
     } as const
+    /* And it flips as the panel opens, saying which way the panel is going,
+       as Select's does. */
     const turning = {
-      transition: web(['rotate', ...ease]),
+      transition: web(['scale', token('duration-normal'), token('easing-emphasized')]),
     } as const
     return [
       on('live', [rule([visuallyHidden])]),
@@ -77,6 +81,17 @@ export default styles(
       include(floatingPanel),
       include(floatingEntrance),
       on('host', [rule({ position: web('relative') })]),
+      /* A tag arriving fades in, one leaving fades where it was, and the rest
+         slide into place, at the pace and on the curve rows and tags move by
+         everywhere. The web element's motion controller reads these. */
+      on('host', [
+        web([
+          rule({
+            '--combobox-move-duration': token('duration-normal'),
+            '--combobox-move-easing': token('easing-standard'),
+          }),
+        ]),
+      ]),
       on('held', [native([rule({ display: 'none' })])]),
       on('field', [
         rule({
@@ -197,12 +212,13 @@ export default styles(
       ]),
       on('indicator', [rule(caret)]),
       on({ region: 'indicator', slotted: '*' }, [rule(caret)]),
-      /* Turned, as Accordion's chevron is, never through a flat line. */
+      /* Flipped, as Accordion's chevron and Select's caret are. A phone flips
+         from a written start. */
       on('indicator', [
-        native([rule({ rotate: '0deg' })]),
-        rule({ open: true }, { rotate: '180deg' }),
+        native([rule({ scale: '1 1' })]),
+        rule({ open: true }, { scale: '1 -1' }),
       ]),
-      on({ region: 'indicator', slotted: '*' }, [rule({ open: true }, { rotate: '180deg' })]),
+      on({ region: 'indicator', slotted: '*' }, [rule({ open: true }, { scale: '1 -1' })]),
       /* Read-only, and the caret says the panel does not open. */
       on('indicator', [rule({ readonly: true }, { opacity: token('opacity-disabled') })]),
       on({ region: 'indicator', slotted: '*' }, [
