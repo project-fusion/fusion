@@ -20,6 +20,7 @@ import '../../checkbox/index.js'
  * @aliases Column picker, Column chooser
  * @documentation https://fusion.dev/helix/components/column-manager
  *
+ * @cssproperty --column-manager-drop-color - The line that marks where a dragged row will land. Defaults to `--helix-color-primary`.
  * @cssproperty --column-manager-gap - The space between the parts of a row.
  * @cssproperty --column-manager-item-hover-background-color - The fill of a row under the pointer.
  * @cssproperty --column-manager-move-duration - How long a column's row takes to slide to its new place. Defaults to `--helix-duration-normal`. `0ms` moves nothing.

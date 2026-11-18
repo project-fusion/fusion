@@ -8,7 +8,7 @@ describe('column manager server output', () => {
     const markup = ssr(
       html`<helix-headless-column-manager for="invoices"></helix-headless-column-manager>`,
     )
-    expect(servedParts(markup)).toEqual(['header', 'list', 'live', 'reset', 'title'])
+    expect(servedParts(markup)).toEqual(['drop', 'header', 'list', 'live', 'reset', 'title'])
   })
 
   test('the host carries nothing the consumer did not write', () => {

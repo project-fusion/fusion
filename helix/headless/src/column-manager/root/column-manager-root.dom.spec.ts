@@ -152,3 +152,54 @@ describe('a column manager', () => {
     expect(table.view.columns.pinned).toEqual({})
   })
 })
+
+describe('a row dragged in a column manager', () => {
+  /* Rows laid out by hand, 40 tall from the top, since nothing here lays out. */
+  const laidOut = (manager: Manager): void => {
+    manager.getBoundingClientRect = () =>
+      ({ bottom: 200, height: 200, left: 0, right: 200, top: 0, width: 200 }) as DOMRect
+    for (const [at, row] of items(manager).entries()) {
+      row.getBoundingClientRect = () =>
+        ({
+          bottom: at * 40 + 40,
+          height: 40,
+          left: 0,
+          right: 200,
+          top: at * 40,
+          width: 200,
+        }) as DOMRect
+    }
+  }
+  const drag = (target: HTMLElement, type: string, clientY = 0): void => {
+    const event = new Event(type, { bubbles: true, cancelable: true, composed: true })
+    Object.defineProperty(event, 'clientY', { value: clientY })
+    target.dispatchEvent(event)
+  }
+  const line = (manager: Manager): HTMLElement =>
+    manager.shadowRoot?.querySelector('[part="drop"]') as HTMLElement
+
+  test('marks the gap under the pointer, and no gap where a drop would move nothing', async () => {
+    const { manager, table } = await page()
+    laidOut(manager)
+    drag(item(manager, 'id'), 'dragstart')
+    drag(item(manager, 'amount'), 'dragover', 110)
+    await settle(manager, table)
+    expect(line(manager).getAttribute('data-at')).toBe('3')
+    expect(line(manager).style.getPropertyValue('--_column-manager-drop-y')).toBe('120px')
+    drag(item(manager, 'customer'), 'dragover', 45)
+    await settle(manager, table)
+    expect(line(manager).hasAttribute('data-at')).toBe(false)
+  })
+
+  test('lands the row in the gap the line marked, and the line goes', async () => {
+    const { manager, table } = await page()
+    laidOut(manager)
+    drag(item(manager, 'id'), 'dragstart')
+    drag(item(manager, 'amount'), 'dragover', 110)
+    await settle(manager, table)
+    drag(item(manager, 'amount'), 'drop', 110)
+    await settle(manager, table)
+    expect(table.view.columns.order).toEqual(['customer', 'amount', 'id'])
+    expect(line(manager).hasAttribute('data-at')).toBe(false)
+  })
+})
