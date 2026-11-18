@@ -1,13 +1,16 @@
-<!-- @summary A pull quote with `no-marks`, beside a large mark the page draws. -->
+<!-- @summary A quotation inside a sentence with `no-marks`, whose marks the page draws in its accent color. -->
 <!-- @layout hug -->
 <link
   href="styles.css"
   rel="stylesheet"
 />
 
-<helix-text
-  class="pull"
-  scale="body"
->
-  <helix-quote no-marks>The report will be ready on Friday.</helix-quote>
+<helix-text scale="body">
+  The sign on the door read
+  <helix-quote
+    class="marked"
+    no-marks
+    >back in five minutes</helix-quote
+  >
+  all afternoon.
 </helix-text>

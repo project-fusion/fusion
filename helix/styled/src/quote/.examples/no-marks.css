@@ -1,11 +1,9 @@
-.pull {
-  display: flex;
-  gap: var(--helix-space-xs);
+.marked::before {
+  color: var(--helix-color-primary);
+  content: "\201C";
 }
 
-.pull::before {
-  color: var(--helix-color-foreground-subtle);
-  content: "\201C";
-  font-size: var(--helix-text-3xl);
-  line-height: 1;
+.marked::after {
+  color: var(--helix-color-primary);
+  content: "\201D";
 }
