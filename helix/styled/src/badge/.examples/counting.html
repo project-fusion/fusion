@@ -1,0 +1,28 @@
+<!-- @summary A count that swells for a moment when it changes, as a new message arrives. -->
+<helix-flex
+  align-items="center"
+  gap="lg"
+>
+  <helix-badge
+    id="unread"
+    value="3"
+  >
+    <helix-button
+      aria-label="Inbox, 3 unread"
+      id="inbox"
+    >Inbox</helix-button>
+  </helix-badge>
+  <helix-button id="arrive">Receive a message</helix-button>
+</helix-flex>
+
+<script type="module">
+  const unread = document.getElementById('unread')
+  const inbox = document.getElementById('inbox')
+
+  // A new count swells the badge, and the button's name says the count.
+  document.getElementById('arrive').addEventListener('click', () => {
+    const count = Number(unread.value) + 1
+    unread.value = String(count)
+    inbox.setAttribute('aria-label', `Inbox, ${count} unread`)
+  })
+</script>

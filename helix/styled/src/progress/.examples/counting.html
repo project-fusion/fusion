@@ -1,0 +1,22 @@
+<!-- @summary A shown value that counts to the new one as the bar fills. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-progress
+    id="upload"
+    label="Uploading files"
+    show-value
+    value="24"
+  ></helix-progress>
+  <helix-button id="advance">Advance</helix-button>
+</helix-flex>
+
+<script type="module">
+  const upload = document.getElementById('upload')
+
+  // Set a new value and the number counts to it as the bar fills.
+  document.getElementById('advance').addEventListener('click', () => {
+    upload.value = upload.value >= 100 ? 0 : Math.min(100, upload.value + 20 + Math.round(Math.random() * 20))
+  })
+</script>

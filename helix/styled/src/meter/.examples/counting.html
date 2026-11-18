@@ -1,0 +1,22 @@
+<!-- @summary A shown reading that counts to the new one as the fill moves. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-meter
+    id="disk"
+    label="Disk used"
+    show-value
+    value="42"
+  ></helix-meter>
+  <helix-button id="measure">Measure again</helix-button>
+</helix-flex>
+
+<script type="module">
+  const disk = document.getElementById('disk')
+
+  // Set a new value and the reading counts to it as the fill moves.
+  document.getElementById('measure').addEventListener('click', () => {
+    disk.value = 10 + Math.round(Math.random() * 85)
+  })
+</script>
