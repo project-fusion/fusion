@@ -155,12 +155,14 @@ const numberedLines = ViewPlugin.fromClass(
 )
 
 /**
- * How many digits the last line's number has, which the sheet reserves room
- * for at the start of every line, so a short file's numbers line up with a long
- * one's as CodeMirror's gutter lined them up.
+ * The widest number the file can hold, written as nines, as the sheet sets it
+ * out of sight to size the band the numbers stand in: `9` up to nine lines,
+ * `99` up to ninety-nine. CodeMirror's gutter was sized from the same number,
+ * so the band is as wide as the gutter was, and a short file's numbers line up
+ * with a long one's.
  */
-const numberDigits: Extension = EditorView.editorAttributes.compute(['doc'], (state) => ({
-  style: `--_sandbox-editor-digits: ${String(state.doc.lines).length}`,
+const widestNumber: Extension = EditorView.editorAttributes.compute(['doc'], (state) => ({
+  style: `--_sandbox-editor-widest: "${'9'.repeat(String(state.doc.lines).length)}"`,
 }))
 
 /** sh, through the same mode the highlighter runs, so a pane and a block agree. */
@@ -402,7 +404,7 @@ export class HelixSandboxEditor extends HelixElement {
         doc: this.value,
         extensions: [
           numberedLines,
-          numberDigits,
+          widestNumber,
           remeasureOnFonts,
           history(),
           /* Two spaces, and Tab types them.
