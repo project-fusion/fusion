@@ -1,7 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { dirname } from 'node:path'
-import { registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 import type { Highlighter, Tag } from '@lezer/highlight'
 
 /* Imported once the DOM is registered: CodeMirror and core read the globals
@@ -101,11 +101,16 @@ describe('sandbox editor highlighting', () => {
  * imports.
  */
 describe('one copy of @lezer/highlight', () => {
+  /* Under Bun only, whose resolver reads the install. The browser runs these
+     specs from one bundle, which holds one copy of each module whatever is
+     installed, and has no `Bun` to ask. */
+  const underBun = hasLayout() ? (): void => {} : test
+
   /** The `@lezer/highlight` entry a package resolves, from that package's own folder. */
   const resolvedFrom = (specifier: string, from: string = import.meta.dir): string =>
     Bun.resolveSync('@lezer/highlight', dirname(Bun.resolveSync(`${specifier}/package.json`, from)))
 
-  test('resolves to one file from every package that uses highlight tags', () => {
+  underBun('resolves to one file from every package that uses highlight tags', () => {
     const ours = Bun.resolveSync('@lezer/highlight', import.meta.dir)
     const javascript = dirname(
       Bun.resolveSync('@codemirror/lang-javascript/package.json', import.meta.dir),

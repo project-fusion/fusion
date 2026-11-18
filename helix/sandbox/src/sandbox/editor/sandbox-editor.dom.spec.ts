@@ -1,6 +1,12 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 import type { Highlighter } from '@lezer/highlight'
 
 /* Imported once the DOM is registered: CodeMirror and core read the globals
@@ -167,4 +173,59 @@ describe('the source given', () => {
     expect(host.modified).toBe(false)
     expect(hasState(host, 'modified')).toBe(false)
   })
+})
+
+/* The geometry is a browser's, and happy-dom lays nothing out. */
+const browser = hasLayout() ? test : (): void => {}
+
+/** The lines the editor drew, in order. */
+const linesOf = (host: Editor): HTMLElement[] => [
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('.cm-content > .cm-line') ?? []),
+]
+
+describe('the line numbers', () => {
+  test('are written on the lines they number, one to a line, in no gutter', async () => {
+    const host = await editor('html', '<helix-button\n  emphasis="solid"\n>Save</helix-button>')
+    expect(linesOf(host).map((line) => line.dataset.line)).toEqual(['1', '2', '3'])
+    expect(host.shadowRoot?.querySelector('.cm-gutters')).toBeNull()
+  })
+
+  test('follow an edit that adds a line', async () => {
+    const host = await editor('html', '<p>')
+    type(host, '\n<b>')
+    await settle(host)
+    expect(linesOf(host).map((line) => line.dataset.line)).toEqual(['1', '2'])
+  })
+
+  /* A face that loads after the editor drew changes its lines' size and
+     leading, and CodeMirror measures nothing until a frame after. The change
+     is made here by hand, so it lands between two frames, where the gutter's
+     numbers kept the heights measured before it: on the Button page at 390
+     they stood higher than their lines and closer together. Each number has
+     to stand at its line's top, in its line's type, read before any frame. */
+  browser(
+    'stay at the top of their lines when the face changes after the editor drew',
+    async () => {
+      const host = await editor(
+        'html',
+        '<helix-button\n  emphasis="solid"\n  tone="primary"\n>Save changes</helix-button>',
+      )
+      host.style.setProperty('--helix-font-mono', 'serif')
+      host.style.setProperty('--helix-text-sm', '23px')
+      host.style.setProperty('--helix-leading-normal', '2')
+      const lines = linesOf(host)
+      expect(lines.map((line) => line.dataset.line)).toEqual(['1', '2', '3', '4'])
+      for (const line of lines) {
+        const own = getComputedStyle(line)
+        const number = getComputedStyle(line, '::before')
+        /* Placed in the line's own box, at no distance from its top edge. */
+        expect(own.position).toBe('relative')
+        expect(number.position).toBe('absolute')
+        expect(number.top).toBe('0px')
+        expect(number.fontFamily).toBe(own.fontFamily)
+        expect(number.fontSize).toBe(own.fontSize)
+        expect(number.lineHeight).toBe(own.lineHeight)
+      }
+    },
+  )
 })
