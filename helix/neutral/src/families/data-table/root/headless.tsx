@@ -297,6 +297,7 @@ export default headless('data-table', {
             exports={{
               first: true,
               gap: true,
+              indicator: true,
               item: true,
               last: true,
               list: true,

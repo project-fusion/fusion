@@ -1,4 +1,15 @@
-import { difference, fn, list, native, product, quotient, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -31,6 +42,8 @@ export default styles(
       disabledForegroundColor: token('color-foreground-subtle'),
       disabledOpacity: token('opacity-disabled'),
       ellipsisForegroundColor: token('color-foreground-muted'),
+      moveDuration: null,
+      moveEasing: null,
       /* The control step, as the buttons it labels step. */
       fontSize: token('text-control'),
       fontWeight: token('weight-medium'),
@@ -70,6 +83,19 @@ export default styles(
         rule({ empty: true }, { display: 'none' }),
         rule({ print: true }, { display: 'none' }),
       ]),
+      /* **The pages slide along the run as it moves**, at the pace and on the
+         curve the chip moves by. The web element reads these from its script,
+         so they are set here rather than read with a fallback, and a page
+         setting either on the element wins over this rule. A phone moves
+         nothing: its pages stand in their new places at once. */
+      on('host', [
+        web([
+          rule({
+            '--pagination-move-duration': token('duration-normal'),
+            '--pagination-move-easing': token('easing-emphasized'),
+          }),
+        ]),
+      ]),
       on('list', [
         rule({
           alignItems: 'center',
@@ -86,6 +112,43 @@ export default styles(
         }),
       ]),
       on('item', [rule({ display: 'inline-flex' })]),
+      /* **One chip that travels to the page you are on**, drawn as the current
+         page's own was, so changing page moves one thing along the run, as
+         Toggle Group's selection does. Once it is placed the current page's
+         own fill and edge stand aside for it; until then, and in a server's
+         first paint, the page draws its own. Behind the pages, which sit above
+         it. A phone draws the current page's own chip. */
+      on('list', [web([rule({ position: 'relative' })])]),
+      on('item', [web([rule({ position: 'relative', zIndex: token('layer-raised') })])]),
+      on('indicator', [
+        web([
+          rule({
+            backgroundColor: hook.currentBackgroundColor,
+            blockSize: measured('indicator-block-size', 0),
+            border: [token('border-thin'), 'solid', hook.currentBorderColor],
+            borderRadius: hook.radius,
+            boxSizing: 'border-box',
+            display: 'block',
+            inlineSize: measured('indicator-inline-size', 0),
+            insetBlockStart: 0,
+            insetInlineStart: 0,
+            opacity: 0,
+            pointerEvents: 'none',
+            position: 'absolute',
+            transition: list(
+              ['translate', token('duration-normal'), token('easing-emphasized')],
+              ['inline-size', token('duration-normal'), token('easing-emphasized')],
+              ['opacity', token('duration-fast'), token('easing-standard')],
+            ),
+            translate: [measured('indicator-x', '0px'), measured('indicator-y', '0px')],
+            zIndex: token('layer-base'),
+          }),
+          rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+          /* The page draws its own in forced colors, at the weight that would
+             have handed it to the chip, which a Canvas fill would hide. */
+          rule({ forcedColors: true }, { display: 'none' }),
+        ]),
+      ]),
       on(
         ['first', 'gap', 'last', 'page', 'previous', 'next'],
         [
@@ -104,8 +167,11 @@ export default styles(
             minInlineSize: hook.size,
             paddingInline: hook.padding,
             textDecoration: 'none',
+            /* And the edge, so a page becoming the current one takes its
+               frame over the same beat as its fill. */
             transition: list(
               ['background-color', token('duration-fast'), token('easing-standard')],
+              ['border-color', token('duration-fast'), token('easing-standard')],
               ['color', token('duration-fast'), token('easing-standard')],
             ),
           }),
@@ -155,6 +221,28 @@ export default styles(
           }),
         ]),
       ]),
+      /* Once the chip is placed, the current page's own fill and edge stand aside for it. */
+      on(
+        {
+          part: 'page',
+          selector:
+            '[part="indicator"][data-placed] ~ [part="item"] [part~="page"][aria-current="page"]',
+        },
+        [
+          web([
+            rule({ backgroundColor: 'transparent', borderColor: 'transparent' }),
+            rule(
+              { forcedColors: true },
+              {
+                backgroundColor: 'Highlight',
+                borderColor: 'Highlight',
+                color: 'HighlightText',
+                forcedColorAdjust: 'none',
+              },
+            ),
+          ]),
+        ],
+      ),
       on({ part: 'page', selector: '[part~="page"][aria-current="page"]' }, [
         web([
           rule(

@@ -137,6 +137,16 @@ export default headless('pagination', {
           part="list"
           role="list"
         >
+          {/* One chip that travels to the page you are on. Hidden until a
+              stylesheet shows it, so the headless tier lays out as it did
+              without it. A phone draws the current page's own chip. */}
+          <View
+            ariaHidden
+            hidden
+            part="indicator"
+            platform="web"
+            role="presentation"
+          />
           <Repeat
             each={paginationRoot.slots}
             key="key"
