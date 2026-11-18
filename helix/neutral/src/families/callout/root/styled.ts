@@ -54,7 +54,10 @@ export default styles(
     }),
     own: {
       calloutBar: null,
+      calloutBlockSize: null,
       calloutColor: null,
+      calloutFoldEnd: null,
+      calloutFoldStart: null,
       calloutIcon: null,
       calloutInset: null,
       calloutLine: null,
@@ -63,7 +66,7 @@ export default styles(
     props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'callout/root/callout-root.generated.css',
   },
-  ({ hook, on, own, rule, variants }) => {
+  ({ hook, keyframes, on, own, rule, variants }) => {
     const iconSize = token('size-icon')
     /* The mark's step: the tight icon, never under the small one. */
     const mark = own.calloutIcon
@@ -162,25 +165,66 @@ export default styles(
             boxShadow: 'none',
           },
         ),
-        rule(
-          { exiting: true },
-          {
-            opacity: 0,
-            transition: ['opacity', token('duration-normal'), token('easing-accelerate')],
-          },
-        ),
-        rule(
-          { entering: true },
-          { transition: ['opacity', token('duration-normal'), token('easing-decelerate')] },
-        ),
-        rule({ startingStyle: true, entering: true }, { opacity: 0 }),
-        rule(
-          [
-            { reducedMotion: true, exiting: true },
-            { reducedMotion: true, entering: true },
-          ],
-          { transition: 'none' },
-        ),
+        /* **A dismissed callout fades, then folds away**, so what follows it
+           on the page rises into its place rather than jumping there once it
+           is hidden. The fade comes first, so nothing moves while the words
+           are still readable, and the fold runs on the height the styled tier
+           measured as the dismissal began, since a height of `auto` is one no
+           animation follows. Brought back with `open`, it unfolds and then
+           fades in, the same two steps the other way. What the element writes
+           as a dismissal begins, and none until then. */
+        web([
+          rule({
+            own: { calloutBlockSize: 'auto', calloutFoldEnd: '0px', calloutFoldStart: '0px' },
+          }),
+          rule(
+            { exiting: true },
+            {
+              animation: [
+                'callout-leave',
+                product(token('duration-normal'), 2),
+                token('easing-standard'),
+                'both',
+              ],
+            },
+          ),
+          rule(
+            { entering: true },
+            {
+              animation: [
+                'callout-arrive',
+                product(token('duration-normal'), 2),
+                token('easing-standard'),
+                'both',
+              ],
+            },
+          ),
+          rule({ reducedMotion: true, exiting: true }, { animation: 'none' }),
+          rule({ reducedMotion: true, entering: true }, { animation: 'none' }),
+        ]),
+        /* A phone measures no height to fold from, so its callout fades out
+           and back in where it stands. */
+        native([
+          rule(
+            { exiting: true },
+            {
+              opacity: 0,
+              transition: ['opacity', token('duration-normal'), token('easing-accelerate')],
+            },
+          ),
+          rule(
+            { entering: true },
+            { transition: ['opacity', token('duration-normal'), token('easing-decelerate')] },
+          ),
+          rule({ startingStyle: true, entering: true }, { opacity: 0 }),
+          rule(
+            [
+              { reducedMotion: true, exiting: true },
+              { reducedMotion: true, entering: true },
+            ],
+            { transition: 'none' },
+          ),
+        ]),
         /* A phone draws nothing of a callout once it has faded out. */
         native([rule({ closed: true }, { display: 'none' })]),
         /* The hairline is an inset shadow, which forced colors drop. */
@@ -308,6 +352,36 @@ export default styles(
           }),
         ]),
       ]),
+      keyframes('callout-leave', {
+        '0%': { blockSize: own.calloutBlockSize, marginBlock: 0, opacity: 1 },
+        '45%': {
+          blockSize: own.calloutBlockSize,
+          marginBlock: 0,
+          opacity: 0,
+          paddingBlock: own.calloutInset,
+        },
+        '100%': {
+          blockSize: 0,
+          marginBlock: [own.calloutFoldStart, own.calloutFoldEnd],
+          opacity: 0,
+          paddingBlock: 0,
+        },
+      }),
+      keyframes('callout-arrive', {
+        '0%': {
+          blockSize: 0,
+          marginBlock: [own.calloutFoldStart, own.calloutFoldEnd],
+          opacity: 0,
+          paddingBlock: 0,
+        },
+        '55%': {
+          blockSize: own.calloutBlockSize,
+          marginBlock: 0,
+          opacity: 0,
+          paddingBlock: own.calloutInset,
+        },
+        '100%': { blockSize: own.calloutBlockSize, marginBlock: 0, opacity: 1 },
+      }),
       /* The heading on a line of its own, over the content. */
       on({ region: 'heading', slotted: '*' }, [
         rule({
