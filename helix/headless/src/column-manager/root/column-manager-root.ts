@@ -40,7 +40,8 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * Each row has:
  *
  * - A checkbox that shows or hides the column. The last column showing cannot be hidden.
- * - A grip that moves the column. Drag it, or press Alt with Up or Down.
+ * - A grip that moves the column. Drag it, or press Alt with Up or Down. While
+ *   a row is dragged, a line marks the gap it will land in.
  * - A pin button that pins the column to the start of the row, then to the end, then unpins it.
  *   A pinned column stays in view while the table scrolls sideways.
  * - A note that says "Pinned", or "Hidden at this width" for a column the table leaves out
@@ -71,6 +72,7 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @documentation https://fusion.dev/helix/components/column-manager
  *
  * @csspart checkbox - The `Checkbox` that shows or hides a column.
+ * @csspart drop - The line that marks where a dragged row will land. It carries `data-at` while it marks a gap, and that gap's place down the element as `--_column-manager-drop-y`. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart checkbox-box - The box drawn for a row's checkbox.
  * @csspart checkbox-control - The native input inside a row's checkbox.
  * @csspart checkbox-feedback - Forwarded from the checkbox. Not shown, since a column's box is never wrong.
@@ -175,6 +177,14 @@ export class HelixHeadlessColumnManager extends HelixElement {
   /** The field being dragged, while a pointer drags one. */
   @state()
   private dragging: string | undefined = undefined
+
+  /**
+   * The gap a dragged row would land in, as its place among the rows, `0`
+   * before the first, and how far down the list the middle of that gap is.
+   * Absent where dropping would move nothing.
+   */
+  @state()
+  private dropGap: { at: number; y: number } | undefined = undefined
 
   /** The columns as the list first read them, which Reset puts back. */
   private first: ViewColumns | undefined = undefined
@@ -322,22 +332,72 @@ export class HelixHeadlessColumnManager extends HelixElement {
     }
   }
 
-  private readonly handleDragOver = (event: DragEvent): void => {
+  /**
+   * **The gap under the pointer**: before the row it is over in that row's
+   * upper half, after it in the lower half. Measured from the element's top,
+   * which the line is placed against, beside the list so the list holds only
+   * the columns.
+   */
+  private readonly handleDragOver = (event: DragEvent, field: string): void => {
+    const table = this.table
+    if (this.dragging === undefined || !table) {
+      return
+    }
+    event.preventDefault()
+    const row = event.currentTarget as HTMLElement
+    const list = this.partNamed('list')
+    const box = row.getBoundingClientRect()
+    const after = event.clientY > box.top + box.height / 2
+    const fields = this.columns(table).map((column) => column.field)
+    const at = fields.indexOf(field) + (after ? 1 : 0)
+    const from = fields.indexOf(this.dragging)
+    if (at === from || at === from + 1 || !list) {
+      this.dropGap = undefined
+      return
+    }
+    /* The middle of the gap: half the list's gap past the row's edge. */
+    const half = (Number.parseFloat(getComputedStyle(list).rowGap) || 0) / 2
+    const y = (after ? box.bottom + half : box.top - half) - this.getBoundingClientRect().top
+    if (this.dropGap?.at !== at || this.dropGap.y !== y) {
+      this.dropGap = { at, y }
+    }
+  }
+
+  /** Over the list between two rows, the line holds where it was. */
+  private readonly handleListOver = (event: DragEvent): void => {
     if (this.dragging !== undefined) {
       event.preventDefault()
     }
   }
 
-  private readonly handleDrop = (event: DragEvent, field: string): void => {
+  /** Out of the list, the line goes, and a drop there moves nothing. */
+  private readonly handleListLeave = (event: DragEvent): void => {
+    const list = event.currentTarget as HTMLElement
+    if (!list.contains(event.relatedTarget as Node | null)) {
+      this.dropGap = undefined
+    }
+  }
+
+  /** Moves the dragged row into the gap the line marks. */
+  private readonly handleDrop = (event: DragEvent): void => {
     const table = this.table
     const moving = this.dragging
+    const gap = this.dropGap
     this.dragging = undefined
-    if (!table || moving === undefined || moving === field) {
+    this.dropGap = undefined
+    if (!table || moving === undefined || gap === undefined) {
       return
     }
     event.preventDefault()
     const fields = this.columns(table).map((column) => column.field)
-    this.moveColumn(moving, fields.indexOf(field) - fields.indexOf(moving))
+    const from = fields.indexOf(moving)
+    const to = gap.at > from ? gap.at - 1 : gap.at
+    this.moveColumn(moving, to - from)
+  }
+
+  private readonly handleDragEnd = (): void => {
+    this.dragging = undefined
+    this.dropGap = undefined
   }
 
   protected renderItem(table: ToolTable, column: ToolColumn, onlyShown: boolean): TemplateResult {
@@ -355,9 +415,8 @@ export class HelixHeadlessColumnManager extends HelixElement {
       data-field=${field}
       draggable="true"
       @dragstart=${(event: DragEvent) => this.handleDragStart(event, field)}
-      @dragend=${() => (this.dragging = undefined)}
-      @dragover=${this.handleDragOver}
-      @drop=${(event: DragEvent) => this.handleDrop(event, field)}
+      @dragend=${this.handleDragEnd}
+      @dragover=${(event: DragEvent) => this.handleDragOver(event, field)}
       @keydown=${(event: KeyboardEvent) => this.handleKey(event, field)}
     >
       <button part="grip" type="button" aria-label=${formatWords(this, 'moveLabel', { name })}
@@ -396,7 +455,13 @@ export class HelixHeadlessColumnManager extends HelixElement {
         <span part="title" id="title">${this.label || this.fallbackLabel}</span>
         <button part="reset" type="button" @click=${() => this.reset()}>${this.resetLabel}</button>
       </div>
-      <ul part="list" aria-labelledby="title">
+      <ul
+        part="list"
+        aria-labelledby="title"
+        @dragover=${this.handleListOver}
+        @dragleave=${this.handleListLeave}
+        @drop=${this.handleDrop}
+      >
         ${
           table
             ? repeat(
@@ -407,6 +472,13 @@ export class HelixHeadlessColumnManager extends HelixElement {
             : nothing
         }
       </ul>
+      <span
+        part="drop"
+        aria-hidden="true"
+        hidden
+        data-at=${this.dropGap?.at ?? nothing}
+        style=${this.dropGap ? `--_column-manager-drop-y: ${this.dropGap.y}px` : nothing}
+      ></span>
       <span part="live" aria-live="polite">${this.said}</span>`
   }
 }

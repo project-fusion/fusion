@@ -3,6 +3,9 @@
      pace and on the curve rows move by everywhere. */
   --column-manager-move-duration: var(--helix-duration-normal);
   --column-manager-move-easing: var(--helix-easing-standard);
+
+  /* The box the drop line is placed against. */
+  position: relative;
 }
 
 :host {
@@ -44,6 +47,30 @@
   padding: 0;
 }
 
+/* **The gap a dragged row will land in**, a primary line across the list,
+ * centered on the gap between the two rows. It glides from gap to gap as the
+ * pointer moves; it arrives where it is first drawn, with nothing to glide
+ * from. Over the rows and taking no pointer, so the drag goes on beneath it. */
+[part="drop"] {
+  display: none;
+}
+
+[part="drop"][data-at] {
+  --_column-manager-drop-y: 0px;
+
+  background-color: var(--column-manager-drop-color, var(--helix-color-primary));
+  block-size: var(--helix-border-thick);
+  border-radius: var(--helix-radii-full);
+  display: block;
+  inset-block-start: 0;
+  inset-inline: var(--helix-space-xs);
+  pointer-events: none;
+  position: absolute;
+  transition: translate var(--helix-duration-fast) var(--helix-easing-emphasized);
+  translate: 0 calc(var(--_column-manager-drop-y) - var(--helix-border-thick) / 2);
+  z-index: var(--helix-layer-raised);
+}
+
 [part~="item"] {
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -70,6 +97,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   [part~="item"] {
+    transition: none;
+  }
+
+  [part="drop"][data-at] {
     transition: none;
   }
 }
