@@ -1,5 +1,5 @@
 ---
-description: The duration and easing tokens, and how components handle reduced motion.
+description: The duration and easing tokens, how components handle reduced motion, and the functions that move your own elements.
 section: Foundations
 title: Motion
 ---
@@ -270,3 +270,140 @@ It names the way for the length of the move, changes the page at once under
 reduced motion or where the browser has no view transitions, and rejects
 where the change does. To keep a header still while the rest of the page
 moves, give it a `view-transition-name` of its own on every page.
+
+## Motion on your own elements
+
+Four functions in `@fusion.dev/helix-core` give elements you write yourself
+the motion Helix's own families have, with no component around them:
+
+- `moveItems` slides the items of a list to their new places.
+- `trackIndicator` sends one mark from item to item.
+- `countTo` counts a figure to a new number.
+- `followPointer` writes where a mouse or pen is over an element.
+
+Each one works on any element, in any framework, and needs no Helix
+stylesheet. Times and curves default to the tokens above, and to the values
+those tokens hold where the page does not load them. Under reduced motion
+nothing moves, the figure changes at once, and the pointer is not followed.
+`moveItems`, `followPointer`, and `trackIndicator` return the way to stop.
+
+### Items that move
+
+`moveItems` watches an element's children. When you or your framework add,
+remove, reorder, or hide them, each item slides from its old place to its new
+one, and an item you add fades in:
+
+```js
+import { moveItems } from '@fusion.dev/helix-core'
+
+const stop = moveItems(document.querySelector('#tasks'), {
+  leaving: document.querySelector('#tasks-box'),
+})
+```
+
+| Option | Default |
+| --- | --- |
+| `items`, a selector or a function returning the items | the element's children |
+| `duration`, in milliseconds, as a time, or as a custom property | `--helix-duration-normal` |
+| `easing`, a curve or a custom property | `--helix-easing-standard` |
+| `leaving`, a positioned box around the element | none, so an item that leaves is gone at once |
+| `arriveIntoEmpty`, so the first item into an empty list fades in | `false` |
+
+A copy of an item that leaves fades out where it was, in the `leaving` box.
+The copy never joins the element's own children, which your framework
+manages, so give the box `position: relative` and put the list inside it.
+When every item is new at once, as when a framework draws the whole list
+again, the list appears without moving.
+
+### A mark that travels
+
+`trackIndicator` places one mark on the item that is marked now, and places it
+again whenever an attribute inside the element changes, an item arrives or
+leaves, or the element changes size:
+
+```js
+import { trackIndicator } from '@fusion.dev/helix-core'
+
+trackIndicator(document.querySelector('nav'), {
+  active: '[aria-current="page"]',
+  indicator: document.querySelector('nav .mark'),
+})
+```
+
+It writes four custom properties on the mark: `--indicator-x`,
+`--indicator-y`, `--indicator-inline-size`, and `--indicator-block-size`.
+Your stylesheet moves the mark with them, so its transition is the move:
+
+```css
+nav {
+  position: relative;
+}
+
+nav .mark {
+  block-size: var(--indicator-block-size, 0);
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  position: absolute;
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast);
+  translate: var(--indicator-x, 0) var(--indicator-y, 0);
+}
+
+nav .mark[data-placed] {
+  opacity: 1;
+}
+```
+
+`data-placed` is on the mark once it has a place, so it fades in where it
+belongs. `data-moving` is on it while it travels. With nothing marked, the
+mark loses `data-placed`. Call `place()` on what it returns after a change it
+cannot see, such as a new stylesheet, and `stop()` to end it.
+
+### Figures that count
+
+`countTo` counts the number an element shows to a new one, and resolves once
+the new figure is written:
+
+```js
+import { countTo } from '@fusion.dev/helix-core'
+
+await countTo(document.querySelector('#revenue'), 1284)
+```
+
+It counts from the number last counted to, or from the number the element's
+text reads. Pass `from` the first time for a figure written with grouping in
+another language. The figure is written in the element's language, or with
+`format`, which takes the number and returns its text. The count takes
+`--helix-duration-slow` along `--helix-easing-decelerate`, and a new count
+started during one carries on from the figure drawn.
+
+The element's text changes on every frame, so keep it out of a live region and
+tell screen reader users the new number another way.
+
+### Following the pointer
+
+`followPointer` writes `--pointer-x` and `--pointer-y` on an element while a
+mouse or pen is over it, each from -1 to 1, with 0 and 0 in the middle. A
+right-to-left page mirrors `--pointer-x`. The two go when the pointer leaves,
+so give them `0` as the fallback:
+
+```js
+import { followPointer } from '@fusion.dev/helix-core'
+
+followPointer(document.querySelector('.card'))
+```
+
+```css
+.card {
+  rotate: x calc(var(--pointer-y, 0) * -6deg);
+  transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
+}
+```
+
+`data-following` is on the element while the two are written. A touch is not
+followed, since a finger is on the element only while it presses. Pass `moved`
+and `left` to hear the same positions in script.
