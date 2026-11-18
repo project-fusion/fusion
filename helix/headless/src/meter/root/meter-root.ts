@@ -409,11 +409,6 @@ export class HelixHeadlessMeter extends HelixElement {
   }
 
   /**
-   * What the reading says: the consumer's words, or the reading in
-   * `format-options`, a share of the range for a percent and the value for
-   * anything else.
-   */
-  /**
    * Counting the number shown under `show-value` from the one before, so it
    * keeps pace with the fill. While it counts, the passing numbers are hidden
    * from screen readers and the new reading is read in their place.
@@ -440,6 +435,11 @@ export class HelixHeadlessMeter extends HelixElement {
     )
   }
 
+  /**
+   * What the reading says: the consumer's words, or the reading in
+   * `format-options`, a share of the range for a percent and the value for
+   * anything else.
+   */
   private get text(): string {
     return (
       this.valueText ||
