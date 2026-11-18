@@ -74,8 +74,11 @@
   min-inline-size: var(--pagination-size, var(--helix-size-control-tight));
   padding-inline: var(--pagination-padding, var(--helix-space-2xs));
   text-decoration: none;
+  /* And the edge, so a page becoming the current one takes its frame over
+     the same beat as its fill. */
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
