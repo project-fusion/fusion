@@ -13,16 +13,11 @@ name: "Screens: Orb"
     visible: 'Preview'
     timeout: 30000
 - takeScreenshot: orb-preview-${MODE}-${SIZE}
-- openLink: helix://orb/sized-to-text/preview
+- openLink: helix://orb/size/preview
 - extendedWaitUntil:
-    visible: 'Sized to text'
+    visible: 'Size'
     timeout: 15000
-- takeScreenshot: orb-sized-to-text-${MODE}-${SIZE}
-- openLink: helix://orb/sizes/preview
-- extendedWaitUntil:
-    visible: 'Sizes'
-    timeout: 15000
-- takeScreenshot: orb-sizes-${MODE}-${SIZE}
+- takeScreenshot: orb-size-${MODE}-${SIZE}
 - openLink: helix://orb/states/preview
 - extendedWaitUntil:
     visible: 'States'

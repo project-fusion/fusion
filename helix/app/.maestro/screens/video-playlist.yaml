@@ -45,13 +45,6 @@ name: "Screens: Video Playlist"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: video-playlist-in-the-control-bar-${MODE}-${SIZE}
-- openLink: helix://video-playlist/placement/preview
-- extendedWaitUntil:
-    visible: 'Placement'
-    timeout: 15000
-- waitForAnimationToEnd:
-    timeout: 15000
-- takeScreenshot: video-playlist-placement-${MODE}-${SIZE}
 - openLink: helix://video-playlist/repeat-and-shuffle/preview
 - extendedWaitUntil:
     visible: 'Repeat And Shuffle'

@@ -1,5 +1,5 @@
 # Sparkline, each example drawn alone: the three plots, the curves, emphasis,
-# a table read by its id, the palette, the plots and weights, and the termini.
+# a table read by its id, the palette, the termini, and the line weights.
 # One screenshot of each, named by the example, `MODE`, and `SIZE`.
 #
 # A sparkline is a drawing a screen reader reaches by its label alone, so the
@@ -35,13 +35,13 @@ name: "Screens: Sparkline"
     visible: 'Palette'
     timeout: 15000
 - takeScreenshot: sparkline-palette-${MODE}-${SIZE}
-- openLink: helix://sparkline/plots-and-weights/preview
-- extendedWaitUntil:
-    visible: 'Plots And Weights'
-    timeout: 15000
-- takeScreenshot: sparkline-plots-and-weights-${MODE}-${SIZE}
 - openLink: helix://sparkline/termini/preview
 - extendedWaitUntil:
     visible: 'Termini'
     timeout: 15000
 - takeScreenshot: sparkline-termini-${MODE}-${SIZE}
+- openLink: helix://sparkline/weight/preview
+- extendedWaitUntil:
+    visible: 'Weight'
+    timeout: 15000
+- takeScreenshot: sparkline-weight-${MODE}-${SIZE}

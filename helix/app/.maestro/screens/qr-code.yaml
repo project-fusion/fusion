@@ -15,11 +15,11 @@ name: "Screens: QR Code"
     visible: 'Preview'
     timeout: 30000
 - takeScreenshot: qr-code-preview-${MODE}-${SIZE}
-- openLink: helix://qr-code/shapes/preview
+- openLink: helix://qr-code/shape/preview
 - extendedWaitUntil:
-    visible: 'Shapes'
+    visible: 'Shape'
     timeout: 15000
-- takeScreenshot: qr-code-shapes-${MODE}-${SIZE}
+- takeScreenshot: qr-code-shape-${MODE}-${SIZE}
 - openLink: helix://qr-code/correction/preview
 - extendedWaitUntil:
     visible: 'Correction'

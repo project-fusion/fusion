@@ -25,13 +25,6 @@ name: "Screens: Toast"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: toast-preview-dismissed-${MODE}-${SIZE}
-- openLink: helix://toast/arriving/preview
-- extendedWaitUntil:
-    visible: Two files were skipped.
-    timeout: 15000
-- waitForAnimationToEnd:
-    timeout: 5000
-- takeScreenshot: toast-arriving-${MODE}-${SIZE}
 - openLink: helix://toast/auto-dismiss/preview
 - extendedWaitUntil:
     visible: Your export is ready to download.
@@ -69,13 +62,13 @@ name: "Screens: Toast"
 - takeScreenshot: toast-queue-next-${MODE}-${SIZE}
 # At the largest text size the stack stands taller than the window, with the
 # newest message showing, and a drag down reaches the first message.
-- openLink: helix://toast/tones/preview
+- openLink: helix://toast/tone/preview
 - extendedWaitUntil:
     visible: Could not reach the server.
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: toast-tones-${MODE}-${SIZE}
+- takeScreenshot: toast-tone-${MODE}-${SIZE}
 - swipe:
     start: 50%, 35%
     end: 50%, 90%

@@ -48,8 +48,3 @@ name: "Screens: Donut Chart"
     visible: 'With A Legend'
     timeout: 15000
 - takeScreenshot: donut-chart-with-a-legend-${MODE}-${SIZE}
-- openLink: helix://donut-chart/with-a-total/preview
-- extendedWaitUntil:
-    visible: 'With A Total'
-    timeout: 15000
-- takeScreenshot: donut-chart-with-a-total-${MODE}-${SIZE}

@@ -1,5 +1,5 @@
-# Icon Button, each example drawn alone: an icon button, then each tone and
-# emphasis and a disabled one. One screenshot of each, named by the example,
+# Icon Button, each example drawn alone: an icon button, each emphasis in
+# three tones and a disabled one, and each tone. One screenshot of each, named by the example,
 # `MODE`, and `SIZE`.
 appId: dev.fusion.helix.app
 name: "Screens: Icon Button"
@@ -12,8 +12,17 @@ name: "Screens: Icon Button"
     visible: '.*Settings.*'
     timeout: 30000
 - takeScreenshot: icon-button-preview-${MODE}-${SIZE}
-- openLink: helix://icon-button/appearances/preview
+- openLink: helix://icon-button/emphasis/preview
 - extendedWaitUntil:
-    visible: '.*Open notes.*'
+    visible: 'Emphasis'
     timeout: 15000
-- takeScreenshot: icon-button-appearances-${MODE}-${SIZE}
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: icon-button-emphasis-${MODE}-${SIZE}
+- openLink: helix://icon-button/tone/preview
+- extendedWaitUntil:
+    visible: 'Tone'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: icon-button-tone-${MODE}-${SIZE}

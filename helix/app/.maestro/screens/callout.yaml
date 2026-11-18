@@ -12,7 +12,7 @@ name: "Screens: Callout"
 - retry:
     maxRetries: 1
     commands:
-      - openLink: helix://callout/tones/preview
+      - openLink: helix://callout/tone/preview
 - scrollUntilVisible:
     centerElement: true
     element: '.*Warning.*'
@@ -20,7 +20,7 @@ name: "Screens: Callout"
     visibilityPercentage: 25
 - waitForAnimationToEnd:
     timeout: 15000
-- takeScreenshot: callout-tones-${MODE}-${SIZE}
+- takeScreenshot: callout-tone-${MODE}-${SIZE}
 - openLink: helix://callout/separation/preview
 - extendedWaitUntil:
     visible: 'Separation'

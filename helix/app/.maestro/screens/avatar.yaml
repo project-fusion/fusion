@@ -17,16 +17,16 @@ name: "Screens: Avatar"
     visible: 'Preview'
     timeout: 30000
 - takeScreenshot: avatar-preview-${MODE}-${SIZE}
-- openLink: helix://avatar/sizes/preview
+- openLink: helix://avatar/size/preview
 - extendedWaitUntil:
-    visible: 'Sizes'
+    visible: 'Size'
     timeout: 15000
-- takeScreenshot: avatar-sizes-${MODE}-${SIZE}
-- openLink: helix://avatar/shapes/preview
+- takeScreenshot: avatar-size-${MODE}-${SIZE}
+- openLink: helix://avatar/shape/preview
 - extendedWaitUntil:
-    visible: 'Shapes'
+    visible: 'Shape'
     timeout: 15000
-- takeScreenshot: avatar-shapes-${MODE}-${SIZE}
+- takeScreenshot: avatar-shape-${MODE}-${SIZE}
 - openLink: helix://avatar/image/preview
 - extendedWaitUntil:
     visible: 'Image'

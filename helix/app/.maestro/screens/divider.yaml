@@ -1,5 +1,5 @@
-# Divider, each example drawn alone: a line between paragraphs, a line with
-# words in it, and vertical lines. One screenshot of each, named by the
+# Divider, each example drawn alone: a line between paragraphs, lines with
+# words in them at each placement, and vertical lines. One screenshot of each, named by the
 # example, `MODE`, and `SIZE`.
 appId: dev.fusion.helix.app
 name: "Screens: Divider"
@@ -12,11 +12,11 @@ name: "Screens: Divider"
     visible: '.*three projects.*'
     timeout: 30000
 - takeScreenshot: divider-preview-${MODE}-${SIZE}
-- openLink: helix://divider/with-content/preview
+- openLink: helix://divider/content-placement/preview
 - extendedWaitUntil:
     visible: '.*Continue with email.*'
     timeout: 15000
-- takeScreenshot: divider-with-content-${MODE}-${SIZE}
+- takeScreenshot: divider-content-placement-${MODE}-${SIZE}
 - openLink: helix://divider/vertical/preview
 - extendedWaitUntil:
     visible: '.*Published.*'

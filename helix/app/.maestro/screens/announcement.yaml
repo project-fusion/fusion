@@ -18,13 +18,13 @@ name: "Screens: Announcement"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: announcement-preview-${MODE}-${SIZE}
-- openLink: helix://announcement/tones/preview
+- openLink: helix://announcement/tone/preview
 - extendedWaitUntil:
-    visible: 'Tones'
+    visible: 'Tone'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
-- takeScreenshot: announcement-tones-${MODE}-${SIZE}
+- takeScreenshot: announcement-tone-${MODE}-${SIZE}
 - openLink: helix://announcement/separation/preview
 - extendedWaitUntil:
     visible: 'Separation'

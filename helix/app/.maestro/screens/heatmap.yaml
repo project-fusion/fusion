@@ -23,11 +23,11 @@ name: "Screens: Heatmap"
     visible: 'Contributions'
     timeout: 15000
 - takeScreenshot: heatmap-contributions-${MODE}-${SIZE}
-- openLink: helix://heatmap/empty/preview
+- openLink: helix://heatmap/states/preview
 - extendedWaitUntil:
-    visible: 'Empty'
+    visible: 'States'
     timeout: 15000
-- takeScreenshot: heatmap-empty-${MODE}-${SIZE}
+- takeScreenshot: heatmap-states-${MODE}-${SIZE}
 - openLink: helix://heatmap/events/preview
 - extendedWaitUntil:
     visible: 'Events'

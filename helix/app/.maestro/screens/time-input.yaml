@@ -1,6 +1,6 @@
 # Time Input, its examples drawn alone: the field, the list its trigger opens on the
 # time it holds, the field after a pick, its segments, several times as tags, a
-# range, the wheels open, and a time the bounds refuse. One screenshot of each,
+# range, the wheels open, and the states, among them a time the bounds refuse. One screenshot of each,
 # named by the example, `MODE`, and `SIZE`. Each example after the first is waited
 # for by its title in the header first, and then by words only it draws: a wait on
 # words the example before also draws passes while the link is still opening, and
@@ -19,16 +19,16 @@ name: "Screens: Time Input"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: time-input-preview-${MODE}-${SIZE}
-- openLink: helix://time-input/bounded/preview
+- openLink: helix://time-input/limits/preview
 - extendedWaitUntil:
-    visible: 'Bounded'
+    visible: 'Limits'
     timeout: 15000
 - extendedWaitUntil:
     visible: '.*every 30 minutes.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: time-input-bounded-${MODE}-${SIZE}
+- takeScreenshot: time-input-limits-${MODE}-${SIZE}
 - tapOn:
     text: '.*Choose a time.*'
     retryTapIfNoChange: false
@@ -37,7 +37,7 @@ name: "Screens: Time Input"
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: time-input-bounded-open-${MODE}-${SIZE}
+- takeScreenshot: time-input-limits-open-${MODE}-${SIZE}
 - tapOn:
     text: '.*10:00.AM.*'
     retryTapIfNoChange: false
@@ -46,7 +46,7 @@ name: "Screens: Time Input"
     timeout: 10000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: time-input-bounded-picked-${MODE}-${SIZE}
+- takeScreenshot: time-input-limits-picked-${MODE}-${SIZE}
 - openLink: helix://time-input/segmented/preview
 - extendedWaitUntil:
     visible: 'Segmented'
@@ -87,13 +87,13 @@ name: "Screens: Time Input"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: time-input-wheels-${MODE}-${SIZE}
-- openLink: helix://time-input/invalid/preview
+- openLink: helix://time-input/states/preview
 - extendedWaitUntil:
-    visible: 'Invalid'
+    visible: 'States'
     timeout: 15000
 - extendedWaitUntil:
-    visible: '.*at or after 9:00.AM.*'
+    visible: '.*Managed by your admin.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: time-input-invalid-${MODE}-${SIZE}
+- takeScreenshot: time-input-states-${MODE}-${SIZE}

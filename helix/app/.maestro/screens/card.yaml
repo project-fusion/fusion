@@ -1,5 +1,6 @@
-# Card, each example drawn alone: an outlined card, the shadow of an elevated
-# one, the translucent materials, and media beside the words. One screenshot
+# Card, each example drawn alone: an outlined card, each separation from
+# plain to the shadow of an elevated card, the translucent materials, and
+# media beside the words. One screenshot
 # of each, named by the example, `MODE`, and `SIZE`.
 #
 # The media beside the words keeps its width at the largest text size, and
@@ -17,11 +18,14 @@ name: "Screens: Card"
     visible: '.*Storage.*'
     timeout: 30000
 - takeScreenshot: card-preview-${MODE}-${SIZE}
-- openLink: helix://card/elevated/preview
+- openLink: helix://card/separation/preview
 - extendedWaitUntil:
-    visible: '.*Team plan.*'
+    visible: 'Separation'
     timeout: 15000
-- takeScreenshot: card-elevated-${MODE}-${SIZE}
+- extendedWaitUntil:
+    visible: '.*Billing.*'
+    timeout: 15000
+- takeScreenshot: card-separation-${MODE}-${SIZE}
 - openLink: helix://card/material/preview
 - extendedWaitUntil:
     visible: '.*Team members.*'

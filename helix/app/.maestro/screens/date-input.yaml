@@ -58,10 +58,13 @@ name: "Screens: Date Input"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: date-input-range-${MODE}-${SIZE}
-- openLink: helix://date-input/invalid/preview
+- openLink: helix://date-input/states/preview
 - extendedWaitUntil:
-    visible: '.*(Your plan starts on this date|on or after August 1, 2026).*'
+    visible: 'States'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*Managed by your admin.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: date-input-invalid-${MODE}-${SIZE}
+- takeScreenshot: date-input-states-${MODE}-${SIZE}

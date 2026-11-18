@@ -44,23 +44,16 @@ name: "Screens: App Header"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: app-header-navigation-at-the-start-${MODE}-${SIZE}
-- openLink: helix://app-header/opaque/preview
+- openLink: helix://app-header/material/preview
 - extendedWaitUntil:
-    visible: Your projects
-    timeout: 15000
-- waitForAnimationToEnd:
-    timeout: 5000
-- takeScreenshot: app-header-opaque-${MODE}-${SIZE}
-- openLink: helix://app-header/glass/preview
-- extendedWaitUntil:
-    visible: Glass
+    visible: Material
     timeout: 15000
 - extendedWaitUntil:
     visible: Your projects
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: app-header-glass-${MODE}-${SIZE}
+- takeScreenshot: app-header-material-${MODE}-${SIZE}
 - openLink: helix://app-header/transparent/preview
 - extendedWaitUntil:
     visible: Transparent

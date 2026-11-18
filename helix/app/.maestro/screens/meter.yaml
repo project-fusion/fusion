@@ -12,16 +12,19 @@ name: "Screens: Meter"
     visible: '.*Disk used.*'
     timeout: 30000
 - takeScreenshot: meter-preview-${MODE}-${SIZE}
-- openLink: helix://meter/shapes/preview
+- openLink: helix://meter/shape/preview
 - extendedWaitUntil:
     visible: '.*Signal.*'
     timeout: 15000
-- takeScreenshot: meter-shapes-${MODE}-${SIZE}
-- openLink: helix://meter/low-high-optimum/preview
+- takeScreenshot: meter-shape-${MODE}-${SIZE}
+- openLink: helix://meter/ranges/preview
+- extendedWaitUntil:
+    visible: 'Ranges'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*Disk used.*'
     timeout: 15000
-- takeScreenshot: meter-low-high-optimum-${MODE}-${SIZE}
+- takeScreenshot: meter-ranges-${MODE}-${SIZE}
 - openLink: helix://meter/emphasis/preview
 - extendedWaitUntil:
     visible: '.*Network.*'

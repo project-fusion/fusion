@@ -17,13 +17,13 @@ name: "Screens: Bar Chart"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: bar-chart-preview-${MODE}-${SIZE}
-- openLink: helix://bar-chart/glass-and-gradient/preview
+- openLink: helix://bar-chart/emphasis/preview
 - extendedWaitUntil:
-    visible: 'Glass And Gradient'
+    visible: 'Emphasis'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
-- takeScreenshot: bar-chart-glass-and-gradient-${MODE}-${SIZE}
+- takeScreenshot: bar-chart-emphasis-${MODE}-${SIZE}
 - openLink: helix://bar-chart/grouped/preview
 - extendedWaitUntil:
     visible: 'Grouped'
@@ -38,20 +38,13 @@ name: "Screens: Bar Chart"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: bar-chart-horizontal-${MODE}-${SIZE}
-- openLink: helix://bar-chart/outlined/preview
+- openLink: helix://bar-chart/material/preview
 - extendedWaitUntil:
-    visible: 'Outlined'
+    visible: 'Material'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
-- takeScreenshot: bar-chart-outlined-${MODE}-${SIZE}
-- openLink: helix://bar-chart/outlined-series/preview
-- extendedWaitUntil:
-    visible: 'Outlined Series'
-    timeout: 15000
-- waitForAnimationToEnd:
-    timeout: 15000
-- takeScreenshot: bar-chart-outlined-series-${MODE}-${SIZE}
+- takeScreenshot: bar-chart-material-${MODE}-${SIZE}
 - openLink: helix://bar-chart/stacked/preview
 - extendedWaitUntil:
     visible: 'Stacked'
@@ -59,6 +52,13 @@ name: "Screens: Bar Chart"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: bar-chart-stacked-${MODE}-${SIZE}
+- openLink: helix://bar-chart/wash/preview
+- extendedWaitUntil:
+    visible: 'Wash'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: bar-chart-wash-${MODE}-${SIZE}
 - openLink: helix://bar-chart/with-a-line/preview
 - extendedWaitUntil:
     visible: 'With A Line'

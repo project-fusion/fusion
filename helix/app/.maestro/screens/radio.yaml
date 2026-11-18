@@ -1,5 +1,5 @@
-# Radio, each example drawn alone: a group with one chosen, radios drawn as
-# cards, and chips with icons. One screenshot of each, named by the example,
+# Radio, each example drawn alone: a group with one chosen, radios drawn
+# plain, outlined, and filled, and chips with icons. One screenshot of each, named by the example,
 # `MODE`, and `SIZE`.
 appId: dev.fusion.helix.app
 name: "Screens: Radio"
@@ -12,11 +12,14 @@ name: "Screens: Radio"
     visible: '.*Free.*'
     timeout: 30000
 - takeScreenshot: radio-preview-${MODE}-${SIZE}
-- openLink: helix://radio/cards/preview
+- openLink: helix://radio/separation/preview
+- extendedWaitUntil:
+    visible: 'Separation'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*Personal.*'
     timeout: 15000
-- takeScreenshot: radio-cards-${MODE}-${SIZE}
+- takeScreenshot: radio-separation-${MODE}-${SIZE}
 - openLink: helix://radio/chips/preview
 - extendedWaitUntil:
     visible: '.*Very dissatisfied.*'

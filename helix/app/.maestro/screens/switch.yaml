@@ -1,5 +1,5 @@
 # Switch, each example drawn alone: a switch with its hint, a switch with
-# icons, and disabled switches. One screenshot of each, named by the example,
+# icons, and a switch in each state. One screenshot of each, named by the example,
 # `MODE`, and `SIZE`.
 appId: dev.fusion.helix.app
 name: "Screens: Switch"
@@ -17,8 +17,11 @@ name: "Screens: Switch"
     visible: '.*Dark mode.*'
     timeout: 15000
 - takeScreenshot: switch-icons-${MODE}-${SIZE}
-- openLink: helix://switch/disabled/preview
+- openLink: helix://switch/states/preview
+- extendedWaitUntil:
+    visible: 'States'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*Text message notifications.*'
     timeout: 15000
-- takeScreenshot: switch-disabled-${MODE}-${SIZE}
+- takeScreenshot: switch-states-${MODE}-${SIZE}

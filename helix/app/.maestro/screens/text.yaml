@@ -12,13 +12,13 @@ name: "Screens: Text"
     visible: '.*Account settings.*'
     timeout: 30000
 - takeScreenshot: text-preview-${MODE}-${SIZE}
-- openLink: helix://text/appearances/preview
+- openLink: helix://text/scale/preview
 - extendedWaitUntil:
     visible: '.*Display.*'
     timeout: 15000
-- takeScreenshot: text-appearances-${MODE}-${SIZE}
-- openLink: helix://text/tones/preview
+- takeScreenshot: text-scale-${MODE}-${SIZE}
+- openLink: helix://text/tone/preview
 - extendedWaitUntil:
     visible: '.*Muted primary.*'
     timeout: 15000
-- takeScreenshot: text-tones-${MODE}-${SIZE}
+- takeScreenshot: text-tone-${MODE}-${SIZE}

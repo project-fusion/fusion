@@ -113,20 +113,6 @@ name: "Screens: Map"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-events-${MODE}-${SIZE}
-- openLink: helix://map/framed/preview
-- extendedWaitUntil:
-    visible: 'Framed'
-    timeout: 15000
-- waitForAnimationToEnd:
-    timeout: 15000
-- extendedWaitUntil:
-    visible:
-      id: helix-map-drawn
-    timeout: 20000
-    optional: true
-- waitForAnimationToEnd:
-    timeout: 15000
-- takeScreenshot: map-framed-${MODE}-${SIZE}
 - openLink: helix://map/globe/preview
 - extendedWaitUntil:
     visible: 'Globe'

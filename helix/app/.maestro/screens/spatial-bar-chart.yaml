@@ -13,16 +13,11 @@ name: "Screens: Spatial Bar Chart"
     visible: 'Preview'
     timeout: 30000
 - takeScreenshot: spatial-bar-chart-preview-${MODE}-${SIZE}
-- openLink: helix://spatial-bar-chart/diagonal/preview
+- openLink: helix://spatial-bar-chart/layout/preview
 - extendedWaitUntil:
-    visible: 'Diagonal'
+    visible: 'Layout'
     timeout: 15000
-- takeScreenshot: spatial-bar-chart-diagonal-${MODE}-${SIZE}
-- openLink: helix://spatial-bar-chart/one-bar-lit/preview
-- extendedWaitUntil:
-    visible: 'One bar lit'
-    timeout: 15000
-- takeScreenshot: spatial-bar-chart-one-bar-lit-${MODE}-${SIZE}
+- takeScreenshot: spatial-bar-chart-layout-${MODE}-${SIZE}
 - openLink: helix://spatial-bar-chart/row/preview
 - extendedWaitUntil:
     visible: 'Row'
@@ -38,11 +33,6 @@ name: "Screens: Spatial Bar Chart"
     visible: 'Three'
     timeout: 15000
 - takeScreenshot: spatial-bar-chart-three-${MODE}-${SIZE}
-- openLink: helix://spatial-bar-chart/week/preview
-- extendedWaitUntil:
-    visible: 'Week'
-    timeout: 15000
-- takeScreenshot: spatial-bar-chart-week-${MODE}-${SIZE}
 - openLink: helix://spatial-bar-chart/without-a-box/preview
 - extendedWaitUntil:
     visible: 'Without a box'

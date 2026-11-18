@@ -28,11 +28,6 @@ name: "Screens: Video"
     visible: 'Extra Controls'
     timeout: 15000
 - takeScreenshot: video-extra-controls-${MODE}-${SIZE}
-- openLink: helix://video/filled/preview
-- extendedWaitUntil:
-    visible: 'Filled'
-    timeout: 15000
-- takeScreenshot: video-filled-${MODE}-${SIZE}
 - openLink: helix://video/header/preview
 - extendedWaitUntil:
     visible: 'Header'
@@ -58,21 +53,16 @@ name: "Screens: Video"
     visible: 'Overflow Controls'
     timeout: 15000
 - takeScreenshot: video-overflow-controls-${MODE}-${SIZE}
-- openLink: helix://video/plain/preview
-- extendedWaitUntil:
-    visible: 'Plain'
-    timeout: 15000
-- takeScreenshot: video-plain-${MODE}-${SIZE}
 - openLink: helix://video/playlist-controls/preview
 - extendedWaitUntil:
     visible: 'Playlist Controls'
     timeout: 15000
 - takeScreenshot: video-playlist-controls-${MODE}-${SIZE}
-- openLink: helix://video/scrim/preview
+- openLink: helix://video/separation/preview
 - extendedWaitUntil:
-    visible: 'Scrim'
+    visible: 'Separation'
     timeout: 15000
-- takeScreenshot: video-scrim-${MODE}-${SIZE}
+- takeScreenshot: video-separation-${MODE}-${SIZE}
 - openLink: helix://video/sources/preview
 - extendedWaitUntil:
     visible: 'Sources'
@@ -83,11 +73,6 @@ name: "Screens: Video"
     visible: 'Start Control'
     timeout: 15000
 - takeScreenshot: video-start-control-${MODE}-${SIZE}
-- openLink: helix://video/subtitles-and-skip-buttons/preview
-- extendedWaitUntil:
-    visible: 'Subtitles And Skip Buttons'
-    timeout: 15000
-- takeScreenshot: video-subtitles-and-skip-buttons-${MODE}-${SIZE}
 - openLink: helix://video/unavailable/preview
 - extendedWaitUntil:
     visible: 'Unavailable'

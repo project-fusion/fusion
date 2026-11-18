@@ -20,11 +20,11 @@ name: "Screens: Loader"
     visible: '.*Loading projects.*'
     timeout: 30000
 - takeScreenshot: loader-preview-${MODE}-${SIZE}
-- openLink: helix://loader/sizes/preview
+- openLink: helix://loader/size/preview
 - extendedWaitUntil:
-    visible: 'Sizes'
+    visible: 'Size'
     timeout: 15000
-- takeScreenshot: loader-sizes-${MODE}-${SIZE}
+- takeScreenshot: loader-size-${MODE}-${SIZE}
 - openLink: helix://loader/with-icon/preview
 - extendedWaitUntil:
     visible: '.*Uploading file.*'

@@ -43,13 +43,13 @@ name: "Screens: Terminal"
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: terminal-in-a-pane-${MODE}-${SIZE}
-- openLink: helix://terminal/plain/preview
+- openLink: helix://terminal/without-a-header/preview
 - extendedWaitUntil:
-    visible: 'Plain'
+    visible: 'Without a header'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
-- takeScreenshot: terminal-plain-${MODE}-${SIZE}
+- takeScreenshot: terminal-without-a-header-${MODE}-${SIZE}
 - openLink: helix://terminal/transcript/preview
 - extendedWaitUntil:
     visible: 'Transcript'

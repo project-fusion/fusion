@@ -57,7 +57,7 @@ name: "Screens: Popover"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: popover-plain-${MODE}-${SIZE}
-- openLink: helix://popover/offset/preview
+- openLink: helix://popover/placement/preview
 - extendedWaitUntil:
     notVisible: .*ready to share with your team.*
     timeout: 15000
@@ -73,4 +73,4 @@ name: "Screens: Popover"
     timeout: 5000
 - waitForAnimationToEnd:
     timeout: 5000
-- takeScreenshot: popover-offset-${MODE}-${SIZE}
+- takeScreenshot: popover-placement-${MODE}-${SIZE}
