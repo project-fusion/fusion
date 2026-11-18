@@ -15,17 +15,22 @@ const run = hasLayout() ? test : (): void => {}
 
 describe('the dismissible example', () => {
   run(
-    'the dismiss button takes the callout away, and focus moves on to the button after it',
+    'the dismiss button folds the callout away, focus moves on, and Show tip brings it back',
     async () => {
       await example(dismissible)
-      const tip = document.getElementById('tip') as HTMLElement
+      const tip = document.getElementById('tip') as HTMLElement & { open: boolean }
       const dismiss = part(tip, 'dismiss') as HTMLElement
       dismiss.focus()
       dismiss.click()
-      await idle()
-      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
-      expect(document.getElementById('tip')).toBeNull()
+      for (let wait = 0; wait < 40 && !tip.hidden; wait += 1) {
+        await new Promise((done) => setTimeout(done, 50))
+      }
+      expect(tip.hidden).toBe(true)
       expect(document.activeElement?.localName).toBe('helix-button')
+      ;(document.getElementById('show-tip') as HTMLElement).click()
+      await idle()
+      expect(tip.open).toBe(true)
+      expect(tip.hidden).toBe(false)
     },
   )
 })
