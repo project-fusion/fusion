@@ -29,6 +29,8 @@ export default styles(
     prefix: 'timeline',
     hooks: {
       gap: token('space-lg'),
+      moveDuration: null,
+      moveEasing: null,
     },
     own: {
       timelineAbove: null,
@@ -73,6 +75,19 @@ export default styles(
     stylesheet: 'timeline/root/timeline-root.generated.css',
   },
   ({ hook, on, rule }) => [
+    /* Items slide to their new places at the pace of a change that answers a
+       hand. The timeline reads these from its script, so they are set here
+       rather than read with a fallback, and a page setting either on the element
+       wins over this rule. A phone moves nothing: its items stand in their new
+       places at once. */
+    on('host', [
+      web([
+        rule({
+          '--timeline-move-duration': token('duration-normal'),
+          '--timeline-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('host', [
       rule({ display: 'flex', flexDirection: 'column' }),
       rule(
