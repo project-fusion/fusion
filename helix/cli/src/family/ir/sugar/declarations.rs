@@ -39,6 +39,7 @@ impl Names {
                                     ordered(&written, &name)?;
                                 }
                                 written.push(name.clone());
+                                self.own_hook_set(&name);
                                 let value = Lit::Call("web".to_owned(), vec![self.value(value)?]);
                                 declarations.push(Lit::Array(vec![Lit::Text(name), value]));
                             }
@@ -60,6 +61,7 @@ impl Names {
                         let name = property(key);
                         ordered(&written, &name)?;
                         written.push(name.clone());
+                        self.own_hook_set(&name);
                         declarations.push(Lit::Array(vec![Lit::Text(name), self.value(value)?]));
                     }
                 }

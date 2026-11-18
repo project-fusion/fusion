@@ -353,6 +353,31 @@ impl Names {
         Ok(name)
     }
 
+    /// A custom property a rule sets that is one of the family's own hooks,
+    /// counted as that hook's use. **A hook a script reads** has no rule that
+    /// reads it: the family sets its default on the host, and the element reads
+    /// it with `getPropertyValue`, as List times its rows sliding into place by
+    /// `--list-move-duration`. The hook is still declared in `hooks`, with no
+    /// default, so the declaration is what says the script reads it.
+    fn own_hook_set(&mut self, property: &str) {
+        let Some(rest) = property
+            .strip_prefix("--")
+            .and_then(|name| name.strip_prefix(self.prefix.as_str()))
+            .and_then(|name| name.strip_prefix('-'))
+        else {
+            return;
+        };
+        if rest.starts_with('_') {
+            return;
+        }
+        /* Only a declared one: a name under the prefix may be another
+        family's, whose prefix starts with this one, as List sets List Item's
+        `--list-item-rail-content`, which the check across families reads. */
+        if self.hooks.iter().any(|(_, name)| name == rest) {
+            self.used.insert(format!("hook {rest}"));
+        }
+    }
+
     fn own_name(&mut self, key: &str) -> Result<String, String> {
         let found = self.own.iter().find(|(written, _)| written == key);
         let Some((_, name)) = found else {

@@ -65,6 +65,18 @@ fn declared<'a>(families: &[&'a Family]) -> Declared<'a> {
     for family in families {
         let hooks = declared.hooks.entry(family.name.as_str()).or_default();
         for rule in rules(family) {
+            /* A hook of its own the family sets, which its script reads: the
+            source's `hooks` declared it, which the sugar holds a set to. */
+            for (property, _) in &rule.set {
+                if let Some(hook) = property
+                    .strip_prefix("--")
+                    .and_then(|name| name.strip_prefix(family.name.as_str()))
+                    .and_then(|name| name.strip_prefix('-'))
+                    .filter(|hook| !hook.starts_with('_'))
+                {
+                    hooks.insert(hook);
+                }
+            }
             declared
                 .own
                 .extend(rule.values.iter().map(|(name, _)| name.as_str()));

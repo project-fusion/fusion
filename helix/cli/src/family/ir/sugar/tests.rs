@@ -124,6 +124,20 @@ fn variants_are_one_rule_per_value_in_the_order_written() {
 }
 
 #[test]
+fn a_hook_a_script_reads_is_used_where_the_family_sets_it() {
+    let set = rules(&table(
+        "hooks: { moveDuration: null }",
+        "({ on, rule }) => [on('host', [rule({ '--button-move-duration': '200ms' })])]",
+    ));
+    assert_eq!(set.len(), 1);
+    let other = rules(&table(
+        "hooks: { moveDuration: null }",
+        "({ on, rule }) => [on('host', [rule({ '--button-move-duration': '200ms', '--button-group-gap': '0' })])]",
+    ));
+    assert_eq!(other.len(), 1);
+}
+
+#[test]
 fn every_name_is_declared_and_used() {
     let unused = refusal(&table(
         "hooks: { size: null }",
