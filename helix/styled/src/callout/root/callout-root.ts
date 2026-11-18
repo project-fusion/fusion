@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCallout } from '@fusion.dev/helix-headless/callout'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './callout-root.css.js'
 
@@ -67,6 +67,60 @@ export class HelixCallout extends HelixHeadlessCallout {
   separation?: 'filled' | 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
+
+  /**
+   * **The height to fold from, measured as a dismissal begins**, while the
+   * callout still shows, and to unfold to once it shows again, measured
+   * after the headless tier takes `hidden` off and before the frame is
+   * painted. The stylesheet's keyframes read it, a height of `auto` being one
+   * no animation follows.
+   */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    if (this.hasUpdated && changed.has('open') && !this.open) {
+      this.measureFold()
+    }
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    /* Shown and measured before the headless tier marks it entering, whose
+       animation starts it at no height and would be what was measured. */
+    if (changed.has('open') && changed.get('open') !== undefined && this.open) {
+      this.removeAttribute('hidden')
+      this.measureFold()
+    }
+    super.updated(changed)
+  }
+
+  /**
+   * The height to fold, and **the gap beside it in a column**, which goes
+   * with the callout once it is hidden: folded to nothing with the gap still
+   * standing, the next thing jumped the gap's height at the end. The gap
+   * after it where something follows, and before it where it is last.
+   */
+  private measureFold(): void {
+    this.style.setProperty('--_callout-block-size', `${this.getBoundingClientRect().height}px`)
+    this.style.removeProperty('--_callout-fold-start')
+    this.style.removeProperty('--_callout-fold-end')
+    const parent = this.parentElement
+    if (!parent) {
+      return
+    }
+    const style = getComputedStyle(parent)
+    const column =
+      style.display.includes('grid') ||
+      (style.display.includes('flex') && style.flexDirection.startsWith('column'))
+    const gap = Number.parseFloat(style.rowGap)
+    if (!column || !(gap > 0)) {
+      return
+    }
+    const shown = (one: Element | null): boolean => one !== null && !one.hasAttribute('hidden')
+    if (shown(this.nextElementSibling)) {
+      this.style.setProperty('--_callout-fold-end', `${-gap}px`)
+    } else if (shown(this.previousElementSibling)) {
+      this.style.setProperty('--_callout-fold-start', `${-gap}px`)
+    }
+  }
 }
 
 declare global {
