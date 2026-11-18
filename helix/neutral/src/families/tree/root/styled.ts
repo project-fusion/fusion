@@ -27,6 +27,8 @@ export default styles(
       dragPreviewOpacity: 0.9,
       dragPreviewRadius: token('radii-sm'),
       dragPreviewShadow: token('shadow-floating'),
+      moveDuration: null,
+      moveEasing: null,
     },
     own: {
       treeBleed: null,
@@ -42,6 +44,19 @@ export default styles(
     stylesheet: 'tree/root/tree-root.generated.css',
   },
   ({ hook, on, rule }) => [
+    /* Items slide to their new places at the pace of a change that answers a
+       hand. The tree reads these from its script, so they are set here rather
+       than read with a fallback, and a page setting either on the element wins
+       over this rule. A phone moves nothing: its items stand in their new
+       places at once. */
+    on('host', [
+      web([
+        rule({
+          '--tree-move-duration': token('duration-normal'),
+          '--tree-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('host', [
       rule({ display: 'block' }),
       /* Read by every row, at every depth: the rows' words start on the tree's

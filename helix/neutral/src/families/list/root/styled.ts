@@ -1,6 +1,6 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import { oneOf } from '../../../render.js'
-import { fn, inherited, native, token } from '../../../style.js'
+import { fn, inherited, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -32,12 +32,27 @@ export default styles(
       loadingColor: token('color-foreground-muted'),
       loadingPadding: token('space-md'),
       markerGutter: token('space-md'),
+      moveDuration: null,
+      moveEasing: null,
     },
     own: { listBleed: null },
     props: { bleed: false, divided: false, marker: oneOf(['rail']) },
     stylesheet: 'list/root/list-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [
+    /* Rows slide to their new places at the pace of a change that answers a
+       hand. The list reads these from its script, so they are set here rather
+       than read with a fallback, and a page setting either on the element wins
+       over this rule. A phone moves nothing: its rows stand in their new places
+       at once. */
+    on('host', [
+      web([
+        rule({
+          '--list-move-duration': token('duration-normal'),
+          '--list-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('host', [
       rule({ display: 'flex', flexDirection: 'column', gap: hook.gap }),
       /* The markers. **`outside`, with a gutter of our own for it to hang into.**
