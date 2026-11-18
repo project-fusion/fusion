@@ -65,6 +65,7 @@ export function Example() {
           id="playlist"
           items={tracks}
           label="Playlist"
+          text-field="name"
         >
           <template dangerouslySetInnerHTML={{ __html: ROW }} />
         </helix-virtual-list>
@@ -74,6 +75,7 @@ export function Example() {
           items={tracks}
           label="Recently played"
           orientation="horizontal"
+          text-field="name"
         >
           <template dangerouslySetInnerHTML={{ __html: CARD }} />
         </helix-virtual-list>

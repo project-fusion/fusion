@@ -6,7 +6,8 @@ export function Example() {
 
   useEffect(() => {
     const input = email.current
-    input?.updateComplete.then(() => input.focus())
+    /* On a phone the ref has no `updateComplete`, and the field is not focused. */
+    void input?.updateComplete?.then(() => input.focus())
   }, [])
 
   return (
