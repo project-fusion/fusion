@@ -8,6 +8,7 @@ import {
   hookOf,
   list,
   measured,
+  mix,
   native,
   product,
   scheme,
@@ -39,6 +40,7 @@ export default styles(
     hooks: ({ own }) => ({
       backgroundColor: token('color-surface-sunken'),
       borderColor: token('color-border'),
+      hoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
       indicatorColor: own.indicatorSurface,
       indicatorShadow: token('shadow-sm'),
       itemRadius: null,
@@ -198,6 +200,20 @@ export default styles(
     on({ slotted: 'helix-toggle' }, [
       rule({ blockSize: own.toggleHeight, flex: '1 1 auto', minInlineSize: 0 }),
       rule({ orientation: 'vertical' }, { flex: '0 0 auto' }),
+      /* **Pressed and released in a beat**, where several can be pressed and
+         no marker travels to say it: the item's fill and lift come and go
+         over `fast` instead of in one frame. */
+      web([
+        rule(
+          { selectionMode: 'multiple' },
+          {
+            transition: list(
+              ['background-color', token('duration-fast'), token('easing-standard')],
+              ['box-shadow', token('duration-fast'), token('easing-standard')],
+            ),
+          },
+        ),
+      ]),
     ]),
     /* The marker's look, which a pressed toggle shares where several can be
        pressed, since one marker cannot travel to two places. */
@@ -229,6 +245,43 @@ export default styles(
          disappears and a chosen control looks like the others. Measured in Chromium
          on October 31, 2026. */
       rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
+    ]),
+    /* **The hover wash, one element that glides from item to item** as
+       segmented Tabs and Navigation draw theirs, in place of each item's own,
+       which the web's base sheet takes away inside a group. Placed where the
+       pointer arrives and faded in; it slides only once `data-gliding` says it
+       has arrived, so it never slides in from where it was last. Behind the
+       marker, which comes after it. A phone has no pointer to follow. */
+    on('highlight', [
+      web([
+        rule({
+          backgroundColor: hook.hoverBackgroundColor,
+          blockSize: measured('indicator-block-size', 0),
+          borderRadius: own.toggleRadius,
+          display: 'block',
+          inlineSize: measured('indicator-inline-size', 0),
+          insetBlockStart: 0,
+          insetInlineStart: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+          position: 'absolute',
+          transition: ['opacity', token('duration-fast'), token('easing-standard')],
+          translate: [measured('indicator-x', '0px'), measured('indicator-y', '0px')],
+          zIndex: token('layer-base'),
+        }),
+        rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+        rule(
+          { part: { 'data-gliding': true } },
+          {
+            transition: list(
+              ['translate', token('duration-normal'), token('easing-emphasized')],
+              ['inline-size', token('duration-normal'), token('easing-emphasized')],
+              ['block-size', token('duration-normal'), token('easing-emphasized')],
+              ['opacity', token('duration-fast'), token('easing-standard')],
+            ),
+          },
+        ),
+      ]),
     ]),
     /* Written out: a rule on an element passed in reads no state of that element. */
     on(

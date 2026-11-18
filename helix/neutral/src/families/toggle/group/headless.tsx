@@ -63,7 +63,9 @@ export default headless('toggle-group', {
     change: bare(),
     input: bare(),
   },
-  states: ['invalid', 'settled'],
+  /* `gliding` while a mouse or pen is over an item, so the highlight draws
+     the hover wash in place of each item's own. */
+  states: ['gliding', 'invalid', 'settled'],
   collection: {
     allowEmptySelection: 'allowEmptySelection',
     defaultProp: 'defaultValue',
@@ -114,6 +116,15 @@ export default headless('toggle-group', {
               platform="native"
             />
           )}
+          {/* The hover wash that glides from item to item under a mouse or
+                pen. Hidden until a stylesheet shows it, so the headless tier
+                lays out as it did without it. A phone has no pointer to follow. */}
+          <View
+            ariaHidden
+            hidden
+            part="highlight"
+            platform="web"
+          />
           <View
             ariaHidden
             indicator
