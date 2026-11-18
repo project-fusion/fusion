@@ -25,6 +25,34 @@ const words = async (): Promise<Rotating> => {
 }
 
 describe('rotating text', () => {
+  test('says once that it holds more than six words, since the seventh never shows', async () => {
+    const slot = Symbol.for('fusion.dev/helix/runtime')
+    const store = globalThis as Record<symbol, unknown>
+    const seen: { kind: string; tag?: string }[] = []
+    store[slot] = (event: { kind: string; tag?: string }) => {
+      seen.push(event)
+      return true
+    }
+    try {
+      const spans = (n: number) =>
+        Array.from({ length: n }, (_, i) => `<span>word${i + 1}</span>`).join('')
+      await mount(`<helix-rotating-text>${spans(6)}</helix-rotating-text>`)
+      await settle()
+      expect(seen).toHaveLength(0)
+      const host = (await mount(
+        `<helix-rotating-text>${spans(7)}</helix-rotating-text>`,
+      )) as Rotating
+      await settle()
+      host.append(document.createElement('span'))
+      await settle()
+      expect(seen.map((one) => [one.kind, one.tag])).toEqual([
+        ['too-many-words', 'helix-rotating-text'],
+      ])
+    } finally {
+      delete store[slot]
+    }
+  })
+
   test('shows the next word and has the one showing leave, and comes round to the first', async () => {
     const host = await words()
     host.turn()
