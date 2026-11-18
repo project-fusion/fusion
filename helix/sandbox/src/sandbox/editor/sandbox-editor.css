@@ -39,34 +39,39 @@
   text-indent: calc(-1 * var(--_sandbox-editor-hang, 0ch));
 }
 
-/* The line numbers, in a band the content keeps clear at its start. Each is
-   drawn by its own line, at the line's top, in its face and leading, so a face
-   that loads late moves a number with its line and nothing is measured. The
-   band is as wide as CodeMirror's gutter was: room for the last number's
-   digits and a step and a quarter of `2xs` before them and three quarters
-   after, and never under five steps.
-
-   **The digits' room is rounded up to a 64th of a pixel**, as a browser rounds
-   up a box sized to its text, which is how the gutter was sized. Unrounded, a
-   file of ten lines or more started its code a 64th of a pixel before the
-   gutter had started it, and every glyph's edge drew a different shade. */
-[part="editor"] .cm-content {
-  --_sandbox-editor-gutter: max(
-    calc(var(--helix-space-2xs) * 5),
-    calc(round(up, var(--_sandbox-editor-digits, 1) * 1ch, 1px / 64) + var(--helix-space-2xs) * 2)
-  );
-  padding-inline-start: var(--_sandbox-editor-gutter);
+/* The band the line numbers stand in, before the content: the widest number
+   the file can hold, set out of sight in the code's face, with a step and a
+   quarter of `2xs` before it and three quarters after, and never under five
+   steps. That is how CodeMirror sized its gutter, from a hidden number, and
+   the band has to be sized from text as the gutter was. A width in `ch` is
+   the advance a face states, while the text is laid out with the advance a
+   platform draws: Linux draws whole pixels, so a two-digit band in `ch` was
+   0.8px wider there than the gutter, and every picture of a file of ten lines
+   or more moved its code. The scroller lays its children out in a row, so the
+   band takes its room before the content as the gutter did. */
+[part="editor"] .cm-scroller::before {
+  box-sizing: border-box;
+  content: var(--_sandbox-editor-widest, "9");
+  flex-shrink: 0;
+  min-inline-size: calc(var(--helix-space-2xs) * 5);
+  padding-inline: calc(var(--helix-space-2xs) * 1.25) calc(var(--helix-space-2xs) * 0.75);
+  pointer-events: none;
+  user-select: none;
+  visibility: hidden;
+  white-space: nowrap;
 }
 
-/* Out of a copy, being no text in the document. */
+/* Each number is drawn by its own line, at the line's top, in its face and
+   leading, so a face that loads late moves a number with its line and nothing
+   is measured. It ends three quarters of `2xs` before the line starts, where
+   the band ends, as the gutter's numbers did. Out of a copy, being no text in
+   the document. */
 [part="editor"] .cm-line[data-line]::before {
-  box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   content: attr(data-line);
-  inline-size: var(--_sandbox-editor-gutter);
   inset-block-start: 0;
-  inset-inline-start: calc(-1 * var(--_sandbox-editor-gutter));
-  padding-inline: calc(var(--helix-space-2xs) * 1.25) calc(var(--helix-space-2xs) * 0.75);
+  inset-inline-end: 100%;
+  padding-inline-end: calc(var(--helix-space-2xs) * 0.75);
   pointer-events: none;
   position: absolute;
   text-align: end;
