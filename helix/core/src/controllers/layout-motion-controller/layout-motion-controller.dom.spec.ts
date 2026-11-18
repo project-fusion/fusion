@@ -113,7 +113,11 @@ const host = (...names: string[]) => {
 }
 
 /** A controller on a host, connected and recorded, moving at 200ms unless told otherwise. */
-const moving = (element: ReturnType<typeof host>, duration = '200ms') => {
+const moving = (
+  element: ReturnType<typeof host>,
+  duration = '200ms',
+  more: Partial<ConstructorParameters<typeof LayoutMotionController>[1]> = {},
+) => {
   if (duration) {
     element.style.setProperty('--list-move-duration', duration)
     element.style.setProperty('--list-move-easing', 'cubic-bezier(0.2, 0, 0, 1)')
@@ -127,6 +131,7 @@ const moving = (element: ReturnType<typeof host>, duration = '200ms') => {
         easing: style.getPropertyValue('--list-move-easing'),
       }
     },
+    ...more,
   })
   controller.hostConnected()
   return controller
@@ -390,5 +395,72 @@ describe('a host whose items move', () => {
     element.append(a)
     await settle()
     expect(asked.size).toBe(0)
+  })
+})
+
+describe('an item that leaves, where the host names a box for its copy', () => {
+  /* The copy is a clone, which keeps none of the row's stand-ins, so the
+     copies' fades are heard on the prototype. */
+  const fades: { copy: HTMLElement; keyframes: Keyframe[] }[] = []
+  const realAnimate = HTMLElement.prototype.animate
+  beforeEach(() => {
+    fades.length = 0
+    HTMLElement.prototype.animate = function (this: HTMLElement, keyframes: Keyframe[]) {
+      fades.push({ copy: this, keyframes })
+      return { finished: new Promise(() => {}) } as unknown as Animation
+    } as HTMLElement['animate']
+  })
+  afterEach(() => {
+    HTMLElement.prototype.animate = realAnimate
+  })
+
+  test('fades as a copy where it was, hidden and inert, while the rest close up', async () => {
+    const element = host('a', 'b', 'c')
+    const box = document.createElement('section')
+    document.body.append(box)
+    moving(element, '200ms', { leaving: () => box })
+    const [a, b] = rows(element) as [HTMLElement, HTMLElement]
+    b.remove()
+    await settle()
+    const copy = box.firstElementChild as HTMLElement
+    expect(copy?.dataset.name).toBe('b')
+    expect(copy.getAttribute('aria-hidden')).toBe('true')
+    expect(copy.inert).toBe(true)
+    expect(copy.style.top).toBe('40px')
+    expect(copy.style.position).toBe('absolute')
+    expect(fades.at(-1)?.keyframes.at(-1)?.opacity).toBe(0)
+    expect(start(a)).toBeUndefined()
+  })
+
+  test('leaves no copy where the host names no box, nor under reduced motion', async () => {
+    const element = host('a', 'b')
+    const box = document.createElement('section')
+    document.body.append(box)
+    moving(element)
+    ;(rows(element)[1] as HTMLElement).remove()
+    await settle()
+    reduce = true
+    const other = host('c', 'd')
+    moving(other, '200ms', { leaving: () => box })
+    ;(rows(other)[1] as HTMLElement).remove()
+    await settle()
+    expect(box.childElementCount).toBe(0)
+  })
+})
+
+describe('a list that was empty', () => {
+  test('stands still as its first items arrive, unless the host says they arrive', async () => {
+    const still = host()
+    moving(still)
+    still.append(row('a'))
+    await settle()
+    expect(asked.get(still.firstElementChild as HTMLElement)).toBeUndefined()
+    const arriving = host()
+    moving(arriving, '200ms', { arriveIntoEmpty: true })
+    arriving.append(row('b'))
+    await settle()
+    expect(asked.get(arriving.firstElementChild as HTMLElement)?.[0]?.keyframes[0]).toEqual({
+      opacity: 0,
+    })
   })
 })

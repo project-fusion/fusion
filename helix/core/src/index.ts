@@ -342,6 +342,7 @@ export {
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { MixinVoice, type VoiceElement } from './mixins/mixin-voice/mixin-voice.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
+export { type ArriveOptions, arrive } from './utils/arrive/arrive.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
 export { assignSlot, assignSlots } from './utils/assign-slots/assign-slots.js'
 export {
