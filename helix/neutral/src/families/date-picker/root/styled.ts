@@ -304,10 +304,18 @@ export default styles(
           },
           { backgroundColor: token('color-press') },
         ),
-        /* Not on a filler day, which keeps the quieter look above. */
+        /* Not on a filler day, which keeps the quieter look above. **And a
+           line through it**: the lighter ink alone sat close to a filler
+           day's, so a blocked 17th read as any other day, and a press on it
+           chose nothing. The line also holds under forced colors, which drop
+           the opacity and repaint the ink. */
         rule(
           { also: { 'day-disabled': true, 'day-outside': false }, formDisabled: false },
-          { color: token('color-foreground-subtle'), opacity: token('opacity-disabled') },
+          {
+            color: token('color-foreground-subtle'),
+            opacity: token('opacity-disabled'),
+            textDecoration: 'line-through',
+          },
         ),
         /* Forced colors paint every fill Canvas: the chosen day takes the
            Highlight pair, a filler day GrayText, and today an outline in the

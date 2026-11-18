@@ -45,6 +45,8 @@ export default styles(
       backgroundColor: token('color-well'),
       borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
+      moveDuration: null,
+      moveEasing: null,
       segmentFocusBackgroundColor: token('color-primary-surface'),
       segmentFocusColor: token('color-foreground-on-primary'),
       segmentLiteralColor: token('color-foreground-muted'),
@@ -67,6 +69,17 @@ export default styles(
   },
   ({ hook, include, on, rule }) => [
     include(field),
+    /* **A time arriving fades in, one leaving fades where it was, and the
+       rest slide into place**, at the pace and on the curve rows and tags move
+       by everywhere. The web element's motion controller reads these. */
+    on('host', [
+      web([
+        rule({
+          '--time-input-move-duration': token('duration-normal'),
+          '--time-input-move-easing': token('easing-standard'),
+        }),
+      ]),
+    ]),
     on('field', [
       rule({
         alignItems: 'center',
