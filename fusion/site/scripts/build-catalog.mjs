@@ -231,7 +231,7 @@ for (const family of families) {
      to the family it should have used. The headings are one level below
      Guidelines, which `reference` sets at the family's depth. */
   const lowered = (text) =>
-    /^[A-Z][a-z]/.test(text) ? text[0].toLowerCase() + text.slice(1) : text
+    /^[A-Z](?![A-Z])/.test(text) ? text[0].toLowerCase() + text.slice(1) : text
   const guidance = [
     ...(family.use.length > 0
       ? ['# When to use', '', ...family.use.map((line) => `- ${line}`), '']

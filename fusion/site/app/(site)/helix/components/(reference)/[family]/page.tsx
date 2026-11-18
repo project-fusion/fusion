@@ -60,7 +60,7 @@ const listed = (words: readonly string[]): string =>
  * letter is lowered, unless the first word is a name such as "HTML".
  */
 const after = (text: string): string =>
-  /^[A-Z][a-z]/.test(text) ? text[0]?.toLowerCase() + text.slice(1) : text
+  /^[A-Z](?![A-Z])/.test(text) ? text[0]?.toLowerCase() + text.slice(1) : text
 
 /**
  * **The description column: one share of the table, the same in every table.**
@@ -728,22 +728,23 @@ export default async function FamilyDocs({
                   beside the cases for another, so the two lists are read as
                   one choice. Each alternative opens with the other family's
                   name as a link, because the answer to "use something else"
-                  is a family you can open. */}
+                  is a family you can open. The lists are the docs' own prose
+                  lists, since each line is a sentence to read. */}
               <div className={api.guidelines}>
                 {family.use.length > 0 && (
                   <helix-flex direction="column" gap="sm">
                     <helix-text as="h3" scale="body-strong">
                       When to use
                     </helix-text>
-                    <helix-list kind="unordered" label="When to use">
-                      {family.use.map((line) => (
-                        <helix-list-item key={line}>
-                          <span data-item-text>
+                    <div data-prose>
+                      <ul>
+                        {family.use.map((line) => (
+                          <li key={line}>
                             <CodeText>{line}</CodeText>
-                          </span>
-                        </helix-list-item>
-                      ))}
-                    </helix-list>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </helix-flex>
                 )}
                 {family.instead.length > 0 && (
@@ -751,18 +752,18 @@ export default async function FamilyDocs({
                     <helix-text as="h3" scale="body-strong">
                       When to use something else
                     </helix-text>
-                    <helix-list kind="unordered" label="When to use something else">
-                      {family.instead.map((one) => (
-                        <helix-list-item key={one.slug}>
-                          <span data-item-text>
+                    <div data-prose>
+                      <ul>
+                        {family.instead.map((one) => (
+                          <li key={one.slug}>
                             <Link data-link="" href={`/helix/components/${one.slug}`}>
                               {one.label}
                             </Link>
                             : <CodeText>{after(one.description)}</CodeText>
-                          </span>
-                        </helix-list-item>
-                      ))}
-                    </helix-list>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </helix-flex>
                 )}
               </div>
