@@ -38,6 +38,28 @@ export interface LayoutMotionOptions {
    * gives the boxes it draws.
    */
   boxes?: (item: HTMLElement) => readonly HTMLElement[]
+
+  /**
+   * Where a copy of an item that leaves is laid while it fades, for a list
+   * whose items go one at a time, such as a field's tags or a feed's rows:
+   * a positioned box in the host's shadow root, or the shadow root itself
+   * for a host that is positioned. Where it is not given, an item that
+   * leaves is simply gone, and the items after it slide into its room.
+   */
+  leaving?: () => HTMLElement | ShadowRoot | null | undefined
+
+  /**
+   * Whether the first items into a list that was empty fade in. Off, they
+   * are a list arriving whole, which stands still, as a table's first page
+   * does. On for a field whose first tag or file the reader just chose.
+   */
+  arriveIntoEmpty?: boolean
+}
+
+/** How big an item's box is, in the host's layout pixels, for the copy that shows it leaving. */
+interface Size {
+  width: number
+  height: number
 }
 
 /** Where an item's box sits inside its host, in the host's layout pixels. */
@@ -127,12 +149,18 @@ const boxesOf = (element: Element): HTMLElement[] => {
  * **An item that arrives fades in, unless every item is new.** A framework
  * that renders the whole list again with new elements has replaced it rather
  * than added to it, and the whole list arriving at once would be a flash.
+ * `arriveIntoEmpty` makes a list that was empty an exception, for a field
+ * whose first file or tag is the reader's own doing.
  * The items there when the host connected arrive with the page, and do not
  * fade.
  *
  * **An item with no box of its own moves as the boxes it draws.** A table's
  * row is `display: contents`, so its cells take the move, one animation each
  * on one curve, and a row of cells slides as one.
+ *
+ * **An item that leaves can fade where it was**, where `leaving` names a box
+ * for its copy: a field's tags, a feed's rows. Otherwise it is gone at once
+ * and the items after it slide into its room.
  *
  * Only `transform` and `opacity` are animated, so a move never sets off
  * layout, and each animation is composited onto the item's own transform.
@@ -144,6 +172,9 @@ export class LayoutMotionController implements ReactiveController {
 
   /** Where each item was drawn after the last change. Empty until the first record. */
   private places = new Map<HTMLElement, Place>()
+
+  /** How big each item was drawn after the last change, for `leaving`. */
+  private sizes = new Map<HTMLElement, Size>()
 
   /** Whether the host has been measured once, so a change after that is a change. */
   private recorded = false
@@ -249,7 +280,9 @@ export class LayoutMotionController implements ReactiveController {
 
   /** Records where every item is drawn now, with no move started. */
   private record(): void {
-    this.places = this.measure().now
+    const { now, sizes } = this.measure()
+    this.places = now
+    this.sizes = sizes
     this.order = this.options.items()
     this.recorded = true
   }
@@ -266,6 +299,7 @@ export class LayoutMotionController implements ReactiveController {
   private measure(): {
     now: Map<HTMLElement, Place>
     showing: Map<HTMLElement, Place>
+    sizes: Map<HTMLElement, Size>
     within: Map<HTMLElement, HTMLElement>
   } {
     const items = this.options.items()
@@ -293,6 +327,7 @@ export class LayoutMotionController implements ReactiveController {
       return total
     }
     const now = new Map<HTMLElement, Place>()
+    const sizes = new Map<HTMLElement, Size>()
     const frame = this.host.getBoundingClientRect()
     const scale = scaleOf(this.host, frame)
     const scroller = this.options.scroller?.()
@@ -308,8 +343,9 @@ export class LayoutMotionController implements ReactiveController {
         x: (box.left - frame.left) / scale.x - offset.x + scrolled.x,
         y: (box.top - frame.top) / scale.y - offset.y + scrolled.y,
       })
+      sizes.set(item, { height: box.height / scale.y, width: box.width / scale.x })
     }
-    return { now, showing, within }
+    return { now, showing, sizes, within }
   }
 
   /**
@@ -342,9 +378,11 @@ export class LayoutMotionController implements ReactiveController {
    */
   private move(): void {
     const before = this.places
+    const sized = this.sizes
     const recorded = this.recorded
-    const { now, showing, within } = this.measure()
+    const { now, showing, sizes, within } = this.measure()
     this.places = now
+    this.sizes = sizes
     this.order = this.options.items()
     this.recorded = true
     const timing = this.options.timing()
@@ -353,7 +391,15 @@ export class LayoutMotionController implements ReactiveController {
       return
     }
     const easing = timing.easing.trim() || 'ease'
-    const replaced = [...now.keys()].every((item) => !before.has(item))
+    /* An empty list taking its first items has replaced nothing, where the
+       host says so: a field's first files arrive. A table drawing the rows
+       its server sent has replaced them, and they stand still. */
+    const replaced =
+      !(this.options.arriveIntoEmpty && before.size === 0) &&
+      [...now.keys()].every((item) => !before.has(item))
+    if (this.options.leaving && !replaced) {
+      this.leave(before, sized, now, duration)
+    }
     const journeys = new Map<HTMLElement, Place>()
     for (const [item, place] of now) {
       const was = before.get(item)
@@ -408,6 +454,93 @@ export class LayoutMotionController implements ReactiveController {
           easing,
         },
       )
+    }
+  }
+
+  /**
+   * **Copies of the items that left, fading where they were drawn**, so an
+   * item that goes does not vanish in a frame. Each is a clone laid in the
+   * `leaving` box at the item's last place and size, inert and hidden from
+   * assistive technology, shrinking a little as it fades over the first half
+   * of the move, on a curve that leaves, and gone after.
+   *
+   * Only the outermost of what left: a row's own items go with its copy.
+   * Not a list replaced whole, which is new rather than changed.
+   */
+  private leave(
+    before: Map<HTMLElement, Place>,
+    sizes: Map<HTMLElement, Size>,
+    now: Map<HTMLElement, Place>,
+    duration: number,
+  ): void {
+    const holder = this.options.leaving?.()
+    if (!holder) {
+      return
+    }
+    const gone = [...before.keys()].filter((item) => !now.has(item))
+    const outermost = gone.filter((item) => {
+      for (let up = item.parentElement; up && up !== this.host; up = up.parentElement) {
+        if (gone.includes(up)) {
+          return false
+        }
+      }
+      return true
+    })
+    if (outermost.length === 0) {
+      return
+    }
+    /* The holder's own corner in the host's layout pixels, which the copies
+       are placed from. */
+    const frame = this.host.getBoundingClientRect()
+    const scale = scaleOf(this.host, frame)
+    const box = holder instanceof ShadowRoot ? this.host : holder
+    const corner =
+      box === this.host
+        ? { x: this.host.clientLeft, y: this.host.clientTop }
+        : (() => {
+            const rect = box.getBoundingClientRect()
+            return {
+              x: (rect.left - frame.left) / scale.x + box.clientLeft - box.scrollLeft,
+              y: (rect.top - frame.top) / scale.y + box.clientTop - box.scrollTop,
+            }
+          })()
+    for (const item of outermost) {
+      const place = before.get(item)
+      const size = sizes.get(item)
+      if (!place || !size || (size.width === 0 && size.height === 0)) {
+        continue
+      }
+      const copy = item.cloneNode(true) as HTMLElement
+      copy.removeAttribute('id')
+      copy.removeAttribute('slot')
+      copy.removeAttribute('hidden')
+      copy.setAttribute('aria-hidden', 'true')
+      copy.setAttribute('data-leaving', '')
+      copy.inert = true
+      Object.assign(copy.style, {
+        blockSize: `${size.height}px`,
+        boxSizing: 'border-box',
+        inlineSize: `${size.width}px`,
+        left: `${place.x - corner.x}px`,
+        margin: '0',
+        pointerEvents: 'none',
+        position: 'absolute',
+        top: `${place.y - corner.y}px`,
+      })
+      holder.appendChild(copy)
+      if (typeof copy.animate !== 'function') {
+        copy.remove()
+        continue
+      }
+      const fade = copy.animate(
+        [
+          { opacity: 1, transform: 'scale(1)' },
+          { opacity: 0, transform: 'scale(0.9)' },
+        ],
+        { duration: duration / 2, easing: 'cubic-bezier(0.3, 0, 1, 1)', fill: 'forwards' },
+      )
+      const done = (): void => copy.remove()
+      void fade.finished.then(done, done)
     }
   }
 
