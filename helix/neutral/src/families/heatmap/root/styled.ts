@@ -154,6 +154,9 @@ export default styles(
               'transparent',
             ),
             inlineSize: width,
+            /* **A cell takes its new reading's color over a moment** rather
+               than at once, so a grid that refreshes shows which cells changed. */
+            transition: ['background-color', token('duration-normal'), token('easing-decelerate')],
           }),
           /* What each tone a cell names is worth, which a page sets through its hook. */
           rule({ 'data-tone': '1' }, { own: { heatmapPaint: hook.tone1 } }),

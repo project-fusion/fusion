@@ -4,6 +4,7 @@ import printExact from '../../../fragments/print-exact.js'
 import {
   fn,
   inherited,
+  list,
   measured,
   mix,
   native,
@@ -255,12 +256,19 @@ export default styles(
           }),
         ]),
       ]),
-      /* A chart never animates through a value it does not have. */
+      /* A chart never animates through a value it does not have. **And the
+         opacity, which the starting style sets**: without it the fade in had
+         nothing to run on, and the drawing appeared at once. */
       on(
         ['area', 'line'],
         [
           web([
-            rule({ transition: ['d', token('duration-normal'), easing] }),
+            rule({
+              transition: list(
+                ['d', token('duration-normal'), easing],
+                ['opacity', token('duration-slow'), easing],
+              ),
+            }),
             rule({ startingStyle: true }, { opacity: 0 }),
           ]),
         ],

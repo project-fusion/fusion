@@ -4,6 +4,7 @@ import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
+  list,
   measured,
   mix,
   native,
@@ -124,6 +125,26 @@ export default styles(
     ]),
     on('range', [rule({ fill: hook.rangeColor, fillOpacity: hook.rangeOpacity })]),
     on('bar', [rule({ fill: 'currentColor', rx: hook.barRadius })]),
+    /* **The drawing moves from the last readings to the new**, as Line Chart's
+       and Bar Chart's do, on `decelerate`, which is monotonic, so no frame
+       draws a value the data does not hold. A line with a different number of
+       points takes its new shape at once, there being nothing to move between. */
+    on(
+      ['line', 'area'],
+      [web([rule({ transition: ['d', token('duration-normal'), token('easing-decelerate')] })])],
+    ),
+    on('bar', [
+      web([
+        rule({
+          transition: list(
+            ['height', token('duration-normal'), token('easing-decelerate')],
+            ['width', token('duration-normal'), token('easing-decelerate')],
+            ['x', token('duration-normal'), token('easing-decelerate')],
+            ['y', token('duration-normal'), token('easing-decelerate')],
+          ),
+        }),
+      ]),
+    ]),
     on('svg', [
       web([
         rule(

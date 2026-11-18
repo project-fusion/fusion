@@ -123,6 +123,23 @@ export default styles(
         [rule({ fill: 'none', strokeLinecap: 'round', vectorEffect: 'non-scaling-stroke' })],
       ),
       on('point', [rule({ stroke: series, strokeWidth: diameter })]),
+      /* **A point moves from its last reading to its new one**, and grows or
+         shrinks with its weight, as Line Chart's line and Bar Chart's bars do,
+         on `decelerate`, which is monotonic, so no frame draws a value the data
+         does not hold. */
+      on(
+        ['point', 'point-ring'],
+        [
+          web([
+            rule({
+              transition: list(
+                ['d', token('duration-normal'), token('easing-decelerate')],
+                ['stroke-width', token('duration-normal'), token('easing-decelerate')],
+              ),
+            }),
+          ]),
+        ],
+      ),
       on('point-ring', [
         rule({
           stroke: hook.pointRingColor,

@@ -1,4 +1,4 @@
-import { difference, inherited, measured, product, token, web } from '../style.js'
+import { difference, inherited, list, measured, product, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -18,8 +18,8 @@ import { fragment } from '../table.js'
  * drawing does on the web. Never a surface color in the hole, which on a
  * purple card hid the stroke and left a disc of the page.
  *
- * **Web only:** the triangle's clip, and forced colors, where the mark keeps
- * the color its line is drawn in.
+ * **Web only:** the mark gliding with its line, the triangle's clip, and
+ * forced colors, where the mark keeps the color its line is drawn in.
  */
 export default fragment(
   'terminus',
@@ -42,6 +42,30 @@ export default fragment(
           translate: ['-50%', '-50%'],
         }),
         rule({ dir: 'rtl' }, { translate: ['50%', '-50%'] }),
+      ]),
+      /* **The mark rides the end of its line** while the readings change: the
+         line takes its new shape over `duration-normal` along `decelerate`,
+         and its last point travels straight from the old place to the new at
+         the same pace, so the mark moving the same way stays on it. Only where
+         the browser moves a path's shape at all, and not where the line
+         jumped, with a reading more or fewer. A ring stays put: the hole cut
+         for it in the drawing is a gradient that cannot travel with it, and a
+         ring gliding off its hole shows the line through it. */
+      on({ part: 'terminus', selector: '[part="terminus"]:not([data-jumped])' }, [
+        web([
+          rule(
+            { supports: '(d: path("M0 0"))' },
+            {
+              transition: list(
+                ['inset-block-start', token('duration-normal'), token('easing-decelerate')],
+                ['inset-inline-start', token('duration-normal'), token('easing-decelerate')],
+              ),
+            },
+          ),
+        ]),
+      ]),
+      on('terminus', [
+        web([rule({ supports: '(d: path("M0 0"))', terminus: 'ring' }, { transition: 'none' })]),
         rule({ borderRadius: token('radii-full') }),
         rule({ terminus: 'none' }, { display: 'none' }),
         rule({ terminus: 'square' }, { borderRadius: token('radii-none') }),
