@@ -157,12 +157,19 @@ export default styles(
     ]),
     on({ region: 'default', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
     /* Waiting out `delay`: the web marks the drawing `hidden`, and keeps its
-       box. */
+       box. **And it fades in when the wait is over**, so a loader that turns
+       up mid-task arrives instead of flashing on. */
+    on(
+      ['svg', 'mark'],
+      [web([rule({ transition: ['opacity', token('duration-normal'), token('easing-standard')] })])],
+    ),
     on('svg', [
-      web([rule({ part: { hidden: true } }, { display: 'inline', visibility: 'hidden' })]),
+      web([
+        rule({ part: { hidden: true } }, { display: 'inline', opacity: 0, visibility: 'hidden' }),
+      ]),
     ]),
     on('mark', [
-      web([rule({ part: { hidden: true } }, { display: 'flex', visibility: 'hidden' })]),
+      web([rule({ part: { hidden: true } }, { display: 'flex', opacity: 0, visibility: 'hidden' })]),
     ]),
     keyframes('helix-loader-breathe', {
       '0%, 100%': { opacity: 0.12 },

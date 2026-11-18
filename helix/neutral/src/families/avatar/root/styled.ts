@@ -65,6 +65,15 @@ export default styles(
     ]),
     on('image', [
       rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
+      /* **The picture fades in over the disc once it arrives**, as Image's
+         does. Hidden only while `loading`, so a picture a server sent is shown
+         before the script runs and a cached one is already loaded on the first
+         frame, when transitions are still off. On the web a picture slow
+         enough that the initials stood in comes back from `display: none` as
+         it loads, which the starting style fades. */
+      rule({ transition: ['opacity', token('duration-normal'), token('easing-standard')] }),
+      rule({ loading: true }, { opacity: 0 }),
+      web([rule({ startingStyle: true }, { opacity: 0 })]),
       /* A phone lays the picture over the initials, as the web draws one in
          place of the other. */
       native([

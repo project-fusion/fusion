@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { first, hookOf, token, web } from '../../../style.js'
+import { first, hookOf, list, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -88,6 +88,25 @@ export default styles(
       /* A slot is `display: contents`, which `[hidden]` in the UA sheet does not beat. */
       /* Written out: a condition reads no attribute of a slot. */
       on({ part: 'button', selector: 'slot[hidden]' }, [web([rule({ display: 'none' })])]),
+      /* **The mark that takes over pops into place**: the check grows a little
+         past its size and settles back as the clipboard gives way to it, and
+         the clipboard does the same when it comes back. On `spring`, which the
+         motion page keeps for the few places where overshoot reads as a
+         response: a confirmation is one. Over `slow`, the time a spring takes
+         to settle; at `normal` on `emphasized` it read as no motion, a 16 pixel
+         mark growing six pixels. A slot coming back from `display: none` gives
+         its mark a first style, which is what the starting style starts from. */
+      on('mark', [
+        web([
+          rule({
+            transition: list(
+              ['opacity', token('duration-fast'), token('easing-decelerate')],
+              ['scale', token('duration-slow'), token('easing-spring')],
+            ),
+          }),
+          rule({ startingStyle: true }, { opacity: 0, scale: 0.6 }),
+        ]),
+      ]),
       /* The confirmation is the one moment this control is loud, under the pointer too. */
       on('button', [
         rule({ part: { 'data-copied': true } }, { color: success }),
