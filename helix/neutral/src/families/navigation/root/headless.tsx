@@ -52,7 +52,9 @@ export default headless('navigation', {
     overflow: web(oneOf(['scroll'])),
   },
   events: {},
-  states: ['folded', 'open', 'settled'],
+  /* `gliding` while a mouse or pen is over a destination, so the highlight
+     draws the hover wash in place of each destination's own. */
+  states: ['folded', 'gliding', 'open', 'settled'],
   derived: {
     name: derive('navigation-name'),
   },
@@ -73,6 +75,15 @@ export default headless('navigation', {
       part="nav"
       role="navigation"
     >
+      {/* The hover wash that glides from destination to destination under a
+          mouse or pen. Hidden until a stylesheet shows it, so the headless tier
+          lays out as it did without it. A phone has no pointer to follow. */}
+      <View
+        ariaHidden
+        hidden
+        part="highlight"
+        platform="web"
+      />
       <View
         ariaHidden
         indicator

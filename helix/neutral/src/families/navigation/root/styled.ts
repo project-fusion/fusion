@@ -65,6 +65,9 @@ export default styles(
       flex: '0 0 auto',
       inlineSize: token('size-icon-tight'),
     }
+    const flipping = {
+      transition: ['scale', token('duration-normal'), token('easing-emphasized')],
+    } as const
     const glyph = {
       blockSize: token('size-icon'),
       flex: '0 0 auto',
@@ -290,8 +293,23 @@ export default styles(
           ),
         ]),
       ]),
-      on('more-mark', [web([rule(tight)])]),
-      on({ region: 'more-icon', slotted: '*' }, [web([rule(tight)])]),
+      /* **The caret flips as its menu opens**, as Select's and Megamenu's do. */
+      on('more-mark', [web([rule(tight), rule(flipping)])]),
+      on({ region: 'more-icon', slotted: '*' }, [web([rule(tight), rule(flipping)])]),
+      on(
+        {
+          part: 'more-mark',
+          selector: '[part="more"][aria-expanded="true"] [part="more-mark"]',
+        },
+        [web([rule({ scale: '1 -1' })])],
+      ),
+      on(
+        {
+          part: 'more-mark',
+          selector: '[part="more"][aria-expanded="true"] ::slotted([slot="more-icon"])',
+        },
+        [web([rule({ scale: '1 -1' })])],
+      ),
       on('more-glyph', [web([rule(glyph)])]),
       on({ region: 'menu-icon', slotted: '*' }, [web([rule(glyph)])]),
       /* Behind the destinations and out of flow, so moving it reflows nothing. */
@@ -387,6 +405,69 @@ export default styles(
           ),
         ]),
       ]),
+      /* **The hover wash, as one shape that glides** from destination to
+         destination while a mouse or pen moves along the bar, in place of each
+         destination's own, which the web's base sheet takes away while the bar
+         is gliding. Placed where the pointer arrives and faded in; it slides
+         only once `data-gliding` says it has arrived, so it never slides in
+         from where it was last. A phone has no pointer to follow. */
+      on('highlight', [
+        web([
+          rule({
+            backgroundColor: hookOf(
+              'navigation-item',
+              'hover-background-color',
+              mix(token('color-foreground'), 5, 'transparent'),
+            ),
+            blockSize: measured('indicator-block-size', 0),
+            borderRadius: hookOf('navigation-item', 'radius', token('radii-sm')),
+            /* Shown here: the headless tier keeps it hidden, out of the row's layout. */
+            display: 'block',
+            inlineSize: measured('indicator-inline-size', 0),
+            insetBlockStart: '50%',
+            insetInlineStart: 0,
+            opacity: 0,
+            pointerEvents: 'none',
+            position: 'absolute',
+            transition: ['opacity', token('duration-fast'), token('easing-standard')],
+            translate: [measured('indicator-x', 0), '-50%'],
+            zIndex: token('layer-base'),
+          }),
+          rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+          rule(
+            { part: { 'data-gliding': true } },
+            {
+              transition: list(
+                ['translate', token('duration-normal'), token('easing-emphasized')],
+                ['inline-size', token('duration-normal'), token('easing-emphasized')],
+                ['block-size', token('duration-normal'), token('easing-emphasized')],
+                ['opacity', token('duration-fast'), token('easing-standard')],
+              ),
+            },
+          ),
+          rule(
+            { orientation: 'vertical' },
+            {
+              insetBlockStart: 0,
+              translate: [measured('indicator-x', 0), measured('indicator-y', 0)],
+            },
+          ),
+          /* Toggle Group's thumb corner, as the segmented mark takes it. */
+          rule(
+            { marker: 'segmented' },
+            { borderRadius: hookOf('navigation-item', 'radius', token('radii-inset')) },
+          ),
+        ]),
+      ]),
+      /* The overflow button's own wash goes too while the shape draws it,
+         unless its menu is open, which it marks on its own. */
+      on(
+        {
+          part: 'more',
+          selector: ':host(:state(gliding)) [part="more"]:hover:not([aria-expanded="true"])',
+        },
+        [web([rule({ backgroundColor: 'transparent' })])],
+      ),
       keyframes('navigation-edges', {
         '0%': { '--_navigation-fade-end': token('space-xl'), '--_navigation-fade-start': '0rem' },
         '5%, 95%': {
