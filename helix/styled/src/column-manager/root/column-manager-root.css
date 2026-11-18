@@ -1,4 +1,11 @@
 :host {
+  /* **A column's row slides to its new place as the order changes**, at the
+     pace and on the curve rows move by everywhere. */
+  --column-manager-move-duration: var(--helix-duration-normal);
+  --column-manager-move-easing: var(--helix-easing-standard);
+}
+
+:host {
   color: var(--helix-color-foreground);
   display: block;
   font-size: var(--helix-text-control);
@@ -52,8 +59,19 @@
   background-color: var(--column-manager-item-hover-background-color, var(--helix-color-hover));
 }
 
+/* The row being dragged dims over a beat as it lifts, and comes back as it lands. */
+[part~="item"] {
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 [part~="item-dragging"] {
   opacity: var(--helix-opacity-disabled);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part~="item"] {
+    transition: none;
+  }
 }
 
 [part="grip"],
