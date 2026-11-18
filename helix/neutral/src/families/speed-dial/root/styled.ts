@@ -265,6 +265,26 @@ export default styles(
           rule({ blockSize: token('size-icon'), flex: '0 0 auto', inlineSize: token('size-icon') }),
         ]),
       ]),
+      /* **The drawn plus turns an eighth into a cross while the actions are
+         out**, so the button that opened them reads as the one that puts them
+         away. A glyph of your own holds still: a pencil turned an eighth is a
+         pencil at an angle. The web draws the plus as a glyph with no part of
+         its own; a phone turns its mark from a written start. */
+      on({ part: 'trigger', selector: '[part="trigger"] [data-glyph]' }, [
+        web([rule({ transition: ['rotate', token('duration-normal'), token('easing-emphasized')] })]),
+      ]),
+      on({ part: 'trigger', selector: ':host(:state(open)) [part="trigger"] [data-glyph]' }, [
+        web([rule({ rotate: '45deg' })]),
+      ]),
+      on('icon-mark', [
+        native([
+          rule({
+            rotate: '0deg',
+            transition: ['rotate', token('duration-normal'), token('easing-emphasized')],
+          }),
+          rule({ open: true }, { rotate: '45deg' }),
+        ]),
+      ]),
       on('host', [rule({ print: true }, { display: 'none' })]),
       /* Names on demand: each shows while its action is under the pointer
          or has focus, and only the marks take a press. */
