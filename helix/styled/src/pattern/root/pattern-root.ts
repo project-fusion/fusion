@@ -100,12 +100,30 @@ export class HelixPattern extends HelixElement {
     super.disconnectedCallback()
   }
 
+  /* **The tiles are drawn after the first render, never in it.** Hydration
+     keeps the attribute values the server wrote and commits none of its own,
+     so a tile written into the first render's `style` never reached a
+     server-rendered page, even once its script ran: the server has no canvas
+     to draw one with. Drawn a microtask after the first render, the tile is a
+     change, which the next render commits on any page. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (changed.has('motif') && this.motif === 'contours' && this.tile === undefined) {
+    if (this.hasUpdated && changed.has('motif')) {
+      this.draw()
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    queueMicrotask(() => this.draw())
+  }
+
+  /** Draws the tile the motif needs, the first time it needs it. */
+  private draw(): void {
+    if (this.motif === 'contours' && this.tile === undefined) {
       this.tile = contourTile()
     }
-    if (changed.has('motif') && this.motif === 'stars' && this.sky === undefined) {
+    if (this.motif === 'stars' && this.sky === undefined) {
       this.sky = starTiles()
     }
   }
