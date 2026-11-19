@@ -2,6 +2,7 @@ import { customElement, seriesIndex, seriesNames } from '@fusion.dev/helix-core'
 import { HelixHeadlessBarChart } from '@fusion.dev/helix-headless/bar-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
@@ -35,6 +36,8 @@ import '../../tooltip/index.js'
  * @cssproperty --bar-chart-gridline-color - Color of the gridlines drawn across the plot.
  * @cssproperty --bar-chart-line-color - Color of a `lines` series. Overrides its series color.
  * @cssproperty --bar-chart-line-width - Thickness of a `lines` series. Overrides `--chart-stroke`.
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-stroke - Thickness of a `lines` series. Bar Chart, Line Chart, and the top edge of Area Chart share this property. `--bar-chart-line-width` overrides it here.
  */
 @customElement('helix-bar-chart')
@@ -230,6 +233,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   }
 
   static override styles: CSSResultGroup = [
+    motionStyles,
     seriesStyles,
     statusStyles,
     tooltipStyles,

@@ -28,18 +28,18 @@
 }
 
 /* **The mark rides the end of its line** while the readings change: the line
-   takes its new shape over `--helix-duration-normal` along `decelerate`, and
-   its last point travels straight from the old place to the new at the same
-   pace, so the mark moving the same way stays on it. Only where the browser
-   moves a path's shape at all, and not where the line jumped, with a reading
-   more or fewer. A ring stays put: the hole cut for it in the drawing is a
-   gradient that cannot travel with it, and a ring gliding off its hole shows
-   the line through it. */
+   takes its new shape over `--chart-move-duration` along
+   `--chart-move-easing`, and its last point travels straight from the old
+   place to the new at the same pace, so the mark moving the same way stays on
+   it. Only where the browser moves a path's shape at all, and not where the
+   line jumped, with a reading more or fewer. A ring stays put: the hole cut
+   for it in the drawing is a gradient that cannot travel with it, and a ring
+   gliding off its hole shows the line through it. */
 @supports (d: path("M0 0")) {
   [part="terminus"]:not([data-jumped]) {
     transition:
-      inset-block-start var(--helix-duration-normal) var(--helix-easing-decelerate),
-      inset-inline-start var(--helix-duration-normal) var(--helix-easing-decelerate);
+      inset-block-start var(--_chart-move-duration) var(--_chart-move-easing),
+      inset-inline-start var(--_chart-move-duration) var(--_chart-move-easing);
   }
 
   :host([terminus="ring"]) [part="terminus"] {

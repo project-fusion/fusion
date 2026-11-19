@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSparkline } from '@fusion.dev/helix-headless/sparkline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
@@ -29,6 +30,8 @@ import { styles } from './sparkline-root.css.js'
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://fusion.dev/helix/components/sparkline
  *
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus. Without it, the middle is open.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
  * @cssproperty --sparkline-area-opacity - Opacity of the area fill where it meets the line.
@@ -76,7 +79,13 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
-  static override styles: CSSResultGroup = [liveStyles, terminusStyles, styles, statusMarkStyles]
+  static override styles: CSSResultGroup = [
+    motionStyles,
+    liveStyles,
+    terminusStyles,
+    styles,
+    statusMarkStyles,
+  ]
 
   /**
    * The shape of the mark on the last reading.

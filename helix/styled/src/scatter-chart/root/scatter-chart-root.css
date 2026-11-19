@@ -115,8 +115,8 @@
 [part="point"],
 [part="point-ring"] {
   transition:
-    d var(--helix-duration-normal) var(--helix-easing-decelerate),
-    stroke-width var(--helix-duration-normal) var(--helix-easing-decelerate);
+    d var(--_chart-move-duration) var(--_chart-move-easing),
+    stroke-width var(--_chart-move-duration) var(--_chart-move-easing);
 }
 
 [part="point-ring"] {

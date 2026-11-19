@@ -1,0 +1,27 @@
+/* **How long a chart takes to move to new readings, and its curve.** Every 2D
+   chart reads these two privates on the transitions that carry a mark from its
+   last reading to its new one: a bar's height, a line's shape, a point's place,
+   a slice's length, and a cell's color. Hover and focus feedback keeps its own
+   timing, and so do a line drawing itself on and a wash fading in on arrival.
+
+   `--chart-move-duration` and `--chart-move-easing` are the public hooks, and
+   they default to what every chart used before they existed:
+   `--helix-duration-normal` along `--helix-easing-decelerate`, which is
+   monotonic, so no frame draws a value the data does not hold. `0s` moves
+   nothing.
+
+   **Reduced motion wins over a duration the page sets.** The base layer
+   shortens the duration tokens to 0.01ms there, and a literal such as `400ms`
+   on the hook would otherwise bring the motion back. So under reduced motion
+   the duration is the token again, whatever the hook says, as List's rows
+   stand still there whatever `--list-move-duration` says. */
+:host {
+  --_chart-move-duration: var(--chart-move-duration, var(--helix-duration-normal));
+  --_chart-move-easing: var(--chart-move-easing, var(--helix-easing-decelerate));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    --_chart-move-duration: var(--helix-duration-normal);
+  }
+}

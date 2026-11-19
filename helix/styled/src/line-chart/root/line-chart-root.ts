@@ -2,6 +2,7 @@ import { customElement, PLOT_WIDTH, reducedMotion } from '@fusion.dev/helix-core
 import { HelixHeadlessLineChart } from '@fusion.dev/helix-headless/line-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
@@ -38,6 +39,8 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
  *
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`, and to `--helix-easing-standard` for a window of readings sliding along. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-stroke - Thickness of a series drawn as a line. Line Chart, Area Chart's top edge, and Bar Chart's `lines` all read this one property. Each family's own width property overrides it.
  *   family, Area Chart's top edge and Bar Chart's `lines`, since the three read one shared
  *   rule. Each family's own width hook overrides it.
@@ -124,6 +127,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
   material?: 'frosted' | 'glass'
 
   static override styles: CSSResultGroup = [
+    motionStyles,
     seriesStyles,
     statusStyles,
     tooltipStyles,
@@ -162,8 +166,14 @@ export class HelixLineChart extends HelixHeadlessLineChart {
     if (moved === 0) {
       return
     }
+    /* Timed by `--chart-move-duration` and `--chart-move-easing` where the
+       page sets them. Where the page sets no curve, the slide keeps
+       `--helix-easing-standard`. Reduced motion is answered above, so a
+       duration the page sets does not bring the slide back. */
     const style = getComputedStyle(this)
-    const written = style.getPropertyValue('--helix-duration-normal').trim()
+    const written =
+      style.getPropertyValue('--chart-move-duration').trim() ||
+      style.getPropertyValue('--helix-duration-normal').trim()
     const amount = Number.parseFloat(written)
     const duration = written.endsWith('ms') ? amount : amount * 1000
     if (!(duration >= 1)) {
@@ -171,7 +181,10 @@ export class HelixLineChart extends HelixHeadlessLineChart {
     }
     const slot = PLOT_WIDTH / names.length
     const step = (PLOT_WIDTH - slot) / (names.length - 1)
-    const easing = style.getPropertyValue('--helix-easing-standard').trim() || 'ease'
+    const easing =
+      style.getPropertyValue('--chart-move-easing').trim() ||
+      style.getPropertyValue('--helix-easing-standard').trim() ||
+      'ease'
     for (const one of this.renderRoot.querySelectorAll<SVGElement>(
       '[part~="line"], [part="area"], [part~="marker"], [part="marker-ring"]',
     )) {

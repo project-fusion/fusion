@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAreaChart } from '@fusion.dev/helix-headless/area-chart'
 import type { CSSResultGroup } from 'lit'
+import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
@@ -46,6 +47,8 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot.
  * @cssproperty --area-chart-overlap-opacity - How much of each band shows under `overlap`, where the bands in front let the ones behind show through.
  * @cssproperty --area-chart-width - Thickness of a band's top edge. Overrides `--chart-stroke`.
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-stroke - Thickness of a band's top edge. Area Chart, Line Chart, and Bar Chart's `lines` all read this one property. `--area-chart-width` overrides it here.
  */
 @customElement('helix-area-chart')
@@ -57,6 +60,7 @@ export class HelixAreaChart extends HelixHeadlessAreaChart {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [
+    motionStyles,
     seriesStyles,
     statusStyles,
     tooltipStyles,

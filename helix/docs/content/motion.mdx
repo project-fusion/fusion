@@ -226,6 +226,12 @@ does not hold. The mark on the end of a line rides with it. Safari does not
 transition a path's shape, so lines, areas, points, and the mark on a line's
 end there take their new place at once.
 
+Set `--chart-move-duration` and `--chart-move-easing` on a chart, or on an
+element that holds several, to change how long the move takes and its curve.
+They default to `--helix-duration-normal` and `--helix-easing-decelerate`, and
+`0s` turns the move off. Under reduced motion the marks take their new place
+at once, whatever duration you set.
+
 ## 3D charts that grow in and follow their readings
 
 The 3D charts draw their own marks, in SVG and through three.js, so their

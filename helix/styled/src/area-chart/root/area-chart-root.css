@@ -192,7 +192,7 @@
 [part="area"],
 [part="line"] {
   transition:
-    d var(--helix-duration-normal) var(--helix-easing-decelerate),
+    d var(--_chart-move-duration) var(--_chart-move-easing),
     opacity var(--helix-duration-slow) var(--helix-easing-decelerate);
 }
 
