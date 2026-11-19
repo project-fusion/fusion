@@ -1,5 +1,5 @@
 import '@fusion.dev/helix-testing/dom/register'
-import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The frame, after hydration. The table's reading is held by
@@ -351,7 +351,7 @@ describe('growing in again', () => {
     watcher: globalThis.IntersectionObserver,
   }
 
-  beforeEach(() => {
+  const install = (): void => {
     watchers = []
     frames = []
     clock = 1000
@@ -372,13 +372,28 @@ describe('growing in again', () => {
         watchers = watchers.filter((one) => one !== this.seen)
       }
     } as never
-  })
+  }
 
-  afterEach(() => {
+  const restore = (): void => {
     performance.now = real.now
     globalThis.requestAnimationFrame = real.frame
     globalThis.IntersectionObserver = real.watcher
-  })
+  }
+
+  /* Installed and put back by each test, never by `beforeEach` and
+     `afterEach`: the browser harness runs a file's hooks around every test in
+     the family, so a clock left to a hook stood in for the page's frames in
+     every other spec, and each one waited on a frame that never came. */
+  const clocked = (name: string, body: () => Promise<void> | void): void => {
+    test(name, async () => {
+      install()
+      try {
+        await body()
+      } finally {
+        restore()
+      }
+    })
+  }
 
   const sees = (on: boolean): void => {
     for (const one of [...watchers]) {
@@ -400,21 +415,24 @@ describe('growing in again', () => {
   const faces = (element: HTMLElement): number[] =>
     bars(element).map((bar) => bar.querySelectorAll('[part="face"]').length)
 
-  test('stand at the floor again once the chart has left the view, and grow when it returns', async () => {
-    const element = await days('grow grow-again layout="row"')
-    sees(true)
-    await settle(element)
-    expect(faces(element)).toEqual([3, 3, 3])
-    sees(false)
-    await element.updateComplete
-    expect(faces(element)).toEqual([1, 1, 1])
-    sees(true)
-    await element.updateComplete
-    await settle(element)
-    expect(faces(element)).toEqual([3, 3, 3])
-  })
+  clocked(
+    'stand at the floor again once the chart has left the view, and grow when it returns',
+    async () => {
+      const element = await days('grow grow-again layout="row"')
+      sees(true)
+      await settle(element)
+      expect(faces(element)).toEqual([3, 3, 3])
+      sees(false)
+      await element.updateComplete
+      expect(faces(element)).toEqual([1, 1, 1])
+      sees(true)
+      await element.updateComplete
+      await settle(element)
+      expect(faces(element)).toEqual([3, 3, 3])
+    },
+  )
 
-  test('stand where they are, without grow-again, when the chart leaves the view', async () => {
+  clocked('stand where they are, without grow-again, when the chart leaves the view', async () => {
     const element = await days('grow layout="row"')
     sees(true)
     await settle(element)
@@ -423,7 +441,7 @@ describe('growing in again', () => {
     expect(faces(element)).toEqual([3, 3, 3])
   })
 
-  test('a bar a later table adds grows from the floor while the others stand', async () => {
+  clocked('a bar a later table adds grows from the floor while the others stand', async () => {
     const element = await days('grow layout="row"')
     sees(true)
     await settle(element)
