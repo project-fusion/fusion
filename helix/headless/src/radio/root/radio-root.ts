@@ -17,9 +17,8 @@ import { property } from 'lit/decorators.js'
  * it. The group is the form control, so each radio only exposes its role and
  * dispatches an event when it is chosen.
  *
- * The radio has no label of its own. Its content names it, and the label, the
- * hint, and the message of the set belong to the group. It is the only control
- * in the family that takes nothing from `MixinField`.
+ * The radio is the only control in the family that takes nothing from
+ * `MixinField`.
  *
  * When a radio is chosen, it dispatches an event, the group determines whether
  * the choice stands, and the group writes `selected` back. The group is the one
@@ -35,6 +34,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy group
  * @anatomy box
  * @anatomy label
+ * @practice Set the label, the hint, and the message on the `Radio.Group`. - They belong to the set, and a radio has no label of its own: its content names it.
  * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radio's label.

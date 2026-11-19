@@ -100,8 +100,7 @@ const KEYS = new Set([
  * item picked up that way, Enter or Space drops it, and Escape puts it back.
  * The tree says each step in its `live` region. A drop sends
  * `helix-before-reorder`, which you can refuse, and then `helix-reorder`, whose
- * `keys` hold the siblings in the new order. **You move the items**: the tree
- * moves no element of yours, and focus follows the moved item once you have.
+ * `keys` hold the siblings in the new order.
  *
  * **Alt with the arrow along the line moves an item into another branch.**
  * Alt with the arrow that opens a branch (Right on a left-to-right page) puts
@@ -123,6 +122,14 @@ const KEYS = new Set([
  * @status stable
  * @category navigation
  * @aliases FileTree, Navigation tree
+ * @use A hierarchy you open branch by branch, such as the files and folders of a project.
+ * @instead drilldown - Nested lists you step into one level at a time, on a narrow screen.
+ * @instead accordion - Sections of content that open and close, one level deep.
+ * @instead object-inspector - A structured value, such as JSON, shown as a tree.
+ * @anatomy item
+ * @anatomy toggle
+ * @anatomy children
+ * @practice {reordering} Move the items yourself in a `reorderable` tree. - The tree moves no element of yours, and focus follows the moved item once you have.
  * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The tree's items.

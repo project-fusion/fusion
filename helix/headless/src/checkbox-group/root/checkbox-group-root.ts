@@ -26,10 +26,9 @@ import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
  * names it. Without a name, screen readers announce the checkboxes as separate
  * controls.
  *
- * **Each checkbox submits its own value.** Checkboxes are already
- * form-associated, and a native group is several inputs that share a name, so
- * the group adds no form value of its own. It adds the grouping, a shared
- * `name` that you write once, and one place to read and write the whole set.
+ * Checkboxes are already form-associated, and a native group is several inputs
+ * that share a name. The group adds the grouping and one place to read and
+ * write the whole set.
  *
  * `value` is the checked values, separated by commas, in the order the
  * checkboxes are written, read from the boxes themselves. Setting it checks
@@ -45,10 +44,6 @@ import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
  * another kind inside the group, such as an "Other" text field, sends its own
  * `input` and `change` past the group.
  *
- * **The group shows the message you set in `feedback`.** It is form-associated
- * only for validity and never calls `setFormValue`, so the browser does not
- * generate a message for it.
- *
  * **Keyboard.** Each box is its own tab stop, as a set of native checkboxes
  * is, and Space checks the focused one. The select-all box comes first.
  *
@@ -56,6 +51,15 @@ import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
  * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
+ * @use Several choices from one set, such as the places you receive updates.
+ * @instead checkbox - One choice that stands on its own, such as accepting the terms.
+ * @instead radio - One choice from a set of up to five options.
+ * @instead listbox - A list too long to show as boxes, from which you choose several.
+ * @anatomy label
+ * @anatomy items
+ * @anatomy hint?
+ * @practice Write `name` once, on the group. - Each checkbox submits its own value under that name, and the group adds no value of its own.
+ * @practice Set `feedback` for a message about the whole set. - The group never sets a form value, so the browser writes no message for it.
  * @documentation https://fusion.dev/helix/components/checkbox-group
  *
  * @slot - The checkboxes, and anything laid out around them.

@@ -27,6 +27,14 @@ import { styles } from './video-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category media
+ * @use One clip on a page, such as a product walkthrough.
+ * @instead video-playlist - Clips that play one after another in one player.
+ * @instead device-screen - A device's live screen that you tap and type into.
+ * @anatomy video
+ * @anatomy start
+ * @anatomy controls
+ * @practice {native} Set `controls` only where you want the browser's own control bar. - The Helix bar is then not drawn and its keys are not bound, so a key press does not seek twice.
+ * @practice {captions} Write sources and captions as `<source>` and `<track>` children of the player. - They are copied into the inner video, which selects resources from its own child nodes.
  * @documentation https://fusion.dev/helix/components/video
  *
  * @cssproperty --video-accent-color - Color of the played part of the scrubber.

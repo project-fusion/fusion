@@ -18,6 +18,15 @@ import '../../checkbox/index.js'
  * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
+ * @use Several choices from one set, such as the places you receive updates.
+ * @instead checkbox - One choice that stands on its own, such as accepting the terms.
+ * @instead radio - One choice from a set of up to five options.
+ * @instead listbox - A list too long to show as boxes, from which you choose several.
+ * @anatomy label
+ * @anatomy items
+ * @anatomy hint?
+ * @practice Write `name` once, on the group. - Each checkbox submits its own value under that name, and the group adds no value of its own.
+ * @practice Set `feedback` for a message about the whole set. - The group never sets a form value, so the browser writes no message for it.
  * @documentation https://fusion.dev/helix/components/checkbox-group
  *
  * @cssproperty --checkbox-group-gap - The space between the checkboxes.

@@ -20,6 +20,13 @@ import { styles } from './selection-bar-root.css.js'
  * @status experimental
  * @category data
  * @aliases Bulk actions, Action bar
+ * @use Actions on the rows selected in a Data Table, with how many are selected.
+ * @instead toolbar - Controls that stay in place whatever is selected.
+ * @anatomy count
+ * @anatomy actions
+ * @anatomy clear
+ * @practice Put Selection Bar in the Data Table's selection slot. - It then takes the toolbar's place while rows are selected.
+ * @practice Set `for` to the table's id where the bar is written outside the table. - Written inside the table, it finds the table.
  * @documentation https://fusion.dev/helix/components/selection-bar
  *
  * @cssproperty --selection-bar-background-color - The fill of the bar.

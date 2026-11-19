@@ -175,13 +175,9 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * Sort and filter apply to the whole set, including the rows on other pages.
  *
- * **Write the first page as rows, so the served HTML carries the values.** The
- * table reads each cell from its column, and a server does not pass the column
- * children to this element, so on its own it serves the headings and no values.
- * Write the first page under the columns as `TableRow` and `TableCell`
- * elements, in the table's sort and page size and formatted as its columns draw
- * them. The table shows your rows until `rows` holds a row, then draws its own
- * in their place and leaves yours in the page, unshown. A development build
+ * **The served first page.** Write it in the table's sort and page size and
+ * formatted as its columns draw them. The table shows your rows until `rows`
+ * holds a row, then draws its own in their place and leaves yours in the page, unshown. A development build
  * warns when the two differ. In React, map the first page of the same array in
  * the same server component.
  *
@@ -204,10 +200,9 @@ const isControl = (element: HTMLElement): boolean =>
  * To act on a single row, such as opening it, put a link or a button in a cell.
  * `row-link` makes a press anywhere else on the row work that control.
  *
- * **A cell renders in the table's shadow root.** Tokens and custom properties
- * reach it, and so do the base layer's `data-link`, `data-link-underline`, and
- * `data-density`. A class from your stylesheet does not. Pass the rules as
- * `cellStyles`, or name an element with `part` and style it with `::part()`.
+ * The base layer's `data-link`, `data-link-underline`, and `data-density`
+ * reach a cell, as tokens and custom properties do. Name an element in a cell
+ * with `part` to style it with `::part()`.
  *
  * `helix-before-follow` hands a press on a link in a cell to your router:
  *
@@ -371,9 +366,7 @@ const isControl = (element: HTMLElement): boolean =>
  * stylesheet can read the table's own attributes and not its columns', so the
  * served rows are laid out at the widths the table draws.
  *
- * **The columns are an import of their own.** A column is the Table family's
- * `TableColumn`, which the data table does not register, so a page that writes
- * one imports the Table entry beside the data table:
+ * A page that writes columns imports both entries:
  *
  * ```js
  * import '@fusion.dev/helix/data-table'
@@ -387,6 +380,17 @@ const isControl = (element: HTMLElement): boolean =>
  * @status stable
  * @category data
  * @aliases Grid, Result table, Data grid
+ * @use Rows you pass as an array, sorted, filtered, and paged across the whole set.
+ * @instead table - A short table you write out by hand, one row of markup at a time.
+ * @instead list - Rows with one label each, and no columns to read across.
+ * @instead grid - A layout that places elements in rows and columns.
+ * @anatomy head
+ * @anatomy row
+ * @anatomy cell
+ * @anatomy pagination?
+ * @practice Import Table beside Data Table. - A column is the Table family's `TableColumn`, which Data Table does not register.
+ * @practice {serving-the-first-page} Write the first page as `TableRow` and `TableCell` elements under the columns. - A server does not pass the columns to the table, so on its own it serves the headings and no values.
+ * @practice Style what a cell draws with `cellStyles`. - A cell renders in the table's shadow root, where tokens reach it and a class from your stylesheet does not.
  * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.

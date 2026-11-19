@@ -103,6 +103,13 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @status experimental
  * @category charts
  * @aliases 3D scatter chart, 3D scatter plot, Point cloud, Three-dimensional scatter
+ * @use Three measures for each row, such as customers by age, spend, and visits.
+ * @instead scatter-chart - Two measures for each row, such as page weight and load time.
+ * @instead spatial-surface-chart - A measure that varies over a grid of two others.
+ * @anatomy grid
+ * @anatomy point
+ * @anatomy tick
+ * @anatomy axis-name
  * @documentation https://fusion.dev/helix/components/spatial-scatter-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.

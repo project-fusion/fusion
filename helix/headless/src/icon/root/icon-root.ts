@@ -34,9 +34,8 @@ import { afterPageSettles } from '../settle.js'
  *
  * **A name is looked up in a registry.** The family's entry registers the
  * whole set, so any name in it draws, and `icon/all` registers the same set.
- * The element's own entry, `@fusion.dev/helix-headless/icon/root`, registers
- * none: a page that imports it and calls `registerIcons` with the glyphs it
- * names ships those and no others. `registerIconLibrary` resolves names under a prefix of your own,
+ * `registerIcons` adds glyphs to the registry by name. `registerIconLibrary`
+ * resolves names under a prefix of your own,
  * such as `lucide:camera`, at once or later, and the element fires `load` when
  * a glyph that came later is drawn. A glyph registered after the element
  * rendered is drawn then.
@@ -70,6 +69,11 @@ import { afterPageSettles } from '../settle.js'
  * @status stable
  * @category media
  * @aliases Glyph, Symbol
+ * @use A symbol from the Helix set, beside a label or alone in an icon button.
+ * @instead icon-button - A square button whose content is an icon.
+ * @instead badge - A count or a dot pinned to another element.
+ * @instead avatar - A person or an account, shown by their photo or their initials.
+ * @practice Import the element's own entry, `icon/root`, and register only the glyphs a page names. - That entry registers no glyph, so the page ships the glyphs it registers and no others.
  * @documentation https://fusion.dev/helix/components/icon
  *
  * @event {Event} error - `name` matches no registered icon and no library answers it, or `src` is no SVG, so nothing is drawn.

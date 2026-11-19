@@ -76,10 +76,8 @@ const holds = (outer: Element, inner: Element): boolean => {
  *
  * Set `alert` for a dialog that interrupts to ask for an answer, such as a
  * confirmation before a deletion. It is an `alertdialog`, which a screen reader
- * announces with its description as it opens. Put the action that dismisses
- * first in the footer, with `autofocus`, so focus starts on the action that
- * destroys nothing. Set
- * `dismissible` to draw a close control, labeled by `dismiss-label`.
+ * announces with its description as it opens. Set `dismissible` to draw a
+ * close control, labeled by `dismiss-label`.
  *
  * **Keyboard.** Opening moves focus to the first control in the dialog.
  *
@@ -101,6 +99,7 @@ const holds = (outer: Element, inner: Element): boolean => {
  * @anatomy surface
  * @anatomy header
  * @anatomy footer
+ * @practice {alert} Under `alert`, put the action that dismisses first in the footer, and give it autofocus. - Focus then starts on the action that destroys nothing.
  * @documentation https://fusion.dev/helix/components/dialog
  *
  * @slot - The dialog's content.

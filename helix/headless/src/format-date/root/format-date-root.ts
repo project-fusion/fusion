@@ -31,8 +31,8 @@ const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'shor
  *
  * **`elapsed` shows compact relative time for a feed**, such as "42m", "3h", or
  * "1d". After six days it shows a date. In en-US, `Intl.NumberFormat` narrow
- * renders both `minute` and `month` as `m`, so a compact "3m" could mean three
- * minutes or three months. `elapsedTime` in `helix/core` does the measurement.
+ * renders both `minute` and `month` as `m`. `elapsedTime` in `helix/core` does
+ * the measurement.
  *
  * **`relative` shows the same reading in words**, such as "3 hours ago" at
  * `long`, "3 hr. ago" at `short` and "3h ago" at `narrow`, the styles
@@ -52,8 +52,7 @@ const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'shor
  * `frozen` draws the reading once and leaves it.
  *
  * **`fields` draws each field of a date as a part of its own**, such as
- * `day`, `month` and `year`, so a stylesheet can set the year in a lighter ink
- * or the weekday in capitals with `::part()`. The text between the fields is
+ * `day`, `month` and `year`. The text between the fields is
  * the locale's own and has no part. An `elapsed` or `relative` reading is one
  * phrase, with no parts inside it.
  *
@@ -76,6 +75,12 @@ const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'shor
  * @status stable
  * @category typography
  * @aliases RelativeTime, Timestamp, TimeAgo
+ * @use A moment shown as text, such as when a post went up or how long ago it changed.
+ * @instead date-input - A date you type or pick in a form.
+ * @instead time-input - A time you type or pick in a form.
+ * @instead date-picker - A month calendar you choose dates on.
+ * @practice Set `elapsed` in a feed, and `relative` where a reading stands alone. - In en-US, a compact 3m can mean three minutes or three months.
+ * @practice Set `fields` to style one field of a date, such as the year in a lighter ink. - Without `fields`, the reading is one text with no parts inside it.
  * @documentation https://fusion.dev/helix/components/format-date
  *
  * @csspart day - The day of the month, with `fields`.

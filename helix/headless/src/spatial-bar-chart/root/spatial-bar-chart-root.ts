@@ -181,6 +181,12 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @status experimental
  * @category charts
  * @aliases 3D bar chart, 3D column chart, Isometric bar chart, Isometric column chart, Bar chart in 3D
+ * @use Values over two sets of categories, such as signups by region and quarter.
+ * @instead bar-chart - Values over one set of categories, read against a scale.
+ * @instead spatial-heatmap - A count for each day over weeks, such as commits.
+ * @anatomy grid
+ * @anatomy bar
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-bar-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.

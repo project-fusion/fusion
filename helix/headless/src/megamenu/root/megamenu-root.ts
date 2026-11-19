@@ -32,9 +32,8 @@ import { HandOver, type Motion } from '../hand-over.js'
  * disclosure, middle clicks, modified clicks, and the status bar keep working.
  * Use `Menu` for a row of commands.
  *
- * It renders no links. A router renders its own anchors and cannot render them
- * inside this shadow root, so the panel is a slot for the lists and headings
- * you write.
+ * It renders no links. The panel is a slot for the lists and headings you
+ * write.
  *
  * It opens on hover by default, and a press always opens it too. `open-on` sets
  * which. Hover is the default because in a navigation bar people expect to move
@@ -95,6 +94,8 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @instead navigation - Links that fit in one row.
  * @anatomy trigger
  * @anatomy surface
+ * @practice Write the panel's links and headings yourself, in its default slot. - A router renders its own anchors and cannot render them inside the megamenu's shadow root.
+ * @practice {preview} Mark the panel's columns, headings, and links with their data-megamenu attributes. - `helix.css` lays out the panel through them, and without them the panel holds your markup as you styled it.
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @slot - The panel's contents, such as your own lists of links and their headings.

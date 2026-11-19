@@ -42,8 +42,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * readers, so it is in the page once. When the announcement is in the served
  * HTML, the region stays empty and nothing is read out.
  *
- * The dismiss button fires `helix-dismiss`, and the announcement stays in the
- * document, so remove it in your listener. The event is cancelable, and
+ * The dismiss button fires `helix-dismiss`. The event is cancelable, and
  * `dismiss()` returns `false` when a listener calls `preventDefault()`. When
  * your listener removes an announcement whose dismiss button has focus, focus
  * moves to the dismiss button of the announcement beside it. With no other
@@ -59,11 +58,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * the key moved focus into is removed with focus still inside, focus goes
  * back to where it was before the key.
  *
- * **Set `queued` to show several announcements one at a time.** A queued
- * announcement waits while a queued announcement before it in the same parent
- * is still there, and shows when that one is removed: its message is then
- * read out, and its `duration` starts. While it waits it renders nothing,
- * is no region, and carries `:state(waiting)`. A server cannot see the
+ * When a queued announcement shows, its message is read out, and its
+ * `duration` starts. While it waits it renders nothing, is no region, and
+ * carries `:state(waiting)`. A server cannot see the
  * announcements beside it, so a served page shows every one until the script
  * runs.
  *
@@ -84,6 +81,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @instead toast - A reply to an action.
  * @anatomy content
  * @anatomy dismiss?
+ * @practice Remove a dismissed announcement in your listener. - The dismiss button and `duration` send the dismiss event, and the announcement stays in the document.
+ * @practice Set `queued` to show several announcements one at a time. - A queued announcement waits while one queued before it in the same parent is still there, and shows when that one is removed.
  * @documentation https://fusion.dev/helix/components/announcement
  *
  * @slot - The message.

@@ -15,15 +15,16 @@ import { styles } from './reveal-root.css.js'
  * server, in print, and where the reader asked for less movement, the content
  * shows as it is. Screen readers and find in page reach it throughout.
  *
- * Several in a row come in one after another with a `--reveal-delay` on each,
- * such as `0ms`, `80ms`, and `160ms`.
- *
  * A single tier, as `Marquee` is: the entrance is the whole of the component.
  *
  * @since 0.241.0
  * @status experimental
  * @category content
  * @aliases Reveal on scroll, Scroll reveal, Fade in, Entrance, Animate on scroll
+ * @use Sections of a long page that come in as you scroll to them, such as features.
+ * @instead skeleton - The shape of content that is still loading.
+ * @instead highlighter - Words in a sentence marked as they come into view.
+ * @practice Set a `--reveal-delay` on each of several in a row, such as `0ms`, `80ms`, and `160ms`. - They then come in one after another.
  * @documentation https://fusion.dev/helix/components/reveal
  *
  * @slot - The content that comes in.

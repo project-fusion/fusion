@@ -14,6 +14,13 @@ import { styles } from './theme-toggle-root.css.js'
  * @since 0.241.0
  * @status experimental
  * @category actions
+ * @use A control in the page's header that switches the page between light and dark.
+ * @instead toggle - A choice among light, dark, and the system setting.
+ * @instead switch - A color mode setting among the other settings of a form.
+ * @instead motion-toggle - A press that pauses the motion on the page.
+ * @anatomy button
+ * @anatomy icon
+ * @practice Listen for the change event, and write the mode into the next page you serve. - The button sets the mode on the page in front of you, and the next page starts from its own markup.
  * @documentation https://fusion.dev/helix/components/theme-toggle
  *
  * @cssproperty --theme-toggle-background-color - The button's fill. Defaults to the floating overlay surface.

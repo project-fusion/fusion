@@ -9,8 +9,7 @@ import { styles } from './spotlight-root.css.js'
  * @description
  * Put a `Card` or a tile inside, and while a mouse or pen moves over it, a
  * soft light follows the pointer across the content and lights the edge
- * nearest it. When the pointer leaves, the light fades where it was. A row of
- * cards each in its own `Spotlight` reads as one surface the light moves over.
+ * nearest it. When the pointer leaves, the light fades where it was.
  *
  * **The light is the hover wash, drawn round.** It is the foreground at the
  * hover wash's own strength, so it shows the same in light and dark and asks
@@ -28,6 +27,11 @@ import { styles } from './spotlight-root.css.js'
  * @status experimental
  * @category content
  * @aliases Glow card, Hover glow, Cursor glow, Mouse light
+ * @use A row of cards, such as pricing plans, lit under the mouse as it moves.
+ * @instead shine - One button that a band of light crosses.
+ * @instead border-beam - A card whose work is running, lit around its edge.
+ * @instead tilt - A card that leans toward the pointer.
+ * @practice Put each card of a row in its own Spotlight. - The row then reads as one surface the light moves over.
  * @documentation https://fusion.dev/helix/components/spotlight
  *
  * @slot - The content the light moves over, such as a `Card`.

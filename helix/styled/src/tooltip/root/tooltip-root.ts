@@ -8,15 +8,6 @@ import { styles } from './tooltip-root.css.js'
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
- * Place the tooltip beside its trigger, name the trigger with `for`, and name
- * the tooltip in the trigger's `aria-describedby`, so the trigger is described
- * in the server's markup and at rest:
- *
- * ```html
- * <helix-button aria-describedby="save-tip" id="save">Save</helix-button>
- * <helix-tooltip content="Save your work" for="save" id="save-tip"></helix-tooltip>
- * ```
- *
  * The bubble is in the top layer, so it needs no `z-index` and no container
  * clips it.
  *
@@ -32,6 +23,7 @@ import { styles } from './tooltip-root.css.js'
  * @instead popover - Anything you click, type in, or select.
  * @anatomy surface
  * @anatomy arrow?
+ * @practice {described} Place the tooltip beside its trigger, name the trigger in `for`, and name the tooltip in the trigger's aria-describedby. - The trigger is then described in the server's HTML and at rest, in every browser, before anyone points at it or focuses it.
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - The size of the arrow on the bubble's edge.

@@ -9,8 +9,7 @@ import { styles } from './shine-root.css.js'
  * @description
  * Put a button or a card inside, and a band of light crosses it from the
  * inline start to the inline end when a pointer comes over it or focus comes
- * inside it. With `loop`, the band crosses by itself, with a rest between, so
- * the one action on a page that matters most catches the eye.
+ * inside it. With `loop`, the band crosses by itself, with a rest between.
  *
  * **Drawn over the content, which keeps its clicks.** The band takes no
  * pointer and is hidden from screen readers. It is clipped to `--shine-radius`,
@@ -26,6 +25,11 @@ import { styles } from './shine-root.css.js'
  * @status experimental
  * @category content
  * @aliases Shine border, Glint, Sheen, Light sweep
+ * @use The main action on a page, such as a sign-up button, crossed by light on hover.
+ * @instead border-beam - A card whose work is running, lit around its edge.
+ * @instead spotlight - Cards lit under the pointer as it moves over them.
+ * @instead shimmer-text - Words that light sweeps across while the work they name runs.
+ * @practice Set `loop` on one action on a page at most. - The band then catches the eye for the one action that matters most.
  * @documentation https://fusion.dev/helix/components/shine
  *
  * @slot - The content the band crosses.

@@ -104,9 +104,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @description
  * Tokens are your own elements, slotted in. A filter can be a facet with a
  * prefix, a saved query, or a range, and these belong to your model, so the
- * element does not render tokens from a list of strings. Removing a token is a
- * request the element fires, and you apply it. Combobox works the other way:
- * its tokens show a selection it owns, drawn from the options it was given.
+ * element does not render tokens from a list of strings. Combobox works the
+ * other way: its tokens show a selection it owns, drawn from the options it was
+ * given.
  *
  * `value` is the typed text. Every keystroke fires `input` with the text on the
  * element, so a table can narrow as the user types. Backspace in an empty field
@@ -161,17 +161,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * nothing draws it and the menu has no page for it, and the grammar still reads
  * it.
  *
- * **The picker has an entry of its own.** `FilterMenu` draws its pages with
- * `Menu`, which a field without a picker does not need, so this family's entry
- * leaves it out. A page that writes a `FilterMenu` imports both entries:
- *
- * ```js
- * import '@fusion.dev/helix/filter-input'
- * import '@fusion.dev/helix/filter-input/menu'
- * ```
- *
- * A picker written without the second is reported once the page has loaded,
- * with the entry to add.
+ * **The picker has an entry of its own.** A picker written without it is
+ * reported once the page has loaded, with the entry to add.
  *
  * **Suggestions.** Slot options into `suggestions` and the field shows them,
  * moves through them with the arrow keys, and presses one on Enter. The option
@@ -214,8 +205,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *   this library. `default-value` seeds the field.
  * - `open` is the suggestions panel. Cancel `helix-before-open` or
  *   `helix-before-close` to control it, and use `default-open` to seed it.
- * - Tokens are your elements in a slot and hold no state. A token goes when you
- *   remove it from your markup after `helix-dismiss`. A `FilterChip` naming a
+ * - Tokens are your elements in a slot and hold no state. A `FilterChip` naming a
  *   declared field works differently, because the picker holds what is ticked
  *   and removing the chip alone would leave its value ticked in the hidden
  *   menu. Its dismissal is treated as the field being filtered by nothing, so
@@ -223,23 +213,25 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *   when the filter goes. Set `chips` and the field adds, updates, and removes
  *   those chips itself, from every `helix-facet`.
  *
- * **The suggestions you write are an import of their own.** A suggestion is an
- * option, the Option family's, which the field does not register, so a page
- * that slots one imports it beside the field:
- *
- * ```js
- * import '@fusion.dev/helix/filter-input'
- * import '@fusion.dev/helix/option'
- * ```
- *
- * In development, a field holding an option nobody registered says so once the
- * page has loaded, with the line to add. The options `source` gives are drawn
- * as this Option too, and need the same import.
+ * **The suggestions you write are an import of their own.** In development, a
+ * field holding an option nobody registered says so once the page has loaded,
+ * with the line to add. The options `source` gives are drawn as Option too, and
+ * need the Option import as well.
  *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases SearchField, FacetInput, TokenInput
+ * @use Several filters that narrow a list or a table, each shown in the field as a token.
+ * @instead combobox - One value from a long list, found by typing.
+ * @instead input - A single line of text, such as a search term.
+ * @instead find - Words you find in content, moving among the matches.
+ * @anatomy label
+ * @anatomy chip
+ * @anatomy control
+ * @practice {suggesting} Import Option beside Filter Input for anything in `suggestions`. - A suggestion is an option, the Option family's, which the field does not register.
+ * @practice {picking} Import the Filter Input `menu` entry to write a `FilterMenu`. - `FilterMenu` draws its pages with Menu, which the family's own entry leaves out.
+ * @practice {dismissing} Remove a token in `tags` from your markup when it asks to go. - The field only sends the request, from the remove button or from Backspace.
  * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.

@@ -19,10 +19,8 @@ import { styles } from './callout-root.css.js'
  * hairline, `outlined` an edge with no fill, and `plain` the bar and the mark alone.
  *
  * The inset and the type follow `data-density`, as the controls around a
- * callout do: set it on a region for tighter or looser callouts, or on one
- * callout itself, as `<helix-callout data-density="sm">`. That is how one
- * callout is sized, and there is no `size` beside it. `--callout-padding` and
- * `--callout-font-size` set either to a value of your own.
+ * callout do. `--callout-padding` and `--callout-font-size` set either to a
+ * value of your own.
  *
  * @since 0.1.0
  * @status stable
@@ -33,6 +31,8 @@ import { styles } from './callout-root.css.js'
  * @instead announcement - A message for the whole site.
  * @anatomy icon
  * @anatomy content
+ * @practice {dismissible} Set `open` to show a dismissed callout again, or remove it in your listener. - A dismissed callout hides itself and stays in the page.
+ * @practice {density} Size a callout with `data-density="sm"` or `data-density="lg"`, on the callout or a region around it. - A callout follows the density of the controls around it, and has no size property.
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.

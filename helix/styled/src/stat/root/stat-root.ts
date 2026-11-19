@@ -15,6 +15,15 @@ import { styles } from './stat-root.css.js'
  * @status stable
  * @category data
  * @aliases Metric, KPI
+ * @use One measurement with a label, such as active users on a dashboard.
+ * @instead badge - A count pinned to another element.
+ * @instead meter - A measurement shown against a known range.
+ * @instead sliding-number - A figure whose digits roll to each new value.
+ * @anatomy label
+ * @anatomy value
+ * @anatomy group?
+ * @practice {trend} Put a Trend in the `trend` slot. - It is read inside the stat's group, after the figure it qualifies.
+ * @practice {counting} Set `value` for a figure a dashboard refreshes. - A new `value` counts from the one before, so the figure reads as having moved, and a slotted figure changes at once.
  * @documentation https://fusion.dev/helix/components/stat
  *
  * @csspart value - The slot the value is written in, or the figure the stat writes from `value` or from slotted text. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.

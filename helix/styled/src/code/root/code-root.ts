@@ -15,6 +15,11 @@ import { styles } from './code-root.css.js'
  * @status stable
  * @category typography
  * @aliases Inline code
+ * @use A name from code inside a sentence, such as a property or a command.
+ * @instead code-block - Lines of code set apart from the prose, with a copy button.
+ * @instead kbd - A key or a chord you press.
+ * @instead code-input - Code you type into a form.
+ * @practice Set `translate="no"` on the element to keep a page translator off the code. - A translator that rewrites prose would also rewrite an identifier.
  * @documentation https://fusion.dev/helix/components/code
  *
  * @cssproperty --code-background-color - Fill behind the fragment. Defaults to the

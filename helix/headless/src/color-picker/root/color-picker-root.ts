@@ -110,6 +110,12 @@ interface EyeDropperConstructor {
  * @status stable
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
+ * @use A color chosen in a picker that stays on the page, such as in a theme editor.
+ * @instead color-input - A color in a form field that opens a picker when you press it.
+ * @anatomy grid
+ * @anatomy sample
+ * @anatomy channels
+ * @anatomy value
  * @documentation https://fusion.dev/helix/components/color-picker
  *
  * @slot eyedropper-icon - The icon on the eyedropper button, usually a dropper.

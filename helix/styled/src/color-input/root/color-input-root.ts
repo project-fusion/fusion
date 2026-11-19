@@ -30,6 +30,13 @@ import { styles } from './color-input-root.css.js'
  * @status stable
  * @category forms
  * @aliases ColorField, ColourInput, InputColor
+ * @use A color in a form, typed in any syntax or picked from a panel that opens.
+ * @instead color-picker - A picker that stays open on the page, such as in a theme editor.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy trigger
+ * @anatomy hint?
+ * @anatomy surface
  * @documentation https://fusion.dev/helix/components/color-input
  *
  * @cssproperty --color-input-background-color - Fill behind the field.

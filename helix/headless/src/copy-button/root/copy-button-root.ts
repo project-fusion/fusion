@@ -30,9 +30,8 @@ import '../../tooltip/index.js'
  * moment a copy shows `copied-label`, draws a cross, and sends
  * `helix-copy-error`.
  *
- * `from` copies from another element on the page: its text, an attribute
- * written `id[attribute]`, or a property written `id.property`, read at the
- * press. It takes the place of `value`.
+ * `from` writes an attribute as `id[attribute]` and a property as
+ * `id.property`.
  *
  * It replaces Button's render and its press, so it never submits a form or
  * sends a command: `type`, `command`, `commandfor` and the `form*` overrides
@@ -61,6 +60,12 @@ import '../../tooltip/index.js'
  * @status stable
  * @category actions
  * @aliases Copy, Copy to clipboard
+ * @use A value you copy with one press, such as an install command or an API key.
+ * @instead code-block - A block of code, which draws a copy button of its own.
+ * @instead icon-button - An icon that runs an action other than a copy.
+ * @anatomy button
+ * @anatomy mark
+ * @practice Set `from` to copy from another element on the page, in place of `value`. - It reads that element's text, an attribute, or a property at the press.
  * @documentation https://fusion.dev/helix/components/copy-button
  *
  * @slot - The icon shown before a copy. Defaults to a clipboard.

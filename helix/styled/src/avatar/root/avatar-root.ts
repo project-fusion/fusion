@@ -16,6 +16,9 @@ import { styles } from './avatar-root.css.js'
  * @status stable
  * @category media
  * @aliases Profile picture, Gravatar
+ * @use A person or an account, shown by their photo or their initials, such as beside a comment.
+ * @instead icon - A symbol for an action or a kind of thing.
+ * @instead image - A photo that is part of the content.
  * @documentation https://fusion.dev/helix/components/avatar
  *
  * @slot - Shown when there is no usable image, in place of the initials, for an icon. Hidden from assistive technology when the avatar has a `name`, which the host announces.

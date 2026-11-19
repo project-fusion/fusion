@@ -7,13 +7,10 @@ import { styles } from './shimmer-text-root.css.js'
  *
  * @description
  * Put the words inside, such as "Reading the files", and a band of light
- * crosses them again and again, which reads as work going on. Take the
- * element away, or put the result in its place, once the work is done.
+ * crosses them again and again, which reads as work going on.
  *
  * **The words are the page's own**, so a screen reader reads them as they
- * are, and the sweep is paint over them. To have a change of words read out,
- * put the element in a live region, such as a `Chat` turn's status or an
- * element with `role="status"`: the element says nothing by itself.
+ * are, and the sweep is paint over them.
  *
  * **The sweep stops for a reader who asked for less movement**, and the words
  * are drawn in the full ink. It runs for as long as the work does, so it is
@@ -27,6 +24,12 @@ import { styles } from './shimmer-text-root.css.js'
  * @status experimental
  * @category feedback
  * @aliases Shimmering text, Thinking text, Working indicator
+ * @use Words that name work while it runs, such as "Reading the project files".
+ * @instead skeleton - The shape of content that is loading.
+ * @instead loader - Work of unknown length with no words to name it.
+ * @instead orb - What an agent is doing, shown as a shape.
+ * @practice Take the element away, or put the result in its place, once the work is done. - The sweep runs for as long as the element is on the page.
+ * @practice Put the element in a live region, such as a `Chat` turn's status or an element with `role="status"`, to have a change of words read out. - The element says nothing by itself.
  * @documentation https://fusion.dev/helix/components/shimmer-text
  *
  * @slot - The words the sweep crosses.

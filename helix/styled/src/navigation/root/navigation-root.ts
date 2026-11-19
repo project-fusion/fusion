@@ -23,6 +23,13 @@ import '../../menu/index.js'
  * @status stable
  * @category navigation
  * @aliases Nav, NavList, Tabs
+ * @use Links to the sections of a site or an app, with the current page marked.
+ * @instead tabs - Panels on one page that a row of tabs switches between.
+ * @instead megamenu - A section of a site's navigation that opens a panel of links.
+ * @instead app-header - The banner at the top of the page that holds the navigation.
+ * @anatomy nav
+ * @anatomy indicator
+ * @practice Mark the current link with `aria-current`. - The marker reads it, so the attribute a screen reader announces also places the marker.
  * @documentation https://fusion.dev/helix/components/navigation
  *
  * @cssproperty --navigation-block-size - Height of the bar in a row. Each destination fills it.

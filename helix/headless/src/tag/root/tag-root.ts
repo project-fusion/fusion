@@ -21,9 +21,7 @@ import { property } from 'lit/decorators.js'
  * from a badge: a badge shows a state that people cannot change, and a tag
  * names something they can remove.
  *
- * The remove button sends `helix-dismiss`. The tag does not remove itself,
- * because your code owns the list it is in, so remove it in your handler. A
- * listener can cancel `helix-dismiss`, and `dismiss()` then returns `false`.
+ * The remove button sends `helix-dismiss`. A listener can cancel `helix-dismiss`, and `dismiss()` then returns `false`.
  * When the handler removes a tag whose remove button has focus, focus moves to
  * the next tag's remove button, or to the previous one's after the last tag.
  *
@@ -55,6 +53,7 @@ import { property } from 'lit/decorators.js'
  * @instead badge - A count pinned to another element.
  * @instead button - A word that performs an action.
  * @anatomy label
+ * @practice {group} Remove a dismissed tag in your listener. - The tag does not remove itself, because your code owns the list it is in.
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.

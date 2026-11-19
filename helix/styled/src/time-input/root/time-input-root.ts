@@ -32,6 +32,15 @@ import { styles } from './time-input-root.css.js'
  * @status stable
  * @category forms
  * @aliases TimeField, InputTime
+ * @use A time in a form, typed or picked from a panel that opens, such as a start time.
+ * @instead time-picker - A list of times you choose from on the page, such as booking slots.
+ * @instead date-input - A date in a form.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy trigger
+ * @anatomy hint?
+ * @anatomy surface
+ * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
  * @documentation https://fusion.dev/helix/components/time-input
  *
  * @cssproperty --time-input-background-color - Fill behind the field.

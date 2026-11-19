@@ -27,8 +27,7 @@ import { styles } from './marquee-root.css.js'
  * it too, as `:state(paused)`. Where the reader asked for less movement, it
  * does not run at all, and the row scrolls by hand instead.
  *
- * `speed` is how fast it runs, in pixels a second, so a longer row takes
- * longer to go round and every row on a page reads at one pace.
+ * `speed` is how fast it runs, in pixels a second.
  *
  * A single tier, as `Aura` is: the loop is the whole of the component.
  *
@@ -36,6 +35,11 @@ import { styles } from './marquee-root.css.js'
  * @status experimental
  * @category content
  * @aliases Ticker, Logo band, Scrolling row, Carousel strip
+ * @use A band of logos or names that runs by itself, such as the teams on a product.
+ * @instead carousel - Slides you move between yourself, one at a time.
+ * @instead sliding-number - A number whose digits roll to a new value.
+ * @instead rotating-text - One word in a line that turns through others in its place.
+ * @practice Give every Marquee on a page the same `speed`. - A longer row then takes longer to go round, and every row reads at one pace.
  * @documentation https://fusion.dev/helix/components/marquee
  *
  * @slot - The items the row carries.

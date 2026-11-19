@@ -22,6 +22,13 @@ import { styles } from './time-picker-root.css.js'
  * @status stable
  * @category forms
  * @aliases Time, TimeList
+ * @use A time chosen on the page from a list of times, such as a booking slot.
+ * @instead time-input - A time in a form field, typed or picked from a panel that opens.
+ * @instead date-picker - A date on a month calendar.
+ * @anatomy list
+ * @anatomy option
+ * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
+ * @practice Keep `step` at 15 minutes or more where the list spans a day. - At 15 minutes a day is 96 rows, which people can scroll or type into, and at 1 minute it is 1,440.
  * @documentation https://fusion.dev/helix/components/time-picker
  *
  * @cssproperty --time-picker-columns-gap - The space between the wheels. None by default.

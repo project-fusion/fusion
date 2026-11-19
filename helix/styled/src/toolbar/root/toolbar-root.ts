@@ -21,6 +21,10 @@ import { styles } from './toolbar-root.css.js'
  * @status stable
  * @category layout
  * @aliases Actions, Action bar
+ * @use A row of controls that act on one thing, such as text formatting in an editor.
+ * @instead selection-bar - Actions on the rows selected in a Data Table, with how many are selected.
+ * @instead button-group - A few related buttons joined into one control, such as a split button.
+ * @instead menu - Commands that open from one trigger.
  * @documentation https://fusion.dev/helix/components/toolbar
  *
  * @slot - The toolbar's controls.

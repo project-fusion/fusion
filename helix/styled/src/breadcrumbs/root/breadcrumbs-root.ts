@@ -16,6 +16,13 @@ import '../breadcrumb/breadcrumb.js'
  * @status stable
  * @category navigation
  * @aliases Breadcrumb, Crumbs
+ * @use The path from the home page to the page you are on, in a site with nested sections.
+ * @instead navigation - Links to the sections of a site, with the current one marked.
+ * @instead steps - Stages of a task you complete in order, such as a checkout.
+ * @anatomy breadcrumb
+ * @anatomy start?
+ * @anatomy link
+ * @practice Set `items` for a trail built from data, such as a router's matched routes. - It draws each entry as a crumb in order, the last one as the current page.
  * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
  * @slot - The trail's items, in order from root to current page.

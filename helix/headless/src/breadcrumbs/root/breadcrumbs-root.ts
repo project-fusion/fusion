@@ -47,9 +47,8 @@ export interface BreadcrumbItem {
  * The trail does not measure itself, and you write its overflow in markup: put
  * the crumb that holds the folded items where the gap should appear.
  *
- * A trail built from data, such as a router's matched routes, takes `items`: an
- * array of `{ label, href }`, drawn as crumbs in order, the last one as the
- * current page. Slotted crumbs follow them. Use one way or the other in a trail.
+ * `items` is an array of `{ label, href }`. Slotted crumbs follow them. Use one
+ * way or the other in a trail.
  *
  * With `max-items`, a trail that is longer folds its middle into one place:
  * the first crumb, a button, then the last `max-items` less one. The button is
@@ -68,6 +67,13 @@ export interface BreadcrumbItem {
  * @status stable
  * @category navigation
  * @aliases Breadcrumb, Crumbs
+ * @use The path from the home page to the page you are on, in a site with nested sections.
+ * @instead navigation - Links to the sections of a site, with the current one marked.
+ * @instead steps - Stages of a task you complete in order, such as a checkout.
+ * @anatomy breadcrumb
+ * @anatomy start?
+ * @anatomy link
+ * @practice Set `items` for a trail built from data, such as a router's matched routes. - It draws each entry as a crumb in order, the last one as the current page.
  * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
  * @slot - The trail's items, in order from the root to the current page. Put

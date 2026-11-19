@@ -59,7 +59,7 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem =>
  * Each trigger is a button with `aria-expanded` and `aria-controls`, inside a
  * heading, level 3 unless `heading-level` says otherwise, so the sections are
  * in a screen reader's list of headings. An open section is a region named by
- * its trigger. Set the level that fits the page's outline.
+ * its trigger.
  *
  * Find in page searches the closed sections too, and opens the one it matches
  * in. `hidden-until-found="false"` turns that off.
@@ -68,6 +68,15 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem =>
  * @status stable
  * @category layout
  * @aliases Collapse, Expander group
+ * @use Sections that you open and close in place, such as questions and answers on a help page.
+ * @instead tabs - A few sections that you switch between from a row of names.
+ * @instead drawer - Details that slide in over the page from an edge.
+ * @instead card - Content that stays open on a surface of its own.
+ * @anatomy item
+ * @anatomy trigger
+ * @anatomy chevron
+ * @anatomy content
+ * @practice Set `heading-level` to the level that fits the page's outline. - The sections join the page's headings, at level 3 unless it is set.
  * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The accordion's items.

@@ -125,6 +125,14 @@ const dates = (value: string): string[] =>
  * @status stable
  * @category forms
  * @aliases DatePicker, DateField, InputDate
+ * @use A date in a form, typed or picked from a calendar that opens, such as a start date.
+ * @instead date-picker - A calendar that stays open on the page, such as on a booking page.
+ * @instead time-input - A time of day in a form.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy trigger
+ * @anatomy hint?
+ * @anatomy surface
  * @documentation https://fusion.dev/helix/components/date-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.

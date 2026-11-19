@@ -26,6 +26,15 @@ import '../../tooltip/index.js'
  * @status stable
  * @category media
  * @aliases Knowledge graph, Network, Note graph, Second brain
+ * @use Notes and the links between them, such as a knowledge base, with a list of every note.
+ * @instead canvas - Cards and arrows that you place by hand.
+ * @instead tree - Items in a hierarchy, each inside one parent.
+ * @anatomy viewport
+ * @anatomy controls
+ * @anatomy search
+ * @anatomy list
+ * @practice Set `nodes` and `links` as properties, from a script. - A graph of ten thousand notes as ten thousand elements would cost what the renderer exists to save.
+ * @practice On the headless tier, give the `list` part a block size. - Without one, the list grows to hold every row.
  * @documentation https://fusion.dev/helix/components/graph
  *
  * @cssproperty --graph-background-color - The color behind the drawing while it loads.

@@ -7,9 +7,8 @@ import { TableBinding, type ToolTable } from '../../data-table/binding.js'
  * @summary A bar that says how many of a Data Table's rows are selected, with what you can do to them and a way to clear them.
  *
  * @description
- * Put it in a `DataTable`'s `selection` slot, and it takes the toolbar's
- * place while rows are selected. Slot your actions into it, such as Archive
- * and Export, and Clear unselects every row.
+ * Slot your actions into the bar, such as Archive and Export, and Clear
+ * unselects every row.
  *
  * ```html
  * <helix-data-table selectable row-key="id">
@@ -19,14 +18,20 @@ import { TableBinding, type ToolTable } from '../../data-table/binding.js'
  * </helix-data-table>
  * ```
  *
- * Written inside the table, it finds the table. Written anywhere else, set
- * `for` to the table's id. Clear asks the table with `helix-before-select`,
- * as a reader's own choice does.
+ * Clear asks the table with `helix-before-select`, as a reader's own choice
+ * does.
  *
  * @since 0.238.0
  * @status experimental
  * @category data
  * @aliases Bulk actions, Action bar
+ * @use Actions on the rows selected in a Data Table, with how many are selected.
+ * @instead toolbar - Controls that stay in place whatever is selected.
+ * @anatomy count
+ * @anatomy actions
+ * @anatomy clear
+ * @practice Put Selection Bar in the Data Table's selection slot. - It then takes the toolbar's place while rows are selected.
+ * @practice Set `for` to the table's id where the bar is written outside the table. - Written inside the table, it finds the table.
  * @documentation https://fusion.dev/helix/components/selection-bar
  *
  * @slot - What you can do to the selected rows, such as buttons.

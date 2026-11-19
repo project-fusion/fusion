@@ -13,10 +13,7 @@ import { styles } from './badge-root.css.js'
  * icon.
  *
  * `placement` pins it to another corner, or puts it in the line with
- * `inline`. **Inside a control, `inline` puts the count in the control's
- * name**: `<button>Inbox <helix-badge placement="inline" value="8"
- * label="8 unread"></helix-badge></button>` is the button "Inbox 8 unread",
- * kept current by the badge with no label of yours to update.
+ * `inline`.
  *
  * @since 0.1.0
  * @status stable
@@ -26,6 +23,7 @@ import { styles } from './badge-root.css.js'
  * @instead tag - A word that describes the content.
  * @instead stat - A number that is the content itself.
  * @anatomy indicator
+ * @practice {inline} Put the badge inside a control, with `placement="inline"`, to read its count in the control's name. - The button is then "Inbox 8 unread", and the badge keeps the name current with no label of yours to update.
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @cssproperty --badge-attention-duration - How long one beat of `attention` takes.

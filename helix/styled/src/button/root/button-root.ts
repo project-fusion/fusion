@@ -24,6 +24,13 @@ import { styles } from './button-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category actions
+ * @use An action on the page or a form's submit, such as Save, Delete, or Open settings.
+ * @instead icon-button - An action shown as an icon alone, such as Settings in a toolbar.
+ * @instead copy-button - A value you copy to the clipboard, such as an install command.
+ * @anatomy button
+ * @anatomy text
+ * @practice {as-link} Draw a link that looks like a button on your own anchor, with the base layer's recipe. - Button never renders an anchor, because a router renders its own to intercept a click.
+ * @practice {pending} Set `pending` while the action a press started is still running. - The button keeps focus and refuses presses, and a screen reader on it hears `pending-label`.
  * @documentation https://fusion.dev/helix/components/button
  *
  * @slot - The button's label.

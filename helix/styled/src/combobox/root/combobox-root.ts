@@ -33,6 +33,8 @@ import { styles } from './combobox-root.css.js'
  * @anatomy field
  * @anatomy hint?
  * @anatomy surface
+ * @practice Import Option beside Combobox. - An option belongs to the Option family, which Combobox does not register.
+ * @practice Add the option yourself when `creatable` sends its create event. - The options are your light DOM, and your framework would render over an option the combobox inserted.
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @cssproperty --combobox-background-color - Fill behind the field.

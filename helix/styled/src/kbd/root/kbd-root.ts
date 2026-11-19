@@ -17,6 +17,13 @@ import { styles } from './kbd-root.css.js'
  * @status stable
  * @category typography
  * @aliases Key, Shortcut, Hotkey
+ * @use A key or a chord to press, written in a sentence, such as Ctrl+K to search.
+ * @use A shortcut that works the control it names, such as / to move to a search field.
+ * @instead code - A name from code inside a sentence.
+ * @instead shortcut-overlay - Every shortcut on a page, shown while a key is held.
+ * @practice {shortcut} Write a chord in `keys`, such as mod+k. - It draws ⌘K on Apple devices and Ctrl+K elsewhere, and a ⌘K typed into a template is wrong on Windows.
+ * @practice Write a sequence as one Kbd for each key, with the word between them as text, such as then. - Each element holds one key, except under `keys`.
+ * @practice Set `within` for the shortcut to work. - By default the key is drawn and listens for nothing.
  * @documentation https://fusion.dev/helix/components/kbd
  *
  * @cssproperty --kbd-background-color - The fill of the key.

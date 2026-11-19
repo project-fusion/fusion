@@ -171,26 +171,22 @@ const ESTIMATE = 40
  * under a heading named by `row-grips-label`.
  *
  * 1. Each row is known by its `value`, or by its place among the rows where it
- *    has none, as for selecting. Give rows a `value` when they move, so a key
- *    stays with its row.
+ *    has none, as for selecting.
  * 2. A grip is a button named by `move-row-label` ("Move {row}") with the
  *    words of the row's first cell. Drag it to move its row, and the page
  *    scrolls near an edge. Or press it with Space, Enter, or a click to pick
  *    the row up, move it with Up, Down, Home, and End, and press it again to
  *    drop it. A click on another row drops it there, and Escape puts it back.
  * 3. `helix-before-reorder` asks first, and `helix-reorder` follows with
- *    `keys`, every row's key in the new order. **You move the rows**: the
- *    table moves no element of yours, and focus goes back to the moved row's
- *    grip once you have.
+ *    `keys`, every row's key in the new order. Focus goes back to the moved
+ *    row's grip once you have moved it.
  * 4. Each step is said in the table's live region, in words you can change:
  *    `picked-up-label`, `moved-label`, `dropped-label`, and `canceled-label`.
  *    The grips do nothing while a sort is set.
  *
  * **A grid.** `grid` makes the table one tab stop that the arrow keys move
  * through cell by cell, the headings included, as React Aria's table is. The
- * table is then a `grid` and each value a `gridcell`, and the table gives
- * every cell a `tabindex` so focus can rest on it: set `grid` only where the
- * cells may carry one.
+ * table is then a `grid` and each value a `gridcell`.
  *
  * | Key | What it does |
  * |---|---|
@@ -250,6 +246,15 @@ const ESTIMATE = 40
  * @status stable
  * @category data
  * @aliases DataTable, Grid table
+ * @use A short table you write out by hand, with each row in the markup.
+ * @instead data-table - Rows you pass as an array, with filtering and paging.
+ * @instead description-list - One record's fields, each label beside its value.
+ * @anatomy column
+ * @anatomy row
+ * @anatomy cell
+ * @practice {reordering} Give each row a `value` in a `reorderable` table. - A row without one is known by its place, so its key changes as it moves.
+ * @practice Put your rows in the order a reorder reports. - The table moves no element of yours.
+ * @practice Set `grid` only where each cell may take focus. - A grid table gives every cell a `tabindex`, so focus can rest on it.
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.

@@ -23,6 +23,7 @@ import { styles } from './drawer-root.css.js'
  * @anatomy header
  * @anatomy dismiss?
  * @anatomy content
+ * @practice {unsaved} Open the drawer from a button with `commandfor="<id>"` naming the drawer and `command="--show"`. - The platform's invoker attributes open it with no script.
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.

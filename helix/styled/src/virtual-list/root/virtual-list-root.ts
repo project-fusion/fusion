@@ -18,6 +18,13 @@ import { styles } from './virtual-list-root.css.js'
  * @category layout
  * @since 0.1.0
  * @status stable
+ * @use Thousands of rows in one scrolling list, such as a contact list.
+ * @instead scroll-area - A short box of content that scrolls.
+ * @instead data-table - Rows with columns that you sort, filter, and page.
+ * @instead list - A set of rows short enough to draw whole.
+ * @practice {loading-more} Set `loading` while you fetch more items, then add them to `items`. - The list is then busy, and a reader sees that more is on its way.
+ * @practice Keep links and buttons in rows to a list without `selection-mode`. - With it, each row is an option, and a row's own links and buttons are not reached there.
+ * @practice On the headless tier, give the `viewport` part a block size. - Without one, the viewport is as tall as its rows and does not scroll.
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.

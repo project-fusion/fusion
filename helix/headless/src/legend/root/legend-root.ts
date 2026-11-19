@@ -17,16 +17,13 @@ import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
  *
  * @description
  * Renders a legend as a list, separate from any chart, so any chart can use
- * one. Set `for` to the table the chart reads, and the legend takes its entries
- * from that table, so the two always match.
+ * one.
  *
  * `entries` sets how the table is read:
  *
- * - `series`: one entry per data column, named by the header row. Use it for a
- *   line or bar chart.
- * - `categories`: one entry per body row. Use it for a donut, whose slices are
- *   the rows and which has no axis to name them on.
- * - `measures`: drops the first data column. Use it for a scatter.
+ * - `series`: one entry per data column, named by the header row.
+ * - `categories`: one entry per body row.
+ * - `measures`: drops the first data column.
  *
  * The table is resolved on the client. There is no server pass.
  *
@@ -46,6 +43,12 @@ import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
  * @status stable
  * @category charts
  * @aliases Series Key
+ * @use The names and colors of a chart's series, under or beside the chart.
+ * @use Buttons that hide and show each series of the charts that read one table.
+ * @anatomy entry
+ * @anatomy name
+ * @practice Set `for` to the table the chart reads. - The legend takes its entries from that table, so the two always match.
+ * @practice Set `entries="categories"` for a donut chart, and `entries="measures"` for a scatter chart. - A donut's slices are the table's rows, and a scatter's first data column is measured across.
  * @documentation https://fusion.dev/helix/components/legend
  *
  * @event {Event} change - Fired once a toggle has hidden or shown a series.

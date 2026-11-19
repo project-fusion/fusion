@@ -55,11 +55,8 @@ const warmth = (): Warmth => {
  * does not clip it and no `z-index` is needed. `FloatingController` positions
  * it and flips it to another side when the preferred side does not fit.
  *
- * **Place the tooltip beside its trigger, name the trigger with `for`, and
- * name the tooltip in the trigger's `aria-describedby`.** The description is
- * then in your own markup, so it is in the server's HTML and in the
- * accessibility tree at rest, in every browser, before anyone points at the
- * trigger or focuses it:
+ * With the trigger's `aria-describedby` naming the tooltip, the description is
+ * in your own markup:
  *
  * ```html
  * <helix-headless-button aria-describedby="save-tip" id="save">Save</helix-headless-button>
@@ -103,6 +100,7 @@ const warmth = (): Warmth => {
  * @instead popover - Anything you click, type in, or select.
  * @anatomy surface
  * @anatomy arrow?
+ * @practice {described} Place the tooltip beside its trigger, name the trigger in `for`, and name the tooltip in the trigger's aria-describedby. - The trigger is then described in the server's HTML and at rest, in every browser, before anyone points at it or focuses it.
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @slot - The trigger, in the wrapping form. The tooltip describes it, as it

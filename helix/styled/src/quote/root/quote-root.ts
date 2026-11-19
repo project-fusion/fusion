@@ -17,6 +17,8 @@ import { styles } from './quote-root.css.js'
  * @use A quotation inside a sentence.
  * @instead blockquote - A passage set apart, including a pull quote.
  * @anatomy quote
+ * @practice Leave quotation marks out of the text. - The browser draws the marks for the language, so a typed one shows twice.
+ * @practice {languages} Write the language on a quotation in another language, such as `lang="fr"`. - Its marks follow it, so `lang="fr"` sets «…» inside an English page.
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @cssproperty --quote-color - Color of the quoted text.

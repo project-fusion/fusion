@@ -23,6 +23,12 @@ import '../../tooltip/index.js'
  * @status experimental
  * @category charts
  * @groups charts
+ * @use Items sized by one measure and raised by a second, such as services by requests and latency.
+ * @instead donut-chart - Parts of one whole, with a handful of parts.
+ * @instead spatial-bar-chart - Values over two sets of categories.
+ * @anatomy grid
+ * @anatomy block
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-treemap
  *
  * @cssproperty --spatial-treemap-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.

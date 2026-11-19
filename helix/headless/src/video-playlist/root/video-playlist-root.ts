@@ -43,9 +43,7 @@ type Player = HTMLElement & {
  *
  * **The player is a `Video` or a plain `<video>`.** Either takes `src` and
  * `poster` from the entry, is named by it, plays on, and answers Shift with N
- * or P while focused. A plain `<video>` has no previous and next controls
- * that send `helix-previous` or `helix-next`, so its moves are the entries,
- * the menu, and your own buttons calling `previous()` and `next()`.
+ * or P while focused.
  *
  * **Entries are markup.** React skips properties it would set imperatively
  * during hydration, so an array property on a custom element is missing on the
@@ -101,8 +99,6 @@ type Player = HTMLElement & {
  *   an edge. A press that does not travel still plays the entry.
  * - A drop sends `helix-before-reorder`, which you can refuse, and then
  *   `helix-reorder`, whose `keys` hold every entry's `value` in the new order.
- *   **You move the entries**: the playlist moves no element of yours, and the
- *   next entry is the one after the current entry in the order you leave.
  * - Each move is said in the live region, in words you can change:
  *   `moved-label`, `dropped-label`, `canceled-label`, and `picked-up-label`.
  *
@@ -115,6 +111,15 @@ type Player = HTMLElement & {
  * @status stable
  * @category media
  * @aliases Playlist, Queue, Up next
+ * @use Episodes or lessons that play one after another in one player, listed beside it.
+ * @instead video - One clip on its own.
+ * @instead carousel - Slides that you move between, such as pictures or cards.
+ * @anatomy player
+ * @anatomy item
+ * @anatomy thumbnail
+ * @anatomy meta
+ * @practice Put a `Video` in the `player` slot. - A plain video has no previous and next controls, so its moves are the entries, the menu, and your own buttons calling `previous()` and `next()`.
+ * @practice Under `reorderable`, move the entries yourself, in the order the reorder event's keys hold. - The playlist moves no element of yours, and the next entry is the one after the current entry in the order you leave.
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.

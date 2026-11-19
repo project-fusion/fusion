@@ -17,6 +17,13 @@ import { styles } from './shortcut-overlay-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Keyboard shortcuts, Shortcut hints, Key tips, Cheat sheet
+ * @use A page with many keyboard shortcuts, each shown on its control while you hold a key.
+ * @instead kbd - One key or chord written inside a sentence.
+ * @instead command - Commands you find by typing.
+ * @anatomy badge
+ * @anatomy badge-keys
+ * @anatomy badge-name
+ * @practice Set `sheet-keys` to another chord where your page answers `?` with its own help. - Many apps, GitHub and Gmail among them, give `?` to their own help, and one press then opens both.
  * @documentation https://fusion.dev/helix/components/shortcut-overlay
  *
  * @cssproperty --shortcut-overlay-badge-background-color - The badge's fill. Defaults to `surface-inverse`.

@@ -15,11 +15,8 @@ import '../../tooltip/index.js'
  * The styled frame: a bordered box with the pan and zoom buttons in its top
  * corner. The buttons stay visible when the header and footer fade.
  *
- * Set `fill` to lay the map behind a page's own content, such as a hero whose
- * words decide its height: the frame covers its container, which needs a
- * position of its own, such as `position: relative`. Set `credit-placement`
- * to draw the map's credit compact in a corner over the map, which suits a
- * map the width of the page.
+ * Set `credit-placement` to draw the map's credit compact in a corner over
+ * the map, which suits a map the width of the page.
  *
  * The [Maps](https://fusion.dev/helix/docs/maps) guide connects a renderer,
  * lists the keys and what a screen reader hears, and describes every method
@@ -29,6 +26,14 @@ import '../../tooltip/index.js'
  * @status stable
  * @category media
  * @aliases Map frame, Map container, Geo
+ * @use Places, routes, and areas on a map drawn by MapLibre, Leaflet, or your own renderer.
+ * @instead image - A picture of a map that you do not pan or zoom.
+ * @anatomy viewport
+ * @anatomy controls
+ * @anatomy attribution
+ * @practice Import the entry of each layer you write beside `map/root`, such as `map/marker`. - A map draws the layers it is given, so `map/root` registers the frame alone.
+ * @practice Add pan and rotate to `controls` where the map has to be usable without dragging. - Dragging is otherwise the only way a pointer moves the map, and WCAG 2.2 asks for another way at level AA.
+ * @practice {behind-content} Set `fill` to lay the map behind a page's own content, and give its container a position, such as relative. - The frame covers its container.
  * @documentation https://fusion.dev/helix/components/map
  *
  * @cssproperty --map-attribution-border-color - The rule above the map credit, under the map.

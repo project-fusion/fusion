@@ -15,13 +15,20 @@ import '../../voice-level/index.js'
  * Uses the same frame as `Textarea` and `Input`, so a form of mixed fields
  * matches, with the code in the mono face at the size Code Block draws it.
  * The colors are the syntax tokens, through the highlighter the page
- * registered: `import '@fusion.dev/helix-sandbox/code-block'` colors every
- * Code Block and Code Input on the page.
+ * registered.
  *
  * @since 0.216.0
  * @status experimental
  * @category forms
  * @aliases Code field, Code textarea, JSON input, Syntax highlighted input
+ * @use A short piece of code in a form, such as a JSON payload or a query.
+ * @instead code-editor - A whole file of code, in an editor you connect.
+ * @instead code-block - Code you show for reading and copying.
+ * @instead textarea - Several lines of plain text, such as a description.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy hint?
+ * @practice Import Code Block from Helix Sandbox once on the page. - Helix ships no grammar, and that import registers the highlighter that colors every Code Input.
  * @documentation https://fusion.dev/helix/components/code-input
  *
  * @cssproperty --code-input-background-color - Fill behind the code.

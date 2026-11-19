@@ -192,10 +192,8 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * there when the transcript opened. A turn is said with its author first, such
  * as "Ada: It ships today" (`arrival-label`), where its author can be named.
  *
- * Pass the turns as children or as `turns` data. Do not use both: a chat given
- * both draws every turn from `turns` and then the children, and says so once
- * in the console. Children render from the server and suit most
- * conversations. `turns` draws a long
+ * A chat given turns both ways says so once in the console. Children render
+ * from the server and suit most conversations. `turns` draws a long
  * transcript one window at a time, so the log needs a block size of its own.
  *
  * The log scrolls on this tier. It carries `data-scroller`, and `core` ships
@@ -216,18 +214,9 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * "Ada is typing" (`typing-label`), which a screen reader hears, and clearing
  * it takes them away. Anything slotted into `status` is drawn first.
  *
- * **The composer has an entry of its own.** A chat that only shows a
- * conversation takes no new turns and needs no composer, so `chat/root` leaves
- * it out. A page that writes a `Chat.Composer` imports both entries:
- *
- * ```js
- * import '@fusion.dev/helix/chat/root'
- * import '@fusion.dev/helix/chat/composer'
- * ```
- *
- * A composer written without the second is reported once the page has loaded,
- * with the entry to add. The family's own entry, `@fusion.dev/helix/chat`,
- * registers every element.
+ * A composer written without its own entry is reported once the page has
+ * loaded, with the entry to add. The family's own entry,
+ * `@fusion.dev/helix/chat`, registers every element.
  *
  * **Keyboard.** The transcript moves between turns the way a feed does. Each
  * turn says its place, such as "3 of 40", windowed or not. The transcript is
@@ -266,6 +255,16 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @status stable
  * @category feedback
  * @aliases Conversation, Transcript, Thread, Messages
+ * @use A conversation between people, or with an agent, such as a support thread.
+ * @instead log - Output from a process, such as a build, that you follow as it runs.
+ * @instead timeline - Events in the order they happened, such as an audit trail.
+ * @instead notifications - A record of events you mark read.
+ * @anatomy header?
+ * @anatomy message
+ * @anatomy status?
+ * @anatomy composer
+ * @practice Pass the turns either as children or as `turns`. - A chat given both draws every turn from `turns` and then the children.
+ * @practice Import `@fusion.dev/helix/chat/composer` beside `@fusion.dev/helix/chat/root` where you write a `Chat.Composer`. - A chat that only shows a conversation needs no composer, so the root's entry leaves it out.
  * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - The turns.

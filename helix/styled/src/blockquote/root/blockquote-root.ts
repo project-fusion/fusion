@@ -26,6 +26,8 @@ import { styles } from './blockquote-root.css.js'
  * @instead quote - A few words quoted inside a sentence.
  * @anatomy blockquote
  * @anatomy attribution?
+ * @practice Write the source's URL in `cite`, and who said it in `attribution`. - The browser keeps `cite` and does not show it, so a name written there is never seen.
+ * @practice {pull-quote} Leave typed quotation marks out of a passage under `marks`. - The mark is drawn for the element's language, so a typed one makes a second mark.
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @cssproperty --blockquote-attribution-color - The color of the attribution.

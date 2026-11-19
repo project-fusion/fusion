@@ -117,6 +117,12 @@ const SERIES = 24
  * @status experimental
  * @category charts
  * @aliases 3D ribbon chart, 3D line chart, Ribbon chart, Waterfall plot, Line chart in 3D
+ * @use Several series over one set of places that would tangle as lines, such as latency by region.
+ * @instead line-chart - Series over time that you read against one scale.
+ * @instead spatial-surface-chart - A measure that varies over two others, such as load by day and hour.
+ * @anatomy grid
+ * @anatomy ribbon
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-ribbon-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.

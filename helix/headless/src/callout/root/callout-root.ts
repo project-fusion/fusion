@@ -46,8 +46,7 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * Set `dismissible` for a note a reader may put away, as Shoelace's `closable`
  * alert does. The button fires `helix-dismiss`, and unless a listener cancels
  * it the callout hides itself: `open` turns false, `:state(exiting)` holds
- * while its exit animations run, and then it is `hidden`. Remove it in your
- * listener to take it out of the page, or set `open` to show it again, which
+ * while its exit animations run, and then it is `hidden`. Setting `open` again
  * holds `:state(entering)` while it comes back. Focus on its dismiss button
  * moves to the next callout's, or to the tab stop beside it, once it hides.
  *
@@ -64,6 +63,8 @@ type CalloutTone = 'danger' | 'info' | 'neutral' | 'success' | 'warning'
  * @instead announcement - A message for the whole site.
  * @anatomy icon
  * @anatomy content
+ * @practice {dismissible} Set `open` to show a dismissed callout again, or remove it in your listener. - A dismissed callout hides itself and stays in the page.
+ * @practice {density} Size a callout with `data-density="sm"` or `data-density="lg"`, on the callout or a region around it. - A callout follows the density of the controls around it, and has no size property.
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.

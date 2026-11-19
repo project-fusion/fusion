@@ -34,6 +34,13 @@ import { styles } from './trend-root.css.js'
  * @category charts
  * @groups charts
  * @aliases Delta, Change, Movement
+ * @use Which way a measurement moved, such as revenue up 12.4%, and whether that is good.
+ * @instead stat - One measurement, with a label that names what it measures.
+ * @instead sparkline - The shape of a series over time, in a small space.
+ * @instead line-chart - Every reading over a period, read against a scale.
+ * @anatomy icon
+ * @anatomy label?
+ * @practice Set `good` to the direction that is good for the metric. - Up is bad for churn, latency, error rate, cost, and bounce rate, and the color follows from `movement`.
  * @documentation https://fusion.dev/helix/components/trend
  *
  * @cssproperty --trend-better-color - Color of a move that `good` says is an improvement.

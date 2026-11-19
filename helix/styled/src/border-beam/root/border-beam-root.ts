@@ -33,12 +33,10 @@ const LONGEST = 6000
  * Put a `Card` or a panel inside, and a light runs around its edge, at one
  * speed all the way, for as long as the element is there. It says that what
  * is inside is at work: an agent writing a reply, a sync in progress, or a
- * stream that is live. Set `idle` when the work stops, and the light goes.
+ * stream that is live.
  *
  * **Drawn on the edge only**, over the content's own border, so it takes the
  * content's corners from `--border-beam-radius` and nothing inside is covered.
- * The light takes no pointer and is hidden from screen readers, so say what
- * is happening in words as well, such as with a `Badge`.
  *
  * A light that runs by itself runs for as long as the page is open, so a press
  * on `Motion Toggle` holds it where it is, as `:state(paused)`. Where the reader
@@ -50,6 +48,12 @@ const LONGEST = 6000
  * @status experimental
  * @category content
  * @aliases Running border, Moving border, Border light, Glow border
+ * @use A card or a panel whose work is running, such as an agent writing a reply.
+ * @instead shine - One action that a band of light crosses, such as a sign-up button.
+ * @instead spotlight - Cards lit under the pointer as it moves over them.
+ * @instead shimmer-text - A line of words that names the work while it runs.
+ * @practice Set `idle` when the work stops. - A light left running says the work is still going.
+ * @practice Say what is running in words as well, such as with a `Badge`. - The light takes no pointer and is hidden from screen readers.
  * @documentation https://fusion.dev/helix/components/border-beam
  *
  * @slot - The content whose edge the light travels, such as a `Card`.

@@ -24,12 +24,9 @@ import '../../copy-button/index.js'
  * height of a long file, which then scrolls. A line `mark-lines` names takes a
  * band in the primary color, with an edge at its start.
  *
- * **To color code with no highlighter of your own**, install
- * `@fusion.dev/helix-sandbox` and import its `code-block` entry beside the
- * block's. It registers a highlighter for every block, which reads `css`,
- * `html`, `js`, `jsx`, `sh`, `ts` and `tsx`, and names such as `typescript`
- * and `bash`, with Lezer's grammars. It colors them as the sandbox's editor
- * does, from the `--helix-color-syntax-*` tokens:
+ * The sandbox's highlighter reads `css`, `html`, `js`, `jsx`, `sh`, `ts` and
+ * `tsx`, and names such as `typescript` and `bash`, with Lezer's grammars. It
+ * colors them from the `--helix-color-syntax-*` tokens:
  *
  * ```js
  * import '@fusion.dev/helix/code-block'
@@ -40,6 +37,16 @@ import '../../copy-button/index.js'
  * @status stable
  * @category typography
  * @aliases Code block, Snippet, Pre
+ * @use Lines of code set apart from the prose, such as an example to copy.
+ * @instead code - A name from code inside a sentence.
+ * @instead code-input - A short piece of code you type into a form.
+ * @instead code-editor - A file of code you edit, in a code editor you connect.
+ * @anatomy label
+ * @anatomy copy
+ * @anatomy block
+ * @practice Import `@fusion.dev/helix-sandbox/code-block` beside the block to color code with no highlighter of your own. - It registers a highlighter for every block, which colors code as the sandbox's editor does.
+ * @practice Call `registerHighlighter()` once, with the stylesheet for a highlighter that writes classes. - Every block on the page then shares it, and a block's own `highlight` still wins.
+ * @practice Say in the text around the block what a marked line means. - The bands that `mark-lines`, `added-lines`, and `removed-lines` draw are hidden from screen readers.
  * @documentation https://fusion.dev/helix/components/code-block
  *
  * @cssproperty --code-block-added-color - The color a diff's added lines are tinted in and their `+` is drawn in. The success color by default.

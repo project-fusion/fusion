@@ -206,12 +206,12 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @description
  * A pane for working on a file: a header with its name, its language and the
  * page's own actions, the code, the problems in it, and a status line that
- * says where the caret is. On its own the code is a `<textarea>` in the code
- * face. Connect an engine and it draws the code instead: `connectCodeEditor` from
- * `@fusion.dev/helix-code-editor` connects CodeMirror, with highlighting in your
- * theme's syntax colors, line numbers, folding, bracket matching and history.
- * The value, the form, validation and the events stay the editor's, so a page
- * reads and writes it the same either way.
+ * says where the caret is. Connect an engine and it draws the code:
+ * `connectCodeEditor` from `@fusion.dev/helix-code-editor` connects CodeMirror,
+ * with highlighting in your theme's syntax colors, line numbers, folding,
+ * bracket matching and history. The value, the form, validation and the events
+ * stay the editor's, so a page reads and writes it the same with an engine or
+ * without one.
  *
  * For a few lines in a form, such as a setting in JSON, use `Code Input`,
  * which needs no engine.
@@ -240,6 +240,17 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @status experimental
  * @category editors
  * @aliases Code editor, CodeMirror, File editor, IDE, Monaco
+ * @use A file of code you edit, with its problems listed under it.
+ * @instead code-input - A short piece of code in a form, such as a JSON setting.
+ * @instead code-block - Code you read and copy, with no editing.
+ * @instead editor - A document of prose you write and format.
+ * @anatomy header
+ * @anatomy controls
+ * @anatomy body
+ * @anatomy diagnostics?
+ * @anatomy status
+ * @practice Connect CodeMirror for highlighting, line numbers, and folding. - On its own the code is a plain textarea in the code face.
+ * @practice {fill} Set `fill` for an editor that fills a pane, such as one side of a split view. - Without it, the editor is 24rem tall.
  * @documentation https://fusion.dev/helix/components/code-editor
  *
  * @slot actions - The page's own controls in the header, such as Run or Format, before the built-in ones.

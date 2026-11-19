@@ -127,9 +127,8 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * left, such as "3 results", from `result-label` and `results-label`. A filter
  * that leaves none says `no-results-text`.
  *
- * **Moving options** is a separate import, `@fusion.dev/helix/listbox/reorder`,
- * so a list that never moves options carries none of its code. With it
- * imported, `reorderable` lets a reader move options:
+ * With `@fusion.dev/helix/listbox/reorder` imported, `reorderable` lets a
+ * reader move options:
  *
  * - Alt with Up or Down moves the highlighted option a place, and Alt with
  *   Home or End moves it to either end, as the APG's rearrangeable listbox
@@ -137,9 +136,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * - A pointer drags an option, with a drop indicator, and the list scrolls near
  *   an edge. A press that does not travel still chooses the option.
  * - A drop sends `helix-before-reorder`, which you can refuse, and then
- *   `helix-reorder`, whose `keys` hold every value in the new order. **You
- *   move the options**, or set `items` in the new order: the list moves no
- *   element of yours.
+ *   `helix-reorder`.
  * - The list says each move in its `live` region. The words are the
  *   `moved-label`, `canceled-label`, `dropped-label`, and `picked-up-label`
  *   attributes, which the import reads.
@@ -147,18 +144,8 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *   filter narrows the list, under `layout="grid"`, or while the list is
  *   disabled.
  *
- * **The options are an import of their own.** An option you write is the Option
- * family's, which the list does not register, so a page that writes one imports
- * it beside the list:
- *
- * ```js
- * import '@fusion.dev/helix/listbox'
- * import '@fusion.dev/helix/option'
- * ```
- *
  * In development, a list holding an option nobody registered says so once the
- * page has loaded, with the line to add. The options `items` draws are this
- * Option too, and need the same import.
+ * page has loaded, with the line to add.
  *
  * @since 0.1.0
  * @status stable
@@ -169,6 +156,9 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @anatomy label
  * @anatomy items
  * @anatomy hint?
+ * @practice Import Option beside Listbox, for options you write and for `items` alike. - An option belongs to the Option family, which Listbox does not register.
+ * @practice Import `@fusion.dev/helix/listbox/reorder` to set `reorderable`. - Moving options is a separate import, so a list that never moves options carries none of its code.
+ * @practice Move the options yourself after a reorder, or set `items` in the new order. - The list moves no element of yours, and the reorder event holds every value in the new order.
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.

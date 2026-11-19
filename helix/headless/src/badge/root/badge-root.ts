@@ -39,12 +39,6 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * count changes. A control that already has a description keeps its own. The
  * count is also a status of its own, read when it changes.
  *
- * **Put the badge inside the control to have its count read with the
- * control's name**, as Web Awesome and Shoelace do: `<button>Inbox
- * <helix-badge value="8" label="8 unread"></helix-badge></button>` is the
- * button "Inbox 8 unread", and stays current as the count changes. The styled
- * tier's `placement="inline"` draws the mark in the line for that case.
- *
  * **An icon goes inside the mark** through the `icon` slot, before the count,
  * as Web Awesome's badge takes one at its start. With no `value` the icon is
  * the whole mark, such as a check on an avatar, drawn where the dot would be.
@@ -59,6 +53,7 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * @instead tag - A word that describes the content.
  * @instead stat - A number that is the content itself.
  * @anatomy indicator
+ * @practice {inline} Put the badge inside a control, with `placement="inline"`, to read its count in the control's name. - The button is then "Inbox 8 unread", and the badge keeps the name current with no label of yours to update.
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @slot - The element being decorated.

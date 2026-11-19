@@ -41,10 +41,8 @@ const bleedConverter = {
  * without `paginated` and with either `mode`, so a page or a chunk from a
  * server can be windowed.
  *
- * **Write the first page as rows, so the served HTML carries the values.**
- * Write it under the columns as `helix-table-row` and `helix-table-cell`
- * elements. `@fusion.dev/helix-styles/helix.css` lays them out as the table
- * draws them before it upgrades, and the table shows them until `rows` holds a
+ * **The served first page.** `@fusion.dev/helix-styles/helix.css` lays its
+ * rows out as the table draws them before it upgrades, and the table shows them until `rows` holds a
  * row. It holds the checkbox column and the pagination's row from the first
  * paint, and takes the widths from `columns`, so nothing moves when the table
  * upgrades or draws its own rows.
@@ -52,6 +50,17 @@ const bleedConverter = {
  * @since 0.1.0
  * @status stable
  * @category data
+ * @use Rows you pass as an array, sorted, filtered, and paged across the whole set.
+ * @instead table - A short table you write out by hand, one row of markup at a time.
+ * @instead list - Rows with one label each, and no columns to read across.
+ * @instead grid - A layout that places elements in rows and columns.
+ * @anatomy head
+ * @anatomy row
+ * @anatomy cell
+ * @anatomy pagination?
+ * @practice Import Table beside Data Table. - A column is the Table family's `TableColumn`, which Data Table does not register.
+ * @practice {serving-the-first-page} Write the first page as `TableRow` and `TableCell` elements under the columns. - A server does not pass the columns to the table, so on its own it serves the headings and no values.
+ * @practice Style what a cell draws with `cellStyles`. - A cell renders in the table's shadow root, where tokens reach it and a class from your stylesheet does not.
  * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.

@@ -26,6 +26,14 @@ import { styles } from './pagination-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Pager, Page nav
+ * @use Results split into numbered pages, such as a search with hundreds of matches.
+ * @instead virtual-list - A long list you scroll through without pages.
+ * @instead data-table - Rows of a table, which has paging of its own.
+ * @anatomy previous
+ * @anatomy page
+ * @anatomy next
+ * @practice {links} Set `href` to render every page as a link, with `{page}` replaced by the page number. - The links can be crawled, a middle click opens a tab, and the address bar holds the state.
+ * @practice {footer} Place `Pagination.Summary` and `Pagination.Size` beside the pagination. - They are separate elements, so you choose where they go and in what order.
  * @documentation https://fusion.dev/helix/components/pagination
  *
  * @csspart first - The control that jumps to the first page, under `ends`.

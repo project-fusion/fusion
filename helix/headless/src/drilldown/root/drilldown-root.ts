@@ -71,12 +71,9 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * or by `fallbackLabel` where nothing names it, and by the page's title below
  * it.
  *
- * **`navigation` makes it a site's navigation.** The host is a `navigation`
- * landmark named by `label`, and unnamed without one. Each page is a list,
- * and each row is a list item holding a link or a button, as the APG's
- * disclosure navigation is built,
- * so a reader meets places to go in place of a menu of commands. The keys stay
- * the same. The back button and the title sit above
+ * Under `navigation`, the landmark is named by `label`, and unnamed without
+ * one. Each row is a list item holding a link or a button, as the APG's
+ * disclosure navigation is built. The keys stay the same. The back button and the title sit above
  * the menu. Disabled rows stay reachable with the arrow keys, and typing a
  * letter moves to the next row whose name starts with it.
  *
@@ -84,6 +81,14 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @status stable
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
+ * @use Nested lists you step into one level at a time, such as settings on a narrow screen.
+ * @instead tree - A hierarchy whose branches open in place.
+ * @instead menu - Commands that open from a trigger and close when you are done.
+ * @instead listbox - A value you choose from a list.
+ * @anatomy page
+ * @anatomy item
+ * @anatomy mark
+ * @practice {navigation} Set `navigation` for a site's navigation. - The host is then a navigation landmark, and each page a list of places to go in place of a menu of commands.
  * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @slot - The rows of the top page.

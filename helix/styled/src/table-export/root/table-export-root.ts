@@ -19,6 +19,15 @@ import '../../radio/index.js'
  * @status experimental
  * @category data
  * @aliases Download, Export dialog
+ * @use A file or a copy of a Data Table's rows, in the columns and format you pick.
+ * @instead copy-button - One string copied to the clipboard.
+ * @instead column-manager - The columns a table shows on the page.
+ * @anatomy rows
+ * @anatomy columns
+ * @anatomy values
+ * @anatomy format
+ * @anatomy actions
+ * @practice Put Table Export in a Popover or a Dialog opened by an Export button. - The panel is the content, and it draws no trigger of its own.
  * @documentation https://fusion.dev/helix/components/table-export
  *
  * @cssproperty --table-export-gap - The space between the groups.

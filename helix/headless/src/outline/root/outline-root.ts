@@ -42,9 +42,6 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  *
  * A heading slotted into `heading` names the navigation, in place of `label`.
  *
- * In a contents rail with a scrollbar of its own, `follow` keeps the link of
- * the section in view showing as the reader scrolls the page.
- *
  * **Keyboard.** The links are your anchors, in the tab order as you wrote
  * them, so the outline adds no keys of its own: Tab moves through the links
  * and Enter follows one. Following a link moves focus to its section, so the
@@ -90,6 +87,12 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * @status stable
  * @category navigation
  * @aliases Table of contents, On this page, Outline
+ * @use Links to the headings of a long page, such as a guide, with the section in view marked.
+ * @instead navigation - Links to the pages of a site.
+ * @anatomy nav
+ * @anatomy indicator
+ * @practice Set `data-level` on each link to its heading's level, `2` through `6`. - The outline does not read heading levels from the document, because the headings are not always in it.
+ * @practice Set `follow` on an outline with a scrollbar of its own. - It keeps the link of the section in view showing as you scroll the page.
  * @documentation https://fusion.dev/helix/components/outline
  *
  * @slot - The links, as anchors with fragment hrefs, or lists holding them.

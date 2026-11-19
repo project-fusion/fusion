@@ -34,6 +34,7 @@ import { styles } from './number-input-root.css.js'
  * @anatomy decrement
  * @anatomy control
  * @anatomy increment
+ * @practice Set `value` as a plain number, such as `0.25` for 25%, whatever `format-options` shows. - The format is only what the field shows while it is not being edited, and the form receives the plain number.
  * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot decrement-icon - Replaces the icon on the step down button.

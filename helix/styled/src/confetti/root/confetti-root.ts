@@ -30,14 +30,11 @@ const splitColors = (list: string): string[] => {
  *
  * @description
  * Put the control that finishes something inside, such as the last button of
- * onboarding or a publish button, and call `burst()` once the action is done.
- * A press does not burst by itself, because an action can still fail after it.
- * The pieces fly up from the content, fall, turn, and fade, in about a second
- * and a half.
+ * onboarding or a publish button. The pieces fly up from the content, fall,
+ * turn, and fade, in about a second and a half.
  *
- * **A burst is decoration**, so say that the action is done in words as well,
- * such as in a status message. The pieces are drawn on a canvas over the whole
- * viewport, which takes no pointer and is hidden from screen readers. Nothing
+ * The pieces are drawn on a canvas over the whole viewport, which takes no
+ * pointer and is hidden from screen readers. Nothing
  * is drawn where the reader asked for less movement, or while a press on
  * `Motion Toggle` has paused the page's motion, and `burst()` then resolves at
  * once.
@@ -50,6 +47,11 @@ const splitColors = (list: string): string[] => {
  * @status experimental
  * @category content
  * @aliases Celebration, Party popper, Success burst
+ * @use The end of a milestone, such as publishing a page or finishing onboarding.
+ * @instead toast - A confirmation of a routine action, such as saving a change.
+ * @instead shine - A button that draws the eye before it is pressed.
+ * @practice Call `burst()` once the action has finished. - A press does not burst by itself, because an action can still fail after it.
+ * @practice Say that the action is done in words as well, such as in a status message. - A burst is decoration: a screen reader hears nothing, and reduced motion draws nothing.
  * @documentation https://fusion.dev/helix/components/confetti
  *
  * @slot - The content the confetti bursts out of.

@@ -29,6 +29,12 @@ import { styles } from './description-list-root.css.js'
  * @status stable
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
+ * @use One record's fields, each label beside its value, such as a details panel.
+ * @instead table - Several records compared field by field, in columns.
+ * @instead object-inspector - A nested value, such as an API response, that you open as a tree.
+ * @anatomy item
+ * @anatomy label
+ * @anatomy value
  * @documentation https://fusion.dev/helix/components/description-list
  *
  * @cssproperty --description-list-column-gap - The space between the column of labels and the column of values, with `direction="row"`.

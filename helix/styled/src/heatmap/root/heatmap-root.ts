@@ -12,9 +12,7 @@ import '../../tooltip/index.js'
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
  * @description
- * Cells fill down each column, then across. A column is a week, so the strip
- * reads left to right in weeks and top to bottom in days. `rows="1"` makes a
- * single row.
+ * Cells fill down each column, then across.
  *
  * An empty cell takes the palette's quietest background color, so a gap shows
  * as a period with no data.
@@ -27,6 +25,14 @@ import '../../tooltip/index.js'
  * @status stable
  * @category charts
  * @groups charts
+ * @use A reading for each day or hour in a strip, such as uptime or commits.
+ * @instead line-chart - A measure over time whose rise and fall you follow.
+ * @instead spatial-heatmap - Counts by day drawn as a relief, such as a year of commits.
+ * @anatomy cell
+ * @anatomy start?
+ * @anatomy summary?
+ * @anatomy end?
+ * @practice Set `rows` to 7 for a contribution graph, and to 1 for a status strip. - With seven rows, each column is a week, read top to bottom in days.
  * @documentation https://fusion.dev/helix/components/heatmap
  *
  * @slot end - Below the strip, at the trailing edge.

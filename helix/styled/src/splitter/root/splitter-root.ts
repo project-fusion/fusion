@@ -30,6 +30,15 @@ import { styles } from './splitter-root.css.js'
  * @status stable
  * @category layout
  * @aliases SplitPane, Resizable, SplitView
+ * @use Two panes, such as files and an editor, whose share of the space you set by dragging.
+ * @instead grid - Columns whose widths the page sets.
+ * @instead drawer - A panel that slides in over the page from an edge.
+ * @anatomy start
+ * @anatomy separator
+ * @anatomy end
+ * @practice Set `primary` to a sidebar's pane. - That pane keeps its size when the splitter's own size changes, and the other pane takes all of the change.
+ * @practice {bounds} Set `min` and `end-min` to the least each pane needs. - By default the divider reaches either edge, so you can drag a pane fully closed.
+ * @practice {nested} For three columns, nest a splitter in the `end` pane of another. - A divider then resizes only the two panes beside it.
  * @documentation https://fusion.dev/helix/components/splitter
  *
  * @csspart corner - The handle where a nested splitter's divider crosses this one.

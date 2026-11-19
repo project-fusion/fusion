@@ -16,13 +16,12 @@ import { styles } from './skip-link-root.css.js'
  * It is fixed to the viewport, because the page may already be scrolled when
  * focus arrives, from a restored position or an anchor in the address.
  *
- * Put it first inside `<body>`, before the header, and give the content region
- * the id its `href` names.
- *
  * @since 0.1.0
  * @status stable
  * @category navigation
  * @aliases Skip navigation, Skip to content
+ * @use A page with a header or a navigation before its main content.
+ * @practice {custom-target} Put it first inside the body, and give the content region the id its `href` names. - A press moves focus past the header to that region.
  * @documentation https://fusion.dev/helix/components/skip-link
  *
  * @cssproperty --skip-link-background-color - The background of the link while it is shown.

@@ -16,6 +16,13 @@ import { styles } from './option-root.css.js'
  * @status stable
  * @category forms
  * @aliases Item
+ * @use A choice you write inside a Select, a Listbox, or a Combobox.
+ * @instead radio - One choice from a group of radios on the page.
+ * @instead toggle - One option in a group of toggles, such as list or grid.
+ * @instead menu - A command that runs when you choose it.
+ * @anatomy item
+ * @anatomy label
+ * @practice Put a tile's image in `media`, with empty alternative text. - The row stays the option, and its label stays its name.
  * @documentation https://fusion.dev/helix/components/option
  *
  * @cssproperty --option-active-background-color - The background of the option the keyboard is on.

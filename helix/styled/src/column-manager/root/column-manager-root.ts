@@ -18,6 +18,16 @@ import '../../checkbox/index.js'
  * @status experimental
  * @category data
  * @aliases Column picker, Column chooser
+ * @use Which of a Data Table's columns show, in what order, and which stay pinned.
+ * @instead view-panel - A table's whole view on a phone, with the columns as one section.
+ * @instead quick-filters - A saved view of a table that you switch to in one press.
+ * @anatomy header
+ * @anatomy item
+ * @anatomy grip
+ * @anatomy checkbox
+ * @anatomy pin
+ * @practice Put Column Manager in a Popover opened by a Columns button, or in a Drawer on a phone. - The list is the panel's content, and it draws no trigger of its own.
+ * @practice Store the table's view to keep a reader's columns. - Every change goes to the table's view, and the list keeps nothing of its own.
  * @documentation https://fusion.dev/helix/components/column-manager
  *
  * @cssproperty --column-manager-drop-color - The line that marks where a dragged row will land. Defaults to `--helix-color-primary`.

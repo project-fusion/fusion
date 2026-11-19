@@ -86,15 +86,16 @@ const lengthOf = (value: string | undefined): string | undefined => {
  *
  * **A child can span columns with `data-grid-span`.** `data-grid-span="full"`
  * runs from the first column to the last, such as a heading across a set of
- * cards, and a number from `2` to `6` spans that many columns. A number wider
- * than the grid adds columns of no width beside the real ones, as CSS does,
- * so in a `min` grid, whose count changes with its width, use `full` for a
- * child that must span them all.
+ * cards, and a number from `2` to `6` spans that many columns.
  *
  * @since 0.1.0
  * @status stable
  * @category layout
  * @aliases Layout, Columns
+ * @use Children in columns that line up across rows, such as a set of cards.
+ * @instead flex - Children in one row or one column.
+ * @instead table - Data that you read across rows and down columns.
+ * @practice {spans} In a `min` grid, span a child across every column with `data-grid-span="full"`. - A number wider than the grid adds columns of no width, as CSS does, and the count of a `min` grid changes with its width.
  * @documentation https://fusion.dev/helix/components/grid
  *
  * @slot - The items to lay out.

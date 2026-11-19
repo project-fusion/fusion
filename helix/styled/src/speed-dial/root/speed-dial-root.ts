@@ -12,13 +12,19 @@ import { styles } from './speed-dial-root.css.js'
  * Presentation only: the column the actions fan into, and the end they align
  * to. The base class handles opening, closing, and keyboard movement.
  *
- * It draws no `helix-icon` of its own, so it does not register one: import
- * `@fusion.dev/helix/icon` where your trigger or your actions use it.
- *
  * @since 0.1.0
  * @status stable
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
+ * @use A few main actions of a screen behind one floating button.
+ * @instead menu - Commands with submenus, or items you check.
+ * @instead icon-button - One main action on a floating button, such as Compose.
+ * @anatomy trigger
+ * @anatomy actions
+ * @anatomy item
+ * @anatomy icon
+ * @practice Import Icon beside Speed Dial where your trigger or your actions use one. - Speed Dial draws no icon of its own, so it does not register one.
+ * @practice Set `open-on="long-press"` for a trigger with an action of its own, such as composing a message. - A press then runs the trigger's action, and holding it for half a second opens the dial.
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @cssproperty --speed-dial-background-color - Fill of the trigger the dial draws when none is slotted.

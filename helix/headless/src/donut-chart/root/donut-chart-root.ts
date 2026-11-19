@@ -107,12 +107,6 @@ export interface DonutShare {
  * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
  * @description
- * A donut chart divides one whole into parts, so the component reads one
- * column.
- *
- * **The first column of numbers is the series, and each row is a slice.** Other
- * Helix charts take one column per series.
- *
  * **Negative values are skipped.** An arc cannot show a negative number, so
  * those rows are left out and the total is the sum of the remaining rows.
  *
@@ -154,6 +148,14 @@ export interface DonutShare {
  * @status stable
  * @category charts
  * @aliases Pie Chart, Ring Chart, Share Chart
+ * @use Parts of one whole, such as sessions by source, with a total in the middle.
+ * @instead bar-chart - Many parts, or parts close in size that you compare.
+ * @instead area-chart - Parts of a whole as they change over time.
+ * @instead meter - One measurement against its full range, such as disk used.
+ * @anatomy segment
+ * @anatomy center
+ * @practice Set the ring's thickness with `hole`. - The stroke width and the ring's radius must agree, so no CSS hook sets it.
+ * @practice Point `for` at a table with one row per slice, its amount in the first column of numbers. - A donut divides one whole, so it reads one column where other Helix charts read one per series.
  * @documentation https://fusion.dev/helix/components/donut-chart
  *
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.

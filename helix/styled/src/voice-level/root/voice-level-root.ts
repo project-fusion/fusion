@@ -60,9 +60,7 @@ const ink = (value: string, alpha = 1): string => {
  *   to the center line at both ends. `level` sets how far they swing, and a
  *   quiet level rests as a flat line.
  *
- * Set `level` and `bands` from your audio as often as you have readings, about
- * 30 times a second. Each bar and wave eases toward its reading: up fast and
- * down slower. A spectrum given no `bands` draws every bar from `level`.
+ * A spectrum given no `bands` draws every bar from `level`.
  *
  * The drawing stops when it is off screen, in a background tab, or after the
  * level has been zero for under a second, and starts again with the next
@@ -82,6 +80,10 @@ const ink = (value: string, alpha = 1): string => {
  * @status experimental
  * @category feedback
  * @aliases Audio Level, Waveform, Microphone Level, Equalizer, VU Meter
+ * @use The live level of a microphone or a voice, such as while you speak to an agent.
+ * @instead meter - A measurement in a known range, such as disk used.
+ * @instead orb - What an agent is doing, such as thinking or listening.
+ * @practice Set `level` and `bands` from your audio as often as you have readings, about 30 times a second. - Each bar and wave eases toward its reading, up fast and down slower.
  * @documentation https://fusion.dev/helix/components/voice-level
  *
  * @csspart canvas - The canvas the level is drawn on.

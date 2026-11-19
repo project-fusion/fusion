@@ -55,9 +55,7 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * Buttons are slotted, so they stay your own elements and keep their own
  * appearance and size.
  *
- * **Buttons that stay pressed.** With `selection-mode`, each button with a
- * `value` is a toggle button: a press presses or releases it. `multiple` lets
- * any number be pressed, and each button says so with `aria-pressed`. `single`
+ * **Buttons that stay pressed.** `multiple` lets any number be pressed, and each button says so with `aria-pressed`. `single`
  * keeps one pressed at a time: the group is a `radiogroup` and each button a
  * `radio` that says so with `aria-checked`, as React Aria's toggle button
  * group is. A press on the pressed one releases it, unless
@@ -107,6 +105,12 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * @status stable
  * @category actions
  * @aliases Segmented buttons, Split button, Toggle buttons
+ * @use Related actions joined into one control, such as Cut, Copy, and Paste.
+ * @use Actions that stay on once pressed, such as Bold and Italic.
+ * @instead toggle - A choice a form submits, where the arrow keys choose as they move.
+ * @instead toolbar - A mix of controls that share one tab stop.
+ * @instead tabs - A row that shows one panel of content for each choice.
+ * @practice {selection} Set `selection-mode`, and give each button a `value`, for buttons that stay pressed. - Each button with a `value` is then a toggle button, which a press presses or releases.
  * @documentation https://fusion.dev/helix/components/button-group
  *
  * @slot - The buttons in the group.

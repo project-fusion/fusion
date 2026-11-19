@@ -206,9 +206,8 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  *
  * The controls are a row in the header, and `controls` names which ones:
  * `find`, `copy`, `clear`, and `fullscreen`. `find clear` by default. A control
- * the renderer cannot answer is left out once it is connected. Set `exit-code`
- * when the process exits: the frame says how it exited, stops sending input,
- * and shows a Restart button that sends `helix-terminal-restart`.
+ * the renderer cannot answer is left out once it is connected. The Restart
+ * button shown once the process exits sends `helix-terminal-restart`.
  *
  * **Keyboard.** Every key goes to the program, Tab, Shift+Tab, and Escape
  * included, except these:
@@ -227,13 +226,21 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * screen reader reads nothing in it by default. Set `screen-reader-mode` to
  * have the renderer keep the grid as lines a screen reader can move through
  * and announce new output as it arrives, which xterm.js calls screen reader
- * mode. It costs time on every write, so it is off by default: connect it to
- * a setting your reader can turn on.
+ * mode.
  *
  * @since 0.209.0
  * @status experimental
  * @category media
  * @aliases Terminal emulator, Shell, xterm
+ * @use A shell session on the page, drawn by xterm.js or another terminal emulator.
+ * @instead log - Output that you only read, such as a build log.
+ * @instead code-block - A command or its output, fixed, to read and copy.
+ * @anatomy label
+ * @anatomy controls
+ * @anatomy viewport
+ * @practice Set `exit-code` when the process exits. - The frame says how it exited, stops sending input, and shows a Restart button.
+ * @practice Connect `screen-reader-mode` to a setting your reader can turn on. - It costs time on every write, so it is off by default.
+ * @practice {in-a-pane} Set `fill` for a terminal that fills a pane, such as one side of a Splitter, and give the pane a position, such as relative. - The frame covers its container.
  * @documentation https://fusion.dev/helix/components/terminal
  *
  * @slot - The element your renderer draws the terminal in.

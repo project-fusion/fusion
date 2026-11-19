@@ -10,11 +10,9 @@ import { MarkdownWriter } from '../writer.js'
  * @summary Markdown drawn as a document, which streams in place as a reply arrives.
  *
  * @description
- * Set `text` to the Markdown, or to everything a reply has said so far, with
- * `streaming` while more is coming. Each time `text` grows, only what changed
- * is drawn: a block that has ended is never drawn again, a word arriving is
- * added to the line it ends, and a code block, a list, or a table fills in
- * where it stands. Text you can already read does not move.
+ * `text` is the Markdown. A block that has ended is never drawn again, a word
+ * arriving is added to the line it ends, and a code block, a list, or a table
+ * fills in where it stands. Text you can already read does not move.
  *
  * - A fence becomes a `Code Block`, with its language as its `label` and its
  *   `language`, so a highlighter given to `registerHighlighter` colors it as it
@@ -34,9 +32,7 @@ import { MarkdownWriter } from '../writer.js'
  *
  * **The document is drawn in the element's own children**, so the page's
  * `data-prose` styles reach it, a reader can select and find its text, and a
- * server can send it. Put `data-prose` on the element or on a container. On a
- * server, render `markdownToHtml(text)` inside the element: where what it was
- * sent is exactly what it would draw, it keeps it and draws nothing again.
+ * server can send it.
  *
  * What it reads is CommonMark with GitHub's tables, task lists,
  * strikethrough, autolinks, and alerts. A line of `===` or `---` under a
@@ -50,6 +46,14 @@ import { MarkdownWriter } from '../writer.js'
  * @status experimental
  * @category typography
  * @aliases Markdown renderer, Streaming text, Rich text
+ * @use A reply that arrives as Markdown while you watch, such as an agent's answer.
+ * @use Markdown you already have, such as a README, drawn as a document.
+ * @instead text - A heading or a paragraph you write in your own markup.
+ * @instead editor - A document you write and edit in place.
+ * @instead chat - A conversation's turns in one scrolling transcript.
+ * @practice Set `text` to everything a reply has said so far, with `streaming` while more is coming. - Each time `text` grows, only what changed is drawn.
+ * @practice Put `data-prose` on the element or on a container. - The page's prose recipe then sets the document's type, spacing, lists, and tables.
+ * @practice On a server, render `markdownToHtml(text)` inside the element. - The element keeps markup that matches what it would draw, and draws nothing again.
  * @documentation https://fusion.dev/helix/components/markdown
  *
  * @slot - The drawn document. Written by the element; leave it empty, or fill it with `markdownToHtml(text)` on a server.

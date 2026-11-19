@@ -22,14 +22,11 @@ import { property } from 'lit/decorators.js'
  * @summary A bar or ring that shows how far along a task is.
  *
  * @description
- * Determinate by default. Set `indeterminate` for a task whose total is not
- * known yet. Use `Loader` for a short wait or one with no place of its own on
- * the page.
+ * Determinate by default. Use `Loader` for a short wait or one with no place of
+ * its own on the page.
  *
- * The indeterminate bar runs a segment across the track and does not fill, so
- * it shows that work is happening without claiming a proportion.
- * `aria-valuenow` is omitted in that state, which is the platform's signal for
- * the same thing.
+ * An indeterminate bar omits `aria-valuenow`, which is the platform's signal
+ * that the total is not known.
  *
  * The fill is a fraction of the track, written as a custom property.
  *
@@ -53,6 +50,14 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category feedback
  * @aliases Progress bar, Loading bar
+ * @use How far along a task is, such as an upload or an install.
+ * @instead meter - A measurement in a known range, such as disk used.
+ * @instead loader - A short wait, or one with no place of its own on the page.
+ * @instead scroll-progress - How far you have scrolled through a page or a box.
+ * @anatomy track
+ * @anatomy indicator
+ * @anatomy value?
+ * @practice Set `indeterminate` while the total is not known yet. - The bar then runs a segment across the track and claims no proportion.
  * @documentation https://fusion.dev/helix/components/progress
  *
  * @slot - Words drawn on the bar, or in the middle of a ring, such as the reading. Said as the reading where `value-text` is not set.

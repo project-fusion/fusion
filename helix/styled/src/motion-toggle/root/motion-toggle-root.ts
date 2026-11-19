@@ -14,6 +14,11 @@ import { styles } from './motion-toggle-root.css.js'
  * @since 0.199.0
  * @status experimental
  * @category actions
+ * @use A page with motion that starts by itself, such as a carousel that turns or an aura.
+ * @instead theme-toggle - A press that switches the page between light and dark.
+ * @instead video - One video, which has a pause button of its own.
+ * @anatomy button
+ * @anatomy icon
  * @documentation https://fusion.dev/helix/components/motion-toggle
  *
  * @cssproperty --motion-toggle-background-color - The button's fill. Defaults to the floating overlay surface.

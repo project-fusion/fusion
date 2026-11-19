@@ -17,6 +17,12 @@ import '../../tooltip/index.js'
  * @since 0.1.0
  * @status stable
  * @category actions
+ * @use A value you copy with one press, such as an install command or an API key.
+ * @instead code-block - A block of code, which draws a copy button of its own.
+ * @instead icon-button - An icon that runs an action other than a copy.
+ * @anatomy button
+ * @anatomy mark
+ * @practice Set `from` to copy from another element on the page, in place of `value`. - It reads that element's text, an attribute, or a property at the press.
  * @documentation https://fusion.dev/helix/components/copy-button
  *
  * @cssproperty --copy-button-color - The icon's color at rest. A `tone` keeps its own.

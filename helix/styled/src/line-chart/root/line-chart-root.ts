@@ -38,6 +38,17 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
+ * @use Series over time, such as sessions a month, read against a scale.
+ * @instead area-chart - Parts that add up to a total over time.
+ * @instead sparkline - The shape of a series beside its number, with no axes.
+ * @instead scatter-chart - Two measures against each other, with one point per row.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy line
+ * @anatomy terminus
+ * @anatomy labels
+ * @practice Set `zero` where the distance from zero is the point. - The scale covers the range of the data, since zero would flatten a series that moves between 980 and 1020.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @cssproperty --chart-glide-duration - How long the guide, the band, and the tooltip take to glide from one reading to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places them at once, and under reduced motion they move at once, whatever it says. They are placed where their reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.

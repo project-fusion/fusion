@@ -20,6 +20,16 @@ import { styles } from './command-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category navigation
+ * @use Commands you find by typing, opened from anywhere on the page with a shortcut.
+ * @instead menu - Commands that open from one trigger, such as a row's More button.
+ * @instead combobox - One value for a form, found by typing.
+ * @instead find - Words to find in the content on the page.
+ * @anatomy dialog-surface
+ * @anatomy listbox-search-field
+ * @anatomy listbox-items
+ * @anatomy footer?
+ * @practice Import Command alone for commands written as options. - The palette registers Option itself, since it draws the controls on screen as options.
+ * @practice {controls} Set `controls` to find any control on screen. - Every labeled Helix control puts itself on the page's list, and the palette lists the ones you can reach once you type.
  * @documentation https://fusion.dev/helix/components/command
  *
  * @cssproperty --command-list-size - How tall the list grows before it scrolls.

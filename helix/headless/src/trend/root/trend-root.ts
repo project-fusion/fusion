@@ -46,11 +46,9 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * movement and its color shows whether the change is good. Movement and
  * judgment are separate properties because they are separate facts.
  *
- * `good` is unset by default, so a trend with no judgment is gray. For churn,
- * latency, error rate, cost, and bounce rate, up is bad. Set the metric's
- * polarity once with `good`, and the component picks the color from the
- * movement. The judgment is also a custom state, `better` or `worse`, and so
- * is the movement, `up` or `down`, for a sheet of your own.
+ * `good` is unset by default, so a trend with no judgment is gray. The
+ * judgment is also a custom state, `better` or `worse`, and so is the
+ * movement, `up` or `down`, for a sheet of your own.
  *
  * The movement is also written as a word, so a screen reader reads it. The
  * styled tier hides `part="direction"` visually and keeps it in the
@@ -84,6 +82,13 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @status stable
  * @category charts
  * @aliases Delta, Change, Movement
+ * @use Which way a measurement moved, such as revenue up 12.4%, and whether that is good.
+ * @instead stat - One measurement, with a label that names what it measures.
+ * @instead sparkline - The shape of a series over time, in a small space.
+ * @instead line-chart - Every reading over a period, read against a scale.
+ * @anatomy icon
+ * @anatomy label?
+ * @practice Set `good` to the direction that is good for the metric. - Up is bad for churn, latency, error rate, cost, and bounce rate, and the color follows from `movement`.
  * @documentation https://fusion.dev/helix/components/trend
  *
  * @slot - The metric that moved. Not needed with `value`, which writes it.

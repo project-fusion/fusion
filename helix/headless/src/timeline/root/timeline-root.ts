@@ -25,26 +25,34 @@ import { property } from 'lit/decorators.js'
  * The host has `role="list"`, because the entries are your elements in the
  * light DOM. `Steps` does the same.
  *
- * **Group entries by date with `Timeline.Group`**, which puts a heading such as
- * "Today" over its entries. The group is an entry of the timeline, and its
- * entries are a list of their own named by the heading.
+ * A `Timeline.Group` is an entry of the timeline, and its entries are a list
+ * of their own named by its heading.
  *
  * **The reading order is the order you write the entries in**, in every layout
  * the styled tier draws: down the page, either side of a line down the middle,
  * or across the page. Inside each entry the time is read before what happened.
- * Write the entries in the order the events happened, oldest or newest first,
- * and the layout only moves where they are drawn.
+ * The layout only moves where they are drawn.
  *
- * **A feed that loads more entries sets `loading` while it fetches.** The
- * timeline is busy, and an entry after the last says "Loading", the word every
- * collection uses (`loading-text`, or your own content in the `loading` slot). Put a button
- * that asks for more after the timeline, and move focus to the first new
- * entry when they arrive.
+ * **While `loading` is set, the timeline is busy**, and an entry after the
+ * last says "Loading", the word every collection uses (`loading-text`, or
+ * your own content in the `loading` slot). Move focus to the first new entry
+ * when they arrive.
  *
  * @since 0.1.0
  * @status stable
  * @category data
  * @aliases Activity feed, History, Changelog, Audit trail
+ * @use Events in the order they happened, such as a deployment's history.
+ * @instead notifications - Events you mark read and come back to.
+ * @instead steps - The stages of a task still under way, such as a checkout.
+ * @instead log - Lines of output that arrive while you watch.
+ * @anatomy item
+ * @anatomy marker
+ * @anatomy time
+ * @anatomy content
+ * @practice Write the entries in the order the events happened, oldest or newest first. - The reading order is the order you write them in, in every layout.
+ * @practice {grouped} Group entries by date with `Timeline.Group`. - The group puts a heading such as Today over its entries.
+ * @practice Set `loading` while you fetch more entries, and put a button that asks for more after the timeline. - The timeline is busy, and an entry after the last says Loading.
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - The entries, and any groups of them.

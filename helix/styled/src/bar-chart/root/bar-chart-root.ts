@@ -26,6 +26,15 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Column Chart, Categorical Chart
+ * @use A comparison across categories, such as revenue by quarter or signups by channel.
+ * @instead line-chart - A trend over many points in time.
+ * @instead donut-chart - Parts of one whole, such as sessions by source.
+ * @instead spatial-bar-chart - Values over two sets of categories, drawn in three dimensions.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy bar
+ * @anatomy labels
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - Fill of the category band under the pointer.

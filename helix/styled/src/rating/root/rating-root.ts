@@ -17,6 +17,14 @@ import { styles } from './rating-root.css.js'
  * @status stable
  * @category forms
  * @aliases Stars, Score, Review score
+ * @use A score given or shown as a row of marks, such as stars on a review.
+ * @instead slider - A value picked from a long range by dragging.
+ * @instead meter - A measurement in a known range, such as storage used.
+ * @anatomy label
+ * @anatomy fill
+ * @anatomy track
+ * @practice {halves} Set `step` to `0.5` for half marks. - Five marks at a half step give ten places to press.
+ * @practice {review-summary} Set `readonly` to show a score. - A read-only rating is announced as a displayed value and does not look disabled.
  * @documentation https://fusion.dev/helix/components/rating
  *
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.

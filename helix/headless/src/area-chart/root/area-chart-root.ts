@@ -129,8 +129,7 @@ export interface AreaStack {
  * a reading. The tooltip follows, the `live` part says the reading in words,
  * and Escape puts the tooltip away.
  *
- * Every numeric column is a part, so leave a total column out of the table the
- * chart reads, or it is counted twice. A negative reading is drawn as zero.
+ * A negative reading is drawn as zero.
  *
  * **A tap shows the reading under it**, and keeps it until a tap lands
  * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
@@ -139,8 +138,7 @@ export interface AreaStack {
  *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
- * with its label first. A table is still the better source where the page can
- * show one, since it reads before any script runs.
+ * with its label first.
  *
  * **A chart with nothing to draw says so.** A table with no readings shows
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
@@ -166,6 +164,16 @@ export interface AreaStack {
  * @status stable
  * @category charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart
+ * @use A total over time and the parts it is made of, such as visits a month by source.
+ * @instead line-chart - Series over time that you compare with one another.
+ * @instead bar-chart - A comparison across categories, such as signups by channel.
+ * @instead donut-chart - Parts of a whole at one moment.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy area
+ * @anatomy labels
+ * @practice Leave a total column out of the table `for` names. - Every numeric column is a part, so a total column is counted twice.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.

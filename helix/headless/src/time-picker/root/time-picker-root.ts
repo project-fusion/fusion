@@ -56,18 +56,14 @@ import '../../option/root/index.js'
  * draws a button that chooses the current time, on the step and inside the
  * bounds.
  *
- * The step keeps the list usable. At the default of 15 minutes a day is 96
- * rows, which people can scroll or type into. At 1 minute it is 1,440. Use the
- * list for the times your product offers, and Time Input for any time, the same
- * way Date Input separates typing a date from picking one on the calendar.
+ * Use the list for the times your product offers, and Time Input for any
+ * time, the same way Date Input separates typing a date from picking one on
+ * the calendar.
  *
- * The value is always `HH:mm` on a 24-hour clock, or `HH:mm:ss` with
- * `seconds`. A form submits that shape,
- * `min` and `max` compare against it, and it sorts as a string. Each row's text
- * follows the person's own conventions, from `Intl`.
+ * Each row's text follows the person's own conventions, from `Intl`.
  *
  * The chosen row is marked in the served markup. The listbox gets the answer as
- * `.value`, and Lit SSR serializes no property binding, so without more the 96
+ * `.value`, and Lit SSR serializes no property binding, so without more the
  * served rows would carry no mark until the listbox upgrades and runs `place`.
  * Each option also gets `selected`, an attribute binding that does serialize,
  * and `place` then writes the same answer from the same value. This is the same
@@ -103,6 +99,13 @@ import '../../option/root/index.js'
  * @status stable
  * @category forms
  * @aliases Time, TimeList
+ * @use A time chosen on the page from a list of times, such as a booking slot.
+ * @instead time-input - A time in a form field, typed or picked from a panel that opens.
+ * @instead date-picker - A date on a month calendar.
+ * @anatomy list
+ * @anatomy option
+ * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
+ * @practice Keep `step` at 15 minutes or more where the list spans a day. - At 15 minutes a day is 96 rows, which people can scroll or type into, and at 1 minute it is 1,440.
  * @documentation https://fusion.dev/helix/components/time-picker
  *
  * @slot empty - What the list shows when no time falls between `min` and `max`, for content richer than `empty-text`.

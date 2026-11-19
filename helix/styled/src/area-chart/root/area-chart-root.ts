@@ -40,6 +40,16 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart
+ * @use A total over time and the parts it is made of, such as visits a month by source.
+ * @instead line-chart - Series over time that you compare with one another.
+ * @instead bar-chart - A comparison across categories, such as signups by channel.
+ * @instead donut-chart - Parts of a whole at one moment.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy area
+ * @anatomy labels
+ * @practice Leave a total column out of the table `for` names. - Every numeric column is a part, so a total column is counted twice.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @cssproperty --area-chart-block-size - Height of the drawing.

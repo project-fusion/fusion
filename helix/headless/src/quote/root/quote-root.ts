@@ -16,11 +16,8 @@ import { typedMarks } from '../marks.js'
  * @description
  * Renders a real `<q>`, so the browser supplies the quotation marks. It inserts
  * the correct marks for the document's language and nests them correctly when
- * one quotation sits inside another. Do not type quotation marks into the
- * content: one that starts or ends with a typed mark warns once, with the
- * runtime kind `typed-marks`. A quotation in a language other than the page's takes `lang` on the
- * element, and its marks follow it: `lang="de"` sets „…“ and `lang="fr"` «…»
- * inside an English page.
+ * one quotation sits inside another. A quotation that starts or ends with a
+ * typed mark warns once, with the runtime kind `typed-marks`.
  *
  * **`no-marks` leaves the marks off**, for a quotation whose marks the page
  * draws itself, such as marks set in an accent color. The quotation still counts toward nesting, so a quote
@@ -37,6 +34,8 @@ import { typedMarks } from '../marks.js'
  * @use A quotation inside a sentence.
  * @instead blockquote - A passage set apart, including a pull quote.
  * @anatomy quote
+ * @practice Leave quotation marks out of the text. - The browser draws the marks for the language, so a typed one shows twice.
+ * @practice {languages} Write the language on a quotation in another language, such as `lang="fr"`. - Its marks follow it, so `lang="fr"` sets «…» inside an English page.
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @slot - The quoted text.

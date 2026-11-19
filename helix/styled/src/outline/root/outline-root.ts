@@ -10,10 +10,8 @@ import { styles } from './outline-root.css.js'
  * A rule runs down the leading edge, and the current section is highlighted
  * along it.
  *
- * Set nesting with `data-level` on each link, using the heading levels: `2`
- * through `6` each add one step of `--outline-indent`, and a link without
- * `data-level` is at the top level. The outline does not read heading levels
- * from the document, because the headings are not always in the document.
+ * Each `data-level` from `2` through `6` adds one step of `--outline-indent`,
+ * and a link without `data-level` is at the top level.
  *
  * Links in a nested `<ul>` are styled by `helix.css`, since the outline's own
  * styles reach the elements slotted into it and nothing inside them: the lists
@@ -34,6 +32,12 @@ import { styles } from './outline-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Table of contents, On this page, Outline
+ * @use Links to the headings of a long page, such as a guide, with the section in view marked.
+ * @instead navigation - Links to the pages of a site.
+ * @anatomy nav
+ * @anatomy indicator
+ * @practice Set `data-level` on each link to its heading's level, `2` through `6`. - The outline does not read heading levels from the document, because the headings are not always in it.
+ * @practice Set `follow` on an outline with a scrollbar of its own. - It keeps the link of the section in view showing as you scroll the page.
  * @documentation https://fusion.dev/helix/components/outline
  *
  * @cssproperty --outline-heading-color - The color of the heading in the `heading` slot.

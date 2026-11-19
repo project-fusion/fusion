@@ -34,13 +34,10 @@ import { property, state } from 'lit/decorators.js'
  * It closes on Escape and on a press elsewhere.
  *
  * **It adds to the link and never stands in for it.** The link still goes
- * where it goes when pressed, and a touch screen, which has no hover, follows
- * the link without opening the card. So put nothing in the card that a
- * reader can only reach there.
+ * where it goes when pressed.
  *
- * **Opening moves no focus.** A reader who tabbed to the link stays on it,
- * and the next Tab goes into the card, whose content follows the link in the
- * page's order: place the element right after the link. The card is no
+ * **Opening moves no focus.** A reader who tabbed to the link stays on it.
+ * The card is no
  * description of the link and names nothing on it, so a screen reader reads
  * the link as it is and the card as content when it is reached.
  *
@@ -52,6 +49,11 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category overlays
  * @aliases Preview card, Link preview, Profile card, Hover preview
+ * @use A preview of a person or a page that opens from a link while the pointer rests on it.
+ * @instead tooltip - A short text that names a control.
+ * @instead popover - Content that opens on a press, such as a short form.
+ * @practice Put nothing in the card that you can reach only there. - A touch screen has no hover, so it follows the link without opening the card.
+ * @practice Place the card right after the link that `for` names. - The next Tab from the link goes into the card, whose content follows the link in the page's order.
  * @documentation https://fusion.dev/helix/components/hover-card
  *
  * @slot - The card's content, which may hold links and buttons.

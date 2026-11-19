@@ -100,7 +100,7 @@ const REPEAT_EVERY = 60
  * `format-options` shows the number with `Intl.NumberFormat` in `locale`, as a
  * currency, a percent or a unit, while the field is not being edited. Focus
  * shows the number itself, and a typed `$1,200` or `25%` is read back with the
- * same options. The value stays the plain number: `1200`, or `0.25` for 25%.
+ * same options.
  * The locale's group separators are read in every field, so `1,234` is a
  * number in `en-US`.
  *
@@ -147,6 +147,7 @@ const REPEAT_EVERY = 60
  * @anatomy decrement
  * @anatomy control
  * @anatomy increment
+ * @practice Set `value` as a plain number, such as `0.25` for 25%, whatever `format-options` shows. - The format is only what the field shows while it is not being edited, and the form receives the plain number.
  * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot decrement-icon - Replaces the icon on the step down button.

@@ -70,9 +70,8 @@ const dayOf = (when: string | undefined, locale: string): string | undefined => 
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
  * @description
- * A grid of cells, each colored by a tone. `rows="1"` makes a status strip, and
- * `rows="7"` makes a contribution graph. GitHub's contribution graph uses five
- * discrete levels, which a set of tones covers.
+ * A grid of cells, each colored by a tone. GitHub's contribution graph uses
+ * five discrete levels, which a set of tones covers.
  *
  * Color in a heatmap is per cell. In every other Helix chart, color is per
  * series, so ninety differently colored cells would need ninety series.
@@ -160,6 +159,14 @@ const dayOf = (when: string | undefined, locale: string): string | undefined => 
  * @status stable
  * @category charts
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
+ * @use A reading for each day or hour in a strip, such as uptime or commits.
+ * @instead line-chart - A measure over time whose rise and fall you follow.
+ * @instead spatial-heatmap - Counts by day drawn as a relief, such as a year of commits.
+ * @anatomy cell
+ * @anatomy start?
+ * @anatomy summary?
+ * @anatomy end?
+ * @practice Set `rows` to 7 for a contribution graph, and to 1 for a status strip. - With seven rows, each column is a week, read top to bottom in days.
  * @documentation https://fusion.dev/helix/components/heatmap
  *
  * @slot empty - Content shown in place of the cells when the table has no readings, such as a link to add the first. Falls back to `empty-text`.

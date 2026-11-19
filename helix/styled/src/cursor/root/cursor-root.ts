@@ -10,15 +10,11 @@ const SERIES = 20
  * @summary Another person's pointer on a shared surface, with their name beside it.
  *
  * @description
- * Place one inside a positioned box, such as a board several people edit, for
- * each person there, and set `x` and `y` as their pointer moves: pixels from
- * the box's top left, as a collaboration service reports them. The pointer
- * glides from each place to the next, so updates that arrive a few times a
- * second read as a hand moving.
+ * The pointer glides from each place to the next as `x` and `y` change, so
+ * updates that arrive a few times a second read as a hand moving.
  *
  * **Each person in a color of their own** from the series palette, by
- * `series`, so a pointer and the person's other marks on the page, such as a
- * selection, can share it.
+ * `series`.
  *
  * **Nothing to a screen reader, and nothing to the pointer.** Where another
  * person is matters to the eye of someone working beside them; a page that
@@ -31,6 +27,13 @@ const SERIES = 20
  * @status experimental
  * @category content
  * @aliases Presence cursor, Multiplayer cursor, Collaborator pointer, Live cursor
+ * @use Where another person points, on a board or a document you edit together.
+ * @instead avatar - Who is present, shown once for the whole surface.
+ * @instead spotlight - A light under your own pointer as it moves over a card.
+ * @anatomy arrow
+ * @anatomy label
+ * @practice Put one Cursor for each person in a positioned box, and set `x` and `y` in pixels from its top left. - The pointer is placed as a collaboration service reports it.
+ * @practice Draw a person's other marks, such as a selection, in the color their `series` names. - Their pointer and their marks then read as one person's.
  * @documentation https://fusion.dev/helix/components/cursor
  *
  * @csspart arrow - The pointer's arrow.

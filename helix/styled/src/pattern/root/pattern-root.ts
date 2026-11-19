@@ -37,6 +37,9 @@ export type PatternMotif = 'contours' | 'hexagons' | 'stars'
  * @status experimental
  * @category content
  * @aliases Background pattern, Honeycomb, Hexagon grid, Starfield, Topography, Contour lines
+ * @use Lines or points drawn behind a section, such as a landing page's heading.
+ * @instead aura - A background of drifting light in the theme's colors.
+ * @instead strands - A ribbon of fine strands of light, in a box or down a whole page.
  * @documentation https://fusion.dev/helix/components/pattern
  *
  * @slot - The content drawn over the pattern.

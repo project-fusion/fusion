@@ -26,14 +26,11 @@ import { HelixPreviewEvent } from '../events/index.js'
  *
  * @description
  * Supports half marks, so the value is not always an integer and the press
- * targets are not the marks: five stars at a half step give ten places to
- * press. The pointer handling and `step` are built around half marks.
+ * targets are not the marks. The pointer handling and `step` are built around
+ * half marks.
  *
  * A partial mark is the full mark, clipped. The filled marks are drawn over the
  * empty marks and cut off partway, so any mark and any fraction work.
- *
- * A read-only rating displays a score, which is the most common use. It is
- * announced as a displayed value and does not look disabled.
  *
  * With `clearable`, pressing the chosen score again, or Backspace or Delete on
  * the marks, takes the rating back to unrated and sends `helix-clear`.
@@ -57,6 +54,14 @@ import { HelixPreviewEvent } from '../events/index.js'
  * @status stable
  * @category forms
  * @aliases Stars, Score, Review score
+ * @use A score given or shown as a row of marks, such as stars on a review.
+ * @instead slider - A value picked from a long range by dragging.
+ * @instead meter - A measurement in a known range, such as storage used.
+ * @anatomy label
+ * @anatomy fill
+ * @anatomy track
+ * @practice {halves} Set `step` to `0.5` for half marks. - Five marks at a half step give ten places to press.
+ * @practice {review-summary} Set `readonly` to show a score. - A read-only rating is announced as a displayed value and does not look disabled.
  * @documentation https://fusion.dev/helix/components/rating
  *
  * @slot empty-mark - The shape of an unfilled mark, copied into every position of the track, such as an outlined star beside a filled `mark`. Without it, the track copies `mark`.

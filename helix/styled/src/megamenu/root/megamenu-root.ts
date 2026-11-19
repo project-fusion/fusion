@@ -10,13 +10,10 @@ import { styles } from './megamenu-root.css.js'
  * Styles the trigger and lays out the panel it opens as a grid of columns. What
  * opens and closes the panel comes from the base class.
  *
- * **The panel's contents are laid out by `helix.css`**, through attributes you
- * write on your own markup: `data-megamenu-group` on each column,
- * `data-megamenu-heading` on a column's heading, and `data-megamenu-item` on a
- * link that carries a title in `<strong>` and a line of description in `<span>`
- * or `<p>`, with an icon before them. A plain `<a>` in a group is drawn as a
- * navigation item. Without the attributes the panel holds your markup as you
- * styled it.
+ * `data-megamenu-group` goes on each column, `data-megamenu-heading` on a
+ * column's heading, and `data-megamenu-item` on a link that carries a title in
+ * `<strong>` and a line of description in `<span>` or `<p>`, with an icon
+ * before them. A plain `<a>` in a group is drawn as a navigation item.
  *
  * @since 0.1.0
  * @status stable
@@ -27,6 +24,8 @@ import { styles } from './megamenu-root.css.js'
  * @instead navigation - Links that fit in one row.
  * @anatomy trigger
  * @anatomy surface
+ * @practice Write the panel's links and headings yourself, in its default slot. - A router renders its own anchors and cannot render them inside the megamenu's shadow root.
+ * @practice {preview} Mark the panel's columns, headings, and links with their data-megamenu attributes. - `helix.css` lays out the panel through them, and without them the panel holds your markup as you styled it.
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - The filter behind the panel. Inside an App Header it is the

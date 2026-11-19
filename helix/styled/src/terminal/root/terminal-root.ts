@@ -29,15 +29,22 @@ import '../../toolbar/index.js'
  * `helix-terminal { --terminal-ansi-blue: #3b82f6 }`. The
  * [Terminals](https://fusion.dev/helix/docs/terminals) guide lists them all.
  *
- * Set `fill` for a terminal that fills a pane, such as one side of a
- * `Splitter`: the frame covers its container, which needs a position of its
- * own, such as `position: relative`. Set `separation="plain"` where the pane
- * already draws the edge.
+ * Set `separation="plain"` where a pane around the terminal already draws
+ * the edge.
  *
  * @since 0.209.0
  * @status experimental
  * @category media
  * @aliases Terminal emulator, Shell, xterm
+ * @use A shell session on the page, drawn by xterm.js or another terminal emulator.
+ * @instead log - Output that you only read, such as a build log.
+ * @instead code-block - A command or its output, fixed, to read and copy.
+ * @anatomy label
+ * @anatomy controls
+ * @anatomy viewport
+ * @practice Set `exit-code` when the process exits. - The frame says how it exited, stops sending input, and shows a Restart button.
+ * @practice Connect `screen-reader-mode` to a setting your reader can turn on. - It costs time on every write, so it is off by default.
+ * @practice {in-a-pane} Set `fill` for a terminal that fills a pane, such as one side of a Splitter, and give the pane a position, such as relative. - The frame covers its container.
  * @documentation https://fusion.dev/helix/components/terminal
  *
  * @cssproperty --terminal-block-size - The frame's height, as a length. Ignored with `fill`, where the container decides it.

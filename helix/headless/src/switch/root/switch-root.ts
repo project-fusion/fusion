@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
  * @description
  * A switch turns something on or off right away, and a checkbox is an answer
  * the form submits later. A screen reader announces `role="switch"` as "on" or
- * "off", and people expect the change to take effect immediately. A switch is
+ * "off". A switch is
  * as common outside a form as inside one.
  *
  * It renders a real `<input type="checkbox">` with `role="switch"`, the pairing
@@ -50,6 +50,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy thumb
  * @anatomy label
  * @anatomy hint?
+ * @practice Apply the setting the moment the switch changes, with no Save button after it. - People expect a switch to take effect at once.
  * @documentation https://fusion.dev/helix/components/switch
  *
  * @slot - The label that names what the switch turns on.

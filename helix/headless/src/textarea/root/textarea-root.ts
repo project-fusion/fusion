@@ -57,6 +57,13 @@ import { grownHeight, lineMetrics } from '../grow.js'
  * @status stable
  * @category forms
  * @aliases Multiline, TextArea
+ * @use Text that runs to several lines, such as a description or a comment.
+ * @instead input - A single line of text, such as a name.
+ * @instead code-input - A short piece of code, highlighted as you type.
+ * @instead editor - A document with headings, lists, and links.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/textarea
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
