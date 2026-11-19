@@ -1,0 +1,28 @@
+<!-- @summary Confetti bursts out of the button once the page is published, and a status message says so in words. -->
+<helix-flex
+  align-items="center"
+  direction="column"
+  gap="sm"
+>
+  <helix-confetti id="confetti">
+    <helix-button
+      emphasis="solid"
+      id="publish"
+    >Publish page</helix-button>
+  </helix-confetti>
+  <span
+    id="said"
+    role="status"
+  ></span>
+</helix-flex>
+
+<script type="module">
+  const confetti = document.getElementById('confetti')
+  const said = document.getElementById('said')
+
+  // Burst once the action is done, and say so in words as well.
+  document.getElementById('publish').addEventListener('click', () => {
+    said.textContent = 'Your page is published.'
+    confetti.burst()
+  })
+</script>

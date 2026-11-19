@@ -1,0 +1,5 @@
+/* The brand's three colors in place of the theme's series. */
+.brand {
+  --confetti-colors:
+    var(--helix-color-primary), var(--helix-color-accent), var(--helix-color-success);
+}

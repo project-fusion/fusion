@@ -1,0 +1,35 @@
+<!-- @summary Confetti in the brand's colors, set with `--confetti-colors`, for finishing onboarding. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  align-items="center"
+  direction="column"
+  gap="sm"
+>
+  <helix-confetti
+    class="brand"
+    id="confetti"
+  >
+    <helix-button
+      emphasis="solid"
+      id="finish"
+    >Finish setup</helix-button>
+  </helix-confetti>
+  <span
+    id="said"
+    role="status"
+  ></span>
+</helix-flex>
+
+<script type="module">
+  const confetti = document.getElementById('confetti')
+  const said = document.getElementById('said')
+
+  document.getElementById('finish').addEventListener('click', () => {
+    said.textContent = 'Your workspace is ready.'
+    confetti.burst()
+  })
+</script>
