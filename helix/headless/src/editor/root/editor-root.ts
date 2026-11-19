@@ -346,6 +346,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart block-menu-back-mark - The glyph on the back control of a submenu.
  * @csspart block-menu-empty - The text shown when the menu has no items.
  * @csspart block-menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart block-menu-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart block-menu-live - The block menu's live region, which repeats the empty and loading text for screen readers.
  * @csspart block-menu-loading - The text shown while the items are loading.
  * @csspart block-menu-search-field - The block menu's filter field, drawn with `filterable`.
@@ -502,6 +503,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart overflow-divider-line - The line of that rule.
  * @csspart overflow-empty - The text shown when the menu has no items.
  * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart overflow-live - The overflow menu's live region, which repeats the empty and loading text for screen readers.
  * @csspart overflow-loading - The text shown while the items are loading.
  * @csspart overflow-option - One tool in the overflow menu. A mark, a list, or the quote is checked while its format holds.
@@ -1522,7 +1524,7 @@ export class HelixHeadlessEditor extends HelixElement {
       data-fold="block"
       ?hidden=${this.allFolded(['block'])}
       exportparts="back: block-menu-back, back-mark: block-menu-back-mark, empty: block-menu-empty,
-        header: block-menu-header, live: block-menu-live, loading: block-menu-loading,
+        header: block-menu-header, highlight: block-menu-highlight, live: block-menu-live, loading: block-menu-loading,
         search-field: block-menu-search-field, surface: block-menu-surface,
         title: block-menu-title"
       label=${this.blockLabel}
@@ -1682,7 +1684,7 @@ export class HelixHeadlessEditor extends HelixElement {
     return html`<${menu}
       part="overflow"
       exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
-        header: overflow-header, live: overflow-live, loading: overflow-loading,
+        header: overflow-header, highlight: overflow-highlight, live: overflow-live, loading: overflow-loading,
         search-field: overflow-search-field, surface: overflow-surface,
         title: overflow-title"
       label=${this.moreLabel}

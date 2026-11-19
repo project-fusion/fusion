@@ -50,6 +50,7 @@ import '../../menu/index.js'
  * @csspart menu-back-mark - The icon on a submenu's back button.
  * @csspart menu-empty - Shown when there are no items to show.
  * @csspart menu-header - The bar above a submenu, holding the back button and the submenu's name.
+ * @csspart menu-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart menu-live - The inner menu's `live` part, the region screen readers announce its empty and loading messages from.
  * @csspart menu-loading - Shown while the items are loading.
  * @csspart menu-search-field - The inner menu's filter field, drawn with `filterable`.
@@ -245,7 +246,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /** The menu itself, behind a method so a styled tier can render another one. */
   protected renderMenu(): TemplateResult {
     return html`<${this.tag('menu')} part="menu"
-    exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+    exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header, highlight: menu-highlight,
       live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title" label=${this.label || this.fallbackLabel} placement=${this.placement}
       @toggle=${this.heardToggle}>
       <slot name="trigger" slot="trigger">
