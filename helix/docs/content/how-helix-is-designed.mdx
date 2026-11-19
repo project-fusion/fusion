@@ -1,0 +1,100 @@
+---
+description: The eight principles every Helix component follows, and the rules Helix names its components by.
+pinned: true
+section: Foundations
+title: How Helix is designed
+---
+
+# How Helix is designed
+
+Every Helix component follows the eight principles on this page. Each one is
+true in the code today, and each links to the page that goes deeper. The rules
+Helix names its components by close the page.
+
+## Helix behaves like the platform
+
+Helix builds on native elements, the top layer, and form participation, and a
+component keeps its state the way an input keeps its value. A Helix select
+submits with its form, as a `<select>` does.
+
+Read more in [Using the elements](./using-the-elements) and
+[Forms and validation](./forms).
+
+## Behavior and look are separate tiers
+
+The headless tier holds structure, accessibility, and state. The styled tier
+adds the look and nothing else, so you can replace the look and keep every
+behavior.
+
+Read more in [Tiers](./tiers).
+
+## A component varies along named axes
+
+Helix has nine axes, each one word for one question, and every family uses the
+same words. Once you know `tone` on Button, you know it on Callout.
+
+Read more in [Visual axes](./visual-axes).
+
+## The theme is computed and measured
+
+You give Helix a brand color, and it computes every token and checks the
+contrast of each pair. A pair that misses its target is reported.
+
+Read more in [Deriving a theme](./theming).
+
+## Your page owns its content and its decisions
+
+Content arrives through slots. A component reports a change and leaves the
+decision to your code: a Tag sends `helix-dismiss` when you press its remove
+button, and your code removes the tag.
+
+Read more in [Composition](./composition) and
+[State and control](./state-and-control).
+
+## One component serves every screen
+
+A component works the same at 390 pixels as at 1440. A Menu's submenu replaces
+the panel it opens from, so a menu three levels deep still fits a phone.
+
+Read more in [Overlays](./overlays).
+
+## People and agents read one description
+
+The manifest describes every component. The reference pages, the framework
+typings, the `helix api` commands, and the MCP server are written from it, so a
+coding agent reads the same guidance you read.
+
+Read more in [Using Helix with an agent](./using-helix-with-an-agent).
+
+## The rules are checked
+
+`helix component` checks the axes, the part and slot vocabulary, and the
+guidance on every family, so a rule holds without a reviewer remembering it.
+
+Read more in [Diagnostics](./diagnostics).
+
+## Naming
+
+Helix names its components by six rules, applied in order.
+
+1. **The platform's name comes first.** Where HTML has the element, the family
+   takes its name: Dialog, Select, Blockquote, and Quote. If you know HTML, you
+   already know the word.
+2. **Otherwise, the plain word for what you see.** Tag, Badge, Callout, and
+   Drawer. Other systems' words are the family's aliases, so a search for
+   "Chip" or "Modal" still finds it.
+3. **A namespace means composition.** `Tabs.Tab` lives inside Tabs. An
+   icon-only button is no part of Button, so Icon Button is a family of its own.
+4. **A variation is a property, and an alternative is a family.** Two
+   components that do different jobs have two names, even when they look alike.
+5. **A property is named for the question it answers.** `emphasis` is weight
+   and `tone` is meaning. A choice outside the axes is named for what it
+   chooses, such as `marker` or `layout`. No property is named `variant` or
+   `appearance`.
+6. **Words for a position are shared, and words for a thing belong to the
+   family.** Every family calls a floating panel `surface`, and the region at
+   the top of a component `header`. A thumb or a swatch is the family's own.
+
+Each family page lists its aliases under its summary as "Also called". Where
+two families answer to one word, each one's guidelines name the other: Drawer
+and Dialog are both called "Sheet", and each page says when to use the other.
