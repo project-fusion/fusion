@@ -24,6 +24,11 @@ import { styles } from './icon-root.css.js'
  * @status stable
  * @category media
  * @aliases Glyph, Symbol
+ * @use A symbol from the Helix set, beside a label or alone in an icon button.
+ * @instead icon-button - A square button whose content is an icon.
+ * @instead badge - A count or a dot pinned to another element.
+ * @instead avatar - A person or an account, shown by their photo or their initials.
+ * @practice Import the element's own entry, `icon/root`, and register only the glyphs a page names. - That entry registers no glyph, so the page ships the glyphs it registers and no others.
  * @documentation https://fusion.dev/helix/components/icon
  *
  * @csspart svg - The rendered SVG.

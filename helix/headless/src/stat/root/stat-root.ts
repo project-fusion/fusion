@@ -43,8 +43,7 @@ interface StepSharing {
  * dashboard hears "Revenue, group" and then the figure, its unit and its
  * trend as one reading, rather than a run of loose words. The role and the name
  * are set through `ElementInternals` once the label is known, which writes no
- * attribute; a stat with no label has no role. Put a `Trend` in the `trend`
- * slot to have it read inside the group, after the figure it qualifies.
+ * attribute; a stat with no label has no role.
  *
  * **Or give the figure as a number.** `value` is written with
  * `Intl.NumberFormat`, in `locale` and with `format-options`, so
@@ -58,13 +57,11 @@ interface StepSharing {
  * the stat with those breaks, and the slot is hidden while it is. A figure
  * holding an element is shown as it is.
  *
- * **A new `value` counts to the new number** from the one before, so a figure
- * that a dashboard refreshes reads as having moved. A screen reader reads only
- * the new number. The stat times the count from `--stat-count-duration` and
+ * **A new `value` counts to the new number.** A screen reader reads only the
+ * new number. The stat times the count from `--stat-count-duration` and
  * `--stat-count-easing`, which the styled tier sets from the duration and
  * easing tokens. Here neither is set, so the figure changes at once until you
- * set them, and under reduced motion it always does. A slotted figure changes
- * at once.
+ * set them, and under reduced motion it always does.
  *
  * **Each slot is a part of the same name**, and `value` for the figure, so a
  * page reaches the label, the unit and the trend from outside. A slot draws no
@@ -77,6 +74,15 @@ interface StepSharing {
  * @status stable
  * @category data
  * @aliases Metric, KPI
+ * @use One measurement with a label, such as active users on a dashboard.
+ * @instead badge - A count pinned to another element.
+ * @instead meter - A measurement shown against a known range.
+ * @instead sliding-number - A figure whose digits roll to each new value.
+ * @anatomy label
+ * @anatomy value
+ * @anatomy group?
+ * @practice {trend} Put a Trend in the `trend` slot. - It is read inside the stat's group, after the figure it qualifies.
+ * @practice {counting} Set `value` for a figure a dashboard refreshes. - A new `value` counts from the one before, so the figure reads as having moved, and a slotted figure changes at once.
  * @documentation https://fusion.dev/helix/components/stat
  *
  * @slot - The value.

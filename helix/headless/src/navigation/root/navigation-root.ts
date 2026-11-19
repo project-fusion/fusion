@@ -88,9 +88,8 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * A router renders its own anchors and cannot render them inside the
  * component's shadow root.
  *
- * The component moves a marker to the current item. It finds the current item
- * by reading `aria-current`, so the attribute that screen readers announce also
- * places the marker. Any value but `false` counts, so a sidebar of sections on
+ * The component moves a marker to the current item. Any `aria-current` value
+ * but `false` counts, so a sidebar of sections on
  * one page can mark the section in view with `aria-current="location"`. Where
  * several are marked, `page` wins.
  *
@@ -140,6 +139,13 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * @status stable
  * @category navigation
  * @aliases Nav, NavList, Tabs
+ * @use Links to the sections of a site or an app, with the current page marked.
+ * @instead tabs - Panels on one page that a row of tabs switches between.
+ * @instead megamenu - A section of a site's navigation that opens a panel of links.
+ * @instead app-header - The banner at the top of the page that holds the navigation.
+ * @anatomy nav
+ * @anatomy indicator
+ * @practice Mark the current link with `aria-current`. - The marker reads it, so the attribute a screen reader announces also places the marker.
  * @documentation https://fusion.dev/helix/components/navigation
  *
  * @slot - The destinations, as your own links.

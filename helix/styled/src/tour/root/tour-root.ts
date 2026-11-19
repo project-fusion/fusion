@@ -13,6 +13,14 @@ import { styles } from './tour-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category overlays
+ * @use A guided first look at an interface, one stop at a time, such as after you sign up.
+ * @instead steps - Stages of a task you complete in order, such as a checkout.
+ * @instead popover - Content beside one control that opens when you press it.
+ * @anatomy spotlight
+ * @anatomy surface
+ * @anatomy arrow
+ * @anatomy actions
+ * @practice Open what a stop points at in the stop's `effect`, such as a menu or a drawer. - The tour runs it as it reaches the stop, and waits for a promise it returns before it shows the stop.
  * @documentation https://fusion.dev/helix/components/tour
  *
  * @cssproperty --tour-scrim-color - The color of the dimmed area outside the spotlight.

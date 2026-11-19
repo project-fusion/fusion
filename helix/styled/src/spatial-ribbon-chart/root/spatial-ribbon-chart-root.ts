@@ -23,6 +23,12 @@ import '../../tooltip/index.js'
  * @status experimental
  * @category charts
  * @groups charts
+ * @use Several series over one set of places that would tangle as lines, such as latency by region.
+ * @instead line-chart - Series over time that you read against one scale.
+ * @instead spatial-surface-chart - A measure that varies over two others, such as load by day and hour.
+ * @anatomy grid
+ * @anatomy ribbon
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-ribbon-chart
  *
  * @cssproperty --spatial-ribbon-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.

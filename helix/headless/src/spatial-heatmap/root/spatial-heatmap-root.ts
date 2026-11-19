@@ -136,6 +136,13 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @status experimental
  * @category charts
  * @aliases Isometric heatmap, Isometric chart, 3D heatmap, Relief chart, Isometric contribution graph
+ * @use Counts for each day over weeks, drawn as a relief, such as a year of commits.
+ * @instead heatmap - A strip of readings you scan, such as uptime.
+ * @instead spatial-bar-chart - Values over two sets of categories, such as signups by region and quarter.
+ * @anatomy cell
+ * @anatomy base
+ * @anatomy start?
+ * @anatomy end?
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
  *
  * @slot renderer - The renderer's box, which a 3D drawing is made in, over the chart's own.

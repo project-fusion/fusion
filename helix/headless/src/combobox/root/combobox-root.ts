@@ -113,18 +113,6 @@ const isInsertion = (event: Event): boolean =>
  * next choice starts from the whole list.
  *
  * With `creatable`, the combobox offers a create row and fires `helix-create`.
- * It does not add the option. The options are your light DOM, and your
- * framework would re-render over an element the combobox inserted, so add the
- * option in your event handler.
- *
- * **The options are an import of their own.** An option is the Option family's,
- * which the combobox does not register, so a page that writes one imports it
- * beside the combobox:
- *
- * ```js
- * import '@fusion.dev/helix/combobox'
- * import '@fusion.dev/helix/option'
- * ```
  *
  * In development, a combobox holding an option nobody registered says so once
  * the page has loaded, with the line to add.
@@ -140,6 +128,8 @@ const isInsertion = (event: Event): boolean =>
  * @anatomy field
  * @anatomy hint?
  * @anatomy surface
+ * @practice Import Option beside Combobox. - An option belongs to the Option family, which Combobox does not register.
+ * @practice Add the option yourself when `creatable` sends its create event. - The options are your light DOM, and your framework would render over an option the combobox inserted.
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @slot - The options.

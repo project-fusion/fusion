@@ -20,6 +20,7 @@ import { styles } from './empty-root.css.js'
  * @anatomy icon?
  * @anatomy heading
  * @anatomy actions?
+ * @practice {heading} Set `heading` for a view rendered from data or on a server. - It draws a heading at `heading-level` that you find in the outline, with no element of yours to write.
  * @documentation https://fusion.dev/helix/components/empty
  *
  * @cssproperty --empty-actions-gap - Space added above the actions.

@@ -39,10 +39,8 @@ import { property } from 'lit/decorators.js'
  * actions differently. Read in the browser, so a served view carries neither
  * until the script runs.
  *
- * **Or give the heading as words.** `heading` draws them in a `heading` part
- * that is a heading at `heading-level`, 3 where it is not set, so a page
- * rendering from data or on a server gets a heading a reader finds in the
- * outline without writing the element. A heading slotted in replaces it.
+ * `heading` draws its words in a `heading` part that is a heading at
+ * `heading-level`, 3 where it is not set. A heading slotted in replaces it.
  *
  * **Whatever is slotted into `heading` is read as a heading.** An element that
  * is no heading, such as a `<span>` or a `<p>`, is set inside the `heading`
@@ -60,6 +58,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy icon?
  * @anatomy heading
  * @anatomy actions?
+ * @practice {heading} Set `heading` for a view rendered from data or on a server. - It draws a heading at `heading-level` that you find in the outline, with no element of yours to write.
  * @documentation https://fusion.dev/helix/components/empty
  *
  * @slot - The message: why the region is empty, and what to do about it.

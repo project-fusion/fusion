@@ -37,8 +37,7 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @summary A panel that exports a Data Table's rows: which rows, which columns, which values, and the format.
  *
  * @description
- * Set `for` to the id of a `DataTable`, and put the panel in a `Popover` or
- * a `Dialog` opened by an Export button.
+ * Set `for` to the id of a `DataTable`.
  *
  * ```html
  * <helix-table-export for="invoices"></helix-table-export>
@@ -60,6 +59,15 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @status experimental
  * @category data
  * @aliases Download, Export dialog
+ * @use A file or a copy of a Data Table's rows, in the columns and format you pick.
+ * @instead copy-button - One string copied to the clipboard.
+ * @instead column-manager - The columns a table shows on the page.
+ * @anatomy rows
+ * @anatomy columns
+ * @anatomy values
+ * @anatomy format
+ * @anatomy actions
+ * @practice Put Table Export in a Popover or a Dialog opened by an Export button. - The panel is the content, and it draws no trigger of its own.
  * @documentation https://fusion.dev/helix/components/table-export
  *
  * @csspart actions - The row that holds Copy and Export.

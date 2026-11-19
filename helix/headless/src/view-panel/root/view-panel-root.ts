@@ -32,9 +32,7 @@ const closable = (element: Element): element is Closable =>
  * @summary A panel that changes a Data Table's whole view on a phone: its presets, filters, sort, columns, and export.
  *
  * @description
- * On a phone a table has no room above it for a filter field, a Columns
- * button and an Export button. Put this panel in a `Drawer` opened by one
- * View button, set `for` to the table's id, and slot the tools into it:
+ * Set `for` to the table's id, and slot the tools into it:
  *
  * ```html
  * <helix-drawer label="View" placement="bottom">
@@ -55,14 +53,22 @@ const closable = (element: Element): element is Closable =>
  * sort. Show closes the drawer or the dialog the panel is in, with how many
  * rows the view shows.
  *
- * `active` counts the search and the filters, for a badge on the View button.
- * The panel takes no width of its own, so show its View button at the widths
- * that need it, and the tools above the table at the rest.
- *
  * @since 0.238.0
  * @status experimental
  * @category data
  * @aliases View drawer, View sheet, Mobile filters
+ * @use Every part of a Data Table's view in one panel, such as a drawer on a phone.
+ * @instead drawer - A panel of any content that slides in from an edge.
+ * @instead column-manager - The columns alone, beside the table on a wide screen.
+ * @instead quick-filters - Presets in a row above the table.
+ * @anatomy header
+ * @anatomy presets?
+ * @anatomy section
+ * @anatomy summary
+ * @anatomy show
+ * @practice Put View Panel in a Drawer opened by one View button. - On a phone a table has no room above it for a filter field, a Columns button, and an Export button.
+ * @practice Show the View button at the widths that need it, and the tools above the table at the rest. - The panel takes no width of its own.
+ * @practice Show `active` in a badge on the View button. - It counts the search and the filters the view holds.
  * @documentation https://fusion.dev/helix/components/view-panel
  *
  * @slot columns - A `ColumnManager` for the table.

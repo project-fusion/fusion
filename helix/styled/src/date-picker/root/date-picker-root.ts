@@ -26,6 +26,17 @@ import { styles } from './date-picker-root.css.js'
  * @status stable
  * @category forms
  * @aliases Calendar, Date grid, Month view
+ * @use A date or a range chosen on a calendar that stays open on the page.
+ * @instead date-input - A date in a form field, typed or picked from a calendar that opens.
+ * @instead time-picker - A time of day, chosen from a list.
+ * @instead heatmap - Activity drawn day by day, such as contributions.
+ * @anatomy previous
+ * @anatomy heading
+ * @anatomy next
+ * @anatomy weekday
+ * @anatomy day
+ * @practice Write `value`, `min`, and `max` as `YYYY-MM-DD` strings. - Every calculation is in UTC, since a local-time `Date` shifts across a time zone or daylight-saving boundary.
+ * @practice {controlled-month} Set `month` to choose the month on show apart from `value`. - Paging selects nothing, and an unset `month` follows the first chosen date, then the current month.
  * @documentation https://fusion.dev/helix/components/date-picker
  *
  * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.

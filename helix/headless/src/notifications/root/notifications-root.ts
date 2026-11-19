@@ -50,9 +50,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * takes focus itself and is read by its label. `ArrowDown` and `ArrowUp` move to the next and the
  * previous row, `Home` and `End` to the first and the last, and `PageDown` and
  * `PageUp` move a row on or back from anywhere inside one, as in the APG feed
- * pattern. The controls inside a row stay in the `Tab` order. Set `total` when
- * the feed holds one page of a longer list, and each row says its place in the
- * whole of it.
+ * pattern. The controls inside a row stay in the `Tab` order.
  *
  * **Keyboard.**
  *
@@ -67,13 +65,11 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  *
  * **A notification that arrives says so.** Unread rows added above the rows
  * there were are counted in the live region,
- * "1 new notification", in `arrived-label`. Rows that arrive while `loading`
- * is set say nothing, so set it while a page is on its way.
+ * "1 new notification", in `arrived-label`.
  *
  * **`load-more` adds a button after the list** that sends `helix-load-more`,
- * for a feed that holds one page of a longer list. Append the next page, set
- * `loading` while it is on its way, and take `load-more` off once there is
- * nothing more. While the feed is loading the button stays, so focus stays on
+ * for a feed that holds one page of a longer list. Append the next page in
+ * your listener. While the feed is loading the button stays, so focus stays on
  * it, and it is `aria-disabled` and sends nothing.
  *
  * **`error-text` says a page could not be fetched**, such as "Could not load
@@ -90,6 +86,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @anatomy header
  * @anatomy mark-all?
  * @anatomy notification
+ * @practice Set `loading` while the next page is on its way, and take `load-more` off once there is none. - Rows that arrive while `loading` is set are not announced as new.
+ * @practice Set `total` when the feed holds one page of a longer list. - Each row then says its place in the whole list.
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications.

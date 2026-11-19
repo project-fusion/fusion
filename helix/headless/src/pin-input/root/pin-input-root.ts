@@ -102,6 +102,12 @@ const keepFocus = (event: Event): void => event.preventDefault()
  * @status stable
  * @category forms
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
+ * @use A short code typed one character to a box, such as a verification code.
+ * @instead input - A password, or any text of no fixed length.
+ * @instead number-input - A number, such as a quantity.
+ * @anatomy label
+ * @anatomy cell
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/pin-input
  *
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.

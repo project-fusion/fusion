@@ -30,10 +30,6 @@ const TAGS: Record<string, StaticValue> = {
  * reader announces. `scale` sets the type ramp, which decides size, weight,
  * leading, and tracking together.
  *
- * The two match by default, so usually you set only `as`, such as `as="h2"`.
- * Set `scale` when the look and the element differ, such as a heading that
- * looks smaller or a `<p>` styled as a caption.
- *
  * The pairing is resolved in CSS, so the element writes nothing to its host.
  * `as="h2"` picks up the heading ramp through a selector, and setting `scale`
  * overrides the pairing. Do not derive it in `willUpdate`, because that adds a
@@ -59,6 +55,11 @@ const TAGS: Record<string, StaticValue> = {
  * @status stable
  * @category typography
  * @aliases Paragraph, Caption, Heading, Title
+ * @use A heading, a paragraph, or a caption in your own markup.
+ * @use A heading that looks smaller or larger than its level in the outline.
+ * @instead markdown - A document that arrives as Markdown, such as an agent's reply.
+ * @instead blockquote - A passage quoted from another source and set apart.
+ * @practice Set `as` for the element, and `scale` only where the look and the element differ. - The two match by default, so `as="h2"` alone draws a heading in the heading ramp.
  * @documentation https://fusion.dev/helix/components/text
  *
  * @slot - The text.

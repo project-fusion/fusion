@@ -25,6 +25,14 @@ import { styles } from './drilldown-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
+ * @use Nested lists you step into one level at a time, such as settings on a narrow screen.
+ * @instead tree - A hierarchy whose branches open in place.
+ * @instead menu - Commands that open from a trigger and close when you are done.
+ * @instead listbox - A value you choose from a list.
+ * @anatomy page
+ * @anatomy item
+ * @anatomy mark
+ * @practice {navigation} Set `navigation` for a site's navigation. - The host is then a navigation landmark, and each page a list of places to go in place of a menu of commands.
  * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @csspart leaving - A copy of the page going away, which slides out and fades as the next one arrives. Empty but during a move, and hidden from assistive technology and the pointer.

@@ -155,9 +155,7 @@ interface Heard {
  * arrive, since reading a build aloud line by line helps nobody. A separate
  * status region says each line at `error` once it arrives, each step once it
  * finishes or fails, and the end of the run once `done` is set or `source`
- * ends. Set `done` yourself when output you `write` is complete. Set `quiet`
- * where something around the log speaks for it, as a chat turn does for an
- * agent's work.
+ * ends.
  *
  * The log scrolls on this tier. It carries `data-scroller`, so following the
  * newest line and drawing a window work with no stylesheet. Give the log a
@@ -171,6 +169,16 @@ interface Heard {
  * @status experimental
  * @category feedback
  * @aliases Console, Terminal output, Build log, Deploy log, Log viewer, Output
+ * @use Output that arrives while you watch, such as a build, a deployment, or a CI run.
+ * @instead terminal - A shell you type commands into.
+ * @instead chat - A conversation between people, or with an agent.
+ * @instead code-block - Code or output that is finished, shown with a copy button.
+ * @anatomy line
+ * @anatomy number?
+ * @anatomy group
+ * @anatomy status
+ * @practice Set `done` once the output you pass to `write()` is complete. - The status region then says that the run has ended.
+ * @practice Set `quiet` where something around the log speaks for it, as a chat turn does for an agent's work. - The status region would say each error and each finished step a second time.
  * @documentation https://fusion.dev/helix/components/log
  *
  * @slot - The lines, as `Log.Line` and `Log.Group` elements.

@@ -53,12 +53,7 @@ import { over } from '../align.js'
  * place for focus to return to when the list closes.
  *
  * Your options stay in your light DOM and are slotted through into the listbox,
- * so the listbox looks through slots to find them. Write them as `Option`,
- * group them in `Option.Group`, and divide them with `Option.Separator`.
- * Importing the Option entry registers all three. For a list too long to draw
- * whole, set `items` instead: the list draws only the options in sight, as
- * Listbox's `items` does, and the trigger, its keys and the form read the
- * whole set.
+ * so the listbox looks through slots to find them.
  *
  * `Select` owns the value, passes it down to the listbox, and takes changes
  * back, so the value lives in one place. With `multiple`, the value is the
@@ -99,15 +94,6 @@ import { over } from '../align.js'
  * Set `autocomplete` to let a browser's autofill choose, as a native `<select>`
  * with the same attribute would.
  *
- * **The options are an import of their own.** An option is the Option family's,
- * which the select does not register, so a page that writes one imports it
- * beside the select:
- *
- * ```js
- * import '@fusion.dev/helix/select'
- * import '@fusion.dev/helix/option'
- * ```
- *
  * In development, a select holding an option nobody registered says so once the
  * page has loaded, with the line to add.
  *
@@ -123,6 +109,9 @@ import { over } from '../align.js'
  * @anatomy trigger
  * @anatomy indicator
  * @anatomy surface
+ * @practice Import Option beside Select. - An option belongs to the Option family, which Select does not register.
+ * @practice Group options with `Option.Group`, and divide them with `Option.Separator`. - The Option import registers all three.
+ * @practice Set `items` for a list too long to draw whole. - The list draws only the options in sight, and the trigger, its keys, and the form still read the whole set.
  * @documentation https://fusion.dev/helix/components/select
  *
  * @slot - The options, and any groups of them.

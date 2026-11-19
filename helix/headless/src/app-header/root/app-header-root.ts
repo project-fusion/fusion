@@ -40,19 +40,14 @@ import { inSectioningContent } from '../sectioning.js'
  * `ElementInternals.states` is not in the DOM, so hydration has nothing to
  * compare. Select the state with `:state(scrolled)`.
  *
- * The page is the window unless `scroller` names the element that scrolls, for
- * an app shell whose content scrolls inside a container.
- *
  * **Set `hide-on-scroll` for a bar that moves out of the way.** Scrolling down
  * past the bar's own height hides it, and scrolling up shows it again, as does
  * focus moving into it. The custom state `hidden` is on the host while it is
  * hidden, and the styled tier slides a `sticky` bar up out of view.
  *
- * **Set `fold-below` to fold the middle region on a narrow screen.** Below that
- * many pixels of the bar's own width, the middle region is hidden behind a
- * toggle at the end of the bar, named by `menu-label`, or at its start with
- * `toggle-placement="start"`. The toggle says whether the region is open with
- * `aria-expanded`, and the region opens below the row. The region follows the
+ * The toggle that holds a folded middle region is at the end of the bar, named
+ * by `menu-label`, or at its start with `toggle-placement="start"`. The toggle
+ * says whether the region is open with `aria-expanded`, and the region opens below the row. The region follows the
  * toggle's region in focus order, so Tab from the toggle at the end goes into
  * the open region. The custom state `folded` is on the host while the bar is
  * that narrow, and `open` while the folded region is open. A server serves the
@@ -79,6 +74,15 @@ import { inSectioningContent } from '../sectioning.js'
  * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
+ * @use The banner at the top of every page, with the brand, the main navigation, and actions.
+ * @instead navigation - A set of destinations on its own, such as in a sidebar or a footer.
+ * @instead megamenu - A section of the navigation that opens a panel of links.
+ * @instead announcement - A message for the whole site, shown above the header.
+ * @anatomy start
+ * @anatomy content
+ * @anatomy end
+ * @practice Set `fold-below` to fold the middle region on a narrow screen. - Below that many pixels of the bar's own width, the middle region is hidden behind a toggle.
+ * @practice Set `scroller` in an app shell whose content scrolls inside a container. - The bar reads the window's scroll unless `scroller` names the element that scrolls.
  * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.

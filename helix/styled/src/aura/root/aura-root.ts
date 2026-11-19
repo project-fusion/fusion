@@ -114,9 +114,7 @@ const OPENING_PATIENCE = 500
  * to restyle and nothing for a headless version to hold.
  *
  * **Content placed inside sits over the field**, in a `content` part that
- * covers the aura, so an interactive aura answers the pointer over the
- * content too. Clicks still reach the content. Style `::part(content)` to
- * place it, such as centering a hero's heading.
+ * covers the aura.
  *
  * **The colors are the theme's, and each has a hook**: `--aura-ground`,
  * `--aura-haze`, `--aura-glow` and `--aura-peak`, read by the shader and by the
@@ -125,8 +123,7 @@ const OPENING_PATIENCE = 500
  * reaches the shader on the next frame.
  *
  * **`pause-control` draws a control that stops the motion and starts it
- * again**, in the trailing corner of the field, as WCAG 2.2.2 asks of
- * anything that moves for more than five seconds. It is a toggle button named
+ * again**, in the trailing corner of the field. It is a toggle button named
  * by `pause-label`, which says it is pressed while the field is paused, and a
  * press sends `change`. A reader who asked for reduced motion sees no motion
  * and no control.
@@ -138,6 +135,11 @@ const OPENING_PATIENCE = 500
  * @status stable
  * @category media
  * @aliases Backdrop, Background, Atmosphere, Gradient
+ * @use A field of drifting light behind a hero or a sign-in screen.
+ * @instead strands - A ribbon of fine strands of light, in a box or down a whole page.
+ * @instead pattern - A background of lines or points, such as a honeycomb or a night sky.
+ * @practice Put a hero's heading inside the aura, and place it with `::part(content)`. - An interactive aura then answers the pointer over the content too, and clicks still reach the content.
+ * @practice Set `pause-control` where the page has no pause control of its own. - WCAG 2.2.2 asks for a way to stop anything that moves for more than five seconds.
  * @documentation https://fusion.dev/helix/components/aura
  *
  * @slot - Content drawn over the field, such as a heading.

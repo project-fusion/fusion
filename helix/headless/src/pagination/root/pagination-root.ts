@@ -91,22 +91,25 @@ const fill = (template: string, page: number, pages: number): string =>
  * A gap appears only where it hides more than one page. A gap is a control: it
  * goes to the middle of the pages it hides, so any page is a few presses away.
  *
- * Set `href` to render every page as an `<a>`, with `{page}` replaced by the
- * page number. The links can be crawled, a middle click opens a tab, and the
- * address bar holds the state. Without `href` the pages are buttons, for a
+ * Without `href` the pages are buttons, for a
  * table that pages in place. Either way, a click dispatches
  * `helix-before-navigate` first. Call `preventDefault()` to stop both the
  * navigation and the page change, for example to hand navigation to a router.
  * `helix-navigate` follows once the page has moved. There is no `change`,
  * because moving to another page selects nothing.
  *
- * `Pagination.Summary` and `Pagination.Size` are separate elements that you
- * place beside this one, so you choose where they go and in what order.
- *
  * @since 0.1.0
  * @status stable
  * @category navigation
  * @aliases Pager, Page nav
+ * @use Results split into numbered pages, such as a search with hundreds of matches.
+ * @instead virtual-list - A long list you scroll through without pages.
+ * @instead data-table - Rows of a table, which has paging of its own.
+ * @anatomy previous
+ * @anatomy page
+ * @anatomy next
+ * @practice {links} Set `href` to render every page as a link, with `{page}` replaced by the page number. - The links can be crawled, a middle click opens a tab, and the address bar holds the state.
+ * @practice {footer} Place `Pagination.Summary` and `Pagination.Size` beside the pagination. - They are separate elements, so you choose where they go and in what order.
  * @documentation https://fusion.dev/helix/components/pagination
  *
  * @slot first-icon - The glyph on the jump-to-first control, usually a double caret.

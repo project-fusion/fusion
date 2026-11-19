@@ -97,9 +97,8 @@ const DRAG_SLOP = 4
  * move by a control, an indicator, a key, or a drag, the `live` part says the
  * slide's name politely. While the carousel rotates the region is off.
  *
- * **`slides-per-move` moves several slides at a time.** With `per-view="3"`
- * and `slides-per-move="3"`, Next shows the next three, there is one
- * indicator for each stop, and the track snaps only at the stops. The last
+ * **`slides-per-move` moves several slides at a time**, and the track snaps
+ * only at the stops. The last
  * stop is always the end of the run, so a run that does not divide evenly
  * ends on its last slides. Unset moves one slide.
  *
@@ -116,6 +115,15 @@ const DRAG_SLOP = 4
  * @status stable
  * @category layout
  * @aliases Slider, Gallery, Slideshow
+ * @use Several slides of one kind that take turns in one place, such as featured products.
+ * @instead video-playlist - Clips that play one after another in one player.
+ * @instead image - One picture that stays in its place.
+ * @instead marquee - A band of logos that runs by itself.
+ * @anatomy slide
+ * @anatomy previous
+ * @anatomy next
+ * @anatomy indicators
+ * @practice {several-across} Set `slides-per-move` to match `per-view` for a run of cards. - Next then shows the next set, with one indicator for each set.
  * @documentation https://fusion.dev/helix/components/carousel
  *
  * @slot - The slides.

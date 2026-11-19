@@ -85,11 +85,8 @@ import {
  * A press with Shift selects every row from the last one pressed, and a press
  * with Control or Command adds or takes out one row under `replace`.
  *
- * **Leave `selection-mode` unset for a list a reader reads**, and set it for
- * one a reader chooses from or acts on. The rows of an interactive list are
- * grid rows, which hold controls as a list box option cannot. Give a control
- * in `end` `tabindex="-1"` to leave it to the arrow keys and out of the tab
- * order.
+ * Give a control in `end` of an interactive list `tabindex="-1"` to leave it
+ * to the arrow keys and out of the tab order.
  *
  * **`reorderable` lets you move rows.** Each row gets a grip after its `end`
  * slot, named by `move-label`. Drag a grip to move its row, and the list
@@ -98,8 +95,7 @@ import {
  * it. A click on another row drops it there, and Escape puts it back. The list
  * says each step in its `live` region. A drop sends `helix-before-reorder`,
  * which you can refuse, and then `helix-reorder`, whose `keys` hold every
- * row's value in the new order. **You move the rows**: the list moves no
- * element of yours, so your framework keeps the order it rendered.
+ * row's value in the new order.
  *
  * | Key, on a held row's grip | What it does |
  * |---|---|
@@ -129,10 +125,9 @@ import {
  *
  * **Loading more.** `load-more` sends `helix-load-more` once the end of the
  * list comes within a screen of view, in the box that scrolls it or the page,
- * once for each number of rows: add rows and it can send it again. While you
- * fetch, set `loading`: the list is busy, and a row after the last says
- * "Loading" (`loading-text`, or your own content in the `loading` slot). The
- * list asks for nothing while `loading` is set.
+ * once for each number of rows: add rows and it can send it again. While
+ * `loading` is set, the list is busy, and a row after the last says "Loading"
+ * (`loading-text`, or your own content in the `loading` slot).
  *
  * An interactive list with no name is reported once in a development build,
  * since a screen reader announces it as a grid and nothing more. Name it with
@@ -142,6 +137,16 @@ import {
  * @status stable
  * @category data
  * @aliases Rows, Menu
+ * @use Rows with a label each, such as recent files or the members of a team.
+ * @instead menu - Commands that open from a trigger and run when you choose them.
+ * @instead listbox - Options you choose from as a form's value.
+ * @instead data-table - Rows with several fields you compare in columns.
+ * @anatomy item
+ * @anatomy start?
+ * @anatomy description?
+ * @practice Leave `selection-mode` unset for a list you read, and set it for one you choose from or act on. - The rows of an interactive list are grid rows, which hold controls as a list box option cannot.
+ * @practice {reordering} In a `reorderable` list, put your rows in the order a reorder reports. - The list moves no element of yours, so your framework keeps the order it rendered.
+ * @practice Set `loading` while you fetch the rows `load-more` asks for. - The list asks for nothing more until `loading` clears.
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.

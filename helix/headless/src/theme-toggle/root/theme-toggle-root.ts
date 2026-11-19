@@ -27,9 +27,7 @@ import { property, state } from 'lit/decorators.js'
  * Two of these on one page agree, and a page can set the mode in its markup,
  * or from its own code with `setColorMode` from `@fusion.dev/helix-core`,
  * which takes the same transitions. With no attribute the page follows the
- * reader's system setting, and the button says which mode that is. To keep a
- * reader's choice across visits, listen for `change` and write the mode into
- * the page you serve next.
+ * reader's system setting, and the button says which mode that is.
  *
  * **The one Helix component that starts a view transition.** A view transition
  * draws the whole document twice and runs between the two pictures, so a
@@ -48,6 +46,13 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category actions
  * @aliases Dark mode toggle, Color mode switch, Light and dark switch, Theme switcher
+ * @use A control in the page's header that switches the page between light and dark.
+ * @instead toggle - A choice among light, dark, and the system setting.
+ * @instead switch - A color mode setting among the other settings of a form.
+ * @instead motion-toggle - A press that pauses the motion on the page.
+ * @anatomy button
+ * @anatomy icon
+ * @practice Listen for the change event, and write the mode into the next page you serve. - The button sets the mode on the page in front of you, and the next page starts from its own markup.
  * @documentation https://fusion.dev/helix/components/theme-toggle
  *
  * @slot - The button's text, where it shows more than its icon. Defaults to nothing, the icon alone, named by `label`.

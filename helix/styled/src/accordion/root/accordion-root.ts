@@ -15,6 +15,15 @@ import { styles } from './accordion-root.css.js'
  * @status stable
  * @category layout
  * @aliases Collapse, Expander group
+ * @use Sections that you open and close in place, such as questions and answers on a help page.
+ * @instead tabs - A few sections that you switch between from a row of names.
+ * @instead drawer - Details that slide in over the page from an edge.
+ * @instead card - Content that stays open on a surface of its own.
+ * @anatomy item
+ * @anatomy trigger
+ * @anatomy chevron
+ * @anatomy content
+ * @practice Set `heading-level` to the level that fits the page's outline. - The sections join the page's headings, at level 3 unless it is set.
  * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The accordion's items.

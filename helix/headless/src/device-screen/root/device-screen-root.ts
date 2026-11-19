@@ -122,11 +122,9 @@ const pastes = (event: KeyboardEvent): boolean =>
  * or a `<canvas>` you draw decoded frames on. The frame gives the screen the
  * device's shape and stretches the element to fill it.
  *
- * Set `screen-width` and `screen-height` to the screen's size in the units
- * your device takes input in: points for the iOS Simulator, and pixels for an
- * Android device. Every point an event carries is in those units, beside the
- * `width` and `height` it is measured against. Without them, the frame reads
- * the stream's own size in pixels.
+ * Every point an event carries is measured against the `width` and `height`
+ * the event carries beside it. Without `screen-width` and `screen-height`, the
+ * frame reads the stream's own size in pixels.
  *
  * **Touches.** Listen in one of two ways, and not both, or the device moves
  * twice:
@@ -164,14 +162,21 @@ const pastes = (event: KeyboardEvent): boolean =>
  *
  * Set `rotation` where your source sends frames in the device's natural
  * orientation while the device is turned: the frame turns the picture, and
- * turns every point back. Set `readonly` to show the screen and send nothing,
- * such as while an agent drives the device. The screen is then a picture, and
- * `showTap()` and `showSwipe()` mark where the agent touched it.
+ * turns every point back. Under `readonly`, the screen is a picture, and
+ * `showTap()` and `showSwipe()` mark where an agent touched it.
  *
  * @since 0.211.0
  * @status experimental
  * @category media
  * @aliases Simulator, Emulator, Device mirror, Remote screen
+ * @use A simulator or a phone's screen on the page, which you tap, swipe, and type into.
+ * @instead video - A recording that you play, pause, and seek.
+ * @instead terminal - A shell on a machine, driven by typing.
+ * @anatomy controls
+ * @anatomy bezel
+ * @anatomy screen
+ * @practice Set `screen-width` and `screen-height` to the screen's size in the units your device takes input in. - Every point an event carries is in those units: points for the iOS Simulator, and pixels for an Android device.
+ * @practice Set `readonly` while an agent drives the device. - The screen then shows the stream and sends nothing back.
  * @documentation https://fusion.dev/helix/components/device-screen
  *
  * @slot - The element that draws the stream: a `<video>`, an `<img>`, or a `<canvas>`.

@@ -20,6 +20,11 @@ import { styles } from './divider-root.css.js'
  * @status stable
  * @category layout
  * @aliases Separator, Rule
+ * @use A line between two groups of content, such as two sections of a settings page.
+ * @instead flex - Groups that space alone keeps apart, set with a gap.
+ * @instead card - Groups that each sit on a surface of their own.
+ * @practice Set words into the line, and no controls. - Controls are hidden with the words, which a screen reader hears once, as the separator's name.
+ * @practice Set `decorative` on a rule that separates nothing, such as one under a heading or between the facts of a byline. - It then leaves the accessibility tree.
  * @documentation https://fusion.dev/helix/components/divider
  *
  * @csspart content - The content set into the line.

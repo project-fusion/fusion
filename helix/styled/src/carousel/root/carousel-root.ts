@@ -21,6 +21,15 @@ import { styles } from './carousel-root.css.js'
  * @status stable
  * @category layout
  * @aliases Slider, Gallery, Slideshow
+ * @use Several slides of one kind that take turns in one place, such as featured products.
+ * @instead video-playlist - Clips that play one after another in one player.
+ * @instead image - One picture that stays in its place.
+ * @instead marquee - A band of logos that runs by itself.
+ * @anatomy slide
+ * @anatomy previous
+ * @anatomy next
+ * @anatomy indicators
+ * @practice {several-across} Set `slides-per-move` to match `per-view` for a run of cards. - Next then shows the next set, with one indicator for each set.
  * @documentation https://fusion.dev/helix/components/carousel
  *
  * @cssproperty --carousel-bleed - Room inside the scroller so it does not clip a slide's

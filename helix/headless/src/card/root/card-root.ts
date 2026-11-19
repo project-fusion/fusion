@@ -61,6 +61,8 @@ import { property, state } from 'lit/decorators.js'
  * @instead drilldown - Pages you step into and back out of.
  * @anatomy header
  * @anatomy footer?
+ * @practice {actions} Put a header of more than one element in one wrapper. - The header and its `header-actions` share one line.
+ * @practice Put an image or a chart in `media` with no inset of its own. - Media runs edge to edge and clips to the card's corners.
  * @documentation https://fusion.dev/helix/components/card
  *
  * @slot - The card's main content.

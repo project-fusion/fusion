@@ -23,6 +23,16 @@ import '../message/chat-message.js'
  * @since 0.1.0
  * @status stable
  * @category feedback
+ * @use A conversation between people, or with an agent, such as a support thread.
+ * @instead log - Output from a process, such as a build, that you follow as it runs.
+ * @instead timeline - Events in the order they happened, such as an audit trail.
+ * @instead notifications - A record of events you mark read.
+ * @anatomy header?
+ * @anatomy message
+ * @anatomy status?
+ * @anatomy composer
+ * @practice Pass the turns either as children or as `turns`. - A chat given both draws every turn from `turns` and then the children.
+ * @practice Import `@fusion.dev/helix/chat/composer` beside `@fusion.dev/helix/chat/root` where you write a `Chat.Composer`. - A chat that only shows a conversation needs no composer, so the root's entry leaves it out.
  * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - The turns.

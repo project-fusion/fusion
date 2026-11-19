@@ -68,9 +68,8 @@ import { onPage, waitFor } from '../wait.js'
  * least distance that brings it on screen, so the stop that points at it is
  * on screen too.
  *
- * **A stop's `effect` runs as the tour reaches it**, before it is shown, and
- * the stop waits for a promise it returns, with `:state(preparing)` on the
- * tour meanwhile. A function it returns runs when the tour leaves the stop.
+ * While a stop's `effect` runs, the tour has `:state(preparing)`. A function
+ * the effect returns runs when the tour leaves the stop.
  *
  * **A press outside the current stop and its target does nothing by
  * default**, so a reader can use the page the tour is describing. Set
@@ -101,6 +100,14 @@ import { onPage, waitFor } from '../wait.js'
  * @status stable
  * @category overlays
  * @aliases Coachmark, Product tour, Walkthrough, Onboarding
+ * @use A guided first look at an interface, one stop at a time, such as after you sign up.
+ * @instead steps - Stages of a task you complete in order, such as a checkout.
+ * @instead popover - Content beside one control that opens when you press it.
+ * @anatomy spotlight
+ * @anatomy surface
+ * @anatomy arrow
+ * @anatomy actions
+ * @practice Open what a stop points at in the stop's `effect`, such as a menu or a drawer. - The tour runs it as it reaches the stop, and waits for a promise it returns before it shows the stop.
  * @documentation https://fusion.dev/helix/components/tour
  *
  * @slot - The stops, in the order they are shown.

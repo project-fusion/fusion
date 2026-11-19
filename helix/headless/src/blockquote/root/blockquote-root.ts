@@ -35,11 +35,10 @@ import { typedMarks } from '../../quote/marks.js'
  * the one the browser sets for a `<q>` in the element's language, „ under
  * `lang="de"` and « under `lang="fr"`, and a `Quote` inside the passage takes
  * the inner marks. The mark is drawn, not read: a screen reader hears the
- * passage. A passage under `marks` that starts with a mark typed into the text
- * would show two, and warns once, with the runtime kind `typed-marks`.
+ * passage. A passage under `marks` that starts with a typed mark warns once,
+ * with the runtime kind `typed-marks`.
  *
- * **`cite` is the source's URL**, which the browser keeps and does not show.
- * Words in it, such as the author's name, warn once, with the runtime kind
+ * Words in `cite`, such as the author's name, warn once, with the runtime kind
  * `cite-not-url`.
  *
  * For a quotation inside a sentence, use `Quote`.
@@ -52,6 +51,8 @@ import { typedMarks } from '../../quote/marks.js'
  * @instead quote - A few words quoted inside a sentence.
  * @anatomy blockquote
  * @anatomy attribution?
+ * @practice Write the source's URL in `cite`, and who said it in `attribution`. - The browser keeps `cite` and does not show it, so a name written there is never seen.
+ * @practice {pull-quote} Leave typed quotation marks out of a passage under `marks`. - The mark is drawn for the element's language, so a typed one makes a second mark.
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @slot - The quoted passage.

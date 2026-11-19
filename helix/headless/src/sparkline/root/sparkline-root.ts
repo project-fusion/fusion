@@ -40,13 +40,9 @@ const STRIP_HEIGHT = 32
  * @summary A small chart with no axes that shows the shape of a series beside its number.
  *
  * @description
- * Takes its numbers from the `values` attribute. The other charts read a table,
- * but a table behind a small trend line would be read aloud row by row. Set
- * `values` to the data and `label` to the one sentence a screen reader
- * announces.
- *
- * Use `for` when a sparkline has a real table behind it. `for` wins when both
- * are set.
+ * Takes its numbers from the `values` attribute, where the other charts read a
+ * table. Set `label` to the one sentence a screen reader announces. `for` wins
+ * when it and `values` are both set.
  *
  * Without a `label` the sparkline is decorative and `aria-hidden`, for example
  * beside a stat that already says "Sessions, 1,102". With a `label` it is
@@ -75,9 +71,6 @@ const STRIP_HEIGHT = 32
  * readings arrive, as on every chart. The `empty` and `loading` slots take
  * markup in place of either.
  *
- * Place it beside a `Stat`, because a change beside a figure is a second fact,
- * as `Stat`'s own spec says. `Trend` is composed the same way.
- *
  * The component writes the properties listed below, and the stylesheet that
  * draws the sparkline reads them. Do not set them yourself. They carry numbers
  * the component computes and CSS cannot, so a stylesheet can draw the sparkline
@@ -98,6 +91,11 @@ const STRIP_HEIGHT = 32
  * @status stable
  * @category charts
  * @aliases Micro Chart, Trend Line, Inline Chart
+ * @use The shape of a series beside its number, such as in a stat or a table row.
+ * @instead line-chart - A series you read against a scale, with axes and labels.
+ * @instead trend - Which way one measurement moved, and whether that is good.
+ * @practice Set `values` to the numbers, and use `for` only where a real table stands behind the sparkline. - A table behind a small trend line would be read aloud row by row.
+ * @practice Place the sparkline beside a `Stat`. - A change beside a figure is a second fact, and `Trend` is placed the same way.
  * @documentation https://fusion.dev/helix/components/sparkline
  *
  * @slot empty - Content shown in place of the line when there are no readings. Falls back to `empty-text`.

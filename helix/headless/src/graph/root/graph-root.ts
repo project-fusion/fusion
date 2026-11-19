@@ -103,18 +103,24 @@ const LONG_LAYOUT = 5000
  * a toolbar and one tab stop too, the arrow keys moving between them by where
  * they sit on screen.
  *
- * `nodes` and `links` are properties, never markup: a graph of ten thousand
- * notes as ten thousand elements would cost what the renderer exists to save.
  * The list draws only the rows in view.
  *
  * The list scrolls on this tier. It carries `data-scroller`, and `core` ships
- * `[data-scroller] { overflow: auto }` into every shadow root. You still need
- * to set a block size on the list, or it grows to hold every row.
+ * `[data-scroller] { overflow: auto }` into every shadow root.
  *
  * @since 0.116.0
  * @status stable
  * @category media
  * @aliases Knowledge graph, Network, Note graph, Second brain
+ * @use Notes and the links between them, such as a knowledge base, with a list of every note.
+ * @instead canvas - Cards and arrows that you place by hand.
+ * @instead tree - Items in a hierarchy, each inside one parent.
+ * @anatomy viewport
+ * @anatomy controls
+ * @anatomy search
+ * @anatomy list
+ * @practice Set `nodes` and `links` as properties, from a script. - A graph of ten thousand notes as ten thousand elements would cost what the renderer exists to save.
+ * @practice On the headless tier, give the `list` part a block size. - Without one, the list grows to hold every row.
  * @documentation https://fusion.dev/helix/components/graph
  *
  * @slot - The renderer's box, which the drawing is made in.

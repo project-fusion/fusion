@@ -38,6 +38,12 @@ import { styles } from './color-picker-root.css.js'
  * @status stable
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
+ * @use A color chosen in a picker that stays on the page, such as in a theme editor.
+ * @instead color-input - A color in a form field that opens a picker when you press it.
+ * @anatomy grid
+ * @anatomy sample
+ * @anatomy channels
+ * @anatomy value
  * @documentation https://fusion.dev/helix/components/color-picker
  *
  * @cssproperty --color-picker-feedback-color - The color of the message under the picker, while `feedback` is set.

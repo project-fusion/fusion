@@ -21,6 +21,17 @@ import '../../copy-button/index.js'
  * @status stable
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
+ * @use A structured value, such as an API response, read as a tree you open and copy from.
+ * @instead code-block - A value shown as formatted text, such as JSON in the docs.
+ * @instead tree - A hierarchy you navigate, such as the files of a project.
+ * @instead description-list - One level of labels and their values.
+ * @anatomy header?
+ * @anatomy copy
+ * @anatomy toggle
+ * @anatomy key
+ * @anatomy count
+ * @practice Name a JSON script with `for` on a page a server renders or React hydrates. - JSON text works with server rendering and with React hydration, which skips object properties.
+ * @practice {windowed} Give a `windowed` inspector a height on the headless tier. - Windowing works only in a box with a height, and the styled tier sets one.
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
  * @cssproperty --object-inspector-background-color - The background of the tree.

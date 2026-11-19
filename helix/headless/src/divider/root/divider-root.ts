@@ -21,10 +21,7 @@ import { property } from 'lit/decorators.js'
  * **The line is a separator**, as `<hr>` is, and as Radix Separator, React
  * Aria Separator, and Web Awesome's divider are. It is named by any content
  * set into it, so a screen reader says "Or, separator" where you wrote "Or" on
- * the line, and the words are read once, as that name. Set words into a
- * separator and no controls, which are hidden with them. Set `decorative` on
- * a rule that separates nothing, such as one under a heading or between the
- * facts of a byline, and it leaves the accessibility tree.
+ * the line, and the words are read once, as that name.
  *
  * Use `orientation="vertical"` between items on one line. A vertical divider
  * stretches to fit its flex parent and sets no height of its own.
@@ -40,6 +37,11 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category layout
  * @aliases Separator, Rule
+ * @use A line between two groups of content, such as two sections of a settings page.
+ * @instead flex - Groups that space alone keeps apart, set with a gap.
+ * @instead card - Groups that each sit on a surface of their own.
+ * @practice Set words into the line, and no controls. - Controls are hidden with the words, which a screen reader hears once, as the separator's name.
+ * @practice Set `decorative` on a rule that separates nothing, such as one under a heading or between the facts of a byline. - It then leaves the accessibility tree.
  * @documentation https://fusion.dev/helix/components/divider
  *
  * @slot - Content set into the line, such as a word between two sections.

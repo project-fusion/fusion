@@ -122,6 +122,11 @@ const kind = (file: File): string => {
  * @status stable
  * @category forms
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
+ * @use Files you attach to a form, chosen from a picker or dropped on the field.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy trigger
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/file-input
  *
  * @slot feedback - The message that says what is wrong with the chosen files.

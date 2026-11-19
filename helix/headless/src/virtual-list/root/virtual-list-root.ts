@@ -189,9 +189,7 @@ const LINE = 'helix-line-'
  * let go of. `value` holds the chosen items' keys, separated by commas, in
  * the order of the set: `key-field` names each item's key, and a string or a
  * number item is its own key. A change asks with `helix-before-change` and
- * tells with `change`. Each row is an `option` marked `aria-selected`, so a
- * row's own links and buttons are not reached there: keep those to a list
- * without `selection-mode`.
+ * tells with `change`. Each row is an `option` marked `aria-selected`.
  *
  * `selection-behavior="replace"` selects the item pressed alone, as a file
  * list does, and the arrow keys carry the selection with them. Control or
@@ -210,9 +208,9 @@ const LINE = 'helix-line-'
  * **Loading more.** `helix-range-change` fires as the items on screen change,
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
- * fire again. While you fetch, set `loading`: the list is busy, and a row after
- * the last item says "Loading", the word every collection uses (`loading-text`,
- * or your own content in the `loading` slot). `scrollToIndex` takes a reader to an item.
+ * fire again. While `loading` is set, the row after the last item says
+ * "Loading", the word every collection uses (`loading-text`, or your own
+ * content in the `loading` slot). `scrollToIndex` takes a reader to an item.
  *
  * **Moving items** is a separate import, `@fusion.dev/helix/virtual-list/reorder`,
  * as React Aria's drag and drop is. With it imported, `reorderable` lets a
@@ -255,11 +253,18 @@ const LINE = 'helix-line-'
  *
  * The viewport scrolls on this tier. It carries `data-scroller`, and `core`
  * ships `[data-scroller] { overflow: auto }` into every shadow root, so
- * `scrollTop` works with no stylesheet. You still need to set a block size.
+ * `scrollTop` works with no stylesheet.
  *
  * @since 0.1.0
  * @status stable
  * @category layout
+ * @use Thousands of rows in one scrolling list, such as a contact list.
+ * @instead scroll-area - A short box of content that scrolls.
+ * @instead data-table - Rows with columns that you sort, filter, and page.
+ * @instead list - A set of rows short enough to draw whole.
+ * @practice {loading-more} Set `loading` while you fetch more items, then add them to `items`. - The list is then busy, and a reader sees that more is on its way.
+ * @practice Keep links and buttons in rows to a list without `selection-mode`. - With it, each row is an option, and a row's own links and buttons are not reached there.
+ * @practice On the headless tier, give the `viewport` part a block size. - Without one, the viewport is as tall as its rows and does not scroll.
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.

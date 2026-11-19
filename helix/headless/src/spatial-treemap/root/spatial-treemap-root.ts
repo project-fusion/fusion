@@ -117,6 +117,12 @@ const SERIES = 24
  * @status experimental
  * @category charts
  * @aliases 3D treemap, Isometric treemap, Treemap in 3D, City map chart
+ * @use Items sized by one measure and raised by a second, such as services by requests and latency.
+ * @instead donut-chart - Parts of one whole, with a handful of parts.
+ * @instead spatial-bar-chart - Values over two sets of categories.
+ * @anatomy grid
+ * @anatomy block
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-treemap
  *
  * @slot - The renderer's box, which the 3D drawing is made in.

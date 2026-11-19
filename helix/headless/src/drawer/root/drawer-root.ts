@@ -121,16 +121,9 @@ import { startsSwipe } from '../swipe-start.js'
  * `drawer-root.ssr.spec.ts` checks that the panel has no hand-written `inert`
  * or `role`.
  *
- * Open the drawer declaratively with the platform's invoker attributes:
- *
- * ```html
- * <helix-headless-button commandfor="nav" command="--toggle">Menu</helix-headless-button>
- * <helix-headless-drawer id="nav">…</helix-headless-drawer>
- * ```
- *
- * From its first press, a button that opens the drawer this way says whether
- * the drawer is open: a Helix button through `expanded`, and any other
- * element with `aria-expanded`.
+ * From its first press, a button that opens the drawer through the invoker
+ * attributes says whether the drawer is open: a Helix button through
+ * `expanded`, and any other element with `aria-expanded`.
  *
  * @since 0.1.0
  * @status stable
@@ -143,6 +136,7 @@ import { startsSwipe } from '../swipe-start.js'
  * @anatomy header
  * @anatomy dismiss?
  * @anatomy content
+ * @practice {unsaved} Open the drawer from a button with `commandfor="<id>"` naming the drawer and `command="--show"`. - The platform's invoker attributes open it with no script.
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.

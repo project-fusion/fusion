@@ -24,16 +24,19 @@ import '../../tooltip/index.js'
  * A track is drawn under the slices, so when the values do not fill the ring,
  * the gap shows as part of the ring.
  *
- * **Set the ring's thickness with `hole`.** There is no CSS hook for it,
- * because the stroke width and the ring's radius must agree: the outer edge is
- * `r + width / 2`, and setting one in CSS while the markup derives the other
- * draws the ring wrong.
- *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @groups charts
  * @aliases Pie Chart, Ring Chart, Share Chart
+ * @use Parts of one whole, such as sessions by source, with a total in the middle.
+ * @instead bar-chart - Many parts, or parts close in size that you compare.
+ * @instead area-chart - Parts of a whole as they change over time.
+ * @instead meter - One measurement against its full range, such as disk used.
+ * @anatomy segment
+ * @anatomy center
+ * @practice Set the ring's thickness with `hole`. - The stroke width and the ring's radius must agree, so no CSS hook sets it.
+ * @practice Point `for` at a table with one row per slice, its amount in the first column of numbers. - A donut divides one whole, so it reads one column where other Helix charts read one per series.
  * @documentation https://fusion.dev/helix/components/donut-chart
  *
  * @cssproperty --chart-glide-duration - How long the tooltip takes to glide from one slice to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places it at once, and under reduced motion it moves at once, whatever it says. It is placed where its reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.

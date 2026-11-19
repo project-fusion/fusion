@@ -31,6 +31,15 @@ import { styles } from './lightbox-root.css.js'
  * @status stable
  * @category media
  * @aliases Photo viewer, Image viewer, Gallery overlay
+ * @use Pictures from a gallery opened large over the page, one at a time.
+ * @instead image - A picture that stays in its place on the page.
+ * @instead carousel - Slides that take turns in one place on the page.
+ * @instead dialog - A task or a decision over the page.
+ * @anatomy header
+ * @anatomy item
+ * @anatomy description
+ * @practice {preview} Set `controls`, or compose the chrome in the `header` and `footer` slots with buttons that send `--previous`, `--next`, and `--close`. - Without either, the viewer has no control a pointer presses to move or to close.
+ * @practice Set `max-zoom`, such as 3, where a reader needs the detail of a picture. - Without it, the shown item stays at its own size.
  * @documentation https://fusion.dev/helix/components/lightbox
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.

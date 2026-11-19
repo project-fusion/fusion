@@ -17,6 +17,14 @@ import { styles } from './tree-root.css.js'
  * @status stable
  * @category navigation
  * @aliases FileTree, Navigation tree
+ * @use A hierarchy you open branch by branch, such as the files and folders of a project.
+ * @instead drilldown - Nested lists you step into one level at a time, on a narrow screen.
+ * @instead accordion - Sections of content that open and close, one level deep.
+ * @instead object-inspector - A structured value, such as JSON, shown as a tree.
+ * @anatomy item
+ * @anatomy toggle
+ * @anatomy children
+ * @practice {reordering} Move the items yourself in a `reorderable` tree. - The tree moves no element of yours, and focus follows the moved item once you have.
  * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The tree's items.

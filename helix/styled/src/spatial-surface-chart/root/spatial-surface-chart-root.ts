@@ -22,6 +22,13 @@ import '../../tooltip/index.js'
  * @status experimental
  * @category charts
  * @groups charts
+ * @use A measure that varies over two others, such as requests by day and hour.
+ * @instead heatmap - A reading for each day or hour, colored in a strip.
+ * @instead spatial-ribbon-chart - A few separate series over one set of places.
+ * @instead spatial-scatter-chart - Rows that each have three measures of their own.
+ * @anatomy grid
+ * @anatomy face
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-surface-chart
  *
  * @cssproperty --spatial-surface-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.

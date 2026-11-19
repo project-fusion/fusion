@@ -27,17 +27,14 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
- * A meter shows a level within a range, or how the level divides: write
- * `Meter.Segment` inside it for each part of the whole, and the meter measures
- * their sum. Use `Progress` to show how far along a
+ * A meter shows a level within a range, or how the level divides. Use
+ * `Progress` to show how far along a
  * task is. A progress bar starts empty and ends full, and full is always the
  * good end. For a meter, which end is good depends on what is measured. There
  * is no `indeterminate`, because a meter always has a value.
  *
- * **Set `low`, `high`, and `optimum`**, as defined in the HTML specification.
- * `low` and `high` divide the range into a low band, a middle band, and a high
- * band. `optimum` sets the preferred band. The band next to it is fair, and the
- * band two away is poor.
+ * The bands follow the HTML specification: the band next to the preferred one
+ * is fair, and the band two away is poor.
  *
  * The band is a custom state on the meter, `good`, `fair` or `poor`, beside
  * `over` and `under` for a value past an end, so a page styles the meter
@@ -52,6 +49,16 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @status stable
  * @category feedback
  * @aliases Gauge, Level, Capacity
+ * @use A measurement in a known range, such as disk used or a battery level.
+ * @use Shares of a whole in one bar, such as storage by file type.
+ * @instead progress - How far along a task is, such as an upload.
+ * @instead voice-level - The live level of a microphone or a voice.
+ * @instead donut-chart - Parts of one whole drawn from a table, such as sessions by source.
+ * @anatomy track
+ * @anatomy indicator
+ * @anatomy value?
+ * @practice Write a `Meter.Segment` for each share of the whole. - The meter measures their sum.
+ * @practice Set `low`, `high`, and `optimum` to mark bands of the range. - `low` and `high` divide the range into a low, a middle, and a high band, and `optimum` sets the preferred one.
  * @documentation https://fusion.dev/helix/components/meter
  *
  * @slot - `Meter.Segment` elements, one for each share of the whole, drawn in the bar.

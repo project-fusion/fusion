@@ -156,8 +156,7 @@ const pathFor = (
  *
  * A higher level holds fewer characters, so a value that fits at `M` can be too
  * long once a logo raises the level to `H`. A value too long for the level
- * draws no code: the element fires `error`, carries `:state(overflow)`, and
- * shows what is in the `fallback` slot, such as the link written out.
+ * fires `error` and carries `:state(overflow)`.
  *
  * `toSvg()`, `toPng()` and `download()` give the drawn code as a file of its
  * own, in the colors it is drawn in, with a slotted image or SVG logo where
@@ -169,6 +168,11 @@ const pathFor = (
  * @status stable
  * @category media
  * @aliases QR, Barcode, Scan code
+ * @use A link or a short code that you scan with a phone, such as a sign-in link on a screen.
+ * @instead copy-button - Text that you paste on the device you are using.
+ * @anatomy finders
+ * @anatomy modules
+ * @practice Write the value out in the `fallback` slot, such as the link as text. - A value too long for the correction level draws no code, and the slot shows in its place.
  * @documentation https://fusion.dev/helix/components/qr-code
  *
  * @slot fallback - Shown in place of the code when the value is too long for it, such as the link as text.

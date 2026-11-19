@@ -34,6 +34,12 @@ import { styles } from './legend-root.css.js'
  * @category charts
  * @groups charts
  * @aliases Series Key
+ * @use The names and colors of a chart's series, under or beside the chart.
+ * @use Buttons that hide and show each series of the charts that read one table.
+ * @anatomy entry
+ * @anatomy name
+ * @practice Set `for` to the table the chart reads. - The legend takes its entries from that table, so the two always match.
+ * @practice Set `entries="categories"` for a donut chart, and `entries="measures"` for a scatter chart. - A donut's slices are the table's rows, and a scatter's first data column is measured across.
  * @documentation https://fusion.dev/helix/components/legend
  *
  * @cssproperty --legend-color - The color of the series names.

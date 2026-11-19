@@ -43,8 +43,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  *
  * Validity comes from the browser. `type` and `required` are set on the real
  * input, and its `validity` is copied to the host. `validate` adds your own
- * rule, run on every change once the browser finds nothing wrong, as React
- * Aria's TextField `validate` does. What it returns is the message the field
+ * rule, as React Aria's TextField `validate` does. What it returns is the message the field
  * shows once the user has edited it, and the message a submit raises.
  *
  * **Keyboard.** The field's own keys are the platform's. Enter submits the
@@ -62,6 +61,14 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @status stable
  * @category forms
  * @aliases TextField, Field, TextInput
+ * @use A single line of text, such as a name, an email address, or a search term.
+ * @instead textarea - Text that runs to several lines, such as a description.
+ * @instead number-input - A number you type or nudge with step buttons.
+ * @instead combobox - A value from a list, found by typing.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy hint?
+ * @practice Set `type` and `required` before you write `validate`. - The browser checks those first, and `validate` runs on each change only once it finds nothing wrong.
  * @documentation https://fusion.dev/helix/components/input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.

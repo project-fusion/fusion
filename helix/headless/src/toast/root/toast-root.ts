@@ -59,20 +59,16 @@ import { joinSaid, messageWords } from '../words.js'
  * and the DOM stay in sync. It hides on its own unless you set `open`, which
  * makes the state yours.
  *
- * **`add()` shows a message from script**, for a page with no framework state
- * to render them from: it appends a message of the region's own tier and
- * removes it once it has been dismissed and has finished leaving. Messages
- * you render yourself stay yours, and the region never removes them. A touch
+ * The message `add()` appends is of the region's own tier, and is removed once
+ * it has finished leaving. A touch
  * or a pen swipes a message away toward the edge the stack sits at, the end
  * of the line unless `placement` puts it at the start, or toward the edge
  * `swipe-direction` names.
  *
- * **`undoable()` offers to take an action back**, which replaces a
- * confirmation dialog for an action that can be undone: do the action, then
- * call it. The message holds an Undo button and shows for 8 seconds, Command+Z
- * (Control+Z elsewhere) undoes it while it shows, and a screen reader hears
- * which keys do. Keep a confirmation for an action that cannot be taken back or
- * that reaches someone else, such as sending or paying.
+ * Command+Z (Control+Z elsewhere) undoes an `undoable()` action while its
+ * message shows, and a screen reader hears which keys do. Keep a confirmation
+ * for an action that cannot be taken back or that reaches someone else, such
+ * as sending or paying.
  *
  * **Every message's timer waits while a pointer or focus is in the stack**, as
  * React Aria's and Radix's regions do, so a reader moving from one message to
@@ -83,12 +79,11 @@ import { joinSaid, messageWords } from '../words.js'
  * opened after it, and above a modal `Dialog`, `Drawer` or `Lightbox` that
  * opened while it showed. Position the `region` part, which is the box in the
  * top layer. While a modal is open, the browser makes everything outside it
- * inert, the stack included, so a message stays visible and its actions cannot
- * be pressed, and a press on a message reaches nothing under it. The stack
- * moves off the modal's surface, above, below or beside it by its own inset,
+ * inert, the stack included, so a press on a message reaches nothing under it.
+ * The stack moves off the modal's surface, above, below or beside it by its own inset,
  * and is hidden while the window has no room outside the surface. Where the
  * browser has `ariaNotify`, a message that arrives then is announced through
- * it. For a message with an action, render a second region inside the dialog.
+ * it.
  *
  * When a message with focus inside it is dismissed, focus moves to the next
  * message, then the one before it, then back to where it was before it entered
@@ -117,6 +112,9 @@ import { joinSaid, messageWords } from '../words.js'
  * @instead announcement - News for the whole site.
  * @anatomy region
  * @anatomy item
+ * @practice {undo} Do an action that can be undone, then call `undoable()`. - The message holds an Undo button and shows for 8 seconds, which replaces a confirmation dialog.
+ * @practice Call `add()` to show a message from a page with no framework state. - It appends a message and removes it once it is dismissed, and the messages you render stay yours.
+ * @practice Render a second region inside a modal dialog for a message with an action. - While a modal is open, a message outside it stays visible, and its actions cannot be pressed.
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The messages.

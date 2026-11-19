@@ -26,6 +26,15 @@ import { styles } from './app-header-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
+ * @use The banner at the top of every page, with the brand, the main navigation, and actions.
+ * @instead navigation - A set of destinations on its own, such as in a sidebar or a footer.
+ * @instead megamenu - A section of the navigation that opens a panel of links.
+ * @instead announcement - A message for the whole site, shown above the header.
+ * @anatomy start
+ * @anatomy content
+ * @anatomy end
+ * @practice Set `fold-below` to fold the middle region on a narrow screen. - Below that many pixels of the bar's own width, the middle region is hidden behind a toggle.
+ * @practice Set `scroller` in an app shell whose content scrolls inside a container. - The bar reads the window's scroll unless `scroller` names the element that scrolls.
  * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.

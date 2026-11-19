@@ -9,10 +9,8 @@ import { html, type TemplateResult } from 'lit'
  * tools and document search. A styled span carries no such meaning, and a
  * screen reader announces nothing about it.
  *
- * **Set `translate="no"` on the element to keep a page translator off the
- * code.** A translator that rewrites prose would also rewrite an identifier.
  * The slotted text takes its translation mode from the element, its parent in
- * the page, and the element writes nothing onto itself, so the attribute is
+ * the page, and the element writes nothing onto itself, so `translate` is
  * yours to set. The `<code>` inside carries `translate="no"` for anything the
  * element draws itself.
  *
@@ -24,6 +22,11 @@ import { html, type TemplateResult } from 'lit'
  * @status stable
  * @category typography
  * @aliases Inline code
+ * @use A name from code inside a sentence, such as a property or a command.
+ * @instead code-block - Lines of code set apart from the prose, with a copy button.
+ * @instead kbd - A key or a chord you press.
+ * @instead code-input - Code you type into a form.
+ * @practice Set `translate="no"` on the element to keep a page translator off the code. - A translator that rewrites prose would also rewrite an identifier.
  * @documentation https://fusion.dev/helix/components/code
  *
  * @slot - The code.

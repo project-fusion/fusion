@@ -20,6 +20,14 @@ import { styles } from './progress-root.css.js'
  * @category feedback
  * @groups charts
  * @aliases Progress bar, Loading bar
+ * @use How far along a task is, such as an upload or an install.
+ * @instead meter - A measurement in a known range, such as disk used.
+ * @instead loader - A short wait, or one with no place of its own on the page.
+ * @instead scroll-progress - How far you have scrolled through a page or a box.
+ * @anatomy track
+ * @anatomy indicator
+ * @anatomy value?
+ * @practice Set `indeterminate` while the total is not known yet. - The bar then runs a segment across the track and claims no proportion.
  * @documentation https://fusion.dev/helix/components/progress
  *
  * @slot - Words drawn on the bar, or in the middle of a ring, such as the reading. The bar grows to their height, and over the fill they take the fill's own ink.

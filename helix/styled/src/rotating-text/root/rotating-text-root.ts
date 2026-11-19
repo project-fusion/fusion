@@ -18,11 +18,9 @@ const MOST = 6
  * @summary A word in a line of text that turns through others in its place, one at a time.
  *
  * @description
- * Put the words inside, each in an element of its own, such as
- * `<span>faster</span><span>simpler</span>`, and the first shows while the
- * rest wait below it. Every `interval`, the word showing rises out and the next
- * rises in, and after the last comes the first again, up to six words. A
- * seventh never shows, and the console says so once.
+ * The first word shows while the rest wait below it. Every `interval`, the
+ * word showing rises out and the next rises in, and after the last comes the
+ * first again. The console says once when there are more than six.
  *
  * **It takes the width of its widest word**, so the line around it never
  * shifts as the words turn.
@@ -39,6 +37,10 @@ const MOST = 6
  * @status experimental
  * @category content
  * @aliases Rotating words, Word rotator, Flip words, Typewriter, Changing word
+ * @use A word in a headline that turns through a few others, such as faster and simpler.
+ * @instead marquee - A row of items that scrolls by itself, such as a band of logos.
+ * @instead sliding-number - A number that rolls to a new value.
+ * @practice {preview} Put each word in an element of its own, six at most. - The words turn one element at a time, and a seventh never shows.
  * @documentation https://fusion.dev/helix/components/rotating-text
  *
  * @slot - The words, each in an element of its own.

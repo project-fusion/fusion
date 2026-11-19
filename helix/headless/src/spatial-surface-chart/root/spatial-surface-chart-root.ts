@@ -122,6 +122,13 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @status experimental
  * @category charts
  * @aliases 3D surface chart, 3D surface plot, Surface chart, Height map, Terrain chart
+ * @use A measure that varies over two others, such as requests by day and hour.
+ * @instead heatmap - A reading for each day or hour, colored in a strip.
+ * @instead spatial-ribbon-chart - A few separate series over one set of places.
+ * @instead spatial-scatter-chart - Rows that each have three measures of their own.
+ * @anatomy grid
+ * @anatomy face
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-surface-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.

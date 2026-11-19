@@ -80,9 +80,8 @@ const PACE = 0.25
  * ground, so a translucent pane or a frosted window behind the element shows
  * through, with the light over it.
  *
- * **Quiet behind words.** `quiet` names elements, such as a hero's words, that
- * the light dims behind to a faint glow, so a bright ribbon can cross the page
- * under them and they stay crisp.
+ * **Quiet behind words.** `quiet` names elements that the light dims behind to
+ * a faint glow.
  *
  * **In its own box, by default.** The element fills the box it is given, the
  * way an image does, and `at` places the bend's apex or the ribbon's axis across
@@ -90,11 +89,9 @@ const PACE = 0.25
  *
  * **Down the whole page, with `travel`.** The element fixes itself behind the
  * page, on `--helix-layer-beneath`, and lays one ribbon from the top of the page to the
- * bottom, so scrolling travels along it. Put `helix-strands-stop` elements
- * inside to pin a form to a section: each names an element with `for` and says
- * which form the ribbon takes there. Between stops the ribbon fills the gap in
- * its own `pattern`, and between two waves less than a screen and a half
- * apart it turns off screen so each wave reads alone. Set `z-index` on the
+ * bottom, so scrolling travels along it. A stop says which form the ribbon
+ * takes at its section. Between two waves less than a screen and a half apart,
+ * the ribbon turns off screen so each wave reads alone. Set `z-index` on the
  * element to move it.
  *
  * The ribbon stops moving in these cases:
@@ -115,6 +112,11 @@ const PACE = 0.25
  * @status experimental
  * @category media
  * @aliases Ribbon, Filaments, Light strands, Fibers
+ * @use A ribbon of light behind a hero, or down a whole page as it scrolls.
+ * @instead aura - A field of drifting light that fills its box.
+ * @instead pattern - A background of lines or points, such as a honeycomb or a night sky.
+ * @practice Name a hero's words in `quiet`. - A bright ribbon can then cross the page under them, and they stay crisp.
+ * @practice {travel} Under `travel`, pin a form to each section with a Strands Stop that names it in `for`. - Between stops the ribbon fills the gap in its own `pattern`.
  * @documentation https://fusion.dev/helix/components/strands
  *
  * @slot - Content drawn over the ribbon, such as a heading, and the `helix-strands-stop` elements that pin its forms in `travel`.

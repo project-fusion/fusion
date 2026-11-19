@@ -46,16 +46,13 @@ const storage = (): Storage | undefined => {
  * </helix-quick-filters>
  * ```
  *
- * Each button shows how many rows the preset would show, counted from the
- * rows the table holds. A table in `server` mode holds one page, so give each
- * preset its `count`.
+ * Each button shows how many rows the preset would show.
  *
  * **Save view.** The last button saves the table's whole view. It fires
  * `helix-before-view-save` with the view and a name, which you can cancel to
  * keep the view in your own store, and then `helix-view-save`. With
  * `view-key`, the view is also kept in this browser's storage under that key
- * and drawn after your presets, and a saved preset can be removed. Without
- * it, nothing is kept: keep the view from the event.
+ * and drawn after your presets, and a saved preset can be removed.
  *
  * The buttons are one tab stop, and the arrow keys, Home, and End move among
  * them, as in a toolbar.
@@ -64,6 +61,14 @@ const storage = (): Storage | undefined => {
  * @status experimental
  * @category data
  * @aliases Saved views, Presets, View tabs
+ * @use Saved views of a Data Table, each one press away, with how many rows each shows.
+ * @instead tabs - Panels of different content, one shown at a time.
+ * @instead filter-input - Filters you type and combine yourself.
+ * @anatomy preset
+ * @anatomy count
+ * @anatomy save
+ * @practice Give each preset its `count` for a table in server mode. - A count comes from the rows the table holds, and a table in server mode holds one page.
+ * @practice Set `view-key`, or keep a saved view from the save event yourself. - Without a key, Save view keeps nothing.
  * @documentation https://fusion.dev/helix/components/quick-filters
  *
  * @slot - The presets, as `QuickFilter` elements.

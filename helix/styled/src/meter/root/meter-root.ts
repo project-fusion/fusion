@@ -31,6 +31,16 @@ import { styles } from './meter-root.css.js'
  * @category feedback
  * @groups charts
  * @aliases Gauge, Level, Capacity
+ * @use A measurement in a known range, such as disk used or a battery level.
+ * @use Shares of a whole in one bar, such as storage by file type.
+ * @instead progress - How far along a task is, such as an upload.
+ * @instead voice-level - The live level of a microphone or a voice.
+ * @instead donut-chart - Parts of one whole drawn from a table, such as sessions by source.
+ * @anatomy track
+ * @anatomy indicator
+ * @anatomy value?
+ * @practice Write a `Meter.Segment` for each share of the whole. - The meter measures their sum.
+ * @practice Set `low`, `high`, and `optimum` to mark bands of the range. - `low` and `high` divide the range into a low, a middle, and a high band, and `optimum` sets the preferred one.
  * @documentation https://fusion.dev/helix/components/meter
  *
  * @slot label - A visible label, above a bar and under a ring or an arc. Its words name it in place of `label`.

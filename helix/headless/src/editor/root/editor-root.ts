@@ -269,8 +269,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * The document is the element you write inside the frame, so it stays in the
  * page: the browser's input methods, spellcheck, and right-to-left text work in
  * it as they do in any field. A server can send the document's HTML there, and
- * it reads before any script loads. Mark it `data-prose`, so the base layer
- * draws its headings, lists, and quotes before a renderer connects.
+ * it reads before any script loads.
  *
  * The toolbar's groups are named by `tools`, in this order: `history` (Undo
  * and Redo), `block` (a menu of Paragraph, three headings, and Code block),
@@ -317,6 +316,16 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @status experimental
  * @category editors
  * @aliases Rich text editor, WYSIWYG, Document editor, ProseMirror, Block editor
+ * @use A document you write and format, such as notes, a brief, or an article.
+ * @instead code-editor - A file of code, with its language and its problems.
+ * @instead textarea - Plain text with no formatting, such as a comment.
+ * @instead markdown - Markdown you show to read, such as a reply that streams in.
+ * @anatomy controls
+ * @anatomy tools
+ * @anatomy block
+ * @anatomy viewport
+ * @practice Write data-prose on the document element in the frame. - The base layer then draws its headings, lists, and quotes before a renderer connects.
+ * @practice {in-a-pane} Set `fill` for an editor that fills a pane. - The document then scrolls inside the frame, where otherwise the frame grows with it.
  * @documentation https://fusion.dev/helix/components/editor
  *
  * @slot - The element your renderer draws the document in.

@@ -93,10 +93,6 @@ const clock = (seconds: number): string => {
  * keys, Home and End, touch targets, and screen reader announcements work as
  * they do natively.
  *
- * When you set `controls`, the browser's control bar is used, the Helix bar is
- * not drawn, and the keys below are not bound, so a key press does not seek
- * twice.
- *
  * **Keyboard.** The keys match other players, and they are bound on the
  * element only, so they work while focus is on the player.
  *
@@ -122,11 +118,10 @@ const clock = (seconds: number): string => {
  * On the scrubber and the volume slider, the arrow keys, Page Up, Page Down,
  * Home, and End move the slider, as on any range input.
  *
- * `<source>` and `<track>` children are copied into the video. A media element
- * selects resources from its own child nodes, and a slot is one node, so
- * slotted sources would give the video no text tracks, no current source, and a
- * `readyState` of zero, and it would not play. They are copied so your light
- * DOM stays intact, and are copied again whenever the slot changes.
+ * A slot is one node, so slotted sources would give the video no text tracks,
+ * no current source, and a `readyState` of zero, and it would not play. The
+ * children are copied so your light DOM stays intact, and are copied again
+ * whenever the slot changes.
  *
  * The player sends every media event of its inner video under the same name,
  * without bubbling, as a `<video>` sends it. Listen on the player as you would
@@ -137,6 +132,14 @@ const clock = (seconds: number): string => {
  * @status stable
  * @category media
  * @aliases Player, Media, Movie
+ * @use One clip on a page, such as a product walkthrough.
+ * @instead video-playlist - Clips that play one after another in one player.
+ * @instead device-screen - A device's live screen that you tap and type into.
+ * @anatomy video
+ * @anatomy start
+ * @anatomy controls
+ * @practice {native} Set `controls` only where you want the browser's own control bar. - The Helix bar is then not drawn and its keys are not bound, so a key press does not seek twice.
+ * @practice {captions} Write sources and captions as `<source>` and `<track>` children of the player. - They are copied into the inner video, which selects resources from its own child nodes.
  * @documentation https://fusion.dev/helix/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.

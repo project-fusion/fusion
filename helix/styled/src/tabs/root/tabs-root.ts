@@ -29,15 +29,22 @@ import { styles } from './tabs-root.css.js'
  * **Tabs with no panels are a strip.** Where what each tab stands for lives
  * outside the set, such as a pane's pages or shells, leave the panels out: the
  * tabs keep their keys and their selection, `active` and `helix-activate` say
- * which is current, and the page shows the rest. Put a control that adds a tab,
- * such as a plus, beside the set rather than in it, so the tab list holds tabs
- * alone. With `dismissible` tabs, `dismiss-marks="hover"` keeps each close
+ * which is current, and the page shows the rest. With `dismissible` tabs, `dismiss-marks="hover"` keeps each close
  * mark out of sight until the tab is current, under the pointer, or holds
  * focus, as a browser's tabs do.
  *
  * @since 0.1.0
  * @status stable
  * @category navigation
+ * @use Panels of one page that you switch between, such as Overview and Activity.
+ * @instead toggle - A choice that changes how one view looks, such as list or grid.
+ * @instead accordion - Sections stacked on the page, opened one or more at a time.
+ * @instead navigation - Links to other pages, with the current one marked.
+ * @anatomy tab
+ * @anatomy indicator
+ * @anatomy panel
+ * @practice {manual} Set `manual` where showing a panel is expensive. - Under `manual`, the arrow keys move focus without selecting.
+ * @practice Put a control that adds a tab, such as a plus, beside the set. - The tab list then holds tabs alone.
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs, as direct children of this element.

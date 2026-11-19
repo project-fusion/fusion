@@ -23,6 +23,12 @@ import '../../tooltip/index.js'
  * @status experimental
  * @category charts
  * @groups charts
+ * @use Values over two sets of categories, such as signups by region and quarter.
+ * @instead bar-chart - Values over one set of categories, read against a scale.
+ * @instead spatial-heatmap - A count for each day over weeks, such as commits.
+ * @anatomy grid
+ * @anatomy bar
+ * @anatomy tick
  * @documentation https://fusion.dev/helix/components/spatial-bar-chart
  *
  * @cssproperty --spatial-bar-chart-bar-size - How wide each bar of a `row` or a `diagonal` stands on the page, whatever the number of bars: the row is as long as its bars make it, centered in the plot, and the tallest bar stands as high as the plot has room for, and no taller than the row is long and a quarter again, so one bar stands as a block. `fits` says how many bars the plot holds. Unset, the row fills the plot's width.

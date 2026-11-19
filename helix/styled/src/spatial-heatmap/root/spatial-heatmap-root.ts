@@ -25,6 +25,13 @@ import '../../tooltip/index.js'
  * @status experimental
  * @category charts
  * @groups charts
+ * @use Counts for each day over weeks, drawn as a relief, such as a year of commits.
+ * @instead heatmap - A strip of readings you scan, such as uptime.
+ * @instead spatial-bar-chart - Values over two sets of categories, such as signups by region and quarter.
+ * @anatomy cell
+ * @anatomy base
+ * @anatomy start?
+ * @anatomy end?
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
  *
  * @cssproperty --spatial-heatmap-cell-size - The largest a cell grows, along its edge. The strip is never wider than its box, and draws smaller cells to fit.

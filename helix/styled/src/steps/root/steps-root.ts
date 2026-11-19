@@ -12,8 +12,7 @@ import { styles } from './steps-root.css.js'
  * reordering the steps renumbers them.
  *
  * A step's name is a `helix-button`, so its hover, focus, and disabled styles
- * come from `Button` and use Button's custom properties. To change the hover
- * color, set `--button-background-color`. There is no `--steps-hover-color`.
+ * come from `Button` and use Button's custom properties.
  *
  * @since 0.1.0
  * @status stable
@@ -24,6 +23,8 @@ import { styles } from './steps-root.css.js'
  * @instead number-input - A number you type, such as a quantity.
  * @anatomy step
  * @anatomy progress?
+ * @practice Give every step a `value`, or none. - A step with no value is named by its place, so a value of 2 and the second place are one name.
+ * @practice Set `--button-background-color` to change the hover color of a step's name. - The name is a Button, and Steps has no `--steps-hover-color`.
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @csspart progress - How far through the sequence is, drawn as a bar under the steps once a stylesheet gives the part a `display`, such as `helix-steps::part(progress) { display: block }`.

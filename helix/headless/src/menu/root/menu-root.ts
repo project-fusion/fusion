@@ -113,17 +113,12 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * sets this on items as a property, never as an attribute. An attribute written
  * onto your element after it upgrades causes a hydration mismatch.
  *
- * Group rows under a heading with `Menu.Section`, which is a `group` named by
- * its heading. Between runs of rows, a `<helix-divider>` is a separator a
- * screen reader announces.
- *
- * **A row goes directly in the menu, in a `Menu.Section`, or in another row's
- * `submenu` slot.** The menu reads rows in those places only. A row inside an
- * element of your own, such as a `<div>` or a component's host element, is
- * skipped by the arrow keys, and a drilled page hides that element with the
- * rest of the top page, so the row's submenu shows none of its rows. A
- * development build warns about it as `wrapped-row`. In a framework, render a
- * component's rows without a wrapper element, such as with a fragment.
+ * A row inside an element of your own, such as a `<div>` or a component's
+ * host element, is skipped by the arrow keys, and a drilled page hides that
+ * element with the rest of the top page, so the row's submenu shows none of
+ * its rows. A development build warns about it as `wrapped-row`. In a
+ * framework, render a component's rows without a wrapper element, such as
+ * with a fragment.
  *
  * Keys: Enter, Space or Down Arrow on the trigger opens the menu on its first
  * row, and Up Arrow on its last. In the menu, Up and Down Arrow move between
@@ -167,16 +162,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * opens it from the keyboard, and the trigger is described by
  * `long-press-label`, which says so.
  *
- * **A filter field** is a separate import, `@fusion.dev/helix/menu/filter`, so
- * a menu that never filters carries none of its code:
- *
- * ```js
- * import '@fusion.dev/helix/menu'
- * import '@fusion.dev/helix/menu/filter'
- * ```
- *
- * With it imported and `filterable` set, the menu opens with focus in a field
- * above its rows, and typing narrows the rows of the page the keys move in,
+ * With the filter imported and `filterable` set, the menu opens with focus in
+ * a field above its rows, and typing narrows the rows of the page the keys move in,
  * as React Aria's `Autocomplete` around a `Menu` does. A row is kept where its
  * words hold the filter, in any case, or where `filterMatch` says so. Each
  * page starts unfiltered, and the filter is cleared as the menu closes. Where
@@ -201,6 +188,9 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @anatomy trigger
  * @anatomy surface
  * @anatomy item
+ * @practice Put each row directly in the menu, in a `Menu.Section`, or in another row's `submenu` slot. - The menu reads rows in those places only.
+ * @practice {sections} Group rows under a heading with `Menu.Section`, and divide runs of rows with Divider. - A section is a group named by its heading, and a divider is a separator a screen reader announces.
+ * @practice Import `@fusion.dev/helix/menu/filter` beside Menu to set `filterable`. - The filter field is a separate import, so a menu that never filters carries none of its code.
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.

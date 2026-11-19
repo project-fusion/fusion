@@ -37,15 +37,11 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * a `role` attribute on the host would be missing from React server-rendered
  * markup.
  *
- * **`for` names the region being loaded**, and the loader sets
- * `aria-busy="true"` on it for as long as the loader is on the page, so a
- * screen reader waits for the region rather than reading it half filled. Two
- * loaders in one region hold it busy until the last one leaves. A region drawn
- * after the loader is marked when it arrives.
+ * The loader sets `aria-busy="true"` on the region `for` names for as long as
+ * the loader is on the page. Two loaders in one region hold it busy until the
+ * last one leaves. A region drawn after the loader is marked when it arrives.
  *
- * **`delay` keeps a quick load from flashing a loader.** The loader stays
- * hidden, and silent, for that many milliseconds, and appears only if the work
- * is still going. While it waits it carries `:state(waiting)`.
+ * While `delay` holds the loader back, it carries `:state(waiting)`.
  *
  * **The loader can stand in for what it wraps.** Put the content in the
  * `content` slot, such as a button or a card, and set `idle` while no work is
@@ -58,6 +54,14 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * @status stable
  * @category feedback
  * @aliases Spinner, Busy, Activity indicator
+ * @use Work of unknown length, such as a request in flight, with no layout to hold.
+ * @instead progress - Work whose share done is known, such as an upload.
+ * @instead skeleton - Content that is loading, where its layout is known.
+ * @instead shimmer-text - Work you name in words, such as an agent reading files.
+ * @anatomy track
+ * @anatomy indicator
+ * @practice Set `delay` so a quick load does not flash a loader. - The loader stays hidden and silent for that many milliseconds, and appears only if the work is still going.
+ * @practice Set `for` to the region being loaded. - A screen reader waits for a busy region to fill before reading it.
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @slot - An icon or logo that stays still at the center. Empty by default.

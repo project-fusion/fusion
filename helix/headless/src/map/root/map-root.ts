@@ -149,9 +149,7 @@ const SETTLES = 400
  * and pressing it turns the map to face north.
  *
  * Add `pan` and `rotate` for buttons around the compass that move and turn the
- * map. Dragging is otherwise the only way a pointer moves the map, so add them
- * where the map has to be usable without dragging, as WCAG 2.2 asks at level
- * AA. The arrow keys pan the map and Shift with Left or Right turns it either
+ * map. The arrow keys pan the map and Shift with Left or Right turns it either
  * way. The buttons are a toolbar and one tab stop: on them, the arrow keys
  * move between the buttons by where they sit, and Shift with an arrow still
  * turns or tilts the map.
@@ -187,9 +185,8 @@ const SETTLES = 400
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
  *
- * **Each element has an entry of its own.** A map draws the layers it is
- * given, so `map/root` registers the frame alone. A page imports each layer it
- * writes, such as a marker and a route:
+ * **Each element has an entry of its own**, such as the frame, a marker, and a
+ * route:
  *
  * ```js
  * import '@fusion.dev/helix/map/root'
@@ -205,6 +202,14 @@ const SETTLES = 400
  * @status stable
  * @category media
  * @aliases Map frame, Map container, Geo
+ * @use Places, routes, and areas on a map drawn by MapLibre, Leaflet, or your own renderer.
+ * @instead image - A picture of a map that you do not pan or zoom.
+ * @anatomy viewport
+ * @anatomy controls
+ * @anatomy attribution
+ * @practice Import the entry of each layer you write beside `map/root`, such as `map/marker`. - A map draws the layers it is given, so `map/root` registers the frame alone.
+ * @practice Add pan and rotate to `controls` where the map has to be usable without dragging. - Dragging is otherwise the only way a pointer moves the map, and WCAG 2.2 asks for another way at level AA.
+ * @practice {behind-content} Set `fill` to lay the map behind a page's own content, and give its container a position, such as relative. - The frame covers its container.
  * @documentation https://fusion.dev/helix/components/map
  *
  * @slot - The element your renderer draws the map in, and the map's markers, routes, areas, positions, and points layers.

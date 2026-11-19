@@ -35,8 +35,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * The tab list is a single tab stop, and the arrow keys move between tabs
  * through `KeyboardNavigationController`, the same as in the radio and toggle
  * groups. Selection follows focus, which suits a small set where showing a
- * panel is cheap. Set `manual` when showing a panel is expensive, so focus can
- * move without selecting.
+ * panel is cheap.
  *
  * `orientation="vertical"` sets the tabs in a column beside the panels, and the
  * tab list says `aria-orientation="vertical"`. The arrow keys of both axes move
@@ -95,6 +94,15 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @status stable
  * @category navigation
  * @aliases TabList, Segmented control
+ * @use Panels of one page that you switch between, such as Overview and Activity.
+ * @instead toggle - A choice that changes how one view looks, such as list or grid.
+ * @instead accordion - Sections stacked on the page, opened one or more at a time.
+ * @instead navigation - Links to other pages, with the current one marked.
+ * @anatomy tab
+ * @anatomy indicator
+ * @anatomy panel
+ * @practice {manual} Set `manual` where showing a panel is expensive. - Under `manual`, the arrow keys move focus without selecting.
+ * @practice Put a control that adds a tab, such as a plus, beside the set. - The tab list then holds tabs alone.
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs, as direct children of this element.

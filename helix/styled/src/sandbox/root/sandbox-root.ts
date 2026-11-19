@@ -117,8 +117,7 @@ const fileOf = (pane: Element): string => {
  * - `package.json` sets the npm packages the scripts import by name, from its
  *   `dependencies`, which load from the preview's `cdn`.
  *
- * The sandbox ignores a pane with any other name, so that pane can show
- * content without changing the preview.
+ * A pane with any other name can show content without changing the preview.
  *
  * **The sandbox is `:state(modified)` while a source pane holds an edit**, and
  * that pane's file tab is also `file-modified` and described as modified to
@@ -162,6 +161,15 @@ const fileOf = (pane: Element): string => {
  * @status stable
  * @category tooling
  * @aliases Playground, REPL, Editor
+ * @use Source you edit beside a live preview of what it draws, such as a playground.
+ * @instead code-editor - A file of code with no preview.
+ * @instead editor - A document of prose you write and format.
+ * @instead code-block - Code you read and copy, with no editing.
+ * @anatomy toolbar
+ * @anatomy source
+ * @anatomy separator
+ * @anatomy status-bar
+ * @practice {files} Give each source pane the `name` of what it sets in the preview, such as html, css, or js. - The sandbox ignores a pane with any other name.
  * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot panel - A panel under both panes, usually a console.

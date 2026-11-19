@@ -28,6 +28,13 @@ import '../../tooltip/index.js'
  * @status stable
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
+ * @use A board of cards and arrows that you place by hand, such as a flow or a plan.
+ * @instead graph - Notes and their links, laid out by a library from the data.
+ * @anatomy node
+ * @anatomy label
+ * @anatomy controls
+ * @practice Set `readonly` on a published board, or on one card or connection to hold only that one. - A card moves by default, and the board writes its new `x` and `y` onto it.
+ * @practice Write a Canvas Edge yourself for each connection the board asks for. - A connection is a new element, and React discards an element the board adds to its markup on the next render.
  * @documentation https://fusion.dev/helix/components/canvas
  *
  * @cssproperty --canvas-background-color - The background behind the board.

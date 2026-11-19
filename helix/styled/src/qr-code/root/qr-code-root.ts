@@ -18,6 +18,11 @@ import { styles } from './qr-code-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category media
+ * @use A link or a short code that you scan with a phone, such as a sign-in link on a screen.
+ * @instead copy-button - Text that you paste on the device you are using.
+ * @anatomy finders
+ * @anatomy modules
+ * @practice Write the value out in the `fallback` slot, such as the link as text. - A value too long for the correction level draws no code, and the slot shows in its place.
  * @documentation https://fusion.dev/helix/components/qr-code
  *
  * @cssproperty --qr-code-background-color - The fill behind the modules, including the quiet zone and the logo's box.

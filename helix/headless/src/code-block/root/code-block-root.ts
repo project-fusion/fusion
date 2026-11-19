@@ -69,9 +69,8 @@ const nameOf = (block: Element): string => {
  * band behind each run, placed where the lines are laid out, so it follows a
  * highlighter's markup and lines that wrap. `added-lines` and
  * `removed-lines` mark lines the same way as inserted and deleted, as
- * Expressive Code's `ins` and `del` do, in code that is not a diff. The bands
- * are drawn and hidden from screen readers, so say in the text around the
- * block what a marked line means. Set `wrap` to wrap long lines
+ * Expressive Code's `ins` and `del` do, in code that is not a diff. Set
+ * `wrap` to wrap long lines
  * rather than scroll them; a gutter then numbers each line where it starts.
  * Set `wrappable` for a button in the header that turns `wrap` on and off,
  * pressed while the lines wrap.
@@ -86,10 +85,8 @@ const nameOf = (block: Element): string => {
  * the slot, so the copy button and the page's own text are the code as
  * written.
  *
- * **Code Block ships no grammar**, so plain code costs you no parser. To give
- * every block on the page one highlighter, call `registerHighlighter` once,
- * with the function and, for a highlighter that writes classes, the
- * stylesheet that colors them. A block's own `highlight` wins over it:
+ * **Code Block ships no grammar**, so plain code costs you no parser. Shiki,
+ * registered for every block on the page:
  *
  * ```js
  * import { registerHighlighter } from '@fusion.dev/helix-headless/code-block'
@@ -159,6 +156,16 @@ const nameOf = (block: Element): string => {
  * @status stable
  * @category typography
  * @aliases Code block, Snippet, Pre
+ * @use Lines of code set apart from the prose, such as an example to copy.
+ * @instead code - A name from code inside a sentence.
+ * @instead code-input - A short piece of code you type into a form.
+ * @instead code-editor - A file of code you edit, in a code editor you connect.
+ * @anatomy label
+ * @anatomy copy
+ * @anatomy block
+ * @practice Import `@fusion.dev/helix-sandbox/code-block` beside the block to color code with no highlighter of your own. - It registers a highlighter for every block, which colors code as the sandbox's editor does.
+ * @practice Call `registerHighlighter()` once, with the stylesheet for a highlighter that writes classes. - Every block on the page then shares it, and a block's own `highlight` still wins.
+ * @practice Say in the text around the block what a marked line means. - The bands that `mark-lines`, `added-lines`, and `removed-lines` draw are hidden from screen readers.
  * @documentation https://fusion.dev/helix/components/code-block
  *
  * @slot - The code.

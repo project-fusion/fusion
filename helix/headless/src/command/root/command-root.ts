@@ -118,15 +118,10 @@ const CONTROL = 'helix-control:'
  * Aria's `Autocomplete` is. The commands are a `listbox` of `option`s. How many commands typing left, the empty text and
  * the loading text are said in a polite live region.
  *
- * **The palette registers Option**, since it draws the controls on screen as
- * options itself with `controls`, so a page that writes commands imports the
- * palette alone. A tier of your own registers its own option, and in
- * development a palette holding one nobody registered says so.
+ * A tier of your own registers its own option, and in development a palette
+ * holding one nobody registered says so.
  *
- * **Set `controls` to find anything on screen.** Every labeled Helix control
- * puts itself on the page's list while it is connected, and the palette lists
- * the ones a reader can reach under its own commands once they type, with
- * each one's shortcut. Choosing one closes the palette and presses it, or
+ * Under `controls`, each control is listed with its shortcut. Choosing one closes the palette and presses it, or
  * moves focus into a field. `unlisted` on a control, or on a region around it,
  * leaves it out.
  *
@@ -134,6 +129,16 @@ const CONTROL = 'helix-control:'
  * @status stable
  * @category navigation
  * @aliases Command palette, Quick open, Spotlight
+ * @use Commands you find by typing, opened from anywhere on the page with a shortcut.
+ * @instead menu - Commands that open from one trigger, such as a row's More button.
+ * @instead combobox - One value for a form, found by typing.
+ * @instead find - Words to find in the content on the page.
+ * @anatomy dialog-surface
+ * @anatomy listbox-search-field
+ * @anatomy listbox-items
+ * @anatomy footer?
+ * @practice Import Command alone for commands written as options. - The palette registers Option itself, since it draws the controls on screen as options.
+ * @practice {controls} Set `controls` to find any control on screen. - Every labeled Helix control puts itself on the page's list, and the palette lists the ones you can reach once you type.
  * @documentation https://fusion.dev/helix/components/command
  *
  * @slot - The commands, and any groups of them.

@@ -257,9 +257,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *   own state and apply them yourself.
  * - `helix-move` once the move is finished.
  *
- * A resize dispatches the same pair with a size. Set `readonly` on the board to
- * keep every card in place, such as on a published board. Set `readonly` on one
- * card or connection to keep only that one in place.
+ * A resize dispatches the same pair with a size.
  *
  * Set `snap` to a length in the document's units, such as `32`, and a card
  * that is moved or resized lands on a multiple of it. Carrying a card, a
@@ -331,10 +329,6 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * left. A focused card your page removes for its own reasons hands focus on
  * the same way, unless the reader has already moved focus somewhere else.
  *
- * The board applies a move itself, because the card already exists. A
- * connection is a new element, and React discards an element the board adds to
- * its markup on the next render, so you write the connection.
- *
  * **`edgeRoute` draws the connections' lines your own way**: a function from
  * where a line leaves and arrives, and the sides it does, to its SVG path, for
  * a route such as one that bends around the cards between. What it returns
@@ -357,6 +351,13 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @status stable
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
+ * @use A board of cards and arrows that you place by hand, such as a flow or a plan.
+ * @instead graph - Notes and their links, laid out by a library from the data.
+ * @anatomy node
+ * @anatomy label
+ * @anatomy controls
+ * @practice Set `readonly` on a published board, or on one card or connection to hold only that one. - A card moves by default, and the board writes its new `x` and `y` onto it.
+ * @practice Write a Canvas Edge yourself for each connection the board asks for. - A connection is a new element, and React discards an element the board adds to its markup on the next render.
  * @documentation https://fusion.dev/helix/components/canvas
  *
  * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.

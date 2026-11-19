@@ -29,9 +29,8 @@ import { property } from 'lit/decorators.js'
  * A checked box submits its `value`, and an unchecked one submits nothing, as a
  * native checkbox does.
  *
- * `indeterminate` changes only the presentation. Assistive technology reports
- * it as neither checked nor unchecked, it never submits, and the first click
- * resolves it.
+ * Assistive technology reports `indeterminate` as neither checked nor
+ * unchecked.
  *
  * **Keyboard.** The box is one tab stop.
  *
@@ -52,6 +51,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy box
  * @anatomy label
  * @anatomy hint?
+ * @practice {states} Set `indeterminate` from your own state, on a box over a set that is partly checked. - It changes only the presentation, it never submits, and the first click resolves it.
  * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @slot - The label.

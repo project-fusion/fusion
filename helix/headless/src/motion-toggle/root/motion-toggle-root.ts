@@ -44,6 +44,11 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category actions
  * @aliases Pause button, Pause animations, Stop motion, Motion control, Animation toggle
+ * @use A page with motion that starts by itself, such as a carousel that turns or an aura.
+ * @instead theme-toggle - A press that switches the page between light and dark.
+ * @instead video - One video, which has a pause button of its own.
+ * @anatomy button
+ * @anatomy icon
  * @documentation https://fusion.dev/helix/components/motion-toggle
  *
  * @slot - The button's text, where it shows more than its icon. Defaults to nothing, the icon alone, named by `label`.

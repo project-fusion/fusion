@@ -48,10 +48,9 @@ import { hideOutside } from '../hide-outside.js'
  * `z-index`, and an ancestor with `overflow: hidden`, `transform`, `filter`, or
  * `contain` does not clip or move it.
  *
- * It opens on click and from a command. `command="--show"` and the related
- * commands work as they do on `Dialog` and `Drawer`, so a button anywhere on
- * the page can open the popover with no script. From its first press, a
- * button that opens it this way says whether the popover is open: a Helix
+ * It opens on click and from a command, such as `command="--show"`. From its
+ * first press, a button that opens it with a command says whether the popover
+ * is open: a Helix
  * button through `expanded`, and any other element with `aria-expanded`.
  *
  * **Opening moves focus into the panel**, to the first control in it, or to the
@@ -60,10 +59,9 @@ import { hideOutside } from '../hide-outside.js'
  * out of the trigger and the panel to somewhere else on the page.
  *
  * `modal` keeps `Tab` inside the panel while it is open and says so with
- * `aria-modal`, for a panel that has to be answered before the page goes on.
- * The rest of the page is hidden from screen readers with `aria-hidden` while
- * it is open, so the virtual cursor stays in the panel too, and the page does
- * not scroll behind it. Without it the popover does not trap focus.
+ * `aria-modal`. The rest of the page is hidden from screen readers with
+ * `aria-hidden` while it is open, so the virtual cursor stays in the panel too,
+ * and the page does not scroll behind it.
  *
  * A press outside closes the panel and leaves focus where the press put it.
  * Where it put focus nowhere, as a press on text or on the page's background
@@ -112,6 +110,8 @@ import { hideOutside } from '../hide-outside.js'
  * @anatomy trigger
  * @anatomy surface
  * @anatomy content
+ * @practice {commanded} Open the popover from a button anywhere on the page with `commandfor="<id>"` and `command="--toggle"`. - The invoker attributes need no script, and work as they do on Dialog and Drawer.
+ * @practice Set `modal` for a panel that has to be answered before the page goes on. - Without it, the popover does not trap focus.
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @slot - The contents of the panel.

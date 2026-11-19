@@ -18,14 +18,21 @@ import '../../toolbar/index.js'
  * sticky with `position: sticky` on the element.
  *
  * Every match is painted with `::highlight(helix-find-match)` and the current
- * one with `::highlight(helix-find-current)`, both in the base layer. Text is
- * painted from the tree it lives in, so content in a shadow root of your own
- * needs the two rules in that root's styles.
+ * one with `::highlight(helix-find-current)`, both in the base layer.
  *
  * @since 0.220.0
  * @status experimental
  * @category navigation
  * @aliases Find in page, Search bar, Find and replace, Search in content
+ * @use Words to find in a block of content, such as an article, a log, or a file of code.
+ * @instead command - Commands you find by typing, from anywhere on the page.
+ * @instead filter-input - Filters that narrow a list or a table.
+ * @anatomy field
+ * @anatomy count
+ * @anatomy previous
+ * @anatomy next
+ * @anatomy close
+ * @practice Copy the `::highlight(helix-find-match)` and `::highlight(helix-find-current)` rules into a shadow root of yours that holds text to search. - Text is painted from the tree it lives in.
  * @documentation https://fusion.dev/helix/components/find
  *
  * @cssproperty --find-background-color - The bar's fill. Defaults to the raised surface.

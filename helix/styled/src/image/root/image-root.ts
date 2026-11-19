@@ -16,6 +16,10 @@ import { styles } from './image-root.css.js'
  * @status stable
  * @category media
  * @aliases Picture, Img, Figure
+ * @use A photo or an illustration on the page, with a placeholder while it loads.
+ * @instead lightbox - Pictures opened large over the page, one at a time.
+ * @instead carousel - Several pictures that take turns in one place.
+ * @instead avatar - A person's photo, or their initials where there is no photo.
  * @documentation https://fusion.dev/helix/components/image
  *
  * @cssproperty --image-aspect - The aspect ratio of the box, such as `16 / 9`.

@@ -39,6 +39,15 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
+ * @use Two measures against each other, one point per row, such as page weight and load time.
+ * @instead line-chart - One measure over time.
+ * @instead spatial-scatter-chart - Three measures for each row, such as age, spend, and visits.
+ * @anatomy y-axis
+ * @anatomy points
+ * @anatomy x-axis
+ * @anatomy x-name
+ * @practice Put the measure read across in the first numeric column of the table `for` names. - That column is measured across, every other numeric column is measured up, and each row is one point.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @cssproperty --chart-glide-duration - How long the tooltip takes to glide from one row to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places it at once, and under reduced motion it moves at once, whatever it says. It is placed where its reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.

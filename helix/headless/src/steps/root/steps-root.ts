@@ -56,9 +56,7 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  *
  * `active` names a step by its `value`. A step with no `value` is named by its
  * place, counted from 1, so a sequence written without values moves as one
- * written with them, and `helix-activate` says `1`, `2` and so on. Give every
- * step a value or none, because a value of `2` and the second place are one
- * name.
+ * written with them, and `helix-activate` says `1`, `2` and so on.
  *
  * `linear` keeps a reader from passing a stage they have not finished, as Ark
  * UI's linear steps do: a stage ahead is out of reach, and its button disabled,
@@ -112,6 +110,8 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  * @instead number-input - A number you type, such as a quantity.
  * @anatomy step
  * @anatomy progress?
+ * @practice Give every step a `value`, or none. - A step with no value is named by its place, so a value of 2 and the second place are one name.
+ * @practice Set `--button-background-color` to change the hover color of a step's name. - The name is a Button, and Steps has no `--steps-hover-color`.
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The steps.

@@ -80,10 +80,9 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * them apart as Menu's sections do: each is a `group` of the menu, and the
  * arrow keys walk through every group's actions in order.
  *
- * **A trigger with its own action.** With `open-on="long-press"`, a press on
- * the trigger is the trigger's own, such as composing a message, and holding it
- * for half a second opens the dial, as React Aria's menu trigger does with
- * `trigger="longPress"`. Alt+Down or Alt+Up opens it from the keyboard, and
+ * **A trigger with its own action.** A long press opens the dial as React
+ * Aria's menu trigger does with `trigger="longPress"`. Alt+Down or Alt+Up
+ * opens it from the keyboard, and
  * the trigger says so in its description, `long-press-label`, the drawn one
  * and a slotted one alike. A press that has opened the dial does not also do
  * the trigger's action.
@@ -99,6 +98,15 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * @status stable
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
+ * @use A few main actions of a screen behind one floating button.
+ * @instead menu - Commands with submenus, or items you check.
+ * @instead icon-button - One main action on a floating button, such as Compose.
+ * @anatomy trigger
+ * @anatomy actions
+ * @anatomy item
+ * @anatomy icon
+ * @practice Import Icon beside Speed Dial where your trigger or your actions use one. - Speed Dial draws no icon of its own, so it does not register one.
+ * @practice Set `open-on="long-press"` for a trigger with an action of its own, such as composing a message. - A press then runs the trigger's action, and holding it for half a second opens the dial.
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The actions.

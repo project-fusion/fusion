@@ -109,11 +109,9 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @summary A chart that shows whether two measures move together, with one point per row.
  *
  * @description
- * A scatter chart shows how two measures relate. The table's first numeric
- * column is measured across, every other numeric column is measured up, and
- * each row is one point. A table of countries with an income column and a life
- * expectancy column draws one point for each country. Each additional numeric
- * column is another series, in its own color.
+ * A scatter chart shows how two measures relate. A table of countries with an
+ * income column and a life expectancy column draws one point for each country.
+ * Each additional numeric column is another series, in its own color.
  *
  * Both axes are labeled, because both positions are values. The ticks sit at
  * round numbers, and the range extends to them.
@@ -159,8 +157,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
- * with its label first. A table is still the better source where the page can
- * show one, since it reads before any script runs.
+ * with its label first.
  *
  * **A chart with nothing to draw says so.** A table with no readings shows
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
@@ -186,6 +183,15 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @status stable
  * @category charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
+ * @use Two measures against each other, one point per row, such as page weight and load time.
+ * @instead line-chart - One measure over time.
+ * @instead spatial-scatter-chart - Three measures for each row, such as age, spend, and visits.
+ * @anatomy y-axis
+ * @anatomy points
+ * @anatomy x-axis
+ * @anatomy x-name
+ * @practice Put the measure read across in the first numeric column of the table `for` names. - That column is measured across, every other numeric column is measured up, and each row is one point.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.

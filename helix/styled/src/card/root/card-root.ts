@@ -15,12 +15,9 @@ import { styles } from './card-root.css.js'
  * part to target.
  *
  * `header-actions` and `footer-actions` put controls at the end of the header's
- * and the footer's line; the footer then moves to the start of its line. Put a
- * header of more than one element in one wrapper, since the header and its
- * actions share a line.
+ * and the footer's line; the footer then moves to the start of its line.
  *
- * `media` runs edge to edge and clips to the card's corners, so an image needs
- * no inset. Set `orientation="horizontal"` to put the media beside the header,
+ * Set `orientation="horizontal"` to put the media beside the header,
  * content, and footer. Set `media-placement="end"` to put it below the content,
  * for example for a chart that ends a card.
  *
@@ -33,6 +30,8 @@ import { styles } from './card-root.css.js'
  * @instead drilldown - Pages you step into and back out of.
  * @anatomy header
  * @anatomy footer?
+ * @practice {actions} Put a header of more than one element in one wrapper. - The header and its `header-actions` share one line.
+ * @practice Put an image or a chart in `media` with no inset of its own. - Media runs edge to edge and clips to the card's corners.
  * @documentation https://fusion.dev/helix/components/card
  *
  * @slot - The card's main content.

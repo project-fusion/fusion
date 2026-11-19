@@ -17,6 +17,15 @@ import '../../checkbox/index.js'
  * @since 0.1.0
  * @status stable
  * @category data
+ * @use A short table you write out by hand, with each row in the markup.
+ * @instead data-table - Rows you pass as an array, with filtering and paging.
+ * @instead description-list - One record's fields, each label beside its value.
+ * @anatomy column
+ * @anatomy row
+ * @anatomy cell
+ * @practice {reordering} Give each row a `value` in a `reorderable` table. - A row without one is known by its place, so its key changes as it moves.
+ * @practice Put your rows in the order a reorder reports. - The table moves no element of yours.
+ * @practice Set `grid` only where each cell may take focus. - A grid table gives every cell a `tabindex`, so focus can rest on it.
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.

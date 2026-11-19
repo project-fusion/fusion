@@ -56,11 +56,8 @@ const typeText = (control: HTMLTextAreaElement, text: string): void => {
  * - Lines keep their length and the field scrolls sideways, unless `wrap` is
  *   `soft`.
  *
- * **The colors are the page's choice.** Helix ships no grammar, so a page
- * that wants color registers a highlighter once, the one Code Block uses:
- * `import '@fusion.dev/helix-sandbox/code-block'` registers Helix's own, or
- * `registerHighlighter` takes Shiki or Prism. Without one the code is drawn
- * plain, and `highlight` sets one for a single field.
+ * **The colors come from a highlighter.** `registerHighlighter` takes Shiki or
+ * Prism in place of Helix's own, and `highlight` sets one for a single field.
  *
  * For a whole file, with line numbers, folding, search and problems listed by
  * line, use `Code Editor`. Code Input is for a few dozen lines in a form: a
@@ -75,6 +72,14 @@ const typeText = (control: HTMLTextAreaElement, text: string): void => {
  * @status experimental
  * @category forms
  * @aliases Code field, Code textarea, JSON input, Syntax highlighted input
+ * @use A short piece of code in a form, such as a JSON payload or a query.
+ * @instead code-editor - A whole file of code, in an editor you connect.
+ * @instead code-block - Code you show for reading and copying.
+ * @instead textarea - Several lines of plain text, such as a description.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy hint?
+ * @practice Import Code Block from Helix Sandbox once on the page. - Helix ships no grammar, and that import registers the highlighter that colors every Code Input.
  * @documentation https://fusion.dev/helix/components/code-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.

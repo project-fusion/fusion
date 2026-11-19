@@ -104,18 +104,11 @@ const columnHeads = (
  * - `PageUp` and `PageDown` move by month.
  * - `Home` and `End` move to the start and end of the week.
  *
- * **Dates are `YYYY-MM-DD` strings, and every calculation is in UTC**, because
- * a local-time `Date` shifts across a time zone or daylight-saving boundary.
- *
  * **The months are the ones `calendar` counts**: the Gregorian months for the
  * locale's own calendar where its months are the Gregorian months, as `th-TH`
  * writes 2569 for 2026, and `gregory` where they are not, as for `fa-IR`
  * with no `calendar`. Name a calendar with months of its own, such as
  * `persian`, and every view counts its days, months, and years from `Intl`.
- *
- * `month` sets which month the grid shows, separately from `value`, so paging
- * selects nothing and you can control the view. When unset, it follows the
- * first selected date, then the current month.
  *
  * `mode` sets how many dates are held. Unset holds one, `range` holds two and
  * marks the dates between them, and `multiple` toggles each date. All three
@@ -148,6 +141,17 @@ const columnHeads = (
  * @status stable
  * @category forms
  * @aliases Calendar, Date grid, Month view
+ * @use A date or a range chosen on a calendar that stays open on the page.
+ * @instead date-input - A date in a form field, typed or picked from a calendar that opens.
+ * @instead time-picker - A time of day, chosen from a list.
+ * @instead heatmap - Activity drawn day by day, such as contributions.
+ * @anatomy previous
+ * @anatomy heading
+ * @anatomy next
+ * @anatomy weekday
+ * @anatomy day
+ * @practice Write `value`, `min`, and `max` as `YYYY-MM-DD` strings. - Every calculation is in UTC, since a local-time `Date` shifts across a time zone or daylight-saving boundary.
+ * @practice {controlled-month} Set `month` to choose the month on show apart from `value`. - Paging selects nothing, and an unset `month` follows the first chosen date, then the current month.
  * @documentation https://fusion.dev/helix/components/date-picker
  *
  * @slot footer - Content under the calendar, such as buttons for today or a common range.

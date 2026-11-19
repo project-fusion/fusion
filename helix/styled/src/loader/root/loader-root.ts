@@ -24,6 +24,14 @@ import { styles } from './loader-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Spinner, Busy, Activity indicator
+ * @use Work of unknown length, such as a request in flight, with no layout to hold.
+ * @instead progress - Work whose share done is known, such as an upload.
+ * @instead skeleton - Content that is loading, where its layout is known.
+ * @instead shimmer-text - Work you name in words, such as an agent reading files.
+ * @anatomy track
+ * @anatomy indicator
+ * @practice Set `delay` so a quick load does not flash a loader. - The loader stays hidden and silent for that many milliseconds, and appears only if the work is still going.
+ * @practice Set `for` to the region being loaded. - A screen reader waits for a busy region to fill before reading it.
  * @documentation https://fusion.dev/helix/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.

@@ -30,8 +30,7 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  *
  * @description
  * Set `for` to the id of a `DataTable`, and the list holds a row for each of
- * its columns with a `field`, in the order the table shows them. Put it in a
- * `Popover` opened by a Columns button, or in a `Drawer` on a phone.
+ * its columns with a `field`, in the order the table shows them.
  *
  * ```html
  * <helix-column-manager for="invoices"></helix-column-manager>
@@ -52,8 +51,7 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  *
  * **It writes the table's `view.columns` and nothing else.** Every change asks
  * the table with `requestView`, so the table fires `helix-before-view-change`,
- * which you can refuse, and `helix-view-change`. Store the view to keep a
- * reader's columns.
+ * which you can refuse, and `helix-view-change`.
  *
  * **Keyboard.** Each row's checkbox, grip and pin button are in the tab order.
  *
@@ -69,6 +67,16 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @status experimental
  * @category data
  * @aliases Column picker, Column chooser
+ * @use Which of a Data Table's columns show, in what order, and which stay pinned.
+ * @instead view-panel - A table's whole view on a phone, with the columns as one section.
+ * @instead quick-filters - A saved view of a table that you switch to in one press.
+ * @anatomy header
+ * @anatomy item
+ * @anatomy grip
+ * @anatomy checkbox
+ * @anatomy pin
+ * @practice Put Column Manager in a Popover opened by a Columns button, or in a Drawer on a phone. - The list is the panel's content, and it draws no trigger of its own.
+ * @practice Store the table's view to keep a reader's columns. - Every change goes to the table's view, and the list keeps nothing of its own.
  * @documentation https://fusion.dev/helix/components/column-manager
  *
  * @csspart checkbox - The `Checkbox` that shows or hides a column.

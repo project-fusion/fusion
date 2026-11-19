@@ -45,11 +45,6 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @description
  * A line chart shows the shape of each series: where the readings went.
  *
- * The scale covers the range of the data. Including zero in the range of a
- * series that moves between 980 and 1020 would flatten the line into a rule
- * across the top of the box. `BarChart` always starts at zero, because a bar's
- * length is its value. Set `zero` when the distance from zero is the point.
- *
  * Every series shares one scale, as in the bar chart.
  *
  * `dashed` names the series drawn as a dashed line, such as a forecast or a
@@ -86,8 +81,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
- * with its label first. A table is still the better source where the page can
- * show one, since it reads before any script runs.
+ * with its label first.
  *
  * **A chart with nothing to draw says so.** A table with no readings shows
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
@@ -113,6 +107,17 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @status stable
  * @category charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
+ * @use Series over time, such as sessions a month, read against a scale.
+ * @instead area-chart - Parts that add up to a total over time.
+ * @instead sparkline - The shape of a series beside its number, with no axes.
+ * @instead scatter-chart - Two measures against each other, with one point per row.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy line
+ * @anatomy terminus
+ * @anatomy labels
+ * @practice Set `zero` where the distance from zero is the point. - The scale covers the range of the data, since zero would flatten a series that moves between 980 and 1020.
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.

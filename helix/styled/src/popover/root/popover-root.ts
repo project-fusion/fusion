@@ -32,6 +32,8 @@ import { styles } from './popover-root.css.js'
  * @anatomy trigger
  * @anatomy surface
  * @anatomy content
+ * @practice {commanded} Open the popover from a button anywhere on the page with `commandfor="<id>"` and `command="--toggle"`. - The invoker attributes need no script, and work as they do on Dialog and Drawer.
+ * @practice Set `modal` for a panel that has to be answered before the page goes on. - Without it, the popover does not trap focus.
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.

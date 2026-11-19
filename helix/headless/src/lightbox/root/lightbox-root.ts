@@ -68,15 +68,13 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  * item with no `value` by its place, counted from 1, as in `Steps`, so a set
  * written without values moves and `helix-activate` says `1`, `2` and so on.
  *
- * Set `controls` for the viewer's own previous, next and close controls, named
- * by `previous-label`, `next-label` and `dismiss-label`, whose glyphs you can
- * replace in the `previous-icon`, `next-icon` and `dismiss-icon` slots. A set
- * of one item has nothing to step to, so it draws no previous, next or counter. Without
- * it, compose the chrome yourself in the `header` and `footer` slots, with
- * buttons that send `--previous`, `--next` and `--close`.
+ * The viewer's own controls, drawn with `controls`, are named by
+ * `previous-label`, `next-label` and `dismiss-label`, and you can replace their
+ * glyphs in the `previous-icon`, `next-icon` and `dismiss-icon` slots. A set
+ * of one item has nothing to step to, so it draws no previous, next or counter.
  *
- * **Set `max-zoom` to let a reader zoom into the shown item**, such as `3`.
- * Two fingers pinch it, and so does a trackpad pinch or the wheel with Ctrl
+ * **Under `max-zoom`, a reader zooms into the shown item.** Two fingers
+ * pinch it, and so does a trackpad pinch or the wheel with Ctrl
  * held, about the point under the pointer. A double click or a double tap
  * zooms all the way in about the point pressed and back out, and once zoomed
  * one pointer drags it about and the wheel moves it. `+` and `-` zoom in and out from the keyboard, and `0` puts it back.
@@ -122,6 +120,15 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  * @status stable
  * @category media
  * @aliases Photo viewer, Image viewer, Gallery overlay
+ * @use Pictures from a gallery opened large over the page, one at a time.
+ * @instead image - A picture that stays in its place on the page.
+ * @instead carousel - Slides that take turns in one place on the page.
+ * @instead dialog - A task or a decision over the page.
+ * @anatomy header
+ * @anatomy item
+ * @anatomy description
+ * @practice {preview} Set `controls`, or compose the chrome in the `header` and `footer` slots with buttons that send `--previous`, `--next`, and `--close`. - Without either, the viewer has no control a pointer presses to move or to close.
+ * @practice Set `max-zoom`, such as 3, where a reader needs the detail of a picture. - Without it, the shown item stays at its own size.
  * @documentation https://fusion.dev/helix/components/lightbox
  *
  * @slot - The items, which are `<helix-headless-lightbox-item>` elements.

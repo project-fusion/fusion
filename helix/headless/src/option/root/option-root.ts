@@ -41,16 +41,21 @@ export { isOption, optionsAmong } from '../among.js'
  * option's description. A name you give with `aria-label` or
  * `aria-labelledby` wins over both.
  *
- * **An image goes in `media`, above the label**, for an option drawn as a
- * tile, such as a photo or a product in a listbox with `layout="grid"`. The
- * row is still the option: choosing, the arrow keys and the highlight work as
- * they do on a row with no image, and the label stays its name, so give the
- * image an empty `alt`.
+ * An option can be drawn as a tile, such as a photo or a product in a listbox
+ * with `layout="grid"`. Choosing, the arrow keys and the highlight work as
+ * they do on a row with no image.
  *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases Item
+ * @use A choice you write inside a Select, a Listbox, or a Combobox.
+ * @instead radio - One choice from a group of radios on the page.
+ * @instead toggle - One option in a group of toggles, such as list or grid.
+ * @instead menu - A command that runs when you choose it.
+ * @anatomy item
+ * @anatomy label
+ * @practice Put a tile's image in `media`, with empty alternative text. - The row stays the option, and its label stays its name.
  * @documentation https://fusion.dev/helix/components/option
  *
  * @slot - The option's label.

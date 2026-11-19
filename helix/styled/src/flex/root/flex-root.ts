@@ -33,9 +33,8 @@ const wrapConverter = {
  *
  * - `cluster`: items in a wrapping row, centered on one line, such as tags.
  * - `split`: the first item at the start, the last at the end, and any between
- *   them spaced evenly, such as a title and its actions. Put several actions
- *   in a flex of their own so they stay together at the end. Wraps when there
- *   is no room.
+ *   them spaced evenly, such as a title and its actions. Wraps when there is
+ *   no room.
  * - `flank` and `flank-end`: a fixed item beside one that takes the rest, such
  *   as an icon and its text, or a field and its button. The item that takes
  *   the rest stays at least `--flex-flank-min` wide, and the pair stacks once
@@ -51,6 +50,9 @@ const wrapConverter = {
  * @status stable
  * @category layout
  * @aliases Stack, Column, HStack, VStack
+ * @use Children in one row or one column with a gap, such as an avatar beside a name.
+ * @instead grid - Children in columns that line up across rows.
+ * @practice {layouts} Put several actions in a flex of their own inside a flex whose `layout` is split. - They then stay together at the end, where split would space them evenly.
  * @documentation https://fusion.dev/helix/components/flex
  *
  * @slot - The items to lay out.

@@ -52,10 +52,7 @@ import '../../time-picker/index.js'
  * You can type a time or pick one. The list offers times at a step, and the
  * field lets you enter any time, such as `09:07`.
  *
- * The value is always `HH:mm` on a 24-hour clock, or `HH:mm:ss` with
- * `seconds`, because that is what the form
- * submits, what `min` and `max` compare against, and what sorts correctly as a
- * string. While idle, the field shows the time in the user's locale format.
+ * While idle, the field shows the time in the user's locale format.
  * Once the caret is in the field, it shows the value itself. You can type
  * `14:30`, or a time as you write one, such as `2:30 PM`, `2.30pm`, or
  * `14h30`, and the field reads it as you leave it, with AM and PM in the
@@ -102,6 +99,15 @@ import '../../time-picker/index.js'
  * @status stable
  * @category forms
  * @aliases TimeField, InputTime
+ * @use A time in a form, typed or picked from a panel that opens, such as a start time.
+ * @instead time-picker - A list of times you choose from on the page, such as booking slots.
+ * @instead date-input - A date in a form.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy trigger
+ * @anatomy hint?
+ * @anatomy surface
+ * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
  * @documentation https://fusion.dev/helix/components/time-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.

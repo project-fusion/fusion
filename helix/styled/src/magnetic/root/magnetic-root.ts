@@ -12,9 +12,8 @@ import { styles } from './magnetic-root.css.js'
  * edge, and springs back to its place when the pointer leaves.
  *
  * **Only for a pointer that hovers.** A finger is not followed, and nothing
- * drifts where the reader asked for less movement. The drift never takes the
- * content out from under the pointer: it moves by at most `--magnetic-reach`,
- * which is smaller than the content.
+ * drifts where the reader asked for less movement. The content moves by at
+ * most `--magnetic-reach`.
  *
  * A single tier, as `Tilt` is: the drift is the whole of the component.
  *
@@ -22,6 +21,10 @@ import { styles } from './magnetic-root.css.js'
  * @status experimental
  * @category content
  * @aliases Magnetic button, Pointer pull, Attract
+ * @use The main button on a landing page, drawn toward the mouse as it nears.
+ * @instead tilt - A card that turns in depth under the pointer.
+ * @instead shine - A button that a band of light crosses.
+ * @practice Keep `--magnetic-reach` smaller than the content. - The drift then never takes the content out from under the pointer.
  * @documentation https://fusion.dev/helix/components/magnetic
  *
  * @slot - The content that drifts, such as a `Button`.

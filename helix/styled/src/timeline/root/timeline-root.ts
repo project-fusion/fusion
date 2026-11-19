@@ -32,6 +32,17 @@ import { styles } from './timeline-root.css.js'
  * @status stable
  * @category data
  * @aliases Activity feed, History, Changelog, Audit trail
+ * @use Events in the order they happened, such as a deployment's history.
+ * @instead notifications - Events you mark read and come back to.
+ * @instead steps - The stages of a task still under way, such as a checkout.
+ * @instead log - Lines of output that arrive while you watch.
+ * @anatomy item
+ * @anatomy marker
+ * @anatomy time
+ * @anatomy content
+ * @practice Write the entries in the order the events happened, oldest or newest first. - The reading order is the order you write them in, in every layout.
+ * @practice {grouped} Group entries by date with `Timeline.Group`. - The group puts a heading such as Today over its entries.
+ * @practice Set `loading` while you fetch more entries, and put a button that asks for more after the timeline. - The timeline is busy, and an entry after the last says Loading.
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @cssproperty --timeline-gap - Space between one entry and the next.

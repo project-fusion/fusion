@@ -18,14 +18,16 @@ import { styles } from './icon-button-root.css.js'
  * as "button" and nothing else, which is the most common way a toolbar becomes
  * unusable without sight.
  *
- * Set `raised` for a button that floats over the page, such as one over a map
- * or a board, and `material` for the ground under it there. A raised button
- * takes the theme's floating edge and shadow, as a popover does.
+ * `material` sets the ground under a raised button.
  *
  * @since 0.1.0
  * @status stable
  * @category actions
  * @aliases Icon button, Square button
+ * @use An action shown as an icon alone, such as Settings in a toolbar or Close on a panel.
+ * @instead button - An action named in words, such as Save changes.
+ * @instead copy-button - An icon that copies a value to the clipboard.
+ * @practice Set `raised` on a button that floats over the page, such as one over a map or a board. - A raised button takes the theme's floating edge and shadow, as a popover does.
  * @documentation https://fusion.dev/helix/components/icon-button
  *
  * @slot - The icon.

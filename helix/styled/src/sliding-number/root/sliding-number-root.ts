@@ -40,6 +40,13 @@ const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] as const
  * @status experimental
  * @category data
  * @aliases Odometer, Rolling number, Animated number, Ticker digits
+ * @use A number that changes while you watch, such as a live count of sales.
+ * @instead stat - A measurement with a label that names it.
+ * @instead rotating-text - A word in a sentence that turns through others.
+ * @instead marquee - A row of content that scrolls round by itself, such as a band of logos.
+ * @anatomy value
+ * @anatomy digit
+ * @anatomy character?
  * @documentation https://fusion.dev/helix/components/sliding-number
  *
  * @csspart character - A sign, separator, or symbol in the number, which holds still.

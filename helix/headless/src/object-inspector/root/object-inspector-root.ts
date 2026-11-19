@@ -91,9 +91,8 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * or a raw record, as a read-only tree with each entry's type visible.
  *
  * Pass the object to `value`, or name a `<script type="application/json">` by
- * id with `for`, the same source `VirtualList` and the charts read. JSON text
- * works with server rendering and with React hydration, which skips object
- * properties. `value` wins when both are set.
+ * id with `for`, the same source `VirtualList` and the charts read. `value`
+ * wins when both are set.
  *
  * **Keyboard.** The tree is one tab stop, and focus moves from row to row.
  *
@@ -152,13 +151,22 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * key. Filtering and copying still read the value itself.
  *
  * `windowed` draws only the rows in view, for values with thousands of entries.
- * The box needs a height for windowing to work. The styled tier sets one, and
- * in the headless tier you set it yourself.
  *
  * @since 0.1.0
  * @status stable
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
+ * @use A structured value, such as an API response, read as a tree you open and copy from.
+ * @instead code-block - A value shown as formatted text, such as JSON in the docs.
+ * @instead tree - A hierarchy you navigate, such as the files of a project.
+ * @instead description-list - One level of labels and their values.
+ * @anatomy header?
+ * @anatomy copy
+ * @anatomy toggle
+ * @anatomy key
+ * @anatomy count
+ * @practice Name a JSON script with `for` on a page a server renders or React hydrates. - JSON text works with server rendering and with React hydration, which skips object properties.
+ * @practice {windowed} Give a `windowed` inspector a height on the headless tier. - Windowing works only in a box with a height, and the styled tier sets one.
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
  * @slot empty - Shown in the tree while it has no entries to show. Defaults to `empty-text`, or `no-matches-label` while a filter matched none.

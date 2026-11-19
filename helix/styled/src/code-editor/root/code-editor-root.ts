@@ -21,13 +21,21 @@ import '../../toolbar/index.js'
  * `@fusion.dev/helix-code-editor` themes CodeMirror's gutter, caret, selection and
  * syntax from your tokens, and draws a problem's line number in its tone.
  *
- * Set `fill` for an editor that fills a pane, such as one side of a split
- * view.
- *
  * @since 0.216.0
  * @status experimental
  * @category editors
  * @aliases Code editor, CodeMirror, File editor, IDE, Monaco
+ * @use A file of code you edit, with its problems listed under it.
+ * @instead code-input - A short piece of code in a form, such as a JSON setting.
+ * @instead code-block - Code you read and copy, with no editing.
+ * @instead editor - A document of prose you write and format.
+ * @anatomy header
+ * @anatomy controls
+ * @anatomy body
+ * @anatomy diagnostics?
+ * @anatomy status
+ * @practice Connect CodeMirror for highlighting, line numbers, and folding. - On its own the code is a plain textarea in the code face.
+ * @practice {fill} Set `fill` for an editor that fills a pane, such as one side of a split view. - Without it, the editor is 24rem tall.
  * @documentation https://fusion.dev/helix/components/code-editor
  *
  * @cssproperty --code-editor-background-color - The ground the code is drawn on. Defaults to the page's background.

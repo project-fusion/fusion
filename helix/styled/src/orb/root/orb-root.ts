@@ -138,6 +138,10 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  * @status stable
  * @category feedback
  * @aliases Thinking, Agent, Status
+ * @use What an agent is doing, such as connecting, thinking, listening, or working.
+ * @instead loader - Work of unknown length with no agent behind it.
+ * @instead shimmer-text - The step an agent is on, named in words.
+ * @instead voice-level - The live level of a voice as you speak.
  * @documentation https://fusion.dev/helix/components/orb
  *
  * @slot - A shape of your own, drawn over the orb's box in place of the dots.

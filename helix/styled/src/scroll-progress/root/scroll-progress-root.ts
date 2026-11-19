@@ -8,11 +8,7 @@ import { styles } from './scroll-progress-root.css.js'
  *
  * @description
  * The bar is empty at the top and full at the end, so a reader of a long
- * article sees how far through it they are. It follows the page unless `for`
- * names the box that scrolls, by its `id`.
- *
- * **Place it yourself**, such as at the top of a sticky header: the bar fills
- * the width it is given and draws nothing else.
+ * article sees how far through it they are.
  *
  * **Hidden from screen readers.** Where a reader is in the page is what their
  * reader already says, and a bar that changed on every scroll would be a
@@ -29,6 +25,13 @@ import { styles } from './scroll-progress-root.css.js'
  * @status experimental
  * @category feedback
  * @aliases Reading progress, Scroll indicator, Progress bar
+ * @use How far you have scrolled through an article, or through a box on the page.
+ * @instead progress - How far along a task is, such as an upload.
+ * @instead outline - Links to the headings on the page, with the section in view marked.
+ * @anatomy track
+ * @anatomy bar
+ * @practice Set `for` to the id of the box that scrolls. - Without it, the bar follows the page.
+ * @practice Place the bar yourself, such as at the top of a sticky header. - It fills the width it is given and draws nothing else.
  * @documentation https://fusion.dev/helix/components/scroll-progress
  *
  * @csspart bar - The fill, scaled along its length by how far the page or the box is scrolled.

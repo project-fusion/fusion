@@ -149,8 +149,7 @@ interface BarFrame {
  *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
- * with its label first. A table is still the better source where the page can
- * show one, since it reads before any script runs.
+ * with its label first.
  *
  * **A chart with nothing to draw says so.** A table with no readings shows
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
@@ -177,6 +176,15 @@ interface BarFrame {
  * @status stable
  * @category charts
  * @aliases Column Chart, Categorical Chart
+ * @use A comparison across categories, such as revenue by quarter or signups by channel.
+ * @instead line-chart - A trend over many points in time.
+ * @instead donut-chart - Parts of one whole, such as sessions by source.
+ * @instead spatial-bar-chart - Values over two sets of categories, drawn in three dimensions.
+ * @anatomy axis
+ * @anatomy gridline
+ * @anatomy bar
+ * @anatomy labels
+ * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
  * @documentation https://fusion.dev/helix/components/bar-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.

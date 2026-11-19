@@ -107,9 +107,6 @@ const FOCUSABLE =
  * the start pane and open it again. A drag in progress is tracked as a state, so both dividers a
  * corner moves stay lit for as long as they move.
  *
- * By default, `min` and `max` let the divider reach either edge, so you can
- * drag a pane fully closed. Set them to limit the range.
- *
  * A pane can be collapsed, which is a separate state from a divider at the
  * edge. `collapsed` names the shut pane, `start` or `end`, and the pane opens
  * back to the position where the collapsing gesture began. A drag records that position
@@ -126,17 +123,14 @@ const FOCUSABLE =
  * with nothing measured, so the divider is where it belongs from the first
  * paint, and the start pane keeps that size as the splitter's own size changes.
  *
- * Set `primary` to the pane that keeps its size when the splitter's own size
- * changes, such as a sidebar beside a window being resized. The other pane
- * takes all of the change, as Web Awesome's split panel does. Without it,
- * both panes keep their share.
+ * Without `primary`, both panes keep their share when the splitter's own size
+ * changes.
  *
- * **Three or more panes along one axis are splitters nested on that axis**, a
- * splitter in the `end` pane of another for three columns. The nested one
- * keeps the pane on its far side the size it was while the outer divider
- * moves, so a divider resizes only the two panes beside it, as Zag's splitter
- * does with any number of panels. Where the whole row is resized, every pane
- * keeps its share, unless `primary` says otherwise.
+ * **Three or more panes along one axis are splitters nested on that axis.**
+ * The nested one keeps the pane on its far side the size it was while the
+ * outer divider moves, as Zag's splitter does with any number of panels. Where
+ * the whole row is resized, every pane keeps its share, unless `primary` says
+ * otherwise.
  *
  * **Keyboard.** The divider is one tab stop.
  *
@@ -152,6 +146,15 @@ const FOCUSABLE =
  * @status stable
  * @category layout
  * @aliases SplitPane, Resizable, SplitView
+ * @use Two panes, such as files and an editor, whose share of the space you set by dragging.
+ * @instead grid - Columns whose widths the page sets.
+ * @instead drawer - A panel that slides in over the page from an edge.
+ * @anatomy start
+ * @anatomy separator
+ * @anatomy end
+ * @practice Set `primary` to a sidebar's pane. - That pane keeps its size when the splitter's own size changes, and the other pane takes all of the change.
+ * @practice {bounds} Set `min` and `end-min` to the least each pane needs. - By default the divider reaches either edge, so you can drag a pane fully closed.
+ * @practice {nested} For three columns, nest a splitter in the `end` pane of another. - A divider then resizes only the two panes beside it.
  * @documentation https://fusion.dev/helix/components/splitter
  *
  * @slot end - The pane after the divider.

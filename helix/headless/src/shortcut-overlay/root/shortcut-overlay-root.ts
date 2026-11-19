@@ -66,13 +66,8 @@ const printed = (keys: string, apple: boolean): string => {
  *
  * Press `?` outside a text field, or call `showSheet()`, to open the sheet: a
  * dialog listing every shortcut on the page by name, which is how a keyboard
- * or screen reader user gets the same list. Set `sheet-keys` to another chord,
- * or to nothing to leave `?` to the page.
- *
- * Many apps, GitHub and Gmail among them, already give `?` to their own help,
- * so a page that answers `?` itself opens both on one press. Such a page sets
- * `sheet-keys` to another chord, or to nothing and calls `showSheet()` from
- * its own handler.
+ * or screen reader user gets the same list. `sheet-keys` set to nothing leaves
+ * `?` to the page, which can call `showSheet()` from its own handler.
  *
  * The badges are a picture of what the controls already expose, so they are
  * hidden from assistive technology.
@@ -81,6 +76,13 @@ const printed = (keys: string, apple: boolean): string => {
  * @status experimental
  * @category navigation
  * @aliases Keyboard shortcuts, Shortcut hints, Key tips, Cheat sheet
+ * @use A page with many keyboard shortcuts, each shown on its control while you hold a key.
+ * @instead kbd - One key or chord written inside a sentence.
+ * @instead command - Commands you find by typing.
+ * @anatomy badge
+ * @anatomy badge-keys
+ * @anatomy badge-name
+ * @practice Set `sheet-keys` to another chord where your page answers `?` with its own help. - Many apps, GitHub and Gmail among them, give `?` to their own help, and one press then opens both.
  * @documentation https://fusion.dev/helix/components/shortcut-overlay
  *
  * @csspart badge - One control's badge.

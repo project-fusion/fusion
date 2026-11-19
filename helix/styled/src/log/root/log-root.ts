@@ -28,6 +28,16 @@ import '../line/log-line.js'
  * @since 0.200.0
  * @status experimental
  * @category feedback
+ * @use Output that arrives while you watch, such as a build, a deployment, or a CI run.
+ * @instead terminal - A shell you type commands into.
+ * @instead chat - A conversation between people, or with an agent.
+ * @instead code-block - Code or output that is finished, shown with a copy button.
+ * @anatomy line
+ * @anatomy number?
+ * @anatomy group
+ * @anatomy status
+ * @practice Set `done` once the output you pass to `write()` is complete. - The status region then says that the run has ended.
+ * @practice Set `quiet` where something around the log speaks for it, as a chat turn does for an agent's work. - The status region would say each error and each finished step a second time.
  * @documentation https://fusion.dev/helix/components/log
  *
  * @cssproperty --log-background-color - The fill behind the lines. Defaults to the page background.

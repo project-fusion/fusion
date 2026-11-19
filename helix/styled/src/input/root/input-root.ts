@@ -31,6 +31,14 @@ import '../../voice-level/index.js'
  * @status stable
  * @category forms
  * @aliases TextField, Field, TextInput
+ * @use A single line of text, such as a name, an email address, or a search term.
+ * @instead textarea - Text that runs to several lines, such as a description.
+ * @instead number-input - A number you type or nudge with step buttons.
+ * @instead combobox - A value from a list, found by typing.
+ * @anatomy label
+ * @anatomy field
+ * @anatomy hint?
+ * @practice Set `type` and `required` before you write `validate`. - The browser checks those first, and `validate` runs on each change only once it finds nothing wrong.
  * @documentation https://fusion.dev/helix/components/input
  *
  * @cssproperty --input-background-color - Fill behind the text.

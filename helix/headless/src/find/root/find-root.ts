@@ -85,6 +85,15 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  * @since 0.220.0
  * @status experimental
  * @category navigation
+ * @use Words to find in a block of content, such as an article, a log, or a file of code.
+ * @instead command - Commands you find by typing, from anywhere on the page.
+ * @instead filter-input - Filters that narrow a list or a table.
+ * @anatomy field
+ * @anatomy count
+ * @anatomy previous
+ * @anatomy next
+ * @anatomy close
+ * @practice Copy the `::highlight(helix-find-match)` and `::highlight(helix-find-current)` rules into a shadow root of yours that holds text to search. - Text is painted from the tree it lives in.
  * @documentation https://fusion.dev/helix/components/find
  *
  * @slot actions - Controls of your own in the bar's toolbar, between its options and the buttons that move between matches.

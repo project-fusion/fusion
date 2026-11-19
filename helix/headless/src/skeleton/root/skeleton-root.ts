@@ -17,17 +17,13 @@ import { property } from 'lit/decorators.js'
  * There is no `shape` property. Whether a placeholder is a line, a block, or a
  * circle is presentation, which belongs to the styled tier.
  *
- * **Put the real content inside and set `loading`, and the skeleton takes its
- * size.** While `loading` is set the content is inert, the host is
- * `aria-busy`, and the styled tier hides the content and paints the
- * placeholder over its box, so nothing moves when the content arrives. Take
- * `loading` off and the content is shown as it is. An empty skeleton is a
+ * While `loading` is set the content is inert, the host is `aria-busy`, and
+ * the styled tier hides the content and paints the placeholder over its box.
+ * Take `loading` off and the content is shown as it is. An empty skeleton is a
  * placeholder of its own size, as before.
  *
- * **Draw your own placeholder in the `placeholder` slot** where the content is
- * not there until it loads, such as a card that is drawn from data: a circle
- * and three lines, laid out as the card will be. While `loading` is set the
- * placeholder shows and the content is hidden. Once it is off the placeholder
+ * While `loading` is set, a placeholder in the `placeholder` slot shows and the
+ * content is hidden. Once it is off the placeholder
  * is hidden and the content shows. The placeholder is hidden from screen
  * readers. A server cannot see the children, so it serves both, and the
  * content is hidden once the page has its children.
@@ -40,6 +36,8 @@ import { property } from 'lit/decorators.js'
  * @instead loader - Work of unknown length with no layout to hold.
  * @instead empty - A region that loaded and holds nothing.
  * @anatomy skeleton
+ * @practice {loading} Put the real content inside the skeleton and set `loading`. - The skeleton takes the content's size, so nothing moves when the content arrives.
+ * @practice {revealing} Draw your own placeholder in the `placeholder` slot for content that is not there until it loads. - The placeholder shows while `loading` is set, laid out as the content will be, such as a circle and three lines for a profile.
  * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @slot - The content the skeleton stands in for, which sizes it. Optional.

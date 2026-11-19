@@ -38,14 +38,10 @@ const SLIDER_KEYS = new Set([
  * End, the page keys, and the touch target come from the platform. A native
  * range has a hit area larger than its thumb, sized for a finger.
  *
- * The value is a string, like every other form control's, and
- * `MixinControllerValue` holds text. Use `valueAsNumber` for arithmetic.
- *
  * Marks are drawn by the component. The ticks of a `<datalist>` cannot be
- * styled, and Firefox does not render them for a range. Marks are decoration.
- * `step` sets where the value can land, and the input enforces it whether or
- * not marks are drawn. `markers` is a count, so a slider from zero to a hundred
- * does not draw a hundred and one marks by accident.
+ * styled, and Firefox does not render them for a range. `markers` is a count,
+ * so a slider from zero to a hundred does not draw a hundred and one marks by
+ * accident.
  *
  * A range with two thumbs is two inputs stacked on one track, because there is
  * no native two-thumb range. Each thumb keeps its own value, and a named range
@@ -98,6 +94,16 @@ const SLIDER_KEYS = new Set([
  * @status stable
  * @category forms
  * @aliases Range, Range input
+ * @use A value picked from a range by eye, such as a volume.
+ * @instead number-input - An exact number you type, such as a quantity.
+ * @instead rating - A score of a few steps, such as stars on a review.
+ * @instead carousel - Slides you move between, one at a time.
+ * @anatomy label
+ * @anatomy control
+ * @anatomy output?
+ * @anatomy hint?
+ * @practice Read `valueAsNumber` for arithmetic. - The value is a string, like every other form control's.
+ * @practice {markers} Set `step` for where the value can land, and `markers` for the marks drawn. - Marks are decoration, and the input holds to `step` whether or not marks are drawn.
  * @documentation https://fusion.dev/helix/components/slider
  *
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
