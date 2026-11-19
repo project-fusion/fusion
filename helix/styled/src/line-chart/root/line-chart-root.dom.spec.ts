@@ -61,7 +61,9 @@ describe('the draw-in', () => {
     for (const body of rules) {
       expect(body).not.toContain('stroke-dasharray:')
     }
-    expect(sheet()).toContain('stroke-dasharray var(--helix-duration-slow) step-end allow-discrete')
+    expect(sheet()).toContain(
+      'stroke-dasharray var(--_chart-arrive-duration, var(--helix-duration-slow)) step-end allow-discrete',
+    )
   })
 
   run('leaves a line longer than the dash whole once it has drawn', async () => {

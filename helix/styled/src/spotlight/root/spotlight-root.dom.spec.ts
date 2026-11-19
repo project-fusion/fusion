@@ -9,6 +9,13 @@ beforeAll(async () => {
 
 const frame = () => new Promise((resolve) => setTimeout(resolve, 32))
 
+/** Waits for the light, a frame at a time, since WebKit's frames come later. */
+const lit = async (spot: HTMLElement): Promise<void> => {
+  for (let tries = 0; tries < 20 && !hasState(spot, 'lit'); tries++) {
+    await frame()
+  }
+}
+
 const pointer = (type: string, x: number, y: number, pointerType = 'mouse'): PointerEvent =>
   new PointerEvent(type, { clientX: x, clientY: y, pointerType })
 
@@ -27,7 +34,7 @@ describe('spotlight', () => {
   test('lights where a mouse is, and fades where it was as it leaves', async () => {
     const spot = await spotlight()
     spot.dispatchEvent(pointer('pointermove', 50, 30))
-    await frame()
+    await lit(spot)
     await spot.updateComplete
     const glow = part(spot, 'glow') as HTMLElement
     expect(hasState(spot, 'lit')).toBe(true)
@@ -48,7 +55,7 @@ describe('spotlight', () => {
     await frame()
     expect(hasState(spot, 'lit')).toBe(false)
     spot.dispatchEvent(pointer('pointermove', 50, 30))
-    await frame()
+    await lit(spot)
     await spot.updateComplete
     expect((part(spot, 'glow') as HTMLElement).style.getPropertyValue('--_spotlight-x')).toBe(
       '25.00%',
