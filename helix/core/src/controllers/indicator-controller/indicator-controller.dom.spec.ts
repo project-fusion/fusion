@@ -164,6 +164,16 @@ describe('the geometry of the marked child', () => {
     one.place()
     expect(at(one.indicator)).toMatchObject({ x: '38px', y: '8px' })
   })
+
+  /* A mark inside a surface that scrolls is placed against the surface's
+     content, which has moved up by the scroll from the box the measurement
+     reads. Menu's panel scrolls past a long list. */
+  test('with how far the surface has scrolled added back', () => {
+    const one = scene({ active: box(0, 20, 60, 30), own: box(0, 0, 300, 100) })
+    Object.defineProperty(one.surface, 'scrollTop', { configurable: true, value: 150 })
+    one.place()
+    expect(at(one.indicator)).toMatchObject({ y: '170px' })
+  })
 })
 
 describe('a right-to-left document', () => {

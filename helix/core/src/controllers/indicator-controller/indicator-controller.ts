@@ -264,7 +264,12 @@ export class IndicatorController implements ReactiveController {
       : (box.left - own.left) / sx - surface.clientLeft
 
     const x = `${rtl ? -inline : inline}px`
-    const y = `${(box.top - own.top) / sy - surface.clientTop}px`
+    /* **Plus how far the surface has scrolled**, since a mark inside a
+       scrolling surface is placed against its content, which has moved up by
+       that much from the box the measurement reads. Block only: no surface
+       with a mark scrolls along the line, and the sign of a sideways scroll
+       turns over in a right-to-left document. */
+    const y = `${(box.top - own.top) / sy - surface.clientTop + surface.scrollTop}px`
 
     /* `data-moving` while it is on its way, so a stylesheet can say something
      * about the travel itself.

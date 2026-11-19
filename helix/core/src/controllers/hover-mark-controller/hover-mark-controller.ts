@@ -9,8 +9,12 @@ export interface HoverMarkOptions {
    */
   gliding: (on: boolean) => void
 
-  /** The item a pointer is over, from what is under it, or nothing where it is between items. */
-  item: (under: readonly EventTarget[]) => HTMLElement | undefined
+  /**
+   * The item a pointer is over, from what is under it, or nothing where it is
+   * between items. Left out, the controller follows no pointer, and the host
+   * says where the mark goes with `show`.
+   */
+  item?: (under: readonly EventTarget[]) => HTMLElement | undefined
 
   /** The mark that travels to the item under the pointer. */
   mark: () => HTMLElement | null | undefined
@@ -25,7 +29,7 @@ export interface HoverMarkOptions {
 /**
  * Moves one mark to whichever item a mouse or pen is over, so the wash under
  * the pointer glides from item to item instead of going out on one and coming
- * on at the next. Serves `Navigation` and `Tabs`.
+ * on at the next. Serves `Navigation`, `Tabs`, `Toggle Group` and `Menu`.
  *
  * **Placed by `IndicatorController`**, so the mark carries the same four
  * properties a selection mark does, `--indicator-x`, `--indicator-y`,
@@ -41,6 +45,11 @@ export interface HoverMarkOptions {
  * to take each item's own hover wash away while the mark draws it.
  *
  * **A touch is not followed**, since a finger leaves no hover to draw.
+ *
+ * **A host whose wash marks something besides the pointer drives it itself.**
+ * Without `item` it listens for nothing, and `show` moves the mark with the
+ * same arrival and glide, as `Menu` does for the row with focus, which the
+ * keys move as well as the pointer.
  */
 export class HoverMarkController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -68,8 +77,10 @@ export class HoverMarkController implements ReactiveController {
   }
 
   hostConnected(): void {
-    this.host.addEventListener('pointerover', this.over)
-    this.host.addEventListener('pointerleave', this.leave)
+    if (this.options.item) {
+      this.host.addEventListener('pointerover', this.over)
+      this.host.addEventListener('pointerleave', this.leave)
+    }
   }
 
   hostDisconnected(): void {
@@ -78,12 +89,26 @@ export class HoverMarkController implements ReactiveController {
     this.leave()
   }
 
+  /**
+   * Moves the mark to `item`, gliding from the item it was over, or takes it
+   * away with nothing.
+   *
+   * @param item The element the mark covers, or nothing for none.
+   */
+  show(item: HTMLElement | undefined): void {
+    if (item) {
+      this.move(item)
+    } else {
+      this.leave()
+    }
+  }
+
   private readonly over = (event: PointerEvent): void => {
     if (event.pointerType === 'touch') {
       return
     }
     const under = event.composedPath()
-    const item = this.options.item(under)
+    const item = this.options.item?.(under)
     if (item === this.hovered) {
       return
     }
@@ -95,6 +120,14 @@ export class HoverMarkController implements ReactiveController {
       if (!surface || !under.includes(surface)) {
         this.leave()
       }
+      return
+    }
+    this.move(item)
+  }
+
+  /** Places the mark over `item`, letting it glide once it has arrived. */
+  private move(item: HTMLElement): void {
+    if (item === this.hovered) {
       return
     }
     const arriving = this.hovered === undefined

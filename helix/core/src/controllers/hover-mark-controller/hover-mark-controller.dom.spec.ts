@@ -22,9 +22,25 @@ class Strip extends LitElement {
   }
 }
 
+/** A strip that steers its mark itself, as `Menu` does by focus. */
+class Steered extends LitElement {
+  heard: boolean[] = []
+
+  glide = new HoverMarkController(this, {
+    gliding: (on) => this.heard.push(on),
+    mark: () => this.renderRoot.querySelector<HTMLElement>('[part="mark"]'),
+    surface: () => this.renderRoot.querySelector<HTMLElement>('[part="surface"]'),
+  })
+
+  protected override render(): TemplateResult {
+    return html`<div part="surface"><span part="mark"></span><slot></slot></div>`
+  }
+}
+
 beforeAll(() => {
   registerDom()
   customElements.define('hover-mark-strip', Strip)
+  customElements.define('hover-mark-steered', Steered)
 })
 
 const frame = () => new Promise((resolve) => setTimeout(resolve, 32))
@@ -104,5 +120,31 @@ describe('the mark under the pointer', () => {
     const { items, mark } = await strip()
     over(items[0], 'touch')
     expect(mark.hasAttribute('data-placed')).toBe(false)
+  })
+})
+
+describe('a mark the host steers', () => {
+  test('follows no pointer, and moves, glides, and leaves where `show` says', async () => {
+    const element = document.createElement('hover-mark-steered') as Steered
+    element.innerHTML = '<a href="#a">One</a><a href="#b">Two</a>'
+    document.body.append(element)
+    await element.updateComplete
+    const items = [...element.children] as [HTMLElement, HTMLElement]
+    items[0].getBoundingClientRect = box(0, 60)
+    items[1].getBoundingClientRect = box(60, 80)
+    const surface = element.renderRoot.querySelector('[part="surface"]') as HTMLElement
+    surface.getBoundingClientRect = box(0, 140)
+    const mark = element.renderRoot.querySelector('[part="mark"]') as HTMLElement
+    over(items[1])
+    expect(mark.hasAttribute('data-placed')).toBe(false)
+    element.glide.show(items[0])
+    expect(mark.style.getPropertyValue('--indicator-x')).toBe('0px')
+    await frame()
+    expect(mark.hasAttribute('data-gliding')).toBe(true)
+    element.glide.show(items[1])
+    expect(mark.style.getPropertyValue('--indicator-x')).toBe('60px')
+    element.glide.show(undefined)
+    expect(mark.hasAttribute('data-placed')).toBe(false)
+    expect(element.heard).toEqual([true, false])
   })
 })

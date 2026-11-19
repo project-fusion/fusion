@@ -71,8 +71,8 @@
 [part="item"]:hover:focus,
 [part="item"]:focus-visible {
   background-color: var(
-    --menu-item-hover-background-color,
-    var(--_menu-item-wash, var(--helix-color-hover))
+    --_menu-item-glide,
+    var(--menu-item-hover-background-color, var(--_menu-item-wash, var(--helix-color-hover)))
   );
 }
 
@@ -80,9 +80,16 @@
    row under the pointer is. */
 :host(:state(highlighted)) [part="item"] {
   background-color: var(
-    --menu-item-hover-background-color,
-    var(--_menu-item-wash, var(--helix-color-hover))
+    --_menu-item-glide,
+    var(--menu-item-hover-background-color, var(--_menu-item-wash, var(--helix-color-hover)))
   );
+}
+
+/* **A flyout's rows light themselves.** They inherit the menu's word that
+   its highlight draws the wash through this row, and the highlight is on the
+   panel, which they are not on. */
+[part="surface"] ::slotted(*) {
+  --_menu-item-glide: initial;
 }
 
 [part="item"]:focus-visible {
@@ -345,8 +352,11 @@ slot[name="submenu"]::slotted(helix-divider) {
 :host([tone="danger"]:not([disabled])) [part~="item"]:hover:focus,
 :host([tone="danger"]:not([disabled])) [part~="item"]:focus-visible {
   background-color: var(
-    --menu-item-hover-background-color,
-    color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+    --_menu-item-glide,
+    var(
+      --menu-item-hover-background-color,
+      color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+    )
   );
 }
 
