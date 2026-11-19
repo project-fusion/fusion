@@ -201,8 +201,7 @@ export default styles(
            A phone's panel holds still, or the body has no height to give up. */
         web([rule({ overflowY: 'auto' })]),
       ]),
-      /* **The body gives up its height first** and scrolls, so the title and the
-         actions stay on the screen. */
+      /* **The body gives up its height first** and scrolls, and the actions stay. */
       on('body', [
         rule({
           display: 'flex',
@@ -245,7 +244,12 @@ export default styles(
         }),
       ]),
       on({ region: 'footer', slotted: '*' }, [
-        rule({ display: 'flex', flexShrink: 0, gap: token('space-xs'), justifyContent: 'flex-end' }),
+        rule({
+          display: 'flex',
+          flexShrink: 0,
+          gap: token('space-xs'),
+          justifyContent: 'flex-end',
+        }),
       ]),
       /* It arrives and it leaves, rising as it fades in. */
       on('surface', [
