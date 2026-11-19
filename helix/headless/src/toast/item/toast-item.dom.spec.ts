@@ -251,7 +251,7 @@ describe('a swipe', () => {
     const heard: string[] = []
     found.addEventListener('helix-dismiss', () => heard.push('helix-dismiss'))
     const box = swipe(found, 200)
-    expect(box.style.translate).toBe('200px 0px')
+    expect(box.style.translate).toMatch(/^200px( 0px)?$/)
     expect(hasState(found, 'dragging')).toBe(true)
     release(200)
     await found.updateComplete
@@ -293,7 +293,7 @@ describe('a swipe', () => {
   test('toward the left on a right-to-left page, where the end of the line is', async () => {
     const found = await message('dir="rtl"')
     const box = swipe(found, -200)
-    expect(box.style.translate).toBe('-200px 0px')
+    expect(box.style.translate).toMatch(/^-200px( 0px)?$/)
     release(-200)
     await found.updateComplete
     expect(found.open).toBe(false)

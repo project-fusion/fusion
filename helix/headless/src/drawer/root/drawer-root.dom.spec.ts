@@ -419,7 +419,7 @@ describe('dragging it closed', () => {
   test('follows the finger toward the edge it came from, and says it is dragging', async () => {
     const drawer = await open()
     const panel = await swipe(drawer, 60)
-    expect(panel.style.translate).toBe('60px 0px')
+    expect(panel.style.translate).toMatch(/^60px( 0px)?$/)
     expect(hasState(drawer, 'dragging')).toBe(true)
     expect(panel.style.getPropertyValue('--drawer-drag-progress')).toBe('0.188')
     release(60, 3000)
@@ -488,7 +488,7 @@ describe('dragging it closed', () => {
     try {
       const drawer = await open()
       const panel = await swipe(drawer, -200)
-      expect(panel.style.translate).toBe('-200px 0px')
+      expect(panel.style.translate).toMatch(/^-200px( 0px)?$/)
       release(-200, 3000)
       await drawer.updateComplete
       expect(drawer.open).toBe(false)
