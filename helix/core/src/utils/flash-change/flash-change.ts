@@ -137,8 +137,9 @@ const flashBox = (
         resolve()
       }
     }
-    animation.addEventListener('finish', finish)
-    animation.addEventListener('cancel', finish)
+    /* Settled whether it ends or is canceled, and owned by the animation, so
+       nothing is left listening on a box that leaves the page. */
+    animation.finished.then(finish, finish)
   })
 
 /**

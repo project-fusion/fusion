@@ -26,10 +26,27 @@ const watch = <E extends HTMLElement>(element: E): { asked: Asked[]; element: E 
   const asked: Asked[] = []
   element.animate = ((keyframes: Keyframe[], options: KeyframeAnimationOptions) => {
     const animation = new EventTarget() as Asked['animation']
+    /* Settled as a browser settles it: fulfilled on finishing, refused on
+       being canceled. */
+    let settle: { cancel(): void; finish(): void } = { cancel() {}, finish() {} }
+    const finished = new Promise<Animation>((resolve, reject) => {
+      settle = {
+        cancel: () => reject(new DOMException('Canceled', 'AbortError')),
+        finish: () => resolve(animation),
+      }
+    })
+    finished.catch(() => undefined)
     Object.assign(animation, {
-      cancel: () => animation.dispatchEvent(new Event('cancel')),
+      cancel: () => {
+        settle.cancel()
+        animation.dispatchEvent(new Event('cancel'))
+      },
       currentTime: 0,
-      finish: () => animation.dispatchEvent(new Event('finish')),
+      finish: () => {
+        settle.finish()
+        animation.dispatchEvent(new Event('finish'))
+      },
+      finished,
     })
     asked.push({ animation, keyframes, options })
     return animation
