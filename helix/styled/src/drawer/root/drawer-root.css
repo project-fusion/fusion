@@ -23,6 +23,16 @@
   --_drawer-scrim: var(--helix-color-overlay);
 }
 
+/* **A released panel goes back on the spring**, over at most the slow step,
+   and goes off the edge at the speed it was let go, in no more than that.
+   The drawer reads these from its script, so this rule sets them, and a page
+   setting either on the element wins over it. Reduced motion takes the token to 0.01ms, and a release then lands at
+   once whatever is set. */
+:host {
+  --drawer-release-duration: var(--helix-duration-slow);
+  --drawer-release-easing: var(--helix-easing-spring);
+}
+
 /* Out at rest, in when open, and the `@starting-style` *after* both. A starting
    style and an ordinary rule of the same specificity are separated by source
    order, so a starting style written first loses even for the opening frame and
@@ -306,27 +316,36 @@
   border-inline-width: 0;
 }
 
-/* **The page's own panning stays off the swipe's axis.** A touch the browser
-   reads as a pan is taken from the page and the swipe is canceled, so a panel
-   that slides across leaves only the vertical pan to the browser, and one that
-   slides up or down only the horizontal. The content region is a scroller and
-   decides for itself, so it keeps its vertical scrolling and gives up only the
-   horizontal pan, which it has no use for. */
-[part="panel"],
-[part="content"] {
+/* **The content region keeps its own vertical scrolling.** The panel leaves
+   the page only the pan across its drag, from `DRAGS_RULE` in `core`. The
+   content region is a scroller, which decides for itself: the drawer marks it
+   for the drag while it does not scroll along it, and here it gives up only
+   the horizontal pan, which it has no use for, while it does. */
+[part="content"]:not([data-drags]) {
   touch-action: pan-y;
 }
 
-:host([placement="bottom"]) [part="panel"],
-:host([placement="top"]) [part="panel"] {
-  touch-action: pan-x;
-}
-
-/* Under the finger while it moves, and back to the slide once it lets go. As
-   specific as the open rule above, which it follows and has to beat. */
-:host(:state(open)) [part="panel"][data-swiping] {
+/* **Where the drag puts it, from the first move until the release lands**,
+   with every transition off: the script moves the panel with `translate` on
+   top of its snap point, and glides it on its release. Closed by the drag, it
+   stays at its snap point here, where the closed rule would slide it, and
+   leaves the top layer at once when the glide is off the edge. As specific
+   as the open rule above, which it follows and has to beat. */
+/* biome-ignore lint/style/noDescendingSpecificity: the right-to-left rules above set `--_drawer-away`, which this rule does not read, and the open rule it has to beat is matched at its own weight by the second selector. */
+:host(:state(dragging)) [part="panel"],
+:host(:state(dragging)) [part="panel"][open] {
+  transform: translate(var(--drawer-swipe-x, 0), var(--drawer-swipe-y, 0));
   transition: none;
   user-select: none;
+}
+
+/* **The scrim fades with the drag**, from whole at the smallest snap point to
+   gone off the edge. A `::backdrop` takes custom properties from its
+   dialog. */
+:host(:state(dragging)) [part="panel"]::backdrop,
+:host(:state(dragging)) [part="panel"][open]::backdrop {
+  opacity: calc(1 - var(--drawer-drag-progress, 0));
+  transition: none;
 }
 
 /* A panel coming out of `display: none` has no earlier style to slide from,
@@ -476,9 +495,8 @@
 /* **Under reduced motion the panel fades in place and does not slide**, and
    the scrim fades with it, as Dialog's do. Both went from nothing to whole in
    one frame, since the base layer takes `normal` to 0.01ms there;
-   `duration-fade` is left alone. The panel stays where a swipe puts it, so a
-   finger still moves it, with no transition on the transform. After the
-   swiping rule, at its weight, so the fade holds through a swipe too. */
+   `duration-fade` is left alone. The panel stays at its snap point, and a
+   finger still moves it, through the script's `translate`. */
 @media (prefers-reduced-motion: reduce) {
   [part="panel"],
   :host(:state(open)) [part="panel"][open] {

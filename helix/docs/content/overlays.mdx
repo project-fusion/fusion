@@ -203,8 +203,11 @@ finished. Select on them to draw an entrance or an exit of your own.
 ## Swiping an overlay away
 
 A touch or a pen swipes a `Drawer` toward the edge it came from, and a `Toast`
-message toward the end of the line. A swipe past halfway, or a quick one, closes
-it through the same cancelable request as its close control. A `Drawer` with
+message toward the edge its stack sits at. The surface follows the finger, and
+past its open end it gives less and less. A swipe past halfway, or a quick
+flick from any distance, closes it through the same cancelable request as its
+close control, and a refused request springs it back. Let go, it carries on at
+the speed it was moving, off the window or back to rest. A `Drawer` with
 `snap-points` comes to rest at the nearest point, such as half open, and
 `:state(snapped)` holds while it rests short of the whole panel. Moving focus
 with `Tab` to a control past the edge of the window opens it the rest of the

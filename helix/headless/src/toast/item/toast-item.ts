@@ -1,23 +1,20 @@
 import {
   CountdownController,
   customElement,
+  DRAGS_RULE,
+  DragDismissController,
   drawDismiss,
   drawDismissGlyph,
-  edgeOffset,
   HelixElement,
   hostAria,
   internalsOf,
   isRtl,
   MixinDismissible,
   requestChange,
-  SwipeController,
-  settleSwipe,
-  swipeAxis,
   swipeEdge,
   type ToneMark,
   timeConverter,
   toneMark,
-  towardEdge,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -43,11 +40,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * says each message once as it arrives, a `danger` one assertively, so a
  * message is never a live region of its own.
  *
- * A touch or a pen swipes a message toward the end of the line, or toward the
- * edge the region's `swipe-direction` names, and past halfway, or quickly,
- * dismisses it through the same `helix-dismiss` as its control. While it
- * moves, the distance is on the `item` part as `--toast-swipe-x` or
- * `--toast-swipe-y`.
+ * **A touch or a pen swipes a message away**, toward the edge its stack sits
+ * at, or toward the edge the region's `swipe-direction` names. The message
+ * follows the finger, and past halfway, or at a quick flick from any
+ * distance, it is dismissed through the same `helix-dismiss` as its control.
+ * Let go, it carries on at the speed it was moving: off the window, or back to
+ * its place along `--toast-release-easing` when it stays, as it does when a
+ * listener refuses `helix-dismiss`. The `item` part takes an inline
+ * `translate` only while a swipe and its release run, and the message has
+ * `:state(dragging)` for that time. A mouse does not swipe, since a mouse drag
+ * selects the message's text.
  *
  * **Escape dismisses the message holding focus**, through the same
  * `helix-dismiss`, and focus moves to the next message.
@@ -83,15 +85,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart timer - The bar showing how long is left, where a duration was given.
  *
  * @cssproperty --toast-duration - How long this message stays, in milliseconds, for a progress hint.
- * @cssproperty --toast-swipe-x - How far a swipe has moved the message across, in pixels, toward the right.
- * @cssproperty --toast-swipe-y - How far a swipe has moved the message down, in pixels, under a `swipe-direction` of `top` or `bottom`.
+ * @cssproperty --toast-release-duration - The longest a released message takes to go, or to go back to its place. Unset, it lands at once.
+ * @cssproperty --toast-release-easing - The curve a released message goes back to its place along, with the speed it was let go carried in.
  *
  * @cssstate closed - The message has been dismissed and is hidden, or leaving.
+ * @cssstate dragging - From the moment a finger starts swiping the message until its release has come to rest, on screen or off it.
  * @cssstate paused - The dismiss timer is paused, while a pointer or focus is on the message or in the stack, or while the page is hidden.
  * @cssstate waiting - The region holds the message back, past its `max-visible`, until a message before it goes.
  */
 @customElement('helix-headless-toast-item')
 export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
+  protected static override markRules = [DRAGS_RULE]
+
   /**
    * The key this part's words are registered under, its styled tag. The close
    * control's `dismiss-label` comes from a mixin other families share, and
@@ -144,7 +149,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   /**
    * @internal Set by the region: the edge a swipe dismisses toward, from its
-   * `swipe-direction`.
+   * `swipe-direction`, or else the inline edge its `placement` sits at.
    */
   @property({ attribute: false })
   swipeToward: 'bottom' | 'end' | 'start' | 'top' = 'end'
@@ -171,38 +176,22 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     return swipeEdge(this.swipeToward, isRtl(this))
   }
 
-  /* Swiped toward an edge to dismiss, the end of the line unless the region
-     names another. Touch and pen only: a mouse drags to select the message's
-     text. */
-  protected readonly swipes = new SwipeController(this, {
-    axis: () => (this.open ? swipeAxis(this.swipeTo) : undefined),
-    end: (dx, dy, vx, vy) => {
-      const edge = this.swipeTo
-      const box = this.partNamed('item')?.getBoundingClientRect()
-      const across = swipeAxis(edge) === 'x'
-      const shown = settleSwipe({
-        points: [1],
-        size: (across ? box?.width : box?.height) ?? 0,
-        travel: Math.max(0, towardEdge(edge, dx, dy)),
-        velocity: towardEdge(edge, vx, vy),
-      })
-      if (shown === 0 && this.dismiss()) {
-        return
-      }
-      this.slide(0)
-    },
-    move: (dx, dy) => this.slide(Math.max(0, towardEdge(this.swipeTo, dx, dy))),
+  /* Swiped toward an edge to dismiss, the one the region names. Touch and pen
+     only: a mouse drags to select the message's text. */
+  protected readonly drags = new DragDismissController(this, {
+    dismiss: () => this.dismiss(),
+    edge: () => (this.open ? this.swipeTo : undefined),
+    mark: (on) => this.toggleState('dragging', on),
     start: (_target, event) => event.pointerType !== 'mouse',
     surface: () => this.partNamed('item'),
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--toast-release-duration'),
+        easing: style.getPropertyValue('--toast-release-easing'),
+      }
+    },
   })
-
-  /** Writes how far a swipe has moved the message toward its edge. */
-  private slide(travel: number): void {
-    const item = this.partNamed('item')
-    const { x, y } = edgeOffset(this.swipeTo, travel)
-    item?.style.setProperty('--toast-swipe-x', x === 0 ? '' : `${Math.round(x)}px`)
-    item?.style.setProperty('--toast-swipe-y', y === 0 ? '' : `${Math.round(y)}px`)
-  }
 
   /**
    * The dismiss timer, which pauses while a reader is on the message, and
@@ -404,13 +393,6 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     }
     if (changed.has('regionHeld')) {
       this.holdForRegion()
-    }
-    /* A swipe up or down is one the page would otherwise take as a scroll. */
-    if (changed.has('swipeToward')) {
-      this.partNamed('item')?.style.setProperty(
-        'touch-action',
-        swipeAxis(this.swipeTo) === 'y' ? 'pan-x' : '',
-      )
     }
   }
 

@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import unsaved from '../.examples/unsaved.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -10,6 +11,7 @@ beforeAll(async () => {
   await import('../../list/index.js')
   await import('../../button/index.js')
   await import('../../text/index.js')
+  await import('../../textarea/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -36,5 +38,22 @@ describe('the events example', () => {
       'toggle',
       'close',
     ])
+  })
+})
+
+describe('the unsaved example', () => {
+  run('an unsaved note keeps the sheet open, and Save closes it', async () => {
+    await example(unsaved)
+    press(document.querySelector('[command="--show"]'))
+    await idle()
+    const note = document.getElementById('note') as HTMLElement & { close(): void; open: boolean }
+    const text = document.getElementById('note-text') as HTMLElement & { value: string }
+    text.value = 'Buy milk'
+    note.close()
+    await idle()
+    expect(note.open).toBe(true)
+    press(document.getElementById('note-save'))
+    await idle()
+    expect(note.open).toBe(false)
   })
 })

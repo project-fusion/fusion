@@ -30,7 +30,7 @@
   >
     <helix-list-item>
       No events yet
-      <span slot="description">Press a message's close control</span>
+      <span slot="description">Press a message's close control, or swipe it away</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -61,6 +61,6 @@
   }
 
   stack.addEventListener('helix-dismiss', (event) => {
-    say('helix-dismiss', `the close button on "${event.detail.label}" was pressed, and the event bubbles`)
+    say('helix-dismiss', `"${event.detail.label}" is being dismissed, and the event bubbles`)
   })
 </script>
