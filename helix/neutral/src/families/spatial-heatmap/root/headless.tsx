@@ -23,11 +23,9 @@ import {
  * relief, each reading a prism as tall as its value, on a slab, seen from
  * above at an angle.
  *
- * **Core draws it, on a phone as on the web.** Core reads the readings, their
- * tones, and how many whole columns fit as for Heatmap, and `reliefOf` lays
- * each prism's faces, the slab, and the order to paint them from the camera.
- * A phone draws them in react-native-svg, each face's colors worked out in
- * its machine.
+ * **Core draws it, on a phone as on the web.** Core reads the readings, tones
+ * and fit as for Heatmap, and `reliefOf` lays each prism's faces, the slab,
+ * and their paint order. A phone draws them in react-native-svg.
  *
  * **The strip is read as Heatmap's is**: the arrows walk a reading down and a
  * column across, a tap shows the prism under it and presses it, a screen
