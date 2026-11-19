@@ -199,6 +199,15 @@ the arrow keys move focus, and holds while the pointer crosses a divider. It
 reads `--menu-item-hover-background-color`, and a `danger` row keeps its own
 hue. A submenu that opens beside its row lights its own rows.
 
+## Focus that travels
+
+In `Toolbar`, `Tabs`, and `Toggle Group`, the focus ring is one ring that
+travels from control to control as the arrow keys move focus, so the eye can
+follow it along the strip. It is each control's own ring, with its corners and
+its offset, and it shows at full strength in the frame focus arrives. It
+follows only focus that shows, so a click draws none. Under reduced motion it
+moves at once, and under forced colors each control draws its own system ring.
+
 ## Figures that count
 
 A new `value` on a `Stat` or a `Trend` counts to the new number from the one

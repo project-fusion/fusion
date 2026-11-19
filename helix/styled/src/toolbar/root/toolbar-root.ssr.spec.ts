@@ -37,8 +37,11 @@ describe('toolbar server output', () => {
     /* `toContain('<button type="button">Bold</button>')` passed on the spec's
        own light DOM, which is in the response whatever the toolbar renders. The
        unnamed slot inside the toolbar region is what serves the controls where
-       the consumer put them, untouched. */
-    expect(rendered(markup, 'helix-toolbar')).toMatch(/<slot\s*><\/slot>\s*<\/div>/)
+       the consumer put them, untouched, with only the hidden focus ring after
+       it. */
+    expect(rendered(markup, 'helix-toolbar')).toMatch(
+      /<slot\s*><\/slot>\s*<span part="focus" aria-hidden="true" hidden><\/span>\s*<\/div>/,
+    )
     expect(markup).not.toContain('tabindex')
   })
 

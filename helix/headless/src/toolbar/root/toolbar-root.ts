@@ -3,6 +3,7 @@ import {
   auditName,
   closestInstance,
   customElement,
+  FocusMarkController,
   HelixElement,
   ToolbarController,
   toolbarAround,
@@ -92,8 +93,10 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The toolbar's controls.
  *
+ * @csspart focus - The focus ring, which travels from control to control as the arrow keys move focus along the toolbar. It carries the place and size of the control with focus as the indicator does, its corners, outline width, and offset, `data-placed` while focus shows on one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it.
  * @csspart toolbar - The toolbar container.
  *
+ * @cssstate focus-gliding - While the focus ring is on a control, so it draws the ring in place of each control's own.
  * @cssstate horizontal - The controls run along a row, which is the default.
  * @cssstate nested - The toolbar is a group inside another toolbar, which owns the keys and the tab stop.
  * @cssstate vertical - The controls run down a column, under `orientation="vertical"`.
@@ -147,6 +150,19 @@ export class HelixHeadlessToolbar extends HelixElement {
     members: () => [...this.children],
     nested: () => this.nested,
     stopAtEnds: () => this.stopAtEnds,
+  })
+
+  /**
+   * Moves the focus ring from control to control as the arrow keys move
+   * focus. A toolbar inside another draws none: the outer one reaches its
+   * controls and draws the one ring.
+   */
+  protected readonly focusRing = new FocusMarkController(this, {
+    enabled: () => !this.nested,
+    gliding: (on) => this.toggleState('focus-gliding', on),
+    items: () => this.tabStop.members as HTMLElement[],
+    mark: () => this.partNamed('focus'),
+    surface: () => this.partNamed('toolbar'),
   })
 
   /**
@@ -215,6 +231,7 @@ export class HelixHeadlessToolbar extends HelixElement {
       aria-orientation=${nested ? nothing : this.axis}
     >
       <slot @slotchange=${() => this.tabStop.claim()}></slot>
+      <span part="focus" aria-hidden="true" hidden></span>
     </div>`
   }
 }

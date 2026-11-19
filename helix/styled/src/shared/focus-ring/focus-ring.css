@@ -1,0 +1,57 @@
+/* **One focus ring that travels from control to control** as the arrow keys
+   move focus along a strip, for `Toolbar`, `Tabs`, and `Toggle Group`. The
+   core `FocusMarkController` places it on the control with visible focus and
+   copies that control's corners, outline width, and offset onto it, so it is
+   the control's own ring, drawn by the strip.
+
+   **Drawn whole in the frame focus arrives**, with no fade: a ring that fades
+   in is a moment with no focus shown. It slides only once `data-gliding` says
+   it has arrived, so it never slides in from where it last was. Above the
+   controls, as a ring drawn outside a control would be. */
+[part="focus"] {
+  block-size: var(--indicator-block-size, 0);
+  display: block;
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  pointer-events: none;
+  position: absolute;
+  translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
+  visibility: hidden;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="focus"][data-placed] {
+  visibility: visible;
+}
+
+[part="focus"][data-gliding] {
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    border-radius var(--helix-duration-normal) var(--helix-easing-emphasized);
+}
+
+/* Each control's own ring goes while the strip draws it. The token is set on
+   the controls, so the strip's own ring keeps the color it reads. */
+@media (forced-colors: none) {
+  :host(:state(focus-gliding)) ::slotted(*) {
+    --helix-color-focus-ring: transparent;
+  }
+}
+
+/* Forced colors draw each control's own system ring. */
+@media (forced-colors: active) {
+  [part="focus"] {
+    display: none;
+  }
+}
+
+/* No focus on paper. */
+@media print {
+  [part="focus"] {
+    display: none;
+  }
+}
