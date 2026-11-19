@@ -35,6 +35,35 @@ import { styles } from './orb-root.css.js'
 const MORPH_NEAR = 380
 const MORPH_REACH = 580
 
+/** Whether two read colors are the same, channel for channel. */
+const sameColor = (a: ColorBytesAlpha, b: ColorBytesAlpha): boolean =>
+  a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3]
+
+/**
+ * A color `t` of the way from `a` to `b`, each weighted by its alpha, as a dot
+ * is mixed toward the ground, so a clear end fades the other out and does not
+ * pass through black.
+ */
+const mixColor = (a: ColorBytesAlpha, b: ColorBytesAlpha, t: number): ColorBytesAlpha => {
+  const alpha = a[3] + (b[3] - a[3]) * t
+  if (alpha <= 0) {
+    return [b[0], b[1], b[2], 0]
+  }
+  const channel = (at: 0 | 1 | 2): number =>
+    (a[at] * a[3] + (b[at] * b[3] - a[at] * a[3]) * t) / alpha
+  return [channel(0), channel(1), channel(2), alpha]
+}
+
+/** The first duration a computed `transition-duration` lists, in milliseconds. */
+const millisecondsOf = (duration: string): number => {
+  const first = duration.split(',')[0]?.trim() ?? ''
+  const value = Number.parseFloat(first)
+  if (!Number.isFinite(value)) {
+    return 0
+  }
+  return first.endsWith('ms') ? value : value * 1000
+}
+
 /** How far above the equator the traveling light sits. */
 const LIGHT_Y = 0.36
 
@@ -79,6 +108,9 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  *
  * Colors come from `--orb-color` and `--orb-ground`. Each dot's color is mixed
  * toward the ground color by its depth, so depth holds when the theme changes.
+ * A color your stylesheet sets per state, such as
+ * `helix-orb:state(done) { --orb-color: green }`, crosses with the shape and
+ * lands with it.
  *
  * The animation stops when the orb is off screen or in a background tab. With
  * `prefers-reduced-motion`, it draws one still frame.
@@ -243,7 +275,7 @@ export class HelixOrb extends HelixElement {
   private readonly gate = new PaintGateController(this, {
     canRun: () => !!this.context && !this.lost && !this.own,
     onFrame: (delta) => {
-      this.paint(delta)
+      this.paint(delta, true)
     },
     onMotion: (reduced) => {
       if (reduced) {
@@ -297,6 +329,20 @@ export class HelixOrb extends HelixElement {
    * rate has no such term.
    */
   private phase = STILL_PHASE
+
+  /**
+   * The colors the dots were last drawn in, and the ones they are heading for,
+   * as ink and ground.
+   *
+   * **The script crosses the colors, and the stylesheet only says they moved.**
+   * A color the page sets per state changes on the frame the state does, and
+   * the stylesheet's own transition finished it in a fast beat while the shape
+   * took most of a second, so the new color arrived on the old shape.
+   */
+  private colorsFrom: [ColorBytesAlpha, ColorBytesAlpha] | undefined
+  private colorsTo: [ColorBytesAlpha, ColorBytesAlpha] | undefined
+  private colorsAt = 0
+  private colorsSpan = 0
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -515,6 +561,52 @@ export class HelixOrb extends HelixElement {
     return this.morphAt === 0 ? 1 : Math.min(1, (performance.now() - this.morphAt) / this.span)
   }
 
+  /**
+   * The ink and ground to draw this frame, crossing from the colors on the
+   * screen to the ones the stylesheet now resolves.
+   *
+   * **A change during a change of state lands with the shape**, over what is
+   * left of its span. Any other change, such as a theme switch, takes the
+   * stylesheet's transition duration, which the token layer shortens for a
+   * reader who asked for no motion. A frame drawn once, still or with the loop
+   * stopped, takes the new colors at once, since no frame follows to finish a
+   * crossing.
+   */
+  private crossColors(
+    ink: ColorBytesAlpha,
+    ground: ColorBytesAlpha,
+    duration: string,
+    snap: boolean,
+  ): [ColorBytesAlpha, ColorBytesAlpha] {
+    const to = this.colorsTo
+    if (snap || !to) {
+      this.colorsFrom = this.colorsTo = [ink, ground]
+      this.colorsSpan = 0
+      return [ink, ground]
+    }
+    const now = performance.now()
+    if (!sameColor(ink, to[0]) || !sameColor(ground, to[1])) {
+      this.colorsFrom = this.colorsNow(now)
+      this.colorsTo = [ink, ground]
+      this.colorsAt = now
+      const left = this.morphAt === 0 ? 0 : this.span - (now - this.morphAt)
+      this.colorsSpan = left > 0 ? left : millisecondsOf(duration)
+    }
+    return this.colorsNow(now)
+  }
+
+  /** The colors on the screen at `now`, part way through a crossing or at its end. */
+  private colorsNow(now: number): [ColorBytesAlpha, ColorBytesAlpha] {
+    const from = this.colorsFrom
+    const to = this.colorsTo ?? [GRAY, GRAY]
+    const k = this.colorsSpan <= 0 ? 1 : Math.min(1, (now - this.colorsAt) / this.colorsSpan)
+    if (!from || k >= 1) {
+      return to
+    }
+    const eased = smoother(k)
+    return [mixColor(from[0], to[0], eased), mixColor(from[1], to[1], eased)]
+  }
+
   private paramsNow(): OrbParams {
     const to = this.to
     const k = this.progress
@@ -564,8 +656,12 @@ export class HelixOrb extends HelixElement {
    * Painter's algorithm: every dot is sorted by depth and drawn back to front,
    * because a near dot has to cover a far one for the cloud to read as a solid
    * rather than as a smear.
+   *
+   * @param framed Whether the loop drew it, so a frame follows to finish a
+   *   crossing of colors. The gate has cleared its booking by then, so
+   *   `running` cannot say.
    */
-  private paint(dt: number): void {
+  private paint(dt: number, framed = false): void {
     const ctx = this.context
     const size = this.box
     if (!ctx || size <= 0) {
@@ -581,8 +677,12 @@ export class HelixOrb extends HelixElement {
     /* Carried on an inert property for the reason the colors are. */
     const speed = Number.parseFloat(painted.animationIterationCount)
     this.phase += dt * params.rate * (Number.isFinite(speed) ? speed : 1)
-    const ink = readColorAlpha(painted.color) ?? GRAY
-    const ground = readColorAlpha(painted.textDecorationColor) ?? GRAY
+    const [ink, ground] = this.crossColors(
+      readColorAlpha(painted.color) ?? GRAY,
+      readColorAlpha(painted.textDecorationColor) ?? GRAY,
+      painted.transitionDuration,
+      still || !framed,
+    )
 
     const mesh = meshFor(size)
     const even = evenSphere(mesh.lanes, mesh.segs)

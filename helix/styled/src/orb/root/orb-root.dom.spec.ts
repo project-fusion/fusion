@@ -111,6 +111,30 @@ describe('orb', () => {
     expect(now.ring).not.toBe(ORB_PARAMS.working.ring)
   })
 
+  test('a color that changes with the state crosses with the shape, and one drawn once snaps', async () => {
+    type Color = [number, number, number, number]
+    type Crossing = Upgraded & {
+      crossColors(ink: Color, ground: Color, duration: string, snap: boolean): [Color, Color]
+    }
+    const red: Color = [200, 0, 0, 1]
+    const blue: Color = [0, 0, 200, 1]
+    const ground: Color = [255, 255, 255, 1]
+    const host = (await mount('<helix-orb></helix-orb>')) as Crossing
+    await host.updateComplete
+    expect(host.crossColors(red, ground, '0.12s', false)[0]).toEqual(red)
+    host.state = 'working'
+    await host.updateComplete
+    /* Far past the stylesheet's beat, and well inside the shape's span, the ink
+       is still on its way. */
+    host.crossColors(blue, ground, '0.12s', false)
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    const [ink] = host.crossColors(blue, ground, '0.12s', false)
+    expect(ink[0]).toBeGreaterThan(20)
+    expect(ink[2]).toBeLessThan(180)
+    /* A frame nothing follows takes the new color whole. */
+    expect(host.crossColors(red, ground, '0.12s', true)[0]).toEqual(red)
+  })
+
   test('names itself from the state, through internals rather than an attribute', async () => {
     const host = (await mount('<helix-orb state="fetching"></helix-orb>')) as Upgraded
     await host.updateComplete
