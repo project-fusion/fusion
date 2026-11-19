@@ -383,8 +383,11 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
             ?.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])')
             ?.assignedElements({ flatten: true }) ?? [],
       ),
-      /* And what the dialog draws itself besides its slots, its close control. */
-      ...[...(this.dialog?.children ?? [])].filter((one) => !(one instanceof HTMLSlotElement)),
+      /* And what the dialog draws itself besides its slots and the body's box, its
+         close control. */
+      ...[...(this.dialog?.children ?? [])].filter(
+        (one) => !(one instanceof HTMLSlotElement) && one.getAttribute('part') !== 'body',
+      ),
     ],
     surface: () => this.dialog,
   })
@@ -659,7 +662,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     >
       <slot name="icon"></slot>
       <slot name="header" part="header" @slotchange=${this.nameByHeader}></slot>
-      <slot part="body" @slotchange=${this.describeByBody}></slot>
+      <div part="body"><slot @slotchange=${this.describeByBody}></slot></div>
       <slot name="footer" part="footer"></slot>
       ${
         this.dismissible

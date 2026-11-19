@@ -197,14 +197,12 @@ export default styles(
           maxBlockSize: difference('100dvh', token('space-xl')),
           padding,
         }),
-        /* The panel scrolls as a whole only where the title and the actions alone
-           are taller than the window. A phone's panel holds still, since a box
-           that scrolls there has no height for the body to give up. */
+        /* Whole, only where the title and the actions alone outgrow the window.
+           A phone's panel holds still, or the body has no height to give up. */
         web([rule({ overflowY: 'auto' })]),
       ]),
-      /* **The body gives up its height first**, and scrolls inside, so the title
-         and the actions stay on the screen however long the words or large the
-         text. */
+      /* **The body gives up its height first** and scrolls, so the title and the
+         actions stay on the screen. */
       on('body', [
         rule({
           display: 'flex',
@@ -214,8 +212,7 @@ export default styles(
           minBlockSize: 0,
           overflowY: 'auto',
         }),
-        /* Room inside the scroller for a focus ring, which it clips at its edges,
-           given back outside it. */
+        /* Room for a focus ring the scroller would clip, given back outside it. */
         web([rule({ margin: product(focusRoom, '-1'), padding: focusRoom })]),
       ]),
       /* A closed dialog is not drawn, as the UA's sheet has it, which the
@@ -248,12 +245,7 @@ export default styles(
         }),
       ]),
       on({ region: 'footer', slotted: '*' }, [
-        rule({
-          display: 'flex',
-          flexShrink: 0,
-          gap: token('space-xs'),
-          justifyContent: 'flex-end',
-        }),
+        rule({ display: 'flex', flexShrink: 0, gap: token('space-xs'), justifyContent: 'flex-end' }),
       ]),
       /* It arrives and it leaves, rising as it fades in. */
       on('surface', [

@@ -622,11 +622,17 @@ describe('the dialog’s description', () => {
 })
 
 describe('the dialog’s regions and close control', () => {
-  test('the header, body and footer are parts on their slots, which draw no box of their own', async () => {
+  test('the header and footer are parts on their slots, which draw no box of their own', async () => {
     const host = await dialog()
-    for (const name of ['header', 'body', 'footer']) {
+    for (const name of ['header', 'footer']) {
       expect(part(host, name)?.localName).toBe('slot')
     }
+  })
+
+  test('the body is a box around the default slot, so it can scroll between them', async () => {
+    const body = part(await dialog(), 'body')
+    expect(body?.localName).toBe('div')
+    expect(body?.querySelector('slot:not([name])')).not.toBeNull()
   })
 
   test('no close control unless it is dismissible', async () => {
