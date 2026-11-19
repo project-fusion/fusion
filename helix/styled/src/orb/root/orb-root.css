@@ -75,9 +75,15 @@
   /* A change to either color ends a transition the script hears, so a theme
      changed while the orb is still, by any means, paints a frame in the new
      colors. On the fast duration, which the token layer shortens for a reader
-     who asked for no motion and never to nothing, so the end still fires. */
+     who asked for no motion and never to nothing, so the end still fires.
+
+     **The value steps at the start**, so the script reads the new color on the
+     frame it changes and crosses to it itself, at the shape's pace during a
+     change of state. A transition that eased the value too would hand the
+     script a moving target and cross it twice. */
   transition-duration: var(--helix-duration-fast);
   transition-property: color, text-decoration-color;
+  transition-timing-function: step-start;
 }
 
 /* While the browser holds the context, because a lost canvas is not reliably
