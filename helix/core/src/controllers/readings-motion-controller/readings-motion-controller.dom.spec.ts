@@ -1,5 +1,5 @@
 import '@fusion.dev/helix-testing/dom/register'
-import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { mix } from '../../utils/readings-motion/readings-motion.js'
@@ -54,7 +54,7 @@ const real = {
   watcher: globalThis.IntersectionObserver,
 }
 
-beforeEach(() => {
+const install = (): void => {
   watchers = []
   frames = []
   now = 1000
@@ -75,15 +75,30 @@ beforeEach(() => {
       watchers = watchers.filter((one) => one !== this.seen)
     }
   } as never
-})
+}
 
-afterEach(() => {
+const restore = (): void => {
   performance.now = real.now
   globalThis.requestAnimationFrame = real.frame
   globalThis.IntersectionObserver = real.watcher
   globalThis.matchMedia = real.matchMedia
   document.documentElement.removeAttribute('data-helix-motion')
-})
+}
+
+/* Installed and put back by each test, never by `beforeEach` and
+   `afterEach`: the browser harness runs a file's hooks around every test in
+   the family, so a clock left to a hook stood in for the page's frames in
+   every other spec, and each one waited on a frame that never came. */
+const clocked = (name: string, body: () => Promise<void> | void): void => {
+  test(name, async () => {
+    install()
+    try {
+      await body()
+    } finally {
+      restore()
+    }
+  })
+}
 
 const sees = (on: boolean): void => {
   for (const one of [...watchers]) {
@@ -138,29 +153,32 @@ const host = (options: { duration?: string; grow?: boolean; growAgain?: boolean 
 }
 
 describe('growing in', () => {
-  test('waits on the floor until the host is seen, then grows each step a little after the one before', () => {
-    const { motion } = host({ grow: true })
-    motion.follow(field(['a', 10], ['b', 10]), true)
-    expect(values(motion.drawn)).toEqual([0, 0])
-    tick(500)
-    expect(values(motion.drawn)).toEqual([0, 0])
-    sees(true)
-    tick(300)
-    const [first, second] = values(motion.drawn)
-    expect(first).toBeGreaterThan(second as number)
-    tick(2000)
-    expect(motion.moving).toBe(false)
-    expect(values(motion.drawn)).toEqual([10, 10])
-  })
+  clocked(
+    'waits on the floor until the host is seen, then grows each step a little after the one before',
+    () => {
+      const { motion } = host({ grow: true })
+      motion.follow(field(['a', 10], ['b', 10]), true)
+      expect(values(motion.drawn)).toEqual([0, 0])
+      tick(500)
+      expect(values(motion.drawn)).toEqual([0, 0])
+      sees(true)
+      tick(300)
+      const [first, second] = values(motion.drawn)
+      expect(first).toBeGreaterThan(second as number)
+      tick(2000)
+      expect(motion.moving).toBe(false)
+      expect(values(motion.drawn)).toEqual([10, 10])
+    },
+  )
 
-  test('stands at its readings at once where the page has paused its motion', () => {
+  clocked('stands at its readings at once where the page has paused its motion', () => {
     document.documentElement.setAttribute('data-helix-motion', 'paused')
     const { motion } = host({ grow: true })
     motion.follow(field(['a', 10]), true)
     expect(motion.moving).toBe(false)
   })
 
-  test('stands at its readings at once under reduced motion', () => {
+  clocked('stands at its readings at once under reduced motion', () => {
     globalThis.matchMedia = ((query: string) => ({ matches: query.includes('reduce') })) as never
     const { motion } = host({ duration: '200ms', grow: true })
     motion.follow(field(['a', 10]), true)
@@ -169,7 +187,7 @@ describe('growing in', () => {
     expect(motion.moving).toBe(false)
   })
 
-  test('pausing the page mid-growth stands every item at its reading', async () => {
+  clocked('pausing the page mid-growth stands every item at its reading', async () => {
     const { motion } = host({ grow: true })
     motion.follow(field(['a', 10]), true)
     sees(true)
@@ -180,7 +198,7 @@ describe('growing in', () => {
     expect(motion.moving).toBe(false)
   })
 
-  test('grows in again after leaving the view, under grow-again', () => {
+  clocked('grows in again after leaving the view, under grow-again', () => {
     const { motion } = host({ grow: true, growAgain: true })
     motion.follow(field(['a', 10]), true)
     sees(true)
@@ -193,38 +211,44 @@ describe('growing in', () => {
     expect(values(motion.drawn)).toEqual([10])
   })
 
-  test('a later table grows the items it adds on the growth curve, with no timing for the rest', () => {
-    const { motion } = host({ grow: true })
-    motion.follow(field(['a', 10]), true)
-    sees(true)
-    tick(3000)
-    motion.follow(field(['a', 20], ['b', 10]), true)
-    /* `a` has no timing to move on, so it stands at its new reading. */
-    expect(values(motion.drawn)).toEqual([20, 0])
-    tick(400)
-    expect(values(motion.drawn)[1]).toBeGreaterThan(0)
-    tick(2000)
-    expect(motion.moving).toBe(false)
-  })
+  clocked(
+    'a later table grows the items it adds on the growth curve, with no timing for the rest',
+    () => {
+      const { motion } = host({ grow: true })
+      motion.follow(field(['a', 10]), true)
+      sees(true)
+      tick(3000)
+      motion.follow(field(['a', 20], ['b', 10]), true)
+      /* `a` has no timing to move on, so it stands at its new reading. */
+      expect(values(motion.drawn)).toEqual([20, 0])
+      tick(400)
+      expect(values(motion.drawn)[1]).toBeGreaterThan(0)
+      tick(2000)
+      expect(motion.moving).toBe(false)
+    },
+  )
 })
 
 describe('a change of readings', () => {
-  test('moves on the family timing: kept items to their new readings, added ones from the floor, dropped ones to it', () => {
-    const { clock, motion } = host({ duration: '200ms' })
-    motion.follow(field(['a', 10], ['b', 10]), true)
-    expect(motion.moving).toBe(false)
-    motion.follow(field(['a', 20], ['c', 10]), true)
-    expect(values(motion.drawn)).toEqual([10, 0, 10])
-    clock.progress = 0.5
-    tick(16)
-    expect(values(motion.drawn)).toEqual([15, 5, 5])
-    clock.finished = true
-    tick(16)
-    expect(motion.moving).toBe(false)
-    expect(values(motion.drawn)).toEqual([20, 10])
-  })
+  clocked(
+    'moves on the family timing: kept items to their new readings, added ones from the floor, dropped ones to it',
+    () => {
+      const { clock, motion } = host({ duration: '200ms' })
+      motion.follow(field(['a', 10], ['b', 10]), true)
+      expect(motion.moving).toBe(false)
+      motion.follow(field(['a', 20], ['c', 10]), true)
+      expect(values(motion.drawn)).toEqual([10, 0, 10])
+      clock.progress = 0.5
+      tick(16)
+      expect(values(motion.drawn)).toEqual([15, 5, 5])
+      clock.finished = true
+      tick(16)
+      expect(motion.moving).toBe(false)
+      expect(values(motion.drawn)).toEqual([20, 10])
+    },
+  )
 
-  test('draws a new table at once with no timing, as on the headless tier', () => {
+  clocked('draws a new table at once with no timing, as on the headless tier', () => {
     const { motion } = host()
     motion.follow(field(['a', 10]), true)
     motion.follow(field(['a', 20]), true)
@@ -232,7 +256,7 @@ describe('a change of readings', () => {
     expect(values(motion.drawn)).toEqual([20])
   })
 
-  test('a change mid-move starts from what is drawn', () => {
+  clocked('a change mid-move starts from what is drawn', () => {
     const { clock, motion } = host({ duration: '200ms' })
     motion.follow(field(['a', 0]), true)
     motion.follow(field(['a', 100]), true)
@@ -246,7 +270,7 @@ describe('a change of readings', () => {
     expect(values(motion.drawn)).toEqual([20])
   })
 
-  test('the first table with readings arrives whole, with nothing to move from', () => {
+  clocked('the first table with readings arrives whole, with nothing to move from', () => {
     const { motion } = host({ duration: '200ms' })
     motion.follow(field(), false)
     motion.follow(field(['a', 10]), true)

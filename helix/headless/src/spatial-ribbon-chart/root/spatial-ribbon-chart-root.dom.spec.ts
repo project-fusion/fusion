@@ -1,5 +1,5 @@
 import '@fusion.dev/helix-testing/dom/register'
-import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { HelixHeadlessSpatialRibbonChart } from './spatial-ribbon-chart-root.js'
 
@@ -107,7 +107,7 @@ describe('growing in', () => {
     watcher: globalThis.IntersectionObserver,
   }
 
-  beforeEach(() => {
+  const install = (): void => {
     watchers = []
     frames = []
     clock = 1000
@@ -128,14 +128,29 @@ describe('growing in', () => {
         watchers = watchers.filter((one) => one !== this.seen)
       }
     } as never
-  })
+  }
 
-  afterEach(() => {
+  const restore = (): void => {
     performance.now = real.now
     globalThis.requestAnimationFrame = real.frame
     globalThis.IntersectionObserver = real.watcher
     document.documentElement.removeAttribute('data-helix-motion')
-  })
+  }
+
+  /* Installed and put back by each test, never by `beforeEach` and
+     `afterEach`: the browser harness runs a file's hooks around every test in
+     the family, so a clock left to a hook stood in for the page's frames in
+     every other spec, and each one waited on a frame that never came. */
+  const clocked = (name: string, body: () => Promise<void> | void): void => {
+    test(name, async () => {
+      install()
+      try {
+        await body()
+      } finally {
+        restore()
+      }
+    })
+  }
 
   const sees = (on: boolean): void => {
     for (const one of [...watchers]) {
@@ -154,14 +169,14 @@ describe('growing in', () => {
     }
   }
 
-  test('waits on the floor until the chart is seen', async () => {
+  clocked('waits on the floor until the chart is seen', async () => {
     const element = (await plot('grow')) as unknown as HelixHeadlessSpatialRibbonChart
     expect(element.shown.cells.every((cell) => cell.value === undefined || cell.value === 0)).toBe(
       true,
     )
   })
 
-  test('grows in once the chart is seen, and stands at its readings', async () => {
+  clocked('grows in once the chart is seen, and stands at its readings', async () => {
     const element = (await plot('grow')) as unknown as HelixHeadlessSpatialRibbonChart
     sees(true)
     await settle(element)
@@ -171,7 +186,7 @@ describe('growing in', () => {
     )
   })
 
-  test('stands at its readings at once where the page has paused its motion', async () => {
+  clocked('stands at its readings at once where the page has paused its motion', async () => {
     document.documentElement.setAttribute('data-helix-motion', 'paused')
     const element = (await plot('grow')) as unknown as HelixHeadlessSpatialRibbonChart
     expect(element.shown.cells.every((cell) => cell.value === undefined || cell.value === 0)).toBe(
@@ -179,21 +194,24 @@ describe('growing in', () => {
     )
   })
 
-  test('without grow, stands at its readings', async () => {
+  clocked('without grow, stands at its readings', async () => {
     const element = (await plot()) as unknown as HelixHeadlessSpatialRibbonChart
     expect(element.shown.cells.every((cell) => cell.value === undefined || cell.value === 0)).toBe(
       false,
     )
   })
 
-  test('under grow-again, stands on the floor again once the chart has left the view', async () => {
-    const element = (await plot('grow grow-again')) as unknown as HelixHeadlessSpatialRibbonChart
-    sees(true)
-    await settle(element)
-    sees(false)
-    await element.updateComplete
-    expect(element.shown.cells.every((cell) => cell.value === undefined || cell.value === 0)).toBe(
-      true,
-    )
-  })
+  clocked(
+    'under grow-again, stands on the floor again once the chart has left the view',
+    async () => {
+      const element = (await plot('grow grow-again')) as unknown as HelixHeadlessSpatialRibbonChart
+      sees(true)
+      await settle(element)
+      sees(false)
+      await element.updateComplete
+      expect(
+        element.shown.cells.every((cell) => cell.value === undefined || cell.value === 0),
+      ).toBe(true)
+    },
+  )
 })

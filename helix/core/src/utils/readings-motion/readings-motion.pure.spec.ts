@@ -17,7 +17,7 @@ describe('keysOf', () => {
     expect(keys[0]).toBe('Mon')
     expect(keys[1]).toBe('Tue')
     expect(new Set(keys).size).toBe(4)
-    expect(keysOf(['Mon', 'Mon'])).toEqual([keys[0], keys[2]])
+    expect(keysOf(['Mon', 'Mon'])).toEqual([keys[0] as string, keys[2] as string])
   })
 })
 
