@@ -259,7 +259,8 @@
  */
 [part~="line"] {
   transition:
-    d var(--_chart-move-duration) var(--_chart-move-easing),
+    d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
     stroke-dasharray var(--helix-duration-slow) step-end allow-discrete,
     stroke-dashoffset var(--helix-duration-slow) var(--helix-easing-decelerate);
 }
@@ -286,7 +287,8 @@
 
 [part="area"] {
   transition:
-    d var(--_chart-move-duration) var(--_chart-move-easing),
+    d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
     opacity var(--helix-duration-slow) var(--helix-easing-decelerate);
 }
 

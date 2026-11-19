@@ -122,7 +122,8 @@
   border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
   /* **A cell takes its new reading's color over a moment** rather than at
      once, so a grid that refreshes shows which cells changed. */
-  transition: background-color var(--_chart-move-duration) var(--_chart-move-easing);
+  transition: background-color var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate));
   inline-size: var(--_heatmap-cell-width);
 }
 

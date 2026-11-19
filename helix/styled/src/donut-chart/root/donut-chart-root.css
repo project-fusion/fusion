@@ -159,10 +159,13 @@
 /* The ring answers a change in its numbers, and draws itself on arrival. */
 [part~="segment"] {
   transition:
-    r var(--_chart-move-duration) var(--_chart-move-easing),
+    r var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
     stroke var(--helix-duration-fast) var(--helix-easing-decelerate),
-    stroke-dasharray var(--_chart-move-duration) var(--_chart-move-easing),
-    stroke-dashoffset var(--_chart-move-duration) var(--_chart-move-easing),
+    stroke-dasharray var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    stroke-dashoffset var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
     stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
 
@@ -173,7 +176,8 @@
 }
 
 [part="track"] {
-  transition: r var(--_chart-move-duration) var(--_chart-move-easing);
+  transition: r var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate));
 }
 
 /* On the slices rather than the plot, which is the difference between a ring and
