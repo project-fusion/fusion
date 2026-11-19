@@ -54,6 +54,10 @@ export function AnatomyPreview({ css, html, layout = 'centered', min = ANATOMY_M
     if (!host) {
       return
     }
+    /* **Inert, because it is a picture.** A press could close the part the
+       legend numbers, and the legend under it is the same list in words. Set
+       here, since the element's typings take no `inert`. */
+    host.inert = true
     const release = () => {
       const frame = document.activeElement === host ? host.shadowRoot?.activeElement : undefined
       if (frame instanceof HTMLElement) {
@@ -74,14 +78,9 @@ export function AnatomyPreview({ css, html, layout = 'centered', min = ANATOMY_M
 
   const size = Math.min(ANATOMY_MAX, Math.max(min, drawn ?? min))
   return (
-    /* **Inert, because it is a picture.** An example opened here, such as a
-       Drawer, would otherwise take focus from the page as it loads, and a
-       press could close the part the legend numbers. The legend under it is
-       the same list in words. */
     <helix-sandbox-preview
       class={sheet.anatomyPreview}
       color-mode={scheme}
-      inert
       label="Anatomy preview"
       layout={layout}
       onhelix-resize={measured}

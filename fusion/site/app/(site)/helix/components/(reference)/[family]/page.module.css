@@ -299,11 +299,11 @@
   display: grid;
   gap: var(--helix-space-md);
   margin: 0;
-  padding-inline-start: 1.25em;
+  padding-inline-start: var(--helix-space-lg);
 }
 
 .practice > li::marker {
-  font-weight: 600;
+  font-weight: var(--helix-weight-semibold);
 }
 
 /* The anatomy legend: the number in the disc the frame draws, then how to
