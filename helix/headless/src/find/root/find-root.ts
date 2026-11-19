@@ -108,6 +108,7 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  * @csspart close-spinner - The ring the close button turns while it is pending.
  * @csspart close-text - The box the close button's icon sits in.
  * @csspart controls - The toolbar: the options, your actions, and the buttons that move between matches and close the bar.
+ * @csspart controls-focus - The focus ring that travels along the buttons of the toolbar as the arrow keys move focus.
  * @csspart controls-toolbar - The box inside the toolbar that lays its buttons out.
  * @csspart count - Which match is current and how many there are, such as "3 of 12 matches".
  * @csspart field - The search field.
@@ -784,7 +785,7 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
     const toolbar = this.tag('toolbar')
     const button = this.tag('icon-button')
     const searchable = this.readable && (this.result?.count ?? 0) > 0
-    return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
+    return html`<${toolbar} part="controls" exportparts="focus: controls-focus, toolbar: controls-toolbar" label=${this.controlsLabel}>
       ${this.renderOptionButtons()}
       <slot name="actions" part="actions"></slot>
       <${button}
