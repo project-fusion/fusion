@@ -4,6 +4,7 @@ import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } f
 import { property } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
+import { lapAround, registerLengths } from '../../shared/edge-light/edge-light.js'
 import { styles } from './chat-composer.css.js'
 import '../../tooltip/index.js'
 import '../../voice-level/index.js'
@@ -24,58 +25,18 @@ const PACE = 1.2
 const SHORTEST = 800
 const LONGEST = 1600
 
-/**
- * Registers the light's position, once, so the browser can animate it.
- *
- * **From script, because a sheet cannot.** An `@property` rule inside a
- * shadow root is ignored, and a gradient's position only interpolates once
- * its properties are registered as lengths. A registration is the
- * document's, so it reaches every composer's shadow root. Where the browser
- * has no `registerProperty`, or on the server, the edge still lights, without
- * the light traveling.
- */
-let registered = false
+/** Registers the light's position, once, so the browser can animate it. */
 function registerLight(): void {
-  if (registered || typeof CSS === 'undefined' || !('registerProperty' in CSS)) {
-    return
-  }
-  registered = true
-  for (const name of [LIGHT_X, LIGHT_Y]) {
-    try {
-      CSS.registerProperty({ inherits: false, initialValue: '0px', name, syntax: '<length>' })
-    } catch {
-      // Registered already, by another copy of this module on the page.
-    }
-  }
+  registerLengths([LIGHT_X, LIGHT_Y])
 }
 
 /**
  * The keyframes of one lap of the light around a box `w` wide and `h` tall,
- * clockwise from its top-left corner, each side taking the share of the lap
- * its length is of the edge, so the light moves at one speed. None for a box
- * with no size.
+ * clockwise from its top-left corner, at one speed, coming up as it starts and
+ * going down as it ends. None for a box with no size.
  */
 export function lapOf(w: number, h: number): Keyframe[] {
-  const edge = 2 * (w + h)
-  if (edge === 0) {
-    return []
-  }
-  const at = (x: number, y: number, offset: number): Keyframe => ({
-    [LIGHT_X]: `${x}px`,
-    [LIGHT_Y]: `${y}px`,
-    offset,
-  })
-  return [
-    { ...at(0, 0, 0), opacity: 0 },
-    at(w, 0, w / edge),
-    at(w, h, (w + h) / edge),
-    at(0, h, (2 * w + h) / edge),
-    { ...at(0, 0, 1), opacity: 0 },
-    // Up quickly, and down over the last stretch, so the lap fades out where
-    // it began rather than stopping there.
-    { offset: 0.08, opacity: 1 },
-    { offset: 0.82, opacity: 1 },
-  ].sort((one, two) => (one.offset ?? 0) - (two.offset ?? 0))
+  return lapAround(w, h, LIGHT_X, LIGHT_Y, true)
 }
 
 /**
