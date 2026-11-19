@@ -222,6 +222,24 @@ default, along `--skeleton-reveal-easing`, `--helix-easing-standard` by
 default, and `0ms` turns it off. Under reduced motion the height changes at
 once and the two sides crossfade over `--helix-duration-fade`.
 
+## Swipes that carry through
+
+A touch or a pen drags a `Toast` toward the edge its stack sits at, and a
+`Drawer` toward the edge it came from. The surface follows the finger, and past
+its open end it gives less and less. On release it keeps the speed it had. A
+quick flick dismisses from any distance and carries the surface off the window
+at that speed. A slow drag past halfway dismisses too, and the surface gathers
+pace as it goes. A shorter drag springs back to rest along
+`--helix-easing-spring`, with its speed carried in. A dismissal goes through
+the component's own close, so a page that cancels `helix-before-close` or
+`helix-dismiss` sends the surface back to rest. While a drag and its release
+run, the component has `:state(dragging)`, and a drawer's backdrop fades with
+`--drawer-drag-progress`. Under reduced motion the surface still follows the
+finger, and then goes or returns at once. `--drawer-release-duration` and
+`--toast-release-duration` set the longest a release takes, and `0ms` ends it
+at once. `DragDismissController` in `@fusion.dev/helix-core` gives a component
+of your own the same gesture.
+
 ## Figures that count
 
 A new `value` on a `Stat` or a `Trend` counts to the new number from the one
@@ -581,5 +599,6 @@ Two families do this for you. With `flash-changes`, a `Data Table` lights up
 each row whose values change when you set `rows` again, and each row that
 arrives, known by `row-key`, and a `Code Editor` lights up the lines a new
 `value` or an agent's edit changed, leaving the lines you type alone.
-`--data-table-flash-color` and `--code-editor-flash-color` set the wash.
+`--data-table-flash-color` sets a table's wash, and a code editor's follows
+the theme's info color.
 

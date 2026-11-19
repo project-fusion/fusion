@@ -149,12 +149,13 @@ const remeasureOnFonts: Extension = ViewPlugin.fromClass(
 const given = Annotation.define<boolean>()
 
 /**
- * The wash a changed line takes at its strongest: `--code-editor-flash-color`,
- * which the styled tier sets, or else the info color at 14 percent in light
- * mode and 22 in dark, the wash core's `flashChange` draws, for its reasons.
+ * The wash a changed line takes at its strongest: the info color at 14 percent
+ * in light mode and 22 in dark, the wash core's `flashChange` draws, for its
+ * reasons. From the theme's tokens, so a theme that moves the info color moves
+ * this with it.
  */
 const WASH =
-  'var(--code-editor-flash-color, light-dark(color-mix(in oklab, var(--helix-color-info, oklch(0.48 0.12 245)) 14%, transparent), color-mix(in oklab, var(--helix-color-info, oklch(0.7 0.16 245)) 22%, transparent)))'
+  'light-dark(color-mix(in oklab, var(--helix-color-info, oklch(0.48 0.12 245)) 14%, transparent), color-mix(in oklab, var(--helix-color-info, oklch(0.7 0.16 245)) 22%, transparent))'
 
 /** Whether changed lines light up, which `flash-changes` turns on. */
 const flashing = Facet.define<boolean, boolean>({ combine: (values) => values.some(Boolean) })
