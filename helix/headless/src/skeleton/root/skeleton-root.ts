@@ -160,12 +160,22 @@ export class HelixHeadlessSkeleton extends HelixElement {
         ?hidden=${this.loading && this.placeholdered}
         ?inert=${this.loading}
         ><slot @slotchange=${update}></slot></span
-      ><span
-        part="placeholder"
-        aria-hidden="true"
-        ?hidden=${!this.loading && this.wraps}
-        ><slot name="placeholder" @slotchange=${update}>${this.renderShape()}</slot></span
-      >`
+      >${this.renderPlaceholder(update)}`
+  }
+
+  /**
+   * The `placeholder` slot, with the shape as its fallback, hidden from
+   * assistive technology and once the content has loaded.
+   *
+   * @param update Asks for the update that reads what the page slotted.
+   */
+  protected renderPlaceholder(update: () => void): TemplateResult {
+    return html`<span
+      part="placeholder"
+      aria-hidden="true"
+      ?hidden=${!this.loading && this.wraps}
+      ><slot name="placeholder" @slotchange=${update}>${this.renderShape()}</slot></span
+    >`
   }
 
   /**

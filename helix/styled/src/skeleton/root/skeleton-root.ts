@@ -211,9 +211,9 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
     /* Under reduced motion the height does not move, which `resizeFrom`
        holds, and the sides fade over the fade a panel keeps then. */
     const duration = milliseconds(
-      style
-        .getPropertyValue(reducedMotion() ? '--helix-duration-fade' : '--skeleton-reveal-duration')
-        .trim(),
+      reducedMotion()
+        ? style.getPropertyValue('--helix-duration-fade').trim()
+        : style.getPropertyValue('--skeleton-reveal-duration').trim(),
     )
     const easing = style.getPropertyValue('--skeleton-reveal-easing').trim() || 'ease'
     if (!content || !placeholder || typeof this.animate !== 'function' || !(duration >= 1)) {

@@ -33,7 +33,7 @@ describe('the revealing example', () => {
     const profile = document.getElementById('profile') as HTMLElement & { loading: boolean }
     const card = profile.closest('helix-card') as HTMLElement
     expect(profile.loading).toBe(true)
-    expect(part(profile, 'content')?.hidden).toBe(true)
+    expect((part(profile, 'content') as HTMLElement | null)?.hidden).toBe(true)
     const loading = card.getBoundingClientRect().height
 
     await until(() => !profile.loading)
@@ -47,7 +47,7 @@ describe('the revealing example', () => {
     const loaded = card.getBoundingClientRect().height
     expect(moving).toBeGreaterThan(loading)
     expect(moving).toBeLessThan(loaded)
-    expect(part(profile, 'placeholder')?.hidden).toBe(true)
+    expect((part(profile, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
 
     ;(document.getElementById('reload') as HTMLElement).click()
     await frame()
