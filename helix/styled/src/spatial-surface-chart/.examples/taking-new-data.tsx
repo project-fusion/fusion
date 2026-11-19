@@ -1,38 +1,80 @@
 import { useState } from 'react'
 
 const OPENING = [
-  ['Day 1, 0h', 0, 1, 246],
-  ['Day 1, 4h', 4, 1, 246],
-  ['Day 1, 8h', 8, 1, 750],
-  ['Day 1, 12h', 12, 1, 750],
-  ['Day 1, 16h', 16, 1, 750],
-  ['Day 1, 20h', 20, 1, 246],
-  ['Day 2, 0h', 0, 2, 264],
-  ['Day 2, 4h', 4, 2, 264],
-  ['Day 2, 8h', 8, 2, 840],
-  ['Day 2, 12h', 12, 2, 840],
-  ['Day 2, 16h', 16, 2, 840],
-  ['Day 2, 20h', 20, 2, 264],
-  ['Day 3, 0h', 0, 3, 282],
-  ['Day 3, 4h', 4, 3, 282],
-  ['Day 3, 8h', 8, 3, 930],
-  ['Day 3, 12h', 12, 3, 930],
-  ['Day 3, 16h', 16, 3, 930],
-  ['Day 3, 20h', 20, 3, 282],
-  ['Day 4, 0h', 0, 4, 300],
-  ['Day 4, 4h', 4, 4, 300],
-  ['Day 4, 8h', 8, 4, 1020],
-  ['Day 4, 12h', 12, 4, 1020],
-  ['Day 4, 16h', 16, 4, 1020],
-  ['Day 4, 20h', 20, 4, 300],
+  ['Day 1, 0h', 0, 1, 120],
+  ['Day 1, 3h', 3, 1, 123],
+  ['Day 1, 6h', 6, 1, 166],
+  ['Day 1, 9h', 9, 1, 409],
+  ['Day 1, 12h', 12, 1, 786],
+  ['Day 1, 15h', 15, 1, 684],
+  ['Day 1, 18h', 18, 1, 296],
+  ['Day 1, 21h', 21, 1, 140],
+  ['Day 2, 0h', 0, 2, 120],
+  ['Day 2, 3h', 3, 2, 123],
+  ['Day 2, 6h', 6, 2, 175],
+  ['Day 2, 9h', 9, 2, 464],
+  ['Day 2, 12h', 12, 2, 911],
+  ['Day 2, 15h', 15, 2, 789],
+  ['Day 2, 18h', 18, 2, 328],
+  ['Day 2, 21h', 21, 2, 144],
+  ['Day 3, 0h', 0, 3, 120],
+  ['Day 3, 3h', 3, 3, 124],
+  ['Day 3, 6h', 6, 3, 184],
+  ['Day 3, 9h', 9, 3, 518],
+  ['Day 3, 12h', 12, 3, 1036],
+  ['Day 3, 15h', 15, 3, 895],
+  ['Day 3, 18h', 18, 3, 361],
+  ['Day 3, 21h', 21, 3, 148],
+  ['Day 4, 0h', 0, 4, 120],
+  ['Day 4, 3h', 3, 4, 124],
+  ['Day 4, 6h', 6, 4, 192],
+  ['Day 4, 9h', 9, 4, 572],
+  ['Day 4, 12h', 12, 4, 1161],
+  ['Day 4, 15h', 15, 4, 1001],
+  ['Day 4, 18h', 18, 4, 394],
+  ['Day 4, 21h', 21, 4, 151],
+  ['Day 5, 0h', 0, 5, 120],
+  ['Day 5, 3h', 3, 5, 124],
+  ['Day 5, 6h', 6, 5, 184],
+  ['Day 5, 9h', 9, 5, 518],
+  ['Day 5, 12h', 12, 5, 1036],
+  ['Day 5, 15h', 15, 5, 895],
+  ['Day 5, 18h', 18, 5, 361],
+  ['Day 5, 21h', 21, 5, 148],
+  ['Day 6, 0h', 0, 6, 120],
+  ['Day 6, 3h', 3, 6, 123],
+  ['Day 6, 6h', 6, 6, 175],
+  ['Day 6, 9h', 9, 6, 464],
+  ['Day 6, 12h', 12, 6, 911],
+  ['Day 6, 15h', 15, 6, 789],
+  ['Day 6, 18h', 18, 6, 328],
+  ['Day 6, 21h', 21, 6, 144],
+  ['Day 7, 0h', 0, 7, 120],
+  ['Day 7, 3h', 3, 7, 123],
+  ['Day 7, 6h', 6, 7, 166],
+  ['Day 7, 9h', 9, 7, 409],
+  ['Day 7, 12h', 12, 7, 786],
+  ['Day 7, 15h', 15, 7, 684],
+  ['Day 7, 18h', 18, 7, 296],
+  ['Day 7, 21h', 21, 7, 140],
 ] as const
 
 /* Each reading keeps its hour and its day, so the grid stays the same and the
-   surface moves to its new heights. */
-const shuffled = () =>
-  OPENING.map(
-    ([label, hour, day]) => [label, hour, day, 40 + Math.round(Math.random() * 1360)] as const,
-  )
+   surface moves to its new heights. The busiest hour moves, and so does the
+   busiest day. */
+const shuffled = () => {
+  const peak = 6 + Math.random() * 12
+  const busiest = 1 + Math.random() * 6
+  return OPENING.map(([label, hour, day]) => {
+    const fall = Math.exp(-((hour - peak) ** 2) / 18)
+    return [
+      label,
+      hour,
+      day,
+      Math.round(120 + 1100 * fall * (1 - Math.abs(day - busiest) * 0.12)),
+    ] as const
+  })
+}
 
 export function Example() {
   /* The numbers change in the table. The chart reads the table and moves to

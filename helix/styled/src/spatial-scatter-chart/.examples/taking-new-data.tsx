@@ -1,20 +1,37 @@
 import { useState } from 'react'
 
-const NAMES = ['Ada', 'Grace', 'Lin', 'Mae', 'Noor', 'Omar', 'Rui', 'Sven']
+const NAMES = [
+  'Ada',
+  'Grace',
+  'Lin',
+  'Mae',
+  'Noor',
+  'Omar',
+  'Rui',
+  'Sven',
+  'Tess',
+  'Uma',
+  'Vic',
+  'Wen',
+]
 const OPENING = [
-  [24, 3, 420],
-  [31, 6, 980],
-  [38, 8, 1450],
-  [45, 5, 1120],
-  [52, 9, 2100],
-  [29, 2, 360],
-  [61, 7, 1680],
-  [35, 4, 760],
+  [24, 420, 3],
+  [31, 980, 6],
+  [38, 1450, 8],
+  [45, 1120, 5],
+  [52, 2100, 9],
+  [29, 360, 2],
+  [61, 1680, 7],
+  [35, 760, 4],
+  [42, 1300, 6],
+  [27, 540, 3],
+  [56, 1900, 8],
+  [48, 1250, 5],
 ]
 const RANGES = [
   [20, 70],
-  [1, 12],
   [200, 2800],
+  [1, 12],
 ]
 
 export function Example() {
@@ -42,8 +59,8 @@ export function Example() {
           <tr>
             <th scope="col">Shopper</th>
             <th scope="col">Age</th>
-            <th scope="col">Visits a month</th>
             <th scope="col">Yearly spend</th>
+            <th scope="col">Visits a month</th>
           </tr>
         </thead>
         <tbody>
