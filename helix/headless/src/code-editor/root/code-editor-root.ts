@@ -247,6 +247,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart body - The box the code is drawn in, between the header and the problems.
  * @csspart control - The `<textarea>` the editor is without an engine, and that keeps its validity with one.
  * @csspart controls - The toolbar in the header: the page's actions, then Find.
+ * @csspart controls-focus - The focus ring that travels along the buttons of the header's toolbar as the arrow keys move focus.
  * @csspart controls-toolbar - The box inside the header's toolbar that lays its buttons out.
  * @csspart diagnostic - One problem in the list, a button that moves the caret to it.
  * @csspart diagnostic-danger - A problem whose tone is `danger`, beside `diagnostic`.
@@ -265,6 +266,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart find-close-spinner - The ring the close button turns while it is pending.
  * @csspart find-close-text - The box the close button's icon sits in.
  * @csspart find-controls - The find bar's toolbar of options and moves.
+ * @csspart find-controls-focus - The focus ring that travels along the buttons of the find bar's toolbar as the arrow keys move focus.
  * @csspart find-controls-toolbar - The box inside the find bar's toolbar that lays its buttons out.
  * @csspart find-count - Which match is selected, of how many.
  * @csspart find-field - The field the search is typed in.
@@ -787,7 +789,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     return html`<div part="header">
       ${this.renderLabel()}
       ${language ? html`<span part="language">${language}</span>` : nothing}
-      <${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
+      <${toolbar} part="controls" exportparts="focus: controls-focus, toolbar: controls-toolbar" label=${this.controlsLabel}>
         <slot name="actions"></slot>
         <${button}
           part="find-toggle"
@@ -812,7 +814,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     const find = this.tag('find')
     return html`<${find}
       part="find"
-      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-mark: find-replace-toggle-mark, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
+      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-focus: find-controls-focus, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-mark: find-replace-toggle-mark, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
       close-label=${this.findCloseLabel}
       controls-label=${this.findControlsLabel}
       invalid-label=${this.findInvalidLabel}

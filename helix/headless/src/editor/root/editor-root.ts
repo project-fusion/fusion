@@ -384,6 +384,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart code-spinner - The ring the Code button turns while it is pending.
  * @csspart code-text - The box the Code button's icon sits in.
  * @csspart controls - The toolbar: the tools, then your actions, one tab stop that the arrows move along.
+ * @csspart controls-focus - The focus ring that travels along the buttons of the toolbar as the arrow keys move focus.
  * @csspart controls-toolbar - The box inside the toolbar that lays its buttons out.
  * @csspart divider - The line between two groups of tools.
  * @csspart divider-content - The content set into a divider, which the editor sets none into.
@@ -397,6 +398,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart find-close-spinner - The ring the find bar's close button turns while it is pending.
  * @csspart find-close-text - The box the find bar's close button's icon sits in.
  * @csspart find-controls - The find bar's toolbar of options and moves.
+ * @csspart find-controls-focus - The focus ring that travels along the buttons of the find bar's toolbar as the arrow keys move focus.
  * @csspart find-controls-toolbar - The box inside the find bar's toolbar that lays its buttons out.
  * @csspart find-count - Which match is selected, of how many.
  * @csspart find-field - The field the search is typed in.
@@ -473,6 +475,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart link-close-spinner - The ring the close button turns while it is pending.
  * @csspart link-close-text - The box the close button's icon sits in.
  * @csspart link-controls - The toolbar at the end of the address bar: Apply, Remove, and Close.
+ * @csspart link-controls-focus - The focus ring that travels along the buttons of the address bar's toolbar as the arrow keys move focus.
  * @csspart link-controls-toolbar - The box inside the address bar's toolbar that lays its buttons out.
  * @csspart link-field - The field the address is written in.
  * @csspart link-live - The Link button's live region, which speaks while the button is pending.
@@ -1624,7 +1627,7 @@ export class HelixHeadlessEditor extends HelixElement {
     const find = this.tag('find')
     return html`<${find}
       part="find"
-      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-mark: find-replace-toggle-mark, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
+      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-focus: find-controls-focus, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-mark: find-replace-toggle-mark, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
       label=${this.findLabel}
       ?readonly=${this.readOnly}
       shortcut=""
@@ -1655,7 +1658,7 @@ export class HelixHeadlessEditor extends HelixElement {
       : BAR_GROUPS.map((tools, at) => ({ template: drawn[at], tools: this.drawnOf(tools) })).filter(
           (group) => group.template !== nothing,
         )
-    return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel} @keydown=${this.handleToolbarKeys}>
+    return html`<${toolbar} part="controls" exportparts="focus: controls-focus, toolbar: controls-toolbar" label=${this.controlsLabel} @keydown=${this.handleToolbarKeys}>
       ${groups.map((group, at) =>
         at === 0 ? group.template : html`${this.renderDivider(group.tools)}${group.template}`,
       )}
@@ -1794,7 +1797,7 @@ export class HelixHeadlessEditor extends HelixElement {
         @input=${this.handleLinkInput}
         @keydown=${this.handleLinkKeys}
       />
-      <${toolbar} part="link-controls" exportparts="toolbar: link-controls-toolbar" label=${this.linkControlsLabel}>
+      <${toolbar} part="link-controls" exportparts="focus: link-controls-focus, toolbar: link-controls-toolbar" label=${this.linkControlsLabel}>
         <${button}
           part="link-apply"
           exportparts="button: link-apply-button, live: link-apply-live, spinner: link-apply-spinner, text: link-apply-text"
