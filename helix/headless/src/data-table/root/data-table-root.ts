@@ -14,6 +14,7 @@ import {
   deepActiveElement,
   deepContains,
   everyState,
+  flashChange,
   format,
   formatWords,
   gridMove,
@@ -96,6 +97,7 @@ import '../../option/index.js'
 import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import '../../pagination/index.js'
 import '../../select/index.js'
+import { changedKeys, everyRow, rowsByKey } from '../changes.js'
 import { checkEdit, type EditProblem, readEdit, withValue } from '../edit.js'
 import {
   HelixBeforeCellCommitEvent,
@@ -330,6 +332,15 @@ const isControl = (element: HTMLElement): boolean =>
  * draws only the rows in view, so a sort that brings in other rows fades them
  * in where they land.
  *
+ * **`flash-changes` lights up what changed.** Set it with `row-key`, and a row
+ * whose values differ when you set `rows` again, or a row that arrives in it,
+ * takes a quiet wash that holds and fades, which core's `flashChange` draws
+ * over each of its cells. A row with the same values does not, even as a new
+ * object, and neither does a value a reader saves in a cell. A `rows` that
+ * shares no key with the one before is new data, and nothing lights up. The
+ * wash is `--data-table-flash-color`. Only the rows drawn light up, so a change
+ * on another page or outside the window is not shown later.
+ *
  * **Editable cells.** `editable` on a column lets a reader edit its cells,
  * and `rowEditable` decides row by row. The column's `type` picks the field:
  * text, a number, a date, or a select of an enum's values, and a boolean
@@ -536,6 +547,7 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
+ * @cssproperty --data-table-flash-color - The wash a row takes when it changes, with `flash-changes`, at its strongest. Unset, the info color at 14 percent in light mode and 22 in dark.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-move-duration - How long a row takes to slide to its new place, or to fade in. Unset, nothing moves.
  * @cssproperty --data-table-move-easing - The curve a row slides and fades in along.
@@ -777,6 +789,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.filterState = next
     this.requestUpdate('filter', previous)
   }
+
+  /**
+   * Lights up a row whose data changes, and a row that arrives in `rows` after
+   * the table has drawn, so you see what live data or an agent changed. Wants
+   * `row-key`, which is how a row is known across the change.
+   */
+  @property({ attribute: 'flash-changes', type: Boolean })
+  flashChanges = false
 
   /**
    * The built-in pagination's name for a gap in its run of pages. `{page}` is
@@ -1484,6 +1504,64 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Said once, so a table that re-renders does not repeat it. */
   private warnedAboutKey = false
+
+  /** Each row by its key as `rows` last held it, while `flash-changes` is on. */
+  private seenRows: Map<string, DataRow> | undefined
+
+  /** The rows the table wrote itself, with a value a reader saved, which are not news. */
+  private readonly ownRows = new WeakSet<DataRow>()
+
+  /** Whether the table asked for more rows since `rows` last changed, so the rows that answer are not news. */
+  private askedForMore = false
+
+  /** The keys of the rows to light up once this update has drawn them. */
+  private flashing: ReadonlySet<string> = new Set()
+
+  /**
+   * The rows that changed since `rows` was last set, for `flash-changes`, and
+   * the rows as they are now kept for the next time. Nothing on the first
+   * render, which is the table arriving, or on the render that turns it on.
+   */
+  private rowNews(changed: PropertyValues): ReadonlySet<string> {
+    if (!this.flashChanges || !this.rowKey) {
+      this.seenRows = undefined
+      return new Set()
+    }
+    if (this.seenRows && !changed.has('rows')) {
+      return new Set()
+    }
+    const before = this.seenRows
+    this.seenRows = rowsByKey(everyRow(this.rows, this.childField), (row) => {
+      const key = valueAt(row, this.rowKey)
+      return key === undefined || key === null ? undefined : String(key)
+    })
+    const arrivals = !this.askedForMore
+    this.askedForMore = false
+    if (!before || !this.hasUpdated) {
+      return new Set()
+    }
+    return changedKeys(before, this.seenRows, {
+      arrivals,
+      childField: this.childField || undefined,
+      own: (row) => this.ownRows.has(row),
+    })
+  }
+
+  /** Lights up each drawn row `rowNews` found, in the wash `--data-table-flash-color` holds. */
+  private flashRows(): void {
+    if (this.flashing.size === 0) {
+      return
+    }
+    const keys = this.flashing
+    this.flashing = new Set()
+    const color = getComputedStyle(this).getPropertyValue('--data-table-flash-color').trim()
+    for (const row of this.renderRoot.querySelectorAll<HTMLElement>('[part~="row"][data-row]')) {
+      const data = this.drawnPage[Number(row.dataset.row)]
+      if (data && keys.has(this.rowKeyOf(data, -1))) {
+        void flashChange(row, { color: color || undefined })
+      }
+    }
+  }
 
   /**
    * Sliding each row it keeps to its new place when the table sorts or `rows`
@@ -2476,6 +2554,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Sends `helix-load-more`, for the button in the `more` row or a scroll near the end. */
   private askForMore(): void {
+    this.askedForMore = true
     this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
@@ -3159,6 +3238,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.fit()
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
     this.announced = this.news()
+    this.flashing = this.rowNews(changed)
     hostAria(internalsOf(this), {
       label: this.label || 'Table',
       role: this.childField ? 'treegrid' : 'grid',
@@ -3234,6 +3314,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.announceSort()
     this.quietControls()
     this.placeFocus()
+    this.flashRows()
     /* After the rows are in the tree, so the pass that measures them is looking
        at the window this render drew. The controller holds its answer when it
        stops changing, so this settles rather than looping. */
@@ -3923,6 +4004,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private writeEdit(row: DataRow, field: string, value: unknown, previous: unknown): void {
     const next = withValue(row, field, value)
     const key = this.editKey(row)
+    this.ownRows.add(next)
     this.rows = this.rows.map((one) => (one === row ? next : one))
     this.dispatchEvent(
       new HelixCellCommitEvent({

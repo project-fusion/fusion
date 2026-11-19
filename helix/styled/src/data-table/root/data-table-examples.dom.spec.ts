@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import columnMenu from '../.examples/column-menu.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
+import liveUpdates from '../.examples/live-updates.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import movingRows from '../.examples/moving-rows.html' with { type: 'text' }
 import nestedRows from '../.examples/nested-rows.html' with { type: 'text' }
@@ -19,6 +20,7 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../table/index.js')
+  await import('../../button/index.js')
   await import('../../flex/index.js')
   await import('../../list/index.js')
   await import('../../input/index.js')
@@ -45,6 +47,35 @@ const next = (table: HTMLElement): void => {
   const pagination = table.shadowRoot?.querySelector('[part~="pagination"]') as HTMLElement | null
   ;(pagination?.shadowRoot?.querySelector('[part~="next"]') as HTMLElement | null)?.click()
 }
+
+describe('the live updates example', () => {
+  run('Refresh sets new rows, and only the rows whose values changed light up', async () => {
+    await example(liveUpdates)
+    await idle()
+    const table = document.getElementById('services') as HTMLElement & {
+      rows: readonly Record<string, unknown>[]
+    }
+    const before = table.rows
+    ;(document.getElementById('refresh') as HTMLElement).click()
+    await idle()
+    const changed = table.rows.flatMap((row, place) =>
+      row.latency === before[place]?.latency ? [] : [place],
+    )
+    const washed = (cell: Element): boolean =>
+      cell
+        .getAnimations()
+        .some((one) =>
+          (one.effect as KeyframeEffect | null)
+            ?.getKeyframes()
+            .some((frame) => String(frame.boxShadow ?? '').includes('inset')),
+        )
+    const lit = rows(table).flatMap((row, place) =>
+      [...row.querySelectorAll('[part~="cell"]')].every(washed) ? [place] : [],
+    )
+    expect(changed).toHaveLength(2)
+    expect(lit).toEqual(changed)
+  })
+})
 
 describe('the sorting example', () => {
   run('a heading sorts the rows by its column, kept by their version', async () => {
