@@ -752,6 +752,11 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     super.connectedCallback()
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('submit', this.handleSubmit)
+    /* Moved on the page, the body's slot does not change again, so the
+       content is watched anew here. */
+    if (this.hasUpdated) {
+      this.watchContent()
+    }
   }
 
   override disconnectedCallback(): void {
