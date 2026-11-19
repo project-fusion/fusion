@@ -715,6 +715,7 @@ export {
   requestChange,
   requestValue,
 } from './utils/request-change/request-change.js'
+export { type ResizeFromOptions, resizeFrom } from './utils/resize-from/resize-from.js'
 export {
   type ActivatableItem,
   resolveActiveItem,

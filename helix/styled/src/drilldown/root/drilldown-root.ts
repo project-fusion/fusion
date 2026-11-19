@@ -1,4 +1,4 @@
-import { customElement, reducedMotion } from '@fusion.dev/helix-core'
+import { customElement, reducedMotion, resizeFrom } from '@fusion.dev/helix-core'
 import {
   HelixHeadlessDrilldown,
   HelixHeadlessDrilldownItem,
@@ -171,41 +171,28 @@ export class HelixDrilldown extends HelixHeadlessDrilldown {
   private resize(): void {
     const from = this.heightBefore
     this.heightBefore = undefined
-    if (
-      from === undefined ||
-      typeof this.animate !== 'function' ||
-      typeof ResizeObserver === 'undefined' ||
-      reducedMotion()
-    ) {
+    if (from === undefined) {
       return
     }
     /* **Measured once the page has laid out**, which is a frame's layout after
        this update: the rows of the page arriving are assigned in updates of
        their own, and measured here the box was 32 pixels taller than it came
-       to rest at, so it grew past its place and snapped back. A new observer
-       reports the size once, after layout and before the frame is painted. */
-    const watcher = new ResizeObserver(() => {
-      watcher.disconnect()
-      const to = this.getBoundingClientRect().height
-      if (Math.abs(to - from) < 1) {
-        return
-      }
-      const style = getComputedStyle(this)
-      const written =
-        style.getPropertyValue('--drilldown-duration').trim() ||
-        style.getPropertyValue('--helix-duration-normal').trim()
-      const amount = Number.parseFloat(written)
-      const duration = written.endsWith('ms') ? amount : amount * 1000
-      if (!(duration >= 1)) {
-        return
-      }
-      this.resizing?.cancel()
-      this.resizing = this.animate([{ blockSize: `${from}px` }, { blockSize: `${to}px` }], {
-        duration,
-        easing: style.getPropertyValue('--helix-easing-decelerate').trim() || 'ease-out',
-      })
+       to rest at, so it grew past its place and snapped back. `resizeFrom`
+       measures after that layout and before the frame is painted. */
+    void resizeFrom(this, from, {
+      previous: this.resizing,
+      timing: () => {
+        const style = getComputedStyle(this)
+        return {
+          duration:
+            style.getPropertyValue('--drilldown-duration').trim() ||
+            style.getPropertyValue('--helix-duration-normal').trim(),
+          easing: style.getPropertyValue('--helix-easing-decelerate'),
+        }
+      },
+    }).then((move) => {
+      this.resizing = move
     })
-    watcher.observe(this)
   }
 }
 
