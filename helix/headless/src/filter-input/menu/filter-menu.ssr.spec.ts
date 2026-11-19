@@ -35,12 +35,20 @@ describe('filter menu server output', () => {
         </helix-headless-filter-field>
       </helix-headless-filter-menu>`,
     )
-    /* `menu` and `surface` are this element's frame, forwarded off the menu it
-       composes. `item`, `label` and `text` are the option's own row, which is
+    /* `menu`, `surface` and `highlight` are this element's frame, forwarded off
+       the menu it composes. `item`, `label` and `text` are the option's own row, which is
        the consumer's markup rendering itself and is asserted where it lives.
        What is absent is every `entry`: no field row, no comparison, no value,
        and no divider between the two runs. */
-    expect(servedParts(markup)).toEqual(['item', 'label', 'live', 'menu', 'surface', 'text'])
+    expect(servedParts(markup)).toEqual([
+      'highlight',
+      'item',
+      'label',
+      'live',
+      'menu',
+      'surface',
+      'text',
+    ])
   })
 
   test('the trigger is served, so the control a reader presses exists before any script', () => {
