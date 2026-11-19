@@ -87,7 +87,7 @@ describe('under forced colors', () => {
   test('the end of a line and its markers keep the line’s color', () => {
     expect(rule('helix-line-chart', '[part~="terminus"]')).toContain('forced-color-adjust: none')
     expect(rule('helix-line-chart', '[part~="marker"]')).toContain('forced-color-adjust: none')
-    expect(rule('helix-sparkline', '[part~="terminus"]')).toContain('forced-color-adjust: none')
+    expect(rule('helix-sparkline', '[part="terminus"]')).toContain('forced-color-adjust: none')
     expect(forced('helix-sparkline')).toMatch(/\[part="low"\] \{\s*forced-color-adjust: none/u)
   })
 

@@ -62,6 +62,7 @@ export default headless('breadcrumbs', {
           'fold-back-mark': true,
           'fold-empty': true,
           'fold-header': true,
+          'fold-highlight': true,
           'fold-item': true,
           'fold-item-end': true,
           'fold-item-item': true,

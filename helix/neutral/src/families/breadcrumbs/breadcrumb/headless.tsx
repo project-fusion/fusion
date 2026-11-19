@@ -129,6 +129,7 @@ export default headless('breadcrumb', {
             'back-mark': true,
             empty: true,
             header: true,
+            highlight: true,
             live: true,
             loading: true,
             'search-field': true,

@@ -81,6 +81,7 @@ import '../../menu/index.js'
  * @csspart fold-back-mark - In the fold's menu, the caret on that way back.
  * @csspart fold-empty - In the fold's menu, the words it shows with no rows.
  * @csspart fold-header - In the fold's menu, the bar over a page of it.
+ * @csspart fold-highlight - In the fold's menu, the wash that glides to the row with focus.
  * @csspart fold-item - Each row of that menu, a link to a folded crumb.
  * @csspart fold-item-end - The trailing column of a row of the fold's menu.
  * @csspart fold-item-item - A row of the fold's menu, a link to its crumb.
@@ -248,7 +249,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     return html`<span part="fold-separator" aria-hidden="true">${this.renderMark('fold')}</span
       >${staticHtml`<${menu}
         part="fold"
-        exportparts="back: fold-back, back-mark: fold-back-mark, empty: fold-empty, header: fold-header, live: fold-live, loading: fold-loading, search-field: fold-search-field, surface: fold-surface, title: fold-title"
+        exportparts="back: fold-back, back-mark: fold-back-mark, empty: fold-empty, header: fold-header, highlight: fold-highlight, live: fold-live, loading: fold-loading, search-field: fold-search-field, surface: fold-surface, title: fold-title"
         label=${this.foldLabel}
         ><${button}
           part="expand"
