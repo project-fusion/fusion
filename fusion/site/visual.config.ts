@@ -142,7 +142,9 @@ export default defineConfig({
       name: 'site',
       routes: [
         { name: 'home', path: '/' },
-        { name: 'button', path: '/helix/components/button' },
+        /* Once its anatomy frame has drawn its markers, which comes after
+           the elements settle. */
+        { name: 'button', path: '/helix/components/button', selector: '[data-anatomy-drawn]' },
         { name: 'sandbox', path: '/helix/sandbox' },
         { name: 'theme', path: '/helix/theme', selector: '[data-preview-drawn]' },
         { name: 'maps', path: '/helix/maps' },

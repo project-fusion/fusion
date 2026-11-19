@@ -91,17 +91,18 @@ const partIn = (root: ShadowRoot, name: string): Element | undefined => {
 }
 
 /**
- * The boxes an element draws, through `display: contents`. A slot draws no
- * box, so its boxes are the content assigned to it: Card's `header` part is
- * the slot its heading arrives through.
+ * The boxes an element draws, through `display: contents`. A slot that draws
+ * no box of its own is the content assigned to it: Card's `header` part is
+ * the slot its heading arrives through. Button's `text` is a slot that draws
+ * one, and is measured as it is.
  */
 const boxesOf = (element: Element): DOMRect[] => {
-  if (element instanceof HTMLSlotElement) {
-    return element.assignedElements({ flatten: true }).flatMap(boxesOf)
-  }
   const own = element.getBoundingClientRect()
   if (own.width > 0 || own.height > 0) {
     return [own]
+  }
+  if (element instanceof HTMLSlotElement) {
+    return element.assignedElements({ flatten: true }).flatMap(boxesOf)
   }
   return [...element.children].flatMap(boxesOf)
 }
@@ -159,17 +160,35 @@ const layerOf = (): HTMLElement => {
 let marks: Mark[] = []
 let scope: HTMLElement | undefined
 const watcher = new ResizeObserver(() => schedule())
-let pending = 0
+/**
+ * What `watcher` already observes. **Each element is observed once**, since
+ * observing reports the element's size at once, and observing again on every
+ * draw made every draw schedule the next.
+ */
+let watched = new WeakSet<Element>()
+const watch = (element: Element): void => {
+  if (!watched.has(element)) {
+    watched.add(element)
+    watcher.observe(element)
+  }
+}
+let pending: ReturnType<typeof setTimeout> | undefined
 
-/** One draw on the next frame, however many reasons arrive before it. */
+/**
+ * One draw soon, however many reasons arrive before it.
+ *
+ * **A timer, never `requestAnimationFrame`.** A frame below the fold gets no
+ * animation frames in Chromium until it is scrolled into view, so its markers
+ * were not drawn when a whole-page picture was taken of it.
+ */
 const schedule = (): void => {
   if (marks.length === 0 || pending) {
     return
   }
-  pending = requestAnimationFrame(() => {
-    pending = 0
+  pending = setTimeout(() => {
+    pending = undefined
     draw()
-  })
+  }, 16)
 }
 
 /** Every marker, placed from the boxes as they are now. */
@@ -179,13 +198,12 @@ const draw = (): void => {
   }
   const into = layerOf()
   into.replaceChildren()
-  watcher.disconnect()
-  watcher.observe(scope)
+  watch(scope)
   const placed: { x: number; y: number }[] = []
   marks.forEach((mark, at) => {
     const targets = targetsOf(scope as HTMLElement, mark)
     for (const target of targets) {
-      watcher.observe(target)
+      watch(target)
     }
     const box = union(targets.flatMap(boxesOf))
     if (!box) {
@@ -228,6 +246,8 @@ const draw = (): void => {
     into.hidePopover()
   }
   into.showPopover()
+  /* The page marks the figure drawn, which a picture of the page waits for. */
+  window.parent?.postMessage({ type: 'helix-preview-anatomy-drawn' }, '*')
 }
 
 /**
@@ -238,8 +258,10 @@ export const drawAnatomy = async (root: HTMLElement): Promise<void> => {
   const template = root.querySelector(SELECTOR)
   marks = template ? marksOf(template) : []
   scope = root
+  /* A new render is new elements, so what was watched goes. */
+  watcher.disconnect()
+  watched = new WeakSet()
   if (marks.length === 0) {
-    watcher.disconnect()
     layer?.replaceChildren()
     return
   }
@@ -260,7 +282,18 @@ addEventListener(RESTYLED, schedule)
 addEventListener('scroll', schedule, { capture: true, passive: true })
 document.addEventListener('animationend', schedule, { capture: true })
 document.addEventListener('transitionend', schedule, { capture: true })
-document.addEventListener('toggle', schedule, { capture: true })
+/* An overlay in the example opening or closing, and never the layer itself,
+   which draw raises with a hide and a show, so its own toggle would ask for
+   the next draw. */
+document.addEventListener(
+  'toggle',
+  (event) => {
+    if (event.target !== layer) {
+      schedule()
+    }
+  },
+  { capture: true },
+)
 
 /** The layer's look, which the frame's own stylesheet cannot hold: it is built here. */
 const sheet = document.createElement('style')
