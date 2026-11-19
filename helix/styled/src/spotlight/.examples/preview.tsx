@@ -7,7 +7,7 @@ const PLANS = [
 export function Example() {
   return (
     <helix-grid
-      columns="3"
+      columns={3}
       gap="sm"
     >
       {PLANS.map((plan) => (
