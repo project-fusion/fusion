@@ -347,10 +347,16 @@ describe('toggling a series', () => {
     await bars.updateComplete
     expect(part(ring, 'summary')?.textContent).toBe('Accounts by plan: Free 96%, Enterprise 4%.')
     expect(
-      [...(bars.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map((one) =>
-        one.getAttribute('data-series'),
+      [...(bars.shadowRoot?.querySelectorAll('[part~="bar"]:not([part~="bar-hidden"])') ?? [])].map(
+        (one) => one.getAttribute('data-series'),
       ),
     ).toEqual(['2', '2'])
+    /* A hidden series' columns stay, of no length and hidden, so a sheet can
+       shrink and fade them, and grow them back. */
+    const hidden = [...(bars.shadowRoot?.querySelectorAll('[part~="bar-hidden"]') ?? [])]
+    expect(hidden.map((one) => one.getAttribute('data-series'))).toEqual(['1', '3', '1', '3'])
+    expect(hidden.every((one) => one.getAttribute('visibility') === 'hidden')).toBe(true)
+    expect(hidden.every((one) => one.getAttribute('height') === '0')).toBe(true)
   })
 })
 

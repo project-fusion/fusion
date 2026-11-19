@@ -20,8 +20,18 @@
    shortens the duration tokens to 0.01ms there, and a literal such as `400ms`
    on the hook would otherwise bring the motion back. So under reduced motion
    the duration is the token again, whatever the hook says, as List's rows
-   stand still there whatever `--list-move-duration` says. */
+   stand still there whatever `--list-move-duration` says.
+
+   **What follows the pointer and the keys glides, on its own beat.** The
+   guide, the band, a sparkline's dot and its words, and the reading bubble
+   move from one reading to the next over `--chart-glide-duration`, the fast
+   token by default, along `--helix-easing-decelerate`. A reader sweeping
+   across a chart crosses a reading every few frames, so the beat is shorter
+   than a move to new readings, and it keeps its own hook for that reason.
+   Each is drawn new where its reading is when a reading is shown from none,
+   so nothing slides in from where it was last. */
 :host {
+  --_chart-glide-duration: var(--chart-glide-duration, var(--helix-duration-fast));
   --_chart-move-duration: var(--chart-move-duration, var(--helix-duration-normal));
   --_chart-move-easing: var(--chart-move-easing, var(--helix-easing-decelerate));
   --_chart-arrive-duration: calc(
@@ -32,6 +42,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   :host {
+    --_chart-glide-duration: var(--helix-duration-fast);
     --_chart-move-duration: var(--helix-duration-normal);
     --_chart-arrive-duration: var(--helix-duration-slow);
   }

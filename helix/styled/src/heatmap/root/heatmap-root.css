@@ -184,6 +184,12 @@
   position: absolute;
 }
 
+/* The bubble glides from cell to cell once it has arrived, as the other
+   charts' bubbles do: see `shared/chart/tooltip.css`. */
+[part="tooltip-anchor"][data-gliding] {
+  --tooltip-move-duration: var(--_chart-glide-duration, var(--helix-duration-fast));
+}
+
 /* **Quieter by the bubble's own ink, never a page color.** The bubble is
    `surface-inverse`, so `foreground-muted` on it was a light gray on white in
    dark mode and a mid gray on near black in light: the fault `shared/chart/

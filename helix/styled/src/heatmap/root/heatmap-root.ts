@@ -56,6 +56,7 @@ import '../../tooltip/index.js'
  * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --chart-glide-duration - How long the tooltip takes to glide from one cell to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places it at once, and under reduced motion it moves at once, whatever it says. It is placed where its reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --heatmap-cell-height - How tall a cell is. One row of tall, narrow cells looks like a status page.

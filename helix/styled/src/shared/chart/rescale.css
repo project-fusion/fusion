@@ -1,0 +1,59 @@
+/* **A value scale that changes moves to its new levels**, as the marks move to
+   their new readings, over `--chart-move-duration` along
+   `--chart-move-easing`: a series hidden from a legend, or new readings with
+   a new range. Shared by `BarChart`, `LineChart`, and `AreaChart`, whose
+   value axes and rules are drawn the same way.
+
+   **A level the new scale keeps is the same element.** Its number and its
+   rule travel from the old level to the new one, so the reader watches the
+   ruler stretch or shrink. A level the new scale adds fades in where it
+   belongs. A level it drops stays a moment, as `tick-leaving` and
+   `gridline-leaving`, moving with the others toward its place on the new
+   scale, held inside the plot, while it fades out.
+
+   Reduced motion, through `motion.css`, puts every level in its new place at
+   once. */
+[part~="tick"] {
+  transition:
+    inset-block-start var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    inset-inline-start var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate));
+}
+
+/* `hidden` on the headless tier, where nothing fades it, and drawn here while
+   it fades. */
+[part~="tick-leaving"] {
+  display: block;
+  opacity: 0;
+}
+
+@starting-style {
+  [part~="tick"] {
+    opacity: 0;
+  }
+}
+
+/* A rule is moved by `translate`, in the drawing's own units, and a leaving
+   one carries `visibility="hidden"`, which `visibility` here holds off until
+   its fade has run. */
+[part~="gridline"] {
+  transition:
+    translate var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
+}
+
+[part~="gridline-leaving"] {
+  opacity: 0;
+}
+
+@starting-style {
+  [part~="gridline"] {
+    opacity: 0;
+  }
+}

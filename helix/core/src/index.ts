@@ -738,6 +738,12 @@ export {
   sort,
   window_,
 } from './utils/row-order/row-order.js'
+export {
+  heldInside,
+  type Level,
+  levelsOf,
+  ScaleMemory,
+} from './utils/scale/levels.js'
 export { extent, linear, type Scale } from './utils/scale/scale.js'
 export { headroom, ticks } from './utils/scale/ticks.js'
 export {

@@ -89,7 +89,7 @@
    stood when the page was busy: measured in Chromium on October 10, 2026,
    the second layer of points stayed at about half their opacity with the
    computed value at 0.8 and no animation running. */
-[part="points"] {
+[part~="points"] {
   opacity: var(--scatter-chart-point-opacity, 0.8);
 }
 
@@ -118,7 +118,21 @@
     d var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
     stroke-width var(--_chart-move-duration, var(--helix-duration-normal))
-    var(--_chart-move-easing, var(--helix-easing-decelerate));
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
+}
+
+/* **A series a legend hid fades out where it stood**, while the others move
+   to the scale that fits them. The tier below keeps its points with each
+   path `visibility="hidden"`, which `visibility` above holds off until the
+   fade has run. The paths fade and the group keeps its opacity, for the
+   reason above. Shown again, the points fade in and move from there to their
+   new places. */
+[part~="points-hidden"] > [part="point"],
+[part~="points-hidden"] > [part="point-ring"] {
+  opacity: 0;
 }
 
 [part="point-ring"] {

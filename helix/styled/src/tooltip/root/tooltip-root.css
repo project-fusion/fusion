@@ -43,7 +43,8 @@
     opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
     scale var(--helix-duration-fast) var(--helix-easing-accelerate),
     display var(--helix-duration-fast) allow-discrete,
-    overlay var(--helix-duration-fast) allow-discrete;
+    overlay var(--helix-duration-fast) allow-discrete,
+    translate var(--tooltip-move-duration, 0s) var(--helix-easing-decelerate);
 }
 
 [part~="surface"][data-placed] {
@@ -54,7 +55,15 @@
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),
     display var(--helix-duration-fast) allow-discrete,
-    overlay var(--helix-duration-fast) allow-discrete;
+    overlay var(--helix-duration-fast) allow-discrete,
+    /* **A bubble that stays open follows its anchor to a new place** over
+       `--tooltip-move-duration`, as a chart's bubble follows its reading, on
+       a curve that slows as it arrives and never passes the place. The
+       placing pass writes whole pixels, so the words rest sharp. Unset, it
+       moves at once. Reduced motion, below, moves it at once whatever the
+       hook says. */
+    translate
+    var(--tooltip-move-duration, 0s) var(--helix-easing-decelerate);
 }
 
 /* The point, drawn as a square turned forty-five degrees and half buried under

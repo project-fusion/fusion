@@ -25,7 +25,7 @@
    would show the bands behind it through itself and read as a third color.
    The strength comes from mixing toward the page instead, which keeps a band
    light without letting anything through it. */
-[part="area"] {
+[part~="area"] {
   /* 75% in dark, two whole colors since `light-dark()` cannot sit in a
      percentage. Mixed 55% toward black, the orange band came out rgb(112, 66,
      46) against the same series at rgb(251, 156, 112) in a donut, a muddy
@@ -56,14 +56,14 @@
    one in front of another: an opaque band in front would hide every smaller
    one behind it. Each takes its series' color thinned, so where two meet reads
    as both. */
-:host([overlap]) [part="area"] {
+:host([overlap]) [part~="area"] {
   fill: var(--chart-series);
   fill-opacity: var(--area-chart-overlap-opacity, 0.3);
 }
 
 /* The top edge of each band at the series' full color, so where one part ends
    and the next begins is drawn rather than left to two pale fills meeting. */
-[part="line"] {
+[part~="line"] {
   stroke: var(--chart-series);
   stroke-linejoin: round;
   /* The width every chart's line is, from the shared series sheet, with the
@@ -79,7 +79,7 @@
 }
 
 /* Over the bands, so they have to read on a fill as well as on the page. */
-[part="gridline"] {
+[part~="gridline"] {
   stroke: var(--area-chart-gridline-color, var(--helix-color-border));
   stroke-opacity: 0.7;
   stroke-width: var(--helix-border-thin);
@@ -90,6 +90,11 @@
   stroke: var(--helix-color-foreground-muted);
   stroke-dasharray: 3 3;
   stroke-width: var(--helix-border-thin);
+  /* From reading to reading over `--chart-glide-duration`, along a curve
+     that slows as it arrives, as `LineChart`'s guide does. Drawn new where
+     its reading is when a reading is shown from none. */
+  transition: translate var(--_chart-glide-duration, var(--helix-duration-fast))
+    var(--helix-easing-decelerate);
   vector-effect: non-scaling-stroke;
 }
 
@@ -129,7 +134,7 @@
 
 /* Centered on the level it names, for the reason `BarChart` gives: a number
    whose top edge is on the line reads as belonging to the band under it. */
-[part="tick"] {
+[part~="tick"] {
   inset-inline-end: 0;
   /* One line of its own height, so half of it is the room over the plot. */
   line-height: 1;
@@ -189,18 +194,46 @@
    value it does not have. **And the opacity, which the starting style below
    sets**: without it the fade in had nothing to run on, and the drawing
    appeared at once. */
-[part="area"],
-[part="line"] {
+[part~="area"],
+[part~="line"] {
   transition:
     d var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
-    opacity var(--_chart-arrive-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate);
+    opacity var(--_chart-arrive-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate),
+    visibility var(--_chart-arrive-duration, var(--helix-duration-slow));
 }
 
 @starting-style {
-  [part="area"],
-  [part="line"] {
+  [part~="area"],
+  [part~="line"] {
     opacity: 0;
+  }
+}
+
+/* **A part a legend hid fades as its band closes**, while the bands above
+   settle onto the one below and the scale fits the parts left. The tier
+   below keeps the band with `visibility="hidden"`, which `visibility` here
+   holds off until the fade has run. Shown again, it fades in at the arrival's
+   pace as it opens. Safari moves no path's shape, so there the band closes at
+   once. */
+[part~="area-hidden"],
+[part~="line-hidden"] {
+  opacity: 0;
+  transition:
+    d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
+}
+
+/* **Where the browser moves no path's shape, as in Safari, the scale takes
+   its new levels at once**, with the bands it measures, as `LineChart`'s
+   does. The levels a new scale adds or drops still fade. */
+@supports not (d: path("M0 0")) {
+  [part~="tick"],
+  [part~="gridline"] {
+    transition-property: opacity, visibility;
   }
 }
 

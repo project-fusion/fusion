@@ -1,6 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
+import hiding_a_series from '../.examples/hiding-a-series.html' with { type: 'text' }
 import streaming from '../.examples/streaming.html' with { type: 'text' }
 import taking_new_data from '../.examples/taking-new-data.html' with { type: 'text' }
 
@@ -10,6 +11,7 @@ beforeAll(async () => {
   await import('../../flex/index.js')
   await import('../../list/index.js')
   await import('../../button/index.js')
+  await import('../../legend/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -48,5 +50,29 @@ describe('the streaming example', () => {
     const before = line()
     await until(() => line() !== before, 3000)
     expect(line()).not.toBe(before)
+  })
+})
+
+describe('the hiding-a-series example', () => {
+  run('a press on a name hides its line, and the scale fits the lines left', async () => {
+    await example(hiding_a_series)
+    const chart = document.querySelector('helix-line-chart') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await idle()
+    const top = (): string | null | undefined =>
+      [...(chart.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].at(-1)?.textContent
+    const before = top()
+    const legend = document.querySelector('helix-legend') as HTMLElement
+    const direct = [...(legend.shadowRoot?.querySelectorAll('button') ?? [])].find(
+      (one) => one.textContent?.trim() === 'Direct',
+    )
+    direct?.click()
+    await idle()
+    await chart.updateComplete
+    expect(direct?.getAttribute('aria-pressed')).toBe('false')
+    expect(chart.shadowRoot?.querySelectorAll('[part~="line-hidden"]')).toHaveLength(1)
+    expect(top()).not.toBe(before)
+    expect(chart.shadowRoot?.querySelector('[part="summary"]')?.textContent).not.toContain('Direct')
   })
 })

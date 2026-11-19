@@ -215,7 +215,7 @@ path[part~="bar"],
  * document rule reaching in through the light DOM would still use.
  */
 [part~="bar"],
-[part="line"] {
+[part~="line"] {
   --_bar-chart-series: var(--chart-series);
 }
 
@@ -263,7 +263,20 @@ path[part~="bar"],
     x var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
     y var(--_chart-move-duration, var(--helix-duration-normal))
-    var(--_chart-move-easing, var(--helix-easing-decelerate));
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
+}
+
+/* **A series a legend hid shrinks to the baseline and fades**, while the
+   columns left take the room it gave up and the scale fits them. The tier
+   below keeps each of its columns as a bar of no length on the baseline, or
+   a segment of no length where it stood in a stack, with
+   `visibility="hidden"`, which `visibility` above holds off until the fade
+   has run. Shown again, it grows back out of the baseline as it fades in. */
+[part~="bar-hidden"] {
+  opacity: 0;
 }
 
 /* The columns drawn again over a path of them, for the reading shown, stand
@@ -294,7 +307,7 @@ path[part~="bar"],
 /*
  *  The grid, unless `gridlines` is `none`, and the slot the pointer is in.
  */
-[part="gridline"] {
+[part~="gridline"] {
   stroke: var(--bar-chart-gridline-color, var(--helix-color-border));
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
@@ -302,12 +315,18 @@ path[part~="bar"],
 
 [part="band"] {
   fill: var(--bar-chart-band-color, var(--helix-color-surface-sunken));
+  /* From category to category over `--chart-glide-duration`, along a curve
+     that slows as it arrives and never passes the category. Drawn new where
+     its category is when a reading is shown from none, so it never slides
+     in. */
+  transition: translate var(--_chart-glide-duration, var(--helix-duration-fast))
+    var(--helix-easing-decelerate);
 }
 
 /*
  *  A series drawn as a line across the columns, under `lines`.
  */
-[part="line"] {
+[part~="line"] {
   fill: none;
   stroke: var(--bar-chart-line-color, var(--_bar-chart-series, var(--helix-color-series-1)));
   stroke-linecap: round;
@@ -315,7 +334,17 @@ path[part~="bar"],
   /* The width every chart's line is, from the shared series sheet, with the
      family's own hook in front of it. */
   stroke-width: var(--bar-chart-line-width, var(--_chart-stroke));
+  transition:
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
   vector-effect: non-scaling-stroke;
+}
+
+/* A line a legend hid fades out where it stood, as a hidden series' columns
+   do. */
+[part~="line-hidden"] {
+  opacity: 0;
 }
 
 /*
@@ -460,39 +489,40 @@ path[part~="bar"],
 /* Centered on the level it names rather than hanging below it: a number whose
    top edge is on the line reads as belonging to the band under it, which is off
    by one gridline for the whole column. */
-[part="tick"] {
+[part~="tick"] {
   position: absolute;
 }
 
-:host(:not([orientation="horizontal"])) [part="tick"] {
+:host(:not([orientation="horizontal"])) [part~="tick"] {
   inset-inline-end: 0;
   /* One line of its own height, so half of it is the room over the plot. */
   line-height: 1;
   translate: 0 -50%;
 }
 
-:host([orientation="horizontal"]) [part="tick"] {
+:host([orientation="horizontal"]) [part~="tick"] {
   translate: -50% 0;
 }
 
 /* Placed from the inline start, which is the right on a right-to-left page, so
    centered the other way: `translate` is physical. */
-:host([orientation="horizontal"]:dir(rtl)) [part="tick"] {
+:host([orientation="horizontal"]:dir(rtl)) [part~="tick"] {
   translate: 50% 0;
 }
 
 /* The number at the far end ends at its level, so it stays inside the chart's
    box: centered, the top of the scale hung half its width past the plot's end,
    16 pixels out of the box for 2,000 on the horizontal example. */
-:host([orientation="horizontal"]) [part="tick"]:last-child {
+:host([orientation="horizontal"]) [part~="tick"]:nth-last-child(1 of :not([part~="tick-leaving"])) {
   translate: -100% 0;
 }
 
-:host([orientation="horizontal"]:dir(rtl)) [part="tick"]:last-child {
+:host([orientation="horizontal"]:dir(rtl))
+  [part~="tick"]:nth-last-child(1 of :not([part~="tick-leaving"])) {
   translate: 100% 0;
 }
 
-:host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
+:host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part~="tick"] {
   inset-inline-end: auto;
   inset-inline-start: 0;
 }

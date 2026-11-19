@@ -523,3 +523,34 @@ describe('from data', () => {
     expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('From the table')
   })
 })
+
+/* A series a legend hid after it was drawn keeps its points where they
+   stood, hidden, so a stylesheet can fade them out, and every series keeps
+   its own group: no series' points travel to where another's were. */
+describe('a series a legend hid', () => {
+  test('keeps its points where they stood, in a group of its own', async () => {
+    await import('../../legend/index.js')
+    await mount(
+      `<div>${LOAD}<helix-headless-scatter-chart for="load"></helix-headless-scatter-chart><helix-headless-legend entries="measures" for="load"></helix-headless-legend></div>`,
+    )
+    const host = document.querySelector('helix-headless-scatter-chart') as Chart
+    const legend = document.querySelector('helix-headless-legend') as Chart & {
+      hiddenSeries: string
+    }
+    await legend.updateComplete
+    await host.updateComplete
+    const groups = all(host, 'points')
+    const first = groups.find((one) => one.dataset.series === '1')
+    const before = first?.querySelector('[part="point"]')?.getAttribute('d')
+    legend.hiddenSeries = 'p50'
+    await legend.updateComplete
+    await host.updateComplete
+    await host.updateComplete
+    expect(all(host, 'points-hidden')).toEqual([first as HTMLElement])
+    expect(first?.querySelector('[part="point"]')?.getAttribute('d')).toBe(before as string)
+    expect(first?.querySelector('[part="point"]')?.getAttribute('visibility')).toBe('hidden')
+    expect(all(host, 'points').find((one) => one.dataset.series === '2')).toBe(
+      groups.find((one) => one.dataset.series === '2') as HTMLElement,
+    )
+  })
+})

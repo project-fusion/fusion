@@ -13,6 +13,8 @@ import {
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
   headroom,
+  heldInside,
+  levelsOf,
   linear,
   linePath,
   MIRROR_RULE,
@@ -21,16 +23,17 @@ import {
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Point,
+  ScaleMemory,
   type Series,
   type SeriesPoint,
   seriesIndex,
   seriesKey,
-  ticks,
   unbroken,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import '../../tooltip/index.js'
 
 /** Two decimals, as a line's path is written, which is more than a 100 unit view box can show. */
@@ -120,23 +123,28 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The wash under one line, where `area` is set.
+ * @csspart area-hidden - The `area` of a series a legend hid, kept where it was last drawn and hidden, so a stylesheet can fade it out. Set alongside `area`.
  * @csspart axis - The numbers of the scale beside the plot, unless `value-axis` is `none`.
- * @csspart band - The band around the reading under the pointer.
+ * @csspart band - The band around the reading under the pointer, moved to its slot with `translate`, so a stylesheet can glide it from one to the next.
  * @csspart baseline - The rule at zero, where zero is inside the range.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
- * @csspart guide - A rule down the reading a pointer is resting on.
+ * @csspart gridline-leaving - A rule at a level the scale no longer has, kept hidden at its place on the new scale, so a stylesheet can fade it out as it moves. Set alongside `gridline`.
+ * @csspart guide - A rule down the reading a pointer is resting on, moved to it with `translate`, so a stylesheet can glide it from one to the next.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The line for one series.
  * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
+ * @csspart line-hidden - The `line` of a series a legend hid, kept where it was last drawn and hidden, so a stylesheet can fade it out. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart marker - The marks on one series' readings under `markers`, as one path with a stroke of no length at each reading: give it a round `stroke-linecap`, a `stroke-width` the size of a mark and `vector-effect: non-scaling-stroke`. Carries its series color as `--chart-series`.
+ * @csspart marker-hidden - The `marker` paths of a series a legend hid, kept where they were last drawn and hidden. Set alongside `marker`.
  * @csspart marker-lone - The `marker` path of one series' readings with a blank on either side, which no line reaches and which are marked without `markers`. Set alongside `marker`.
  * @csspart marker-ring - The same marks again under each series' `marker` paths, to stroke a little wider in the page's color, so a mark reads over the line it sits on.
+ * @csspart marker-ring-hidden - The `marker-ring` of a series a legend hid. Set alongside `marker-ring`.
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
@@ -144,7 +152,9 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart terminus - The mark on one series' last reading. It carries `data-jumped` for the drawing where its line took a new shape at once, with a reading more or fewer, so a stylesheet moving the mark can move it at once too.
+ * @csspart terminus-hidden - The `terminus` of a series a legend hid, kept where it was last drawn and `hidden`. Set alongside `terminus`.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
+ * @csspart tick-leaving - A number the scale no longer has, kept `hidden` at its place on the new scale, held inside the plot, so a stylesheet can fade it out as it moves. Set alongside `tick`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
@@ -524,6 +534,39 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   @property({ reflect: true, type: Boolean })
   zero = false
 
+  /** The scale drawn before this one, whose levels the axis and the rules leave from. */
+  private readonly scaleBefore = new ScaleMemory()
+
+  /** The scale before the one this render draws, from `scaleBefore`. */
+  private domainBefore: readonly [number, number] | undefined
+
+  /**
+   * The scales each series was last drawn with while it was shown, by its
+   * key, so a series a legend hides stays where it was as it fades out.
+   */
+  private readonly shownWith = new Map<
+    string,
+    { x: (value: number) => number; y: (value: number) => number }
+  >()
+
+  /**
+   * The scales a series is drawn with: this render's while it is shown, and
+   * the last it was shown with once a legend hides it, so it fades out where
+   * it stood while the others move to the new scale. Nothing for a series
+   * hidden since the chart first drew it, which has nowhere to fade from.
+   */
+  private scalesFor(
+    one: Series,
+    x: (value: number) => number,
+    y: (value: number) => number,
+  ): { hidden: boolean; x: (value: number) => number; y: (value: number) => number } | undefined {
+    if (this.showsSeries(one.name)) {
+      return { hidden: false, x, y }
+    }
+    const held = this.shownWith.get(seriesKey(one.name))
+    return held ? { hidden: true, ...held } : undefined
+  }
+
   /**
    * How many readings each series' line was last drawn with, so a terminus
    * can tell a line that moves to its new shape from one that jumps to it.
@@ -542,7 +585,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     series: Series[],
     x: (value: number) => number,
     y: (value: number) => number,
-  ): Array<{ index: number; jumped: boolean; x: number; y: number }> {
+  ): Array<{ hidden: boolean; index: number; jumped: boolean; x: number; y: number }> {
     return series.flatMap((one, depth) => {
       /* **A line moves to its new shape only through the same number of
          readings**: a path's shape moves point by point, and one with a point
@@ -552,7 +595,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       this.drawnCounts.set(one.name, one.points.length)
       const jumped = before !== undefined && before !== one.points.length
       const last = one.points.at(-1)
-      if (!this.showsSeries(one.name)) {
+      /* A series a legend hid keeps its mark where it last stood, hidden. */
+      const drawn = this.scalesFor(one, x, y)
+      if (!drawn) {
         return []
       }
       /* A single reading is a point rather than a line, and a mark on the end of
@@ -562,10 +607,11 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       }
       return [
         {
+          hidden: drawn.hidden,
           index: seriesIndex(depth),
           jumped,
-          x: (x(last.at) / PLOT_WIDTH) * 100,
-          y: (y(last.value) / PLOT_HEIGHT) * 100,
+          x: (drawn.x(last.at) / PLOT_WIDTH) * 100,
+          y: (drawn.y(last.value) / PLOT_HEIGHT) * 100,
         },
       ]
     })
@@ -582,6 +628,12 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
 
     const domain = this.range(series)
     const { x, y } = this.scalesOf(domain, readings.length)
+    this.domainBefore = this.scaleBefore.before(domain)
+    for (const one of series) {
+      if (this.showsSeries(one.name)) {
+        this.shownWith.set(seriesKey(one.name), { x, y })
+      }
+    }
 
     return html`${this.drawsAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
   }
@@ -597,6 +649,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       (value) => (y(value) / PLOT_HEIGHT) * 100,
       formatNumbers(wordsLocale(this)),
       (widest) => `--line-chart-axis: ${widest}ch`,
+      this.domainBefore,
     )
   }
 
@@ -655,9 +708,10 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        series and a mask needs one layer per hole. Each layer is transparent
        inside its own ring and opaque everywhere else, so intersecting them
        removes the union of the holes and nothing besides. */
+    const rings = ends.filter((end) => !end.hidden)
     const holes =
-      this.terminus === 'ring' && ends.length > 0
-        ? ends
+      this.terminus === 'ring' && rings.length > 0
+        ? rings
             .map(
               (end) =>
                 `radial-gradient(circle at ${end.x}% ${end.y}%, #0000 calc(var(--_chart-terminus-inner) - 0.5px), #000 var(--_chart-terminus-inner))`,
@@ -739,12 +793,24 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
               svg`<line part="gridline" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`,
           )
       : []
+    /* Keyed by level and moved by `translate`, so a rule a new scale keeps
+       moves to its new level, and one it drops stays hidden for its fade. */
     const across = this.rulesValue
-      ? ticks(domain).map(
-          (level) =>
-            svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${y(level)} y2=${y(level)} />`,
+      ? repeat(
+          levelsOf(domain, this.domainBefore),
+          (one) => one.level,
+          ({ leaving, level }) =>
+            svg`<line
+              part=${leaving ? 'gridline gridline-leaving' : 'gridline'}
+              style=${`translate: 0 ${leaving ? heldInside(y(level)) : y(level)}px`}
+              visibility=${leaving ? 'hidden' : nothing}
+              x1="0"
+              x2=${PLOT_WIDTH}
+              y1="0"
+              y2="0"
+            />`,
         )
-      : []
+      : nothing
     return svg`${down}${across}`
   }
 
@@ -767,7 +833,16 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       return nothing
     }
     const slot = PLOT_WIDTH / count
-    return svg`<rect height=${PLOT_HEIGHT} part="band" width=${slot} x=${at * slot} y="0" />`
+    /* Moved by `translate`, a property a stylesheet can transition in every
+       engine, which the `x` attribute is not. */
+    return svg`<rect
+      height=${PLOT_HEIGHT}
+      part="band"
+      style=${`translate: ${at * slot}px 0`}
+      width=${slot}
+      x="0"
+      y="0"
+    />`
   }
 
   /**
@@ -786,7 +861,15 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (at < 0) {
       return nothing
     }
-    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
+    /* At the plot's start and moved by `translate`, as the band is. */
+    return svg`<line
+      part="guide"
+      style=${`translate: ${x(at)}px 0`}
+      x1="0"
+      x2="0"
+      y1="0"
+      y2=${PLOT_HEIGHT}
+    />`
   }
 
   /**
@@ -796,17 +879,22 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * differently without reimplementing the plot.
    */
   protected renderTermini(
-    ends: Array<{ index: number; jumped: boolean; x: number; y: number }>,
+    ends: Array<{ hidden?: boolean; index: number; jumped: boolean; x: number; y: number }>,
   ): TemplateResult | typeof nothing {
     if (ends.length === 0) {
       return nothing
     }
-    return html`${ends.map(
+    /* Keyed by series, so hiding one leaves each other mark on its own line
+       and none glides over to the next series' end. */
+    return html`${repeat(
+      ends,
+      (end) => end.index,
       (end) =>
         html`<span
           aria-hidden="true"
           ?data-jumped=${end.jumped}
-          part="terminus"
+          ?hidden=${end.hidden === true}
+          part=${end.hidden ? 'terminus terminus-hidden' : 'terminus'}
           style=${`--chart-series: var(--chart-series-${end.index}); --chart-terminus-x: ${end.x}%; --chart-terminus-y: ${end.y}%`}
         ></span>`,
     )}`
@@ -833,29 +921,37 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     y: (value: number) => number,
   ): TemplateResult | typeof nothing {
     const drawn = series.flatMap((one, depth) => {
-      if (!this.showsSeries(one.name)) {
+      /* A series a legend hid keeps its marks where they last stood, hidden. */
+      const scales = this.scalesFor(one, x, y)
+      if (!scales) {
         return []
       }
-      const { lone, marks } = this.marksOf(one, x, y)
-      return lone === '' && marks === '' ? [] : [{ index: seriesIndex(depth), lone, marks }]
+      const { lone, marks } = this.marksOf(one, scales.x, scales.y)
+      return lone === '' && marks === ''
+        ? []
+        : [{ hidden: scales.hidden, index: seriesIndex(depth), lone, marks }]
     })
     if (drawn.length === 0) {
       return nothing
     }
-    return svg`${drawn.map(
-      ({ index, lone, marks }) =>
+    return svg`${repeat(
+      drawn,
+      ({ index }) => index,
+      ({ hidden, index, lone, marks }) =>
         svg`<path
           d=${marks + lone}
           data-series=${index}
-          part="marker-ring"
+          part=${hidden ? 'marker-ring marker-ring-hidden' : 'marker-ring'}
+          visibility=${hidden ? 'hidden' : nothing}
         />${
           marks === ''
             ? nothing
             : svg`<path
                 d=${marks}
                 data-series=${index}
-                part="marker"
+                part=${hidden ? 'marker marker-hidden' : 'marker'}
                 style="--chart-series: var(--chart-series-${index})"
+                visibility=${hidden ? 'hidden' : nothing}
               />`
         }${
           lone === ''
@@ -863,8 +959,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
             : svg`<path
                 d=${lone}
                 data-series=${index}
-                part="marker marker-lone"
+                part=${hidden ? 'marker marker-lone marker-hidden' : 'marker marker-lone'}
                 style="--chart-series: var(--chart-series-${index})"
+                visibility=${hidden ? 'hidden' : nothing}
               />`
         }`,
     )}`
@@ -924,11 +1021,16 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     y: (value: number) => number,
     piece: 'area' | 'line',
   ): TemplateResult {
-    /* A series a legend hid keeps its palette slot and draws nothing. */
-    if (!this.showsSeries(one.name)) {
+    /* A series a legend hid keeps its palette slot, and its line and wash
+       stay where they were last drawn, hidden, so a stylesheet can fade them
+       out while the others move to the new scale. Shown again, each moves
+       from there to its place on the scale of the moment. */
+    const scales = this.scalesFor(one, x, y)
+    if (!scales) {
       return html`${nothing}`
     }
-    const runs = this.runsOf(one, x, y)
+    const hidden = scales.hidden
+    const runs = this.runsOf(one, scales.x, scales.y)
     if (runs.length === 0) {
       return html`${nothing}`
     }
@@ -951,8 +1053,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         ? svg`<path
             d=${wash}
             data-series=${index}
-            part="area"
+            part=${hidden ? 'area area-hidden' : 'area'}
             style="--chart-series: var(--chart-series-${index})"
+            visibility=${hidden ? 'hidden' : nothing}
           />`
         : html`${nothing}`
     }
@@ -960,8 +1063,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       d=${path}
       data-series=${index}
       fill="none"
-      part="line${this.dashes(one.name) ? ' line-dashed' : ''}"
+      part="line${this.dashes(one.name) ? ' line-dashed' : ''}${hidden ? ' line-hidden' : ''}"
       style="--chart-series: var(--chart-series-${index})"
+      visibility=${hidden ? 'hidden' : nothing}
     />`
   }
 

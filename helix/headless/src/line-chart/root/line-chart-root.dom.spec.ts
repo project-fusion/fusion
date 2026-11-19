@@ -350,8 +350,10 @@ describe('a blank cell', () => {
     host.pointer.set(1)
     await host.updateComplete
     expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Feb')
+    /* Moved by `translate`, so a stylesheet can glide it to the next. */
     const guide = host.shadowRoot?.querySelector('[part="guide"]')
-    expect(Number(guide?.getAttribute('x1'))).toBe(37.5)
+    expect(guide?.getAttribute('style')).toBe('translate: 37.5px 0')
+    expect(guide?.getAttribute('x1')).toBe('0')
   })
 })
 
@@ -446,6 +448,60 @@ describe('a series a legend hid', () => {
        they do on a chart of one series, and never rest on the hidden one. */
     await press('ArrowDown')
     expect(part(host, 'live')?.textContent).toBe('Feb: Referral 8 (2 of 2)')
+  })
+
+  /* Hidden after it was drawn, its line and its mark stay where they stood,
+     hidden, so a stylesheet can fade them out while the scale fits the rest.
+     The summary says what is shown at once. */
+  test('stays where it was drawn, hidden, while the scale fits the rest', async () => {
+    await import('../../legend/index.js')
+    await mount(
+      `<div>${CHANNELS}<helix-headless-line-chart for="channels"></helix-headless-line-chart><helix-headless-legend for="channels"></helix-headless-legend></div>`,
+    )
+    const host = document.querySelector('helix-headless-line-chart') as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    const legend = document.querySelector('helix-headless-legend') as typeof host & {
+      hiddenSeries: string
+    }
+    await legend.updateComplete
+    await host.updateComplete
+    const all = (name: string): Element[] => [
+      ...(host.shadowRoot?.querySelectorAll(`[part~="${name}"]`) ?? []),
+    ]
+    const direct = all('line').find((one) => one.getAttribute('data-series') === '1')
+    const before = direct?.getAttribute('d')
+    const top = all('tick').at(-1)?.textContent
+    legend.hiddenSeries = 'Direct'
+    await legend.updateComplete
+    await host.updateComplete
+    await host.updateComplete
+    expect(part(host, 'summary')?.textContent?.trim()).toBe('Sessions by channel, Feb: Referral 8.')
+    const hidden = all('line-hidden')
+    expect(hidden).toEqual([direct as Element])
+    expect(direct?.getAttribute('d')).toBe(before as string)
+    expect(direct?.getAttribute('visibility')).toBe('hidden')
+    const end = all('terminus-hidden')
+    expect(end).toHaveLength(1)
+    expect((end[0] as HTMLElement).hidden).toBe(true)
+    /* The axis fits Referral, and the numbers it dropped stay hidden for
+       their fade. */
+    const leaving = all('tick-leaving') as HTMLElement[]
+    expect(leaving.map((one) => one.textContent)).toContain(top as string)
+    expect(leaving.every((one) => one.hidden)).toBe(true)
+    expect(
+      all('gridline-leaving').every((one) => one.getAttribute('visibility') === 'hidden'),
+    ).toBe(true)
+    /* Shown again, it is the same line, drawn on the scale of the moment. */
+    legend.hiddenSeries = ''
+    await legend.updateComplete
+    await host.updateComplete
+    await host.updateComplete
+    expect(all('line-hidden')).toHaveLength(0)
+    expect(all('line').find((one) => one.getAttribute('data-series') === '1')).toBe(
+      direct as Element,
+    )
+    expect(direct?.hasAttribute('visibility')).toBe(false)
   })
 })
 

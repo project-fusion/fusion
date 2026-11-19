@@ -33,6 +33,15 @@
   position: absolute;
 }
 
+/* **The bubble glides from reading to reading**, once `data-gliding` says it
+   has arrived, so the first bubble is placed where its reading is and never
+   slides in from the corner of the window. `Tooltip` moves its surface by
+   `translate` in whole pixels, so the words stay sharp, and its contents are
+   the new reading's from the first frame of the glide. */
+[part="tooltip-anchor"][data-gliding] {
+  --tooltip-move-duration: var(--_chart-glide-duration, var(--helix-duration-fast));
+}
+
 /*
  * **The bubble is a `Tooltip` and is set like one.**
  *
