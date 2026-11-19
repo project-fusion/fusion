@@ -79,6 +79,10 @@ export {
   type Side,
 } from './controllers/floating-controller/floating-controller.js'
 export {
+  FocusMarkController,
+  type FocusMarkOptions,
+} from './controllers/focus-mark-controller/focus-mark-controller.js'
+export {
   controlsIn,
   FocusScopeController,
   type FocusScopeOptions,
