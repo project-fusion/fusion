@@ -11,7 +11,8 @@
 import type { MotionShares } from '../../controllers/readings-motion-controller/readings-motion-controller.js'
 import { type PagePoint, type Projection, pathData } from '../projection/projection.js'
 import { keysOf } from '../readings-motion/readings-motion.js'
-import { type BarCell, type BarField, barKeys, barsBetween, barsOf } from './bars.js'
+import { barKeys, barsBetween } from './bar-motion.js'
+import { type BarCell, type BarField, barsOf } from './bars.js'
 import { inBox } from './box.js'
 import type { FieldRow } from './field.js'
 

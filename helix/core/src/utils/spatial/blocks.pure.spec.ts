@@ -1,14 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { projectionOf } from '../projection/projection.js'
-import {
-  blockItems,
-  blockOrder,
-  blocksBetween,
-  blocksDrawn,
-  type FloorArea,
-  squarified,
-  treemapOf,
-} from './blocks.js'
+import { blockItems, blocksBetween } from './block-motion.js'
+import { blockOrder, blocksDrawn, type FloorArea, squarified, treemapOf } from './blocks.js'
 
 const row = (label: string, team: string, ...values: Array<number | undefined>) => ({
   cells: [

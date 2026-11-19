@@ -1,9 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import { barItems, barKeys, barsBetween } from './bar-motion.js'
 import { floorOf, namesOf } from './bar-row.js'
 import {
-  barItems,
-  barKeys,
-  barsBetween,
   barsDrawn,
   barsOf,
   climbing,

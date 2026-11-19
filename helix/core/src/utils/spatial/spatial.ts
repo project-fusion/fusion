@@ -6,9 +6,12 @@
  */
 
 export { type Camera, ISOMETRIC, type PagePoint, shortNumber } from '../projection/projection.js'
+export { grownAt, growTime } from '../readings-motion/readings-motion.js'
+export * from './bar-motion.js'
 export * from './bar-picture.js'
 export * from './bar-row.js'
 export * from './bars.js'
+export * from './block-motion.js'
 export * from './blocks.js'
 export * from './box.js'
 export * from './field.js'
