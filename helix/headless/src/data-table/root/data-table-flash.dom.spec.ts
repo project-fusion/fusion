@@ -21,28 +21,6 @@ let lit: string[] = []
 let washes: Keyframe[][] = []
 const realAnimate = HTMLElement.prototype.animate
 
-beforeEach(() => {
-  lit = []
-  washes = []
-  HTMLElement.prototype.animate = function (
-    this: HTMLElement,
-    keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-  ): Animation {
-    const frames = (keyframes ?? []) as Keyframe[]
-    if (frames.some((one) => String(one.boxShadow ?? '').includes('inset'))) {
-      const row = this.closest('[part~="row"]') ?? this
-      lit.push(row.querySelector('[part~="cell"]')?.textContent?.trim() ?? '')
-      washes.push(frames)
-    }
-    const animation = new EventTarget()
-    return Object.assign(animation, { cancel: () => undefined, currentTime: 0 }) as Animation
-  } as HTMLElement['animate']
-})
-
-afterEach(() => {
-  HTMLElement.prototype.animate = realAnimate
-})
-
 const ROWS = [
   { id: 'a', name: 'alpha', size: 30 },
   { id: 'b', name: 'bravo', size: 4 },
@@ -60,6 +38,37 @@ const table = async (attrs = 'flash-changes row-key="id"'): Promise<Table> => {
 }
 
 describe('flash-changes', () => {
+  /* Inside the block: in the browser every file of a family shares one page,
+     and a hook declared at the top would stand in for `animate` in the
+     other files too. */
+  beforeEach(() => {
+    lit = []
+    washes = []
+    HTMLElement.prototype.animate = function (
+      this: HTMLElement,
+      keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+    ): Animation {
+      const frames = (keyframes ?? []) as Keyframe[]
+      if (frames.some((one) => String(one.boxShadow ?? '').includes('inset'))) {
+        const row = this.closest('[part~="row"]') ?? this
+        lit.push(row.querySelector('[part~="cell"]')?.textContent?.trim() ?? '')
+        washes.push(frames)
+      }
+      /* A wash that never ends here, so each one is still running when the
+         next `rows` is set, as it is in a browser within the hold. */
+      const animation = new EventTarget()
+      return Object.assign(animation, {
+        cancel: () => undefined,
+        currentTime: 0,
+        finished: new Promise<Animation>(() => undefined),
+      }) as Animation
+    } as HTMLElement['animate']
+  })
+
+  afterEach(() => {
+    HTMLElement.prototype.animate = realAnimate
+  })
+
   test('lights nothing as the table first draws its rows', async () => {
     await table()
     expect(lit).toEqual([])

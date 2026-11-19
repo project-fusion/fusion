@@ -309,6 +309,7 @@ interface Matchers {
   toHaveProperty: (path: string | string[], value?: unknown) => void
   toMatch: (expected: RegExp | string) => void
   toMatchObject: (expected: Record<string, unknown>) => void
+  toStartWith: (expected: string) => void
   toThrow: (expected?: RegExp | string) => void
 }
 
@@ -451,6 +452,12 @@ const build = (actual: unknown, negated: boolean): Matchers => {
        point of it: a spec that called it would throw before reaching the
        assertion. A non-function is a bug in the spec and says so, rather than
        quietly reporting that the value did not throw, which it never could. */
+    toStartWith: (expected) => {
+      check(
+        typeof actual === 'string' && actual.startsWith(expected),
+        `to start with ${show(expected)}`,
+      )
+    },
     toThrow: (expected) => {
       if (typeof actual !== 'function') {
         throw new Error(`toThrow needs a function to call, and was given ${show(actual)}`)
