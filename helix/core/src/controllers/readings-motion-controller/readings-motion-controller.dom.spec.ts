@@ -162,7 +162,7 @@ describe('growing in', () => {
 
   test('stands at its readings at once under reduced motion', () => {
     globalThis.matchMedia = ((query: string) => ({ matches: query.includes('reduce') })) as never
-    const { motion } = host({ grow: true, duration: '200ms' })
+    const { motion } = host({ duration: '200ms', grow: true })
     motion.follow(field(['a', 10]), true)
     expect(motion.moving).toBe(false)
     motion.follow(field(['a', 20]), true)

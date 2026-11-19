@@ -74,8 +74,7 @@ const STAGGER = 110
 const SPREAD = 660
 
 /** The wait between one step's items and the next one's, as they grow in. */
-const stepOf = (steps: number): number =>
-  steps > 1 ? Math.min(STAGGER, SPREAD / (steps - 1)) : 0
+const stepOf = (steps: number): number => (steps > 1 ? Math.min(STAGGER, SPREAD / (steps - 1)) : 0)
 
 /**
  * How much of its reading an item at `step` of `steps` has reached `elapsed`
@@ -92,5 +91,4 @@ export const grownAt = (step: number, steps: number, elapsed: number): number =>
 }
 
 /** How long the items of `steps` steps take to grow in, the last one included, in milliseconds. */
-export const growTime = (steps: number): number =>
-  GROW + stepOf(steps) * Math.max(0, steps - 1)
+export const growTime = (steps: number): number => GROW + stepOf(steps) * Math.max(0, steps - 1)
