@@ -363,6 +363,7 @@ export {
   boxLabels,
   type SeenPlace,
 } from './utils/box-labels/box-labels.js'
+export { type BurstConfettiOptions, burstConfetti } from './utils/burst-confetti/burst-confetti.js'
 export {
   addDays,
   addMonths,
