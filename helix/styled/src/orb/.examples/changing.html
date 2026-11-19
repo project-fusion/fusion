@@ -1,0 +1,38 @@
+<!-- @summary One orb that changes state, crossing from each shape and color to the next. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  align-items="center"
+  direction="column"
+  gap="lg"
+>
+  <helix-orb
+    class="changing"
+    id="orb"
+    size="lg"
+    state="thinking"
+  ></helix-orb>
+
+  <helix-toggle-group
+    id="states"
+    label="State"
+    value="thinking"
+  >
+    <helix-toggle value="thinking">Thinking</helix-toggle>
+    <helix-toggle value="working">Working</helix-toggle>
+    <helix-toggle value="listening">Listening</helix-toggle>
+    <helix-toggle value="done">Done</helix-toggle>
+  </helix-toggle-group>
+</helix-flex>
+
+<script type="module">
+  const orb = document.getElementById('orb')
+
+  // A new state blends from the shape on the screen, however far it has got.
+  document.getElementById('states').addEventListener('change', (event) => {
+    orb.state = event.currentTarget.value
+  })
+</script>
