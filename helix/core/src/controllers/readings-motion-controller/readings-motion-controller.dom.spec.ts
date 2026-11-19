@@ -115,7 +115,14 @@ const tick = (by: number): void => {
 }
 
 /** A plain element standing in for a Lit host, with a change clock the test drives. */
-const host = (options: { duration?: string; grow?: boolean; growAgain?: boolean } = {}) => {
+const host = (
+  options: {
+    between?: typeof between
+    duration?: string
+    grow?: boolean
+    growAgain?: boolean
+  } = {},
+) => {
   const clock = { canceled: 0, finished: false, progress: 0 }
   const element = document.createElement('div') as HTMLDivElement &
     ReactiveControllerHost & { updates: number }
@@ -142,14 +149,15 @@ const host = (options: { duration?: string; grow?: boolean; growAgain?: boolean 
     } as unknown as Animation
   }) as HTMLElement['animate']
   const motion = new ReadingsMotionController<Field>(element, {
-    between,
+    between: options.between ?? between,
     grow: () => options.grow ?? false,
     growAgain: () => options.growAgain ?? false,
     items: (one) => one.readings.map((reading) => ({ key: reading.name, step: reading.step })),
     timing: () => ({ duration: options.duration ?? '', easing: 'linear' }),
   })
-  controller?.hostConnected?.()
-  return { clock, element, motion }
+  const connected = controller as ReactiveController
+  connected.hostConnected?.()
+  return { clock, controller: connected, element, motion }
 }
 
 describe('growing in', () => {
@@ -229,7 +237,110 @@ describe('growing in', () => {
   )
 })
 
+describe('an item that has grown in', () => {
+  clocked('moves on the clock at a later change, while another item still grows', () => {
+    const { clock, motion } = host({ duration: '200ms', grow: true })
+    motion.follow(field(['a', 10]), true)
+    sees(true)
+    tick(3000)
+    motion.follow(field(['a', 10], ['b', 10]), true)
+    /* `b` grows in; a move on the clock keeps the frames running past it. */
+    clock.progress = 0.5
+    tick(1100)
+    expect(values(motion.drawn)).toEqual([10, 10])
+    motion.follow(field(['a', 10], ['b', 20]), true)
+    expect(values(motion.drawn)).toEqual([10, 10])
+    clock.progress = 0.5
+    tick(16)
+    expect(values(motion.drawn)).toEqual([10, 15])
+  })
+})
+
+describe('leaving the page', () => {
+  clocked('mid-move, draws the readings as they are once the host is back', () => {
+    const { clock, controller, element, motion } = host({ duration: '200ms' })
+    motion.follow(field(['a', 0]), true)
+    motion.follow(field(['a', 100]), true)
+    clock.progress = 0.4
+    tick(16)
+    controller.hostDisconnected?.()
+    expect(motion.moving).toBe(false)
+    const updates = element.updates
+    controller.hostConnected?.()
+    expect(element.updates).toBeGreaterThan(updates)
+    expect(values(motion.drawn)).toEqual([100])
+  })
+
+  clocked('mid-entrance under grow-again, watches nothing until the host is back', () => {
+    const { controller, motion } = host({ grow: true, growAgain: true })
+    motion.follow(field(['a', 10]), true)
+    sees(true)
+    tick(200)
+    controller.hostDisconnected?.()
+    expect(watchers).toHaveLength(0)
+    controller.hostConnected?.()
+    expect(watchers).toHaveLength(1)
+    sees(false)
+    expect(values(motion.drawn)).toEqual([0])
+  })
+
+  clocked('after growing in, grows in again under grow-again once the host is back', () => {
+    const { controller, motion } = host({ grow: true, growAgain: true })
+    motion.follow(field(['a', 10]), true)
+    sees(true)
+    tick(3000)
+    controller.hostDisconnected?.()
+    controller.hostConnected?.()
+    sees(false)
+    expect(values(motion.drawn)).toEqual([0])
+    sees(true)
+    tick(3000)
+    expect(values(motion.drawn)).toEqual([10])
+  })
+})
+
+describe('a new layout', () => {
+  clocked('starts nothing moving and grows nothing in', () => {
+    const { motion } = host({ duration: '200ms', grow: true })
+    motion.follow(field(['b', 10]), true)
+    sees(true)
+    tick(3000)
+    motion.relayout(field(['a', 5], ['b', 10]), true)
+    expect(motion.moving).toBe(false)
+    expect(values(motion.drawn)).toEqual([5, 10])
+  })
+
+  clocked('lets a move in flight go on, and stands an item it brings in at its reading', () => {
+    const { clock, motion } = host({ duration: '200ms' })
+    motion.follow(field(['b', 0]), true)
+    motion.follow(field(['b', 100]), true)
+    clock.progress = 0.5
+    tick(16)
+    motion.relayout(field(['a', 8], ['b', 100]), true)
+    expect(motion.moving).toBe(true)
+    expect(values(motion.drawn)).toEqual([8, 50])
+  })
+
+  clocked('a first layout with readings still grows in', () => {
+    const { motion } = host({ grow: true })
+    motion.follow(field(), false)
+    motion.relayout(field(['a', 10]), true)
+    expect(values(motion.drawn)).toEqual([0])
+    sees(true)
+    tick(3000)
+    expect(values(motion.drawn)).toEqual([10])
+  })
+})
+
 describe('a change of readings', () => {
+  clocked('stops the clock where the readings cannot move between the two tables', () => {
+    const { motion } = host({ between: (_from, to) => to, duration: '200ms' })
+    motion.follow(field(['a', 10]), true)
+    motion.follow(field(['a', 20]), true)
+    expect(motion.moving).toBe(false)
+    expect(values(motion.drawn)).toEqual([20])
+  })
+
   clocked(
     'moves on the family timing: kept items to their new readings, added ones from the floor, dropped ones to it',
     () => {

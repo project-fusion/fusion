@@ -110,7 +110,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown while `loading` is set and there are no points yet. Falls back to `loading-text`.
  *
- * @event {HelixPlotChangeEvent} helix-plot-change - The points or the point the keys rest on changed, which the renderer is told. It stays on the chart.
+ * @event {HelixPlotChangeEvent} helix-plot-change - The points or the point the keys rest on changed, or a frame of a move drew the points on their way, which the renderer is told. It stays on the chart.
  * @event {HelixPlotTurnEvent} helix-plot-turn - Shift with an arrow asked the view to turn, by a step across or up.
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading moved, or was put away: `index` is the row, or `-1` for none, with its `label` and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A point was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.

@@ -117,7 +117,8 @@ const risingOf = (items: readonly MotionItem[], since: number): Map<string, Risi
  * as they are.
  *
  * The host asks for an update on every frame through `requestUpdate`, and
- * calls `follow` with its readings before each render.
+ * calls `follow` with its readings before each render, or `relayout` where
+ * only their layout changed, such as the columns a strip has room for.
  */
 export class ReadingsMotionController<F> implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -148,11 +149,23 @@ export class ReadingsMotionController<F> implements ReactiveController {
   /** The items growing in on the growth's own curve, by key. */
   private rising = new Map<string, Rising>()
 
+  /** The items a new layout brought in during a move, which stand at their readings. */
+  private standing = new Set<string>()
+
   /** The change in flight on the family's timing. */
   private clock: Animation | undefined
 
   /** Whether a frame is asked for. */
   private pending = false
+
+  /** Whether the host is on the page, where an observer can watch it. */
+  private connected = false
+
+  /** Whether the chart has grown in under `grow-again`, so it waits to leave the view, on the page or once it comes back to it. */
+  private exitWanted = false
+
+  /** Whether a move was ended off the page, so the drawing stands partway until the host draws again. */
+  private stale = false
 
   /** Watches for the chart to come into view, which starts it growing. */
   private seen: IntersectionObserver | undefined
@@ -179,18 +192,28 @@ export class ReadingsMotionController<F> implements ReactiveController {
   }
 
   hostConnected(): void {
+    this.connected = true
     this.stopListening = onMotionChange((paused) => {
       if (paused) {
         this.rest()
       }
     })
-    /* Moved on the page, it waits for its first sight again. */
+    /* Moved on the page, it waits for its first sight again, or, once grown
+       in, for the view to lose it. */
     if (this.waiting) {
       this.watchSight()
+    } else if (this.exitWanted) {
+      this.watchExit()
+    }
+    /* A move ended off the page left its last frame drawn partway. */
+    if (this.stale) {
+      this.stale = false
+      this.host.requestUpdate()
     }
   }
 
   hostDisconnected(): void {
+    this.connected = false
     this.stopListening?.()
     this.stopListening = undefined
     this.seen?.disconnect()
@@ -198,6 +221,7 @@ export class ReadingsMotionController<F> implements ReactiveController {
     this.gone?.disconnect()
     this.gone = undefined
     if (!this.waiting) {
+      this.stale = this.current !== undefined || this.stale
       this.rest(false)
     }
   }
@@ -239,8 +263,10 @@ export class ReadingsMotionController<F> implements ReactiveController {
     const now = performance.now()
     const items = this.options.items(field)
     const kept = new Set(items.map((item) => item.key))
-    for (const key of [...this.rising.keys()]) {
-      if (!kept.has(key)) {
+    /* An item that has finished growing moves on the clock from here, from
+       the reading drawn, as every other item does. */
+    for (const [key, one] of [...this.rising]) {
+      if (!kept.has(key) || now - one.since >= growTime(one.steps)) {
         this.rising.delete(key)
       }
     }
@@ -253,6 +279,7 @@ export class ReadingsMotionController<F> implements ReactiveController {
         this.rising.set(key, one)
       }
     }
+    this.standing.clear()
     this.clock?.cancel()
     this.clock = this.startClock()
     if (!this.clock && this.rising.size === 0) {
@@ -261,6 +288,39 @@ export class ReadingsMotionController<F> implements ReactiveController {
     }
     this.from = before
     this.frame(now)
+  }
+
+  /**
+   * Takes the host's readings laid out anew, such as at another width, where
+   * the table itself has not changed: **a new layout is not a new reading**,
+   * so nothing starts to move, and nothing grows in. A move in flight goes on
+   * to the new layout, and an item the layout brings in that the move did not
+   * start from stands at its reading. Readings that had nothing to draw before
+   * are taken as `follow` takes them, so a chart laid out for the first time
+   * still grows in.
+   */
+  relayout(field: F, readable: boolean): void {
+    if (field === this.settled) {
+      return
+    }
+    if (!this.readable || !readable) {
+      this.follow(field, readable)
+      return
+    }
+    this.settled = field
+    if (this.waiting) {
+      this.current = this.floorOf(field)
+    } else if (this.current !== undefined) {
+      const had = new Set(
+        this.from === undefined ? [] : this.options.items(this.from).map((item) => item.key),
+      )
+      for (const item of this.options.items(field)) {
+        if (!had.has(item.key) && !this.rising.has(item.key)) {
+          this.standing.add(item.key)
+        }
+      }
+      this.frame(performance.now())
+    }
   }
 
   /** Whether anything may move: a browser that draws frames, a reader who has not asked for less movement, and a page that has not paused its motion. */
@@ -309,6 +369,7 @@ export class ReadingsMotionController<F> implements ReactiveController {
     this.clock?.cancel()
     this.clock = undefined
     this.rising.clear()
+    this.standing.clear()
     this.from = undefined
     this.waiting = true
     this.current = this.floorOf(field)
@@ -346,7 +407,13 @@ export class ReadingsMotionController<F> implements ReactiveController {
 
   /** Under `grow-again`, waits for the chart to leave the view, then puts its items on the floor to grow in again. */
   private watchExit(): void {
-    if (!this.options.growAgain() || this.gone || typeof IntersectionObserver !== 'function') {
+    if (!this.options.growAgain() || typeof IntersectionObserver !== 'function') {
+      this.exitWanted = false
+      return
+    }
+    this.exitWanted = true
+    /* Off the page, nothing is watched: `hostConnected` watches once the host is back. */
+    if (this.gone || !this.connected) {
       return
     }
     this.gone = new IntersectionObserver(([entry]) => {
@@ -355,6 +422,7 @@ export class ReadingsMotionController<F> implements ReactiveController {
       }
       this.gone?.disconnect()
       this.gone = undefined
+      this.exitWanted = false
       if (this.moves() && this.readable) {
         this.wait()
         this.host.requestUpdate()
@@ -382,14 +450,24 @@ export class ReadingsMotionController<F> implements ReactiveController {
       return
     }
     const clocked = progress ?? 1
-    this.current = this.options.between(this.from, field, {
+    const current = this.options.between(this.from, field, {
       axes: clocked,
       floor: (key) => this.rising.has(key),
       share: (key) => {
         const one = this.rising.get(key)
-        return one ? grownAt(one.step, one.steps, now - one.since) : clocked
+        if (one) {
+          return grownAt(one.step, one.steps, now - one.since)
+        }
+        return this.standing.has(key) ? 1 : clocked
       },
     })
+    /* Readings `between` cannot move, such as a grid whose places changed,
+       are drawn as they are, with no clock left running on nothing. */
+    if (current === field) {
+      this.rest()
+      return
+    }
+    this.current = current
     this.host.requestUpdate()
     if (!this.pending) {
       this.pending = true
@@ -412,6 +490,7 @@ export class ReadingsMotionController<F> implements ReactiveController {
     this.clock?.cancel()
     this.clock = undefined
     this.rising.clear()
+    this.standing.clear()
     this.from = undefined
     this.current = undefined
     this.entering = false

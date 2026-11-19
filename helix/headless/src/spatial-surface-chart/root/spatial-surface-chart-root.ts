@@ -129,7 +129,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
- * @event {HelixPlotChangeEvent} helix-plot-change - The readings or the place the keys rest on changed, which the renderer is told. It stays on the chart.
+ * @event {HelixPlotChangeEvent} helix-plot-change - The readings or the place the keys rest on changed, or a frame of a move drew the surface on its way, which the renderer is told. It stays on the chart.
  * @event {HelixPlotTurnEvent} helix-plot-turn - Shift with an arrow asked the view to turn, by a step across or up.
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading moved, or was put away: `index` is the row, or `-1` for none or a place with no reading, with its `label` and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A place was clicked or pressed with Enter or Space, with the same detail as `helix-reading-change`.
@@ -207,11 +207,13 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    *
    * Under `prefers-reduced-motion`, or where the page has paused its motion
    * through `pauseMotion` or `Motion Toggle`, the surface stands at its
-   * readings from the start. A later table raises each place it gives a
-   * reading the same way, so a reading that arrives while the chart is in
-   * view arrives as the first ones did. The places it keeps rise or fall to
-   * their new heights on `--spatial-surface-chart-move-duration`, and stand
-   * there at once where it is unset.
+   * readings from the start. A later table moves the surface on
+   * `--spatial-surface-chart-move-duration`, and stands it at its new
+   * readings at once where that is unset: each place rises or falls to its
+   * new height, a place that gains a reading rises from the lowest reading,
+   * and one that loses its reading sinks to it. A table whose places across
+   * or in depth changed draws its new grid at once, since its places cannot
+   * be matched to the old ones.
    */
   @property({ reflect: true, type: Boolean })
   grow = false
