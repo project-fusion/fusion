@@ -160,8 +160,9 @@ export class HelixDialog extends HelixHeadlessDialog {
    * **A new height while open moves from the old one**, measured after layout
    * and before the frame is painted, so the panel never shows at its new size
    * first. A new width lays out at once, since that is the window or the page
-   * changing rather than what the panel holds, and the panel scrolls nothing
-   * while it moves, so a growing panel shows no scroll bar on its way.
+   * changing rather than what the panel holds, and neither the panel nor its
+   * body scrolls while it moves, so a growing panel shows no scroll bar on its
+   * way.
    */
   private resized(surface: HTMLDialogElement, size: { block: number; inline: number }): void {
     if (!surface.open) {
@@ -198,6 +199,11 @@ export class HelixDialog extends HelixHeadlessDialog {
         duration,
         easing: style.getPropertyValue('--helix-easing-emphasized').trim() || 'ease-in-out',
       },
+    )
+    /* The body gives up its height first, so it holds still for the move too. */
+    this.partNamed<HTMLElement>('body')?.animate(
+      [{ overflowY: 'hidden' }, { overflowY: 'hidden' }],
+      { duration },
     )
     this.resizing = move
     /* **Not watched while it moves.** The move sets the panel's height in the

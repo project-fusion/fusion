@@ -93,7 +93,9 @@ export default headless('dialog', {
         name="header"
         part="header"
       />
-      <Slot part="body" />
+      <View part="body">
+        <Slot />
+      </View>
       <Slot
         name="footer"
         part="footer"

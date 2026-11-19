@@ -21,8 +21,8 @@ import root from './headless.js'
  *
  * **The panel is the floating surface**, with its edge, its shadow and the
  * house radius, as wide as `size` says and never wider or taller than the
- * window less a margin, scrolling inside itself where its content is
- * longer. The scrim is the layer's backdrop. `glass` and `frosted` are the
+ * window less a margin. **Where its content is longer, the body scrolls**
+ * between the title and the actions, which stay on the screen. The scrim is the layer's backdrop. `glass` and `frosted` are the
  * translucent grounds over the theme's blur.
  *
  * **It rises as it fades in, and falls as it fades out**, at once under
@@ -73,6 +73,7 @@ export default styles(
   },
   ({ hook, include, keyframes, on, own, rule, variants }) => {
     const padding = hook.padding
+    const focusRoom = sum(token('size-focus-ring'), token('size-focus-offset'))
     const rise = hook.rise
     const move = token('duration-normal')
     const step = rule({
@@ -194,9 +195,28 @@ export default styles(
           gap: token('space-control'),
           inlineSize: fn('min', own.dialogWidth, difference('100vw', token('space-xl'))),
           maxBlockSize: difference('100dvh', token('space-xl')),
-          overflowY: 'auto',
           padding,
         }),
+        /* The panel scrolls as a whole only where the title and the actions alone
+           are taller than the window. A phone's panel holds still, since a box
+           that scrolls there has no height for the body to give up. */
+        web([rule({ overflowY: 'auto' })]),
+      ]),
+      /* **The body gives up its height first**, and scrolls inside, so the title
+         and the actions stay on the screen however long the words or large the
+         text. */
+      on('body', [
+        rule({
+          display: 'flex',
+          flexDirection: 'column',
+          flexShrink: 1,
+          gap: token('space-control'),
+          minBlockSize: 0,
+          overflowY: 'auto',
+        }),
+        /* Room inside the scroller for a focus ring, which it clips at its edges,
+           given back outside it. */
+        web([rule({ margin: product(focusRoom, '-1'), padding: focusRoom })]),
       ]),
       /* A closed dialog is not drawn, as the UA's sheet has it, which the
          `display` above takes away. */
@@ -224,10 +244,16 @@ export default styles(
           letterSpacing: token('tracking-tight'),
           lineHeight: token('leading-tight'),
           margin: token('space-none'),
+          flexShrink: 0,
         }),
       ]),
       on({ region: 'footer', slotted: '*' }, [
-        rule({ display: 'flex', gap: token('space-xs'), justifyContent: 'flex-end' }),
+        rule({
+          display: 'flex',
+          flexShrink: 0,
+          gap: token('space-xs'),
+          justifyContent: 'flex-end',
+        }),
       ]),
       /* It arrives and it leaves, rising as it fades in. */
       on('surface', [
@@ -315,6 +341,7 @@ export default styles(
         rule({
           blockSize: hook.iconSize,
           display: 'block',
+          flexShrink: 0,
           inlineSize: hook.iconSize,
         }),
       ]),

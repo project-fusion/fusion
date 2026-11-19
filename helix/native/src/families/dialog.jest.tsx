@@ -197,12 +197,44 @@ describe('the generated Dialog', () => {
     expect(style.marginTop).toBe('auto')
     expect(style.borderBottomLeftRadius ?? style.borderBottomStartRadius).toBe(0)
     expect(style.width).toBe(Dimensions.get('window').width)
-    /* The panel scrolls what it holds, padded by space-lg, and by the home
-       indicator's 34 points as well at the bottom, at this rem. */
-    const content = viewsWhere((props) => props.contentContainerStyle !== undefined)[0]
-    const inside = styleOf({ props: { style: content?.props.contentContainerStyle } })
-    expect(inside.padding).toBe(NARROW * 1.5)
-    expect(inside.paddingBottom).toBe(NARROW * 1.5 + 34)
+    /* Padded by space-lg, and by the home indicator's 34 points as well at
+       the bottom, at this rem. */
+    expect(style.padding).toBe(NARROW * 1.5)
+    expect(style.paddingBottom).toBe(NARROW * 1.5 + 34)
+  })
+
+  test('scrolls its body alone, so the title and the actions stay on the screen', async () => {
+    await draw(
+      rename({
+        footer: <Text>Rename</Text>,
+        header: <Text>Rename the file</Text>,
+      }),
+      NARROW,
+    )
+    /* The panel holds still, as tall as the window allows. */
+    expect(panel()?.props.contentContainerStyle).toBeUndefined()
+    expect(styleOf(panel() ?? { props: {} }).maxHeight).toBeDefined()
+    const scrollers = viewsWhere((props) => props.contentContainerStyle !== undefined)
+    expect(scrollers).toHaveLength(1)
+    const [body] = scrollers
+    const holds = (words: string) =>
+      body?.queryAll(
+        (node) =>
+          node.type === 'Text' &&
+          [node.props.children].flat(3).some((child) => child === words),
+      ).length !== 0
+    expect(holds('Choose a new name for the file.')).toBe(true)
+    expect(holds('Rename')).toBe(false)
+    expect(holds('Rename the file')).toBe(false)
+    /* Its frame, around the scroll view, gives up its height before the
+       title and the actions do. */
+    let around = body?.parent
+    while (around && styleOf(around).overflow !== 'hidden') {
+      around = around.parent
+    }
+    const frame = styleOf(around ?? { props: {} })
+    expect(frame.flexShrink).toBe(1)
+    expect(frame.minHeight).toBe(0)
   })
 
   test('is a card as wide as its size says in a wide window', async () => {

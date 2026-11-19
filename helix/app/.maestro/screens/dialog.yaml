@@ -68,10 +68,6 @@ name: "Screens: Dialog"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: dialog-size-small-${MODE}-${SIZE}
-- scrollUntilVisible:
-    element: Cancel
-    direction: DOWN
-    timeout: 10000
 - tapOn: Cancel
 - extendedWaitUntil:
     notVisible: .*becomes read-only.*
@@ -83,12 +79,6 @@ name: "Screens: Dialog"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: dialog-size-large-${MODE}-${SIZE}
-# At the largest text size the dialog's text runs past the screen, and its
-# actions scroll with it, as they do on the web.
-- scrollUntilVisible:
-    element: Cancel
-    direction: DOWN
-    timeout: 10000
 - tapOn: Cancel
 - extendedWaitUntil:
     notVisible: .*Update your name.*
