@@ -220,8 +220,7 @@ describe('the generated Dialog', () => {
     const holds = (words: string) =>
       body?.queryAll(
         (node) =>
-          node.type === 'Text' &&
-          [node.props.children].flat(3).some((child) => child === words),
+          node.type === 'Text' && [node.props.children].flat(3).some((child) => child === words),
       ).length !== 0
     expect(holds('Choose a new name for the file.')).toBe(true)
     expect(holds('Rename')).toBe(false)
