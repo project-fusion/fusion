@@ -29,7 +29,7 @@ const until = async (ready: () => boolean): Promise<void> => {
 
 describe('the revealing example', () => {
   run(
-    'loads a profile, crossfades it in as the card grows, and reloads the next one',
+    'loads a profile, crossfades it in as the card takes its new height, and reloads the next one',
     async () => {
       await example(revealing)
       const profile = document.getElementById('profile') as HTMLElement & { loading: boolean }
@@ -40,18 +40,25 @@ describe('the revealing example', () => {
 
       await until(() => !profile.loading)
       expect(profile.textContent).toContain('Ada Lovelace')
-      await frame()
-      await frame()
-      // Two frames into the reveal, the card is between the two heights.
       expect(hasState(profile, 'revealing')).toBe(true)
-      const moving = card.getBoundingClientRect().height
-      await until(() => !hasState(profile, 'revealing'))
+      /* **Every frame of the reveal, never a fixed one.** Two frames in, a
+         runner on CI read the card at its loaded height in both engines, where
+         a Mac read it mid-move at any CPU speed. */
+      const heights: number[] = []
+      const end = performance.now() + 3000
+      while (hasState(profile, 'revealing') && performance.now() < end) {
+        await frame()
+        heights.push(Math.round(card.getBoundingClientRect().height))
+      }
       const loaded = card.getBoundingClientRect().height
       /* Between, whichever is taller: the placeholder is drawn to the card's
-         shape, and the words it stands for wrap by the runner's fonts. */
-      expect(loaded).not.toBe(loading)
-      expect(moving).toBeGreaterThan(Math.min(loading, loaded))
-      expect(moving).toBeLessThan(Math.max(loading, loaded))
+         shape, and the words it stands for wrap by the runner's fonts. On a
+         failure the message lists the heights read. */
+      expect(Math.round(loaded)).not.toBe(Math.round(loading))
+      const low = Math.min(loading, loaded)
+      const high = Math.max(loading, loaded)
+      const between = heights.some((one) => one > low + 0.5 && one < high - 0.5)
+      expect(between ? 'between' : `${low} to ${high}: ${heights.join(' ')}`).toBe('between')
       expect((part(profile, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
 
       ;(document.getElementById('reload') as HTMLElement).click()

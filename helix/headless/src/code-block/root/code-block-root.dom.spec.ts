@@ -277,6 +277,9 @@ describe('line numbers and a highlighter', () => {
       const slot = el.shadowRoot?.querySelector('[part="code"] slot:not([name])')
       expect([slot?.hasAttribute('hidden'), reported.length]).toEqual([false, 1])
     } finally {
+      /* The block goes before the reporter comes back: left on the page, it
+         throws again on its next render, uncaught, in whichever spec runs next. */
+      document.body.replaceChildren()
       globalThis.reportError = original
     }
   })
