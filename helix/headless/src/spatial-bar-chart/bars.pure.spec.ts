@@ -349,6 +349,19 @@ describe('moving between two tables', () => {
     expect(barsBetween(from, to, at(1)).cells).toHaveLength(1)
   })
 
+  test("a bar moving to a dropped series' place moves to its color, and the dropped bar keeps its own", () => {
+    const from = barsOf([row('Mon', 4, 6, 8)], [0, 1, 2])
+    const to = barsOf([row('Mon', 4, 6, 8)], [0, 2])
+    const half = barsBetween(from, to, at(0.5))
+    const [first, moved, dropped] = half.cells
+    expect(first?.wore).toBeUndefined()
+    expect(moved?.depth).toBe(1)
+    expect(moved?.wore).toEqual({ depth: 2, share: 0.5 })
+    expect(dropped?.depth).toBe(1)
+    expect(dropped?.wore).toBeUndefined()
+    expect(barsBetween(from, to, at(1)).cells.every((cell) => cell.wore === undefined)).toBe(true)
+  })
+
   test('the value axis eases to its new range, and writes only the ticks inside it', () => {
     const from = barsOf([row('Mon', 4)], [0])
     const to = barsOf([row('Mon', 40)], [0])

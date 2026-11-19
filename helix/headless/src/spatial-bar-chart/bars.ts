@@ -53,6 +53,14 @@ export interface BarCell {
   row: number
   /** The tone the cell names with `data-tone`, which colors its own bar, where it names one. */
   tone?: string | undefined
+  /**
+   * On a field drawn between two, the series whose color the cell moves
+   * from, and how far it has come, from 0 to 1, where a move takes it to
+   * another series' place in depth, such as when a series before it left.
+   * Its color moves with it, so a bar shrinking out and the one taking its
+   * place never wear one color.
+   */
+  wore?: { depth: number; share: number } | undefined
   /** The value, where the cell holds a number. */
   value?: number | undefined
 }
@@ -613,6 +621,7 @@ export const barsBetween = (
       key,
       lane: mix(old.lane, cell.lane, share),
       value: mix(old.value, cell.value, share),
+      ...(old.depth !== cell.depth && share < 1 ? { wore: { depth: old.depth, share } } : {}),
     }
   })
   const kept = new Set(keys)

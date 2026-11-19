@@ -140,7 +140,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @slot renderer - The renderer's box, which a 3D drawing is made in, over the chart's own.
  *
- * @event {HelixPlotChangeEvent} helix-plot-change - The readings drawn or the reading the keys rest on changed, which a renderer is told. It stays on the chart.
+ * @event {HelixPlotChangeEvent} helix-plot-change - The readings drawn or the reading the keys rest on changed, or a frame of a move drew the readings on their way, which a renderer is told. It stays on the chart.
  * @event {HelixPlotTurnEvent} helix-plot-turn - Shift with an arrow asked a renderer's view to turn, by a step across or up.
  *
  * @csspart base - The slab the prisms stand on: a group holding its top and its two sides. Hidden from screen readers.
@@ -274,11 +274,23 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   private corners: DrawnCorners | undefined
 
   /** The field last told, the frame of a move, and the reading, so a renderer is told of a change only. */
-  private told: { at: number; field: string; frame: unknown } = {
+  private told: { at: number; field: unknown; frame: unknown } = {
     at: -1,
-    field: '',
+    field: undefined,
     frame: undefined,
   }
+
+  /** `field`, built again only when the readings or what draws them change, so a change is told by identity. */
+  private plotted:
+    | {
+        field: HelixHeadlessSpatialHeatmap['field']
+        flat: boolean
+        heat: HeatField
+        relief: number
+        thresholds: unknown
+        tones: unknown
+      }
+    | undefined
 
   /**
    * What a renderer draws: every reading drawn, down each column and then
@@ -295,7 +307,24 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     columns: number
     rows: number
   } {
-    return this.plotOf(this.heatField)
+    const [heat, flat, relief, thresholds, tones] = [
+      this.heatField,
+      this.flat,
+      this.relief,
+      this.thresholds,
+      this.tones,
+    ]
+    const memo = this.plotted
+    if (
+      memo?.heat !== heat ||
+      memo.flat !== flat ||
+      memo.relief !== relief ||
+      memo.thresholds !== thresholds ||
+      memo.tones !== tones
+    ) {
+      this.plotted = { field: this.plotOf(heat), flat, heat, relief, thresholds, tones }
+    }
+    return (this.plotted as { field: HelixHeadlessSpatialHeatmap['field'] }).field
   }
 
   /**
@@ -387,7 +416,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     super.updated(changed)
     this.placeLabels()
     /* Told only on a change, so a renderer draws again only when it must. */
-    const field = JSON.stringify(this.field)
+    const field = this.field
     const frame = this.motion.drawn
     if (field !== this.told.field) {
       this.told.field = field

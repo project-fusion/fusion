@@ -20,6 +20,8 @@ export interface BarCell {
   /** The tone its cell names, which colors its own bar. */
   tone?: string | undefined
   value?: number | undefined
+  /** On a move frame, the series whose color it moves from and how far it has come, from 0 to 1. */
+  wore?: { depth: number; share: number } | undefined
 }
 
 /**

@@ -492,10 +492,24 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     return { duration: '', easing: '' }
   }
 
-  /** The readings drawn, read once for each table and each width. */
+  /**
+   * The readings drawn, read once for each table and each width, and which
+   * table they come from: a new width or row count lays the same table out
+   * anew, which is not a new reading.
+   */
   private heatMemo:
-    | { field: HeatField; rows: unknown; room: number; series: unknown; tall: number }
+    | {
+        field: HeatField
+        rows: unknown
+        room: number
+        series: unknown
+        table: number
+        tall: number
+      }
     | undefined
+
+  /** The table the motion last followed, by `heatMemo`'s count. */
+  private followed = -1
 
   /**
    * The drawn readings as the strip's motion moves them: each by its row's
@@ -509,6 +523,8 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       const first = Math.max(0, points.length - room)
       const drawn = points.slice(first)
       const keys = keysOf(drawn.map((_, index) => rows[first + index]?.label ?? ''))
+      const table =
+        memo?.series === series && memo.rows === rows ? memo.table : (memo?.table ?? -1) + 1
       this.heatMemo = {
         field: {
           cells: drawn.map((point, index) => ({ ...point, key: keys[index] as string })),
@@ -521,6 +537,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         room,
         rows,
         series,
+        table,
         tall,
       }
     }
@@ -820,7 +837,14 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     /* Decided before the strip is drawn, so a cell that grows never shows its
        tone first. */
     const field = this.heatField
-    this.motion.follow(field, field.cells.length > 0)
+    const table = this.heatMemo?.table ?? -1
+    if (table === this.followed) {
+      /* A wider strip shows older days where they stand: a resize is not a reading. */
+      this.motion.relayout(field, field.cells.length > 0)
+    } else {
+      this.followed = table
+      this.motion.follow(field, field.cells.length > 0)
+    }
   }
 
   /**

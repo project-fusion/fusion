@@ -188,7 +188,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
- * @event {HelixPlotChangeEvent} helix-plot-change - The bars or the bar the keys rest on changed, which the renderer is told. It stays on the chart.
+ * @event {HelixPlotChangeEvent} helix-plot-change - The bars or the bar the keys rest on changed, or a frame of a move drew the bars on their way, which the renderer is told. It stays on the chart.
  * @event {HelixPlotTurnEvent} helix-plot-turn - Shift with an arrow asked the view to turn, by a step across or up.
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading moved, or was put away: `index` is the row, or `-1` for none, with its `label` and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A bar was clicked or pressed with Enter or Space, with the same detail as `helix-reading-change`.
@@ -920,7 +920,9 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   /** One bar, its faces in its tone's color or its series', each shaded by which way it faces. */
   private renderBar(field: BarField, bar: DrawnBar, at: number): SVGTemplateResult {
     const one = field.cells[bar.index]
-    const series = ((one?.depth ?? 0) % SERIES) + 1
+    /* A bar moving to another series' place takes its color halfway. */
+    const wore = one?.wore && one.wore.share < 0.5 ? one.wore.depth : one?.depth
+    const series = ((wore ?? 0) % SERIES) + 1
     const short = (value: number): number => Math.round(value * 1000) / 1000
     /* A tone falls back to the series' color, as on `Bar Chart`. */
     return svg`<g data-index=${bar.index} data-tone=${one?.tone ?? nothing} part="bar${bar.index === at ? ' bar-active' : ''}" style="--chart-series: ${one?.tone ? `var(--spatial-bar-chart-tone-${one.tone}, var(--chart-series-${series}))` : `var(--chart-series-${series})`}">${bar.drawn.faces.map((face) => svg`<path d=${face.d} part="face" style="--spatial-bar-chart-shade: ${short(face.darken)}"></path>`)}</g>`

@@ -1020,6 +1020,23 @@ describe('growing in', () => {
     expect(cells(element).every((cell) => !cell.hasAttribute('data-tone'))).toBe(false)
   })
 
+  clocked('a wider strip shows older days at their readings, with nothing grown in', async () => {
+    const element = (await strip(
+      `grow min-cell="10" gap="0" ${TONED}`,
+      DAYS,
+    )) as unknown as HelixHeadlessHeatmap
+    const sized = element as unknown as { width: number }
+    sized.width = 20
+    await element.updateComplete
+    sees(true)
+    await settle(element)
+    expect(cells(element)).toHaveLength(2)
+    sized.width = 1000
+    await element.updateComplete
+    expect(cells(element)).toHaveLength(4)
+    expect(cells(element).every((cell) => cell.hasAttribute('data-tone'))).toBe(true)
+  })
+
   clocked(
     'under grow-again, stands on the floor again once the chart has left the view',
     async () => {

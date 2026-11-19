@@ -128,6 +128,12 @@ export const threeBarDriver = (
     const lines: BufferGeometry[] = []
     drawnCells = []
     tops = new Map()
+    /* A bar moving to another series' place moves to its color as it goes. */
+    const seriesColor = (cell: (typeof next.cells)[number]): Color => {
+      const of = (depth: number) =>
+        new Color(colors.groups[depth % colors.groups.length] ?? colors.ink)
+      return cell.wore ? of(cell.wore.depth).lerp(of(cell.depth), cell.wore.share) : of(cell.depth)
+    }
     next.cells.forEach((cell, index) => {
       if (cell.value === undefined || (next.stacked && cell.value === 0)) {
         return
@@ -140,7 +146,7 @@ export const threeBarDriver = (
         ? new Color(toned)
         : muted
           ? new Color(colors.ground).lerp(new Color(colors.ink), 0.3)
-          : new Color(colors.groups[cell.depth % colors.groups.length] ?? colors.ink)
+          : seriesColor(cell)
       /* As the chart's own drawing paints them: `outlined` fades the faces
            toward the page and draws the edges in the series' color, and
            `subtle` is a faint wash under the same edges. */
