@@ -33,6 +33,7 @@ import '../../toolbar/index.js'
  * @cssproperty --code-editor-background-color - The ground the code is drawn on. Defaults to the page's background.
  * @cssproperty --code-editor-block-size - The frame's height, as a length: 24rem unless set. Ignored with `fill`, where the container decides it.
  * @cssproperty --code-editor-border-color - The frame's edge and the lines between its strips.
+ * @cssproperty --code-editor-flash-color - The wash a changed line takes with `flash-changes`, at its strongest. Defaults to `--helix-color-info` at 14 percent in light mode and 22 in dark.
  * @cssproperty --code-editor-font-size - The code's size. Defaults to `text-sm`.
  * @cssproperty --code-editor-header-background-color - The fill of the header, the find bar, and the status line.
  * @cssproperty --code-editor-radius - The frame's corner radius.

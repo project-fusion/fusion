@@ -3,6 +3,12 @@
   font-variant-ligatures: none;
   display: flex;
   flex-direction: column;
+  /* The wash a changed line takes with `flash-changes`, which CodeMirror's
+     theme reads: the info color, as Data Table's changed row takes it. */
+  --code-editor-flash-color: light-dark(
+    color-mix(in oklab, var(--helix-color-info) 14%, transparent),
+    color-mix(in oklab, var(--helix-color-info) 22%, transparent)
+  );
 }
 
 :host([fill]) {

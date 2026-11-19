@@ -46,6 +46,8 @@ export interface CodeEditorDiagnostic {
 /** What an editor shows, which an engine draws. */
 export interface CodeEditorEngineState {
   diagnostics: readonly CodeEditorDiagnostic[]
+  /** Whether a line the page changes, and the reader did not type, lights up briefly. */
+  flashChanges: boolean
   /** The editor's name, for the engine's text area. */
   label: string
   /** The language to highlight, such as `ts`, `css`, `md` or `rust`. Empty is plain text. */
@@ -143,6 +145,7 @@ export const diagnosticLines = (
 /** The editor's properties an engine draws, which are what `update` is handed. */
 const ENGINE_KEYS = [
   'diagnostics',
+  'flashChanges',
   'label',
   'language',
   'lineNumbers',
@@ -223,6 +226,10 @@ const LANGUAGE_NAMES: Record<string, string> = {
  *   engine or in the plain field alike.
  * - Every change goes through `requestValue`, so a listener refusing
  *   `helix-before-change` refuses the keystroke, in the engine too.
+ * - `flash-changes` lights up each line a change from the page touched, such
+ *   as a new `value` from an agent, and fades it, in an engine that draws
+ *   lines. A value that changes every line is a new file, and nothing lights
+ *   up.
  *
  * **Keyboard.** Command+F, or Control+F elsewhere, opens the find bar, Enter
  * and Shift+Enter move between matches, and Escape closes it. In an engine,
@@ -432,6 +439,15 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   @property({ attribute: 'find-whole-word-label' })
   findWholeWordLabel = 'Match whole word'
 
+  /**
+   * Lights up the lines a change from the page touches, such as a new
+   * `value` from an agent, and fades them, so you see what changed. Lines a
+   * reader types stay as they are. The engine draws it, and the plain field
+   * draws nothing.
+   */
+  @property({ attribute: 'flash-changes', type: Boolean })
+  flashChanges = false
+
   /** The language to highlight, such as `ts`, `css`, `md` or `rust`. Empty is plain text. */
   @property()
   language = ''
@@ -520,6 +536,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   private get engineState(): CodeEditorEngineState {
     return {
       diagnostics: this.diagnostics,
+      flashChanges: this.flashChanges,
       label: this.label,
       language: this.language,
       lineNumbers: this.lineNumbers,
