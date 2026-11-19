@@ -1,4 +1,4 @@
-import { customElement, numberConverter } from '@fusion.dev/helix-core'
+import { customElement, numberConverter, reducedMotion, resizeFrom } from '@fusion.dev/helix-core'
 import { HelixHeadlessSkeleton } from '@fusion.dev/helix-headless/skeleton'
 import { type CSSResultGroup, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -16,6 +16,18 @@ import { styles } from './skeleton-root.css.js'
  * paints over it, and the content is hidden until `loading` is taken off.
  * Around a field, such as an Input with a label and a hint, it draws the
  * field's own pieces: a line for the label, the box, and a line for the hint.
+ *
+ * **Loading ends in a crossfade in the same place.** When `loading` is taken
+ * off, the placeholder fades out over the content fading in, and the box's
+ * height moves from the placeholder's to the content's over the same beat, so
+ * nothing below the skeleton jumps. Setting `loading` again crossfades back.
+ * The move takes `--skeleton-reveal-duration` along `--skeleton-reveal-easing`,
+ * and `0ms` turns it off. Under reduced motion the height changes at once and
+ * the two sides crossfade over `--helix-duration-fade`.
+ *
+ * **Put the skeleton inside a card**, around what loads, and the card's edge
+ * moves with the box. The box clips at its foot while it moves, so an edge the
+ * content draws itself is hidden until the move ends.
  *
  * **`lines` draws a paragraph.** With `shape="text"` and `lines="3"`, one
  * element stands in for three lines of text: each line a `skeleton` part one
@@ -36,6 +48,7 @@ import { styles } from './skeleton-root.css.js'
  * @csspart lines - The column holding a `lines` paragraph, drawn only for `shape="text"` with two or more lines.
  * @csspart piece - Each shape drawn over a wrapped field: its label, its box, and its hint. Also a `skeleton` part.
  * @csspart pieces - The layer holding the shapes drawn over a wrapped field.
+ * @csspart placeholder - The box around the `placeholder` slot and the shape it falls back to, which shares the content's place and fades out as the content fades in.
  * @csspart sheen - The highlight swept across the shape. Hidden for `effect="pulse"` and `effect="none"`.
  * @csspart skeleton - The placeholder shape, or each line of a `lines` paragraph.
  *
@@ -44,8 +57,12 @@ import { styles } from './skeleton-root.css.js'
  * @cssproperty --skeleton-duration - How long one sweep or one pulse takes.
  * @cssproperty --skeleton-last-line-size - The width of the last line of a `lines` paragraph. Defaults to 60%.
  * @cssproperty --skeleton-radius - The corner of the block shape. Around content, it defaults to the corner the content draws.
+ * @cssproperty --skeleton-reveal-duration - How long the crossfade and the height move take when `loading` changes. Defaults to `--helix-duration-slow`. `0ms` shows the other side at once.
+ * @cssproperty --skeleton-reveal-easing - The curve the crossfade and the height move follow. Defaults to `--helix-easing-standard`.
  * @cssproperty --skeleton-sheen-color - The highlight the sweep carries across the fill.
  * @cssproperty --skeleton-size - The diameter of the circle shape.
+ *
+ * @cssstate revealing - The crossfade and the height move are running, after `loading` changed.
  */
 @customElement('helix-skeleton')
 export class HelixSkeleton extends HelixHeadlessSkeleton {
@@ -100,16 +117,58 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
 
   private watchedField: Element | undefined
 
+  /* **The height the box was last drawn at**, which a reveal starts from. It
+     is read after each layout, because a page or a framework usually puts the
+     loaded content in during the task that takes `loading` off, and a box
+     measured in that task already has the content's height. */
+  private heightSeen: number | undefined
+
+  private sizeWatcher: ResizeObserver | undefined
+
+  /** The height a reveal this update starts from, set where `loading` changed. */
+  private revealFrom: number | undefined
+
+  /* Whether a reveal is running, set in the update that starts one so that
+     update still draws the pieces the placeholder fades out with. */
+  private revealing = false
+
+  /** The fades and the height move of the reveal running, ended where another starts. */
+  private reveal: { fades: Animation[]; height: Animation | undefined } | undefined
+
+  /** Which reveal is the latest, so only it ends the state. */
+  private turn = 0
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watchSize()
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     const first =
-      this.isConnected && typeof getComputedStyle === 'function' ? this.firstElementChild : null
+      this.isConnected && typeof getComputedStyle === 'function' && !this.placeholdered
+        ? this.firstElementChild
+        : null
     this.corner = first ? cornerOf(first) : ''
+    if (this.hasUpdated && changed.has('loading') && this.wraps && this.isConnected) {
+      /* A box in the middle of a reveal is held at the height it is drawn,
+         so it is read now; otherwise the height last drawn. */
+      this.revealFrom =
+        this.reveal || this.heightSeen === undefined
+          ? this.getBoundingClientRect().height
+          : this.heightSeen
+      this.revealing = true
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    const first = this.firstElementChild
+    const from = this.revealFrom
+    this.revealFrom = undefined
+    if (from !== undefined) {
+      this.startReveal(from)
+    }
+    const first = this.placeholdered ? null : this.firstElementChild
     if (first?.localName.includes('-') && !customElements.get(first.localName)) {
       void customElements.whenDefined(first.localName).then(() => {
         requestAnimationFrame(() => this.requestUpdate())
@@ -121,6 +180,117 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.watchField(null)
+    this.sizeWatcher?.disconnect()
+    this.heightSeen = undefined
+    this.endReveal()
+  }
+
+  /** Records the height the box is drawn at, after each layout that changes it. */
+  private watchSize(): void {
+    if (typeof ResizeObserver !== 'function') {
+      return
+    }
+    this.sizeWatcher ??= new ResizeObserver(() => {
+      this.heightSeen = this.getBoundingClientRect().height
+    })
+    this.sizeWatcher.observe(this)
+  }
+
+  /**
+   * **Crossfades from the side that was showing to the side that shows now**,
+   * in one place, while the box's height moves from `from` to the height it
+   * lays out at. The fades start with the height move, once the new side has
+   * laid out and before that frame is painted, so no frame shows the new side
+   * whole or neither side at all. A reveal started during another carries on
+   * from the opacity each side is drawn at.
+   */
+  private startReveal(from: number): void {
+    const content = this.renderRoot.querySelector<HTMLElement>('[part="content"]')
+    const placeholder = this.renderRoot.querySelector<HTMLElement>('[part="placeholder"]')
+    const style = getComputedStyle(this)
+    /* Under reduced motion the height does not move, which `resizeFrom`
+       holds, and the sides fade over the fade a panel keeps then. */
+    const duration = milliseconds(
+      style
+        .getPropertyValue(reducedMotion() ? '--helix-duration-fade' : '--skeleton-reveal-duration')
+        .trim(),
+    )
+    const easing = style.getPropertyValue('--skeleton-reveal-easing').trim() || 'ease'
+    if (!content || !placeholder || typeof this.animate !== 'function' || !(duration >= 1)) {
+      this.endReveal()
+      return
+    }
+    const [arriving, leaving] = this.loading ? [placeholder, content] : [content, placeholder]
+    const previous = this.reveal
+    const drawn = (layer: HTMLElement, otherwise: number): number =>
+      previous ? Number.parseFloat(getComputedStyle(layer).opacity) : otherwise
+    const arrivingFrom = drawn(arriving, 0)
+    const leavingFrom = drawn(leaving, 1)
+    this.turn += 1
+    const turn = this.turn
+    this.toggleState('revealing', true)
+    /* **The box stops recording its height while it moves.** The move starts
+       inside an observer, and a second observer on the same box then has a
+       size it cannot be told in that frame, which WebKit reports as an error
+       on the window. A reveal reads the height it is drawn at instead. */
+    this.sizeWatcher?.unobserve(this)
+    this.heightSeen = undefined
+    const reveal: { fades: Animation[]; height: Animation | undefined } = {
+      fades: previous?.fades ?? [],
+      height: previous?.height,
+    }
+    this.reveal = reveal
+    void resizeFrom(this, from, {
+      previous: previous?.height,
+      timing: () => ({ duration, easing }),
+    }).then((height) => {
+      for (const fade of previous?.fades ?? []) {
+        fade.cancel()
+      }
+      if (turn !== this.turn) {
+        height?.cancel()
+        return
+      }
+      const timing = { duration, easing }
+      reveal.height = height
+      reveal.fades = [
+        arriving.animate([{ opacity: arrivingFrom }, { opacity: 1 }], timing),
+        leaving.animate([{ opacity: leavingFrom }, { opacity: 0 }], {
+          ...timing,
+          fill: 'forwards',
+        }),
+      ]
+      const done = (): void => {
+        if (turn === this.turn) {
+          this.endReveal()
+        }
+      }
+      void Promise.all(
+        [...reveal.fades, ...(height ? [height] : [])].map((one) => one.finished),
+      ).then(done, done)
+    })
+  }
+
+  /** Ends the reveal running, if any, and draws the side that shows alone. */
+  private endReveal(): void {
+    this.turn += 1
+    const reveal = this.reveal
+    this.reveal = undefined
+    for (const one of [...(reveal?.fades ?? []), ...(reveal?.height ? [reveal.height] : [])]) {
+      one.cancel()
+    }
+    this.toggleState('revealing', false)
+    if (!this.revealing) {
+      return
+    }
+    this.revealing = false
+    if (this.isConnected) {
+      this.watchSize()
+    }
+    if (!this.loading && this.pieces.length > 0) {
+      this.pieces = []
+      this.requestUpdate()
+    }
   }
 
   /** Watches the wrapped element's size while loading, to measure its pieces. */
@@ -131,8 +301,11 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
     this.fieldWatcher?.disconnect()
     this.watchedField = field ?? undefined
     if (!field) {
-      /* Nothing to draw again: the shape reads the pieces only while loading. */
-      this.pieces = []
+      /* Nothing to draw again: the shape reads the pieces only while loading,
+         or while it fades out after, which clears them when it ends. */
+      if (!this.revealing) {
+        this.pieces = []
+      }
       return
     }
     this.fieldWatcher ??= new ResizeObserver(() => this.measurePieces())
@@ -154,7 +327,7 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
   /* One shape per line, each a `skeleton` part, so a page's rule for the
      shape reaches every line. */
   protected override renderShape(): TemplateResult {
-    if (this.loading && this.pieces.length > 0) {
+    if ((this.loading || this.revealing) && this.pieces.length > 0) {
       return html`<span part="pieces">${this.pieces.map(
         (piece) =>
           html`<span
@@ -178,6 +351,15 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
       () => html`<span part="skeleton line"><span part="sheen"></span></span>`,
     )}</span>`
   }
+}
+
+/** Reads a CSS time as milliseconds. Anything that does not read as one is 0. */
+const milliseconds = (value: string): number => {
+  const amount = Number.parseFloat(value)
+  if (!Number.isFinite(amount)) {
+    return 0
+  }
+  return value.endsWith('ms') ? amount : amount * 1000
 }
 
 /** One shape over a wrapped field, in pixels from the host's start edge and top. */

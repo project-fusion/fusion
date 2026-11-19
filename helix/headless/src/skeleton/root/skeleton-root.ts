@@ -24,6 +24,14 @@ import { property } from 'lit/decorators.js'
  * `loading` off and the content is shown as it is. An empty skeleton is a
  * placeholder of its own size, as before.
  *
+ * **Draw your own placeholder in the `placeholder` slot** where the content is
+ * not there until it loads, such as a card that is drawn from data: a circle
+ * and three lines, laid out as the card will be. While `loading` is set the
+ * placeholder shows and the content is hidden. Once it is off the placeholder
+ * is hidden and the content shows. The placeholder is hidden from screen
+ * readers. A server cannot see the children, so it serves both, and the
+ * content is hidden once the page has its children.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -34,8 +42,10 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @slot - The content the skeleton stands in for, which sizes it. Optional.
+ * @slot placeholder - What shows while `loading` is set, in place of the content, such as skeletons laid out as the content will be. Falls back to the skeleton's own shape.
  *
- * @csspart content - The box around the content, inert while `loading`.
+ * @csspart content - The box around the content, inert while `loading`, and hidden while `loading` where the `placeholder` slot is filled.
+ * @csspart placeholder - The box around the `placeholder` slot and the shape it falls back to, hidden once the content has loaded.
  * @csspart sheen - The highlight inside the shape, which the styled tier sweeps across it. Empty, and drawn by no rule on this tier.
  * @csspart skeleton - The placeholder shape.
  *
@@ -69,13 +79,23 @@ export class HelixHeadlessSkeleton extends HelixElement {
    * be known. Not on a server, where an unlabeled skeleton is taken for an
    * empty one until the page has its children.
    */
-  private get wraps(): boolean {
+  protected get wraps(): boolean {
     return (
       this.childrenKnown &&
       [...this.childNodes].some(
         (node) => node.nodeType === 1 || (node.textContent ?? '').trim() !== '',
       )
     )
+  }
+
+  /**
+   * Whether the page drew its own placeholder, in the `placeholder` slot,
+   * read off the children where they can be known. Not on a server, which
+   * serves the content and the placeholder both until the page has its
+   * children.
+   */
+  protected get placeholdered(): boolean {
+    return this.knownChildren.some((child) => child.slot === 'placeholder')
   }
 
   /* The busy state and a live region were on the placeholder itself, which
@@ -96,7 +116,8 @@ export class HelixHeadlessSkeleton extends HelixElement {
     this.toggleState('wrapping', wraps)
     /* A block fills its line, so a skeleton around one fills it too: shrunk to
        fit, a wrapped Input measured 202 pixels against the 260 it takes alone. */
-    const first = this.firstElementChild
+    const first =
+      this.knownChildren.find((child) => child.slot !== 'placeholder') ?? this.firstElementChild
     const display = wraps && first && this.isConnected ? getComputedStyle(first).display : ''
     this.toggleState(
       'wrapping-block',
@@ -127,9 +148,24 @@ export class HelixHeadlessSkeleton extends HelixElement {
     /* The sheen is an element rather than a sheet's `::after`, so a page
        reaches it as a part, as Web Awesome's skeleton publishes its
        indicator. */
-    return html`<span part="content" ?inert=${this.loading}
-        ><slot @slotchange=${() => this.requestUpdate()}></slot></span
-      >${this.renderShape()}`
+    /* **The shape is the `placeholder` slot's fallback**, so a placeholder
+       the page draws replaces it with no detection: the server cannot see
+       the children, and the slot decides at assignment time on both sides.
+       The placeholder is hidden once the content has loaded, and the content
+       is hidden while it loads where the page drew a placeholder, so with no
+       stylesheet one of the two shows. */
+    const update = (): void => this.requestUpdate()
+    return html`<span
+        part="content"
+        ?hidden=${this.loading && this.placeholdered}
+        ?inert=${this.loading}
+        ><slot @slotchange=${update}></slot></span
+      ><span
+        part="placeholder"
+        aria-hidden="true"
+        ?hidden=${!this.loading && this.wraps}
+        ><slot name="placeholder" @slotchange=${update}>${this.renderShape()}</slot></span
+      >`
   }
 
   /**

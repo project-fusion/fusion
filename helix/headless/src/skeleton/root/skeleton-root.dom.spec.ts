@@ -137,3 +137,55 @@ describe('a skeleton around content', () => {
     expect(hasState(skeleton, 'wrapping')).toBe(true)
   })
 })
+
+/* A card drawn from data is not there until it loads, so it cannot size a
+   skeleton around it. The page draws the placeholder itself, laid out as the
+   card will be, and the skeleton shows one side or the other. */
+describe('a placeholder the page draws', () => {
+  type Skeleton = HTMLElement & { loading: boolean; updateComplete: Promise<unknown> }
+
+  const markup = `<helix-headless-skeleton loading>
+    <div slot="placeholder">Shapes</div>
+    <p>Card</p>
+  </helix-headless-skeleton>`
+
+  test('shows in place of the content while it loads, and the content shows once it has', async () => {
+    const skeleton = (await mount(markup)) as Skeleton
+    expect(part(skeleton, 'content')?.hidden).toBe(true)
+    expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(true)
+    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+    skeleton.loading = false
+    await skeleton.updateComplete
+    expect(part(skeleton, 'content')?.hidden).toBe(false)
+    expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(false)
+    expect(part(skeleton, 'placeholder')?.hidden).toBe(true)
+  })
+
+  test('replaces the shape, which is the slot fallback, and is hidden from screen readers', async () => {
+    const skeleton = (await mount(markup)) as Skeleton
+    const slot = part(skeleton, 'placeholder')?.querySelector('slot') as HTMLSlotElement
+    expect(slot.name).toBe('placeholder')
+    expect(slot.assignedElements()[0]?.textContent).toBe('Shapes')
+    expect(slot.querySelector('[part="skeleton"]')).not.toBeNull()
+    expect(part(skeleton, 'placeholder')?.getAttribute('aria-hidden')).toBe('true')
+    expect(internalsOf(skeleton).ariaBusy).toBe('true')
+  })
+
+  test('without one, the content keeps its place while it loads, and the shape goes once loaded', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton loading><p>Card</p></helix-headless-skeleton>',
+    )) as Skeleton
+    expect(part(skeleton, 'content')?.hidden).toBe(false)
+    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+    skeleton.loading = false
+    await skeleton.updateComplete
+    expect(part(skeleton, 'placeholder')?.hidden).toBe(true)
+  })
+
+  test('a placeholder alone is never hidden, loading or not', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton></helix-headless-skeleton>',
+    )) as Skeleton
+    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+  })
+})
