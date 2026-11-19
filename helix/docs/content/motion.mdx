@@ -184,13 +184,19 @@ stylesheet, so its stack has no hooks of this kind.
 
 ## The wash under the pointer
 
-In `Navigation` and `Tabs`, the hover wash is one shape that glides from item
-to item as a mouse or pen moves along the row, and fades out when the pointer
-leaves. It takes the place of each item's own wash, in the same color, from
-`--navigation-item-hover-background-color` or
-`--tabs-tab-hover-background-color`. Arriving from outside the row, it appears
-under the pointer without sliding. A touch draws no wash, and under reduced
-motion the wash moves at once.
+In `Navigation`, `Tabs`, and `Toggle Group`, the hover wash is one shape that
+glides from item to item as a mouse or pen moves along the row, and fades out
+when the pointer leaves. It takes the place of each item's own wash, in the
+same color, from `--navigation-item-hover-background-color`,
+`--tabs-tab-hover-background-color`, or
+`--toggle-group-hover-background-color`. Arriving from outside the row, it
+appears under the pointer without sliding. A touch draws no wash, and under
+reduced motion the wash moves at once.
+
+In `Menu`, the wash marks the row with focus, so it glides as the pointer or
+the arrow keys move focus, and holds while the pointer crosses a divider. It
+reads `--menu-item-hover-background-color`, and a `danger` row keeps its own
+hue. A submenu that opens beside its row lights its own rows.
 
 ## Figures that count
 

@@ -59,6 +59,9 @@
   --_floating-border-width: var(--menu-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--menu-shadow, var(--helix-shadow-floating));
 
+  /* Its own stack, so the highlight can sit behind the rows and still above
+     the fill. */
+  isolation: isolate;
   min-inline-size: var(--menu-min-inline-size, 12rem);
   /* Block only. The inset belongs to the rows, so a row's hover and focus reach
      the full width of the surface instead of stopping short of it and leaving a
@@ -200,5 +203,65 @@
 @media print {
   :host {
     display: none;
+  }
+}
+
+/* **The highlight, one wash that glides from row to row** as the hover wash
+   does in `Navigation`, `Tabs` and `Toggle Group`, in place of each row's own,
+   which the rule after this takes away while it is placed. It lands where
+   focus arrives and fades in, and slides only once `data-gliding` says it has
+   arrived, so it never slides in from the row it last left. Behind the rows,
+   so their words and a pressed row's fill stay on top. */
+[part="highlight"] {
+  background-color: var(--menu-item-hover-background-color, var(--helix-color-hover));
+  block-size: var(--indicator-block-size, 0);
+  border-radius: var(--_menu-item-radius, var(--helix-radii-none));
+  display: block;
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
+  z-index: -1;
+}
+
+[part="highlight"][data-placed] {
+  opacity: 1;
+}
+
+[part="highlight"][data-gliding] {
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    background-color var(--helix-duration-normal) var(--helix-easing-standard),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* On a destructive row, that row's wash, 12% of the danger hue. */
+[part="highlight"][data-tone="danger"] {
+  background-color: var(
+    --menu-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+  );
+}
+
+/* Each row's own wash goes while the highlight draws it. A flyout's rows take
+   it back in `menu-item.css`, since they inherit this through their parent. */
+:host(:state(gliding)) ::slotted(*) {
+  --_menu-item-glide: transparent;
+}
+
+/* Under forced colors each row draws its own system highlight. */
+@media (forced-colors: active) {
+  [part="highlight"] {
+    display: none;
+  }
+
+  :host(:state(gliding)) ::slotted(*) {
+    --_menu-item-glide: initial;
   }
 }

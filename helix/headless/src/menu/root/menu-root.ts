@@ -10,6 +10,7 @@ import {
   elementById,
   focusTarget,
   HelixElement,
+  HoverMarkController,
   inlineStep,
   internalsOf,
   KeyboardNavigationController,
@@ -52,6 +53,13 @@ const HOVER_DELAY = 100
 
 /** How long the grace area toward an open submenu holds, in milliseconds, as Radix's does. */
 const GRACE = 300
+
+/**
+ * What can move the highlight: focus arriving or leaving, the pointer coming
+ * over the panel or off it, and a key, which shows focus where the pointer
+ * hid it.
+ */
+const HIGHLIGHT_EVENTS = ['focusin', 'focusout', 'pointerover', 'pointerout', 'keydown'] as const
 
 /** Whether a point is inside a triangle. */
 const inTriangle = (x: number, y: number, [a, b, c]: [number, number][]): boolean => {
@@ -211,6 +219,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @csspart back-mark - The glyph on the back control of a submenu.
  * @csspart empty - The text shown when the menu has no items.
  * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart highlight - The wash on the row with focus, which glides from row to row as the pointer or the keys move focus. It carries the row's place and size as an indicator does, `data-placed` while it is on one, `data-gliding` from the frame after it arrives, and `data-tone` with the row's `tone`. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the items are loading.
  * @csspart search-field - With `filterable`, the field that narrows the rows.
@@ -223,6 +232,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
  * @cssstate entering - From the moment the panel shows until its entrance has finished.
  * @cssstate exiting - From the moment the panel hides until its exit has finished.
+ * @cssstate gliding - While the highlight is on a row, so it draws the wash in place of each row's own.
  * @cssstate mark - A row on the current page has a checkbox or a link, so every row keeps the trailing column.
  * @cssstate open - While the menu is open.
  * @cssstate placed-bottom - While the open panel sits below its trigger.
@@ -570,6 +580,77 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     open: () => this.open,
     surface: () => this.partNamed('surface'),
   })
+
+  /**
+   * **The highlight glides from row to row**, as the hover wash does in
+   * `Navigation`, `Tabs` and `Toggle Group`. It marks what each row lights on
+   * its own: the row with focus, which the pointer and the keys both move,
+   * while the pointer is over the panel or focus shows, and the row the keys
+   * reached in a filtered menu. Between two rows the pointer leaves focus
+   * where it was, so the mark holds and glides on. Rows on the panel only: a
+   * flyout's rows are drawn in their parent row and light themselves.
+   */
+  protected readonly highlight = new HoverMarkController(this, {
+    gliding: (on) => this.toggleState('gliding', on),
+    mark: () => this.partNamed('highlight'),
+    surface: () => this.partNamed('surface'),
+  })
+
+  /** The frame the highlight is next placed in. */
+  private highlightFrame = 0
+
+  /**
+   * Places the highlight a frame from now, once focus, the pointer, and each
+   * row's own update have settled. Every input that can move it books the
+   * same frame, so a burst of them places it once.
+   */
+  private readonly queueHighlight = (): void => {
+    if (typeof requestAnimationFrame !== 'function') {
+      return
+    }
+    cancelAnimationFrame(this.highlightFrame)
+    this.highlightFrame = requestAnimationFrame(() => {
+      this.highlightFrame = 0
+      const box = this.highlightedRow()
+      /* The row's tone goes with it, for a sheet that draws a destructive
+         row's wash in its own hue. */
+      const tone = box ? (box.getRootNode() as ShadowRoot).host?.getAttribute('tone') : null
+      const mark = this.partNamed('highlight')
+      if (tone) {
+        mark?.setAttribute('data-tone', tone)
+      } else {
+        mark?.removeAttribute('data-tone')
+      }
+      this.highlight.show(box)
+    })
+  }
+
+  /** The row the highlight belongs on, as the box its wash fills, or nothing. */
+  private highlightedRow(): HTMLElement | undefined {
+    const surface = this.partNamed('surface')
+    if (!this.open || !surface) {
+      return undefined
+    }
+    const pointer = surface.matches(':hover')
+    const rows = this.flies ? this.topRows : this.drilldown.rows
+    for (const row of rows) {
+      if (row.disabled || !this.kept(row)) {
+        continue
+      }
+      const box = row.shadowRoot?.querySelector<HTMLElement>('[part~="item"]')
+      if (!box) {
+        continue
+      }
+      if (
+        this.filters?.highlighted === row ||
+        box.matches(':focus-visible') ||
+        (pointer && box.matches(':focus'))
+      ) {
+        return box
+      }
+    }
+    return undefined
+  }
 
   /** Carries a host `aria-label` and `aria-labelledby` to the surface. */
   protected readonly aria = new AriaForwardController(this, {
@@ -1348,6 +1429,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('pointercancel', this.handlePointerCancel)
     this.addEventListener('click', this.handleHeldClick, true)
     this.addEventListener('focusin', this.handleTriggerFocusIn)
+    for (const type of HIGHLIGHT_EVENTS) {
+      this.addEventListener(type, this.queueHighlight)
+    }
     this.rowWatch = new MutationObserver(this.followRemoved)
     this.rowWatch.observe(this, { childList: true, subtree: true })
     void this.whenSettled.then(() => {
@@ -1385,6 +1469,11 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('pointercancel', this.handlePointerCancel)
     this.removeEventListener('click', this.handleHeldClick, true)
     this.removeEventListener('focusin', this.handleTriggerFocusIn)
+    for (const type of HIGHLIGHT_EVENTS) {
+      this.removeEventListener(type, this.queueHighlight)
+    }
+    cancelAnimationFrame(this.highlightFrame)
+    this.highlightFrame = 0
     this.unwatchArea()
     this.rowWatch?.disconnect()
     this.rowWatch = undefined
@@ -1440,6 +1529,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* A page, a filter, or the panel opening or closing can each move it. */
+    this.queueHighlight()
     if (changed.has('for') || changed.has('context')) {
       this.watchArea()
     }
@@ -1712,6 +1803,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         data-filtered=${filters?.filtering ? '' : nothing}
         ?hidden=${!this.open}
       >
+        <div part="highlight" aria-hidden="true" hidden></div>
         ${filters ? filters.drawFilter(rows, busy) : rows}
       </div>${this.renderLive(this.hasRows)}`
   }
