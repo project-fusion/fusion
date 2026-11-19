@@ -62,6 +62,7 @@ export const TAG_PREFIX = 'helix-'
  * at. What it no longer says is where those things are.
  */
 export const SOURCE = {
+  codeEditor: 'helix/code-editor/src',
   core: 'helix/core/src',
   editor: 'helix/editor/src',
   gallery: 'helix/gallery/src',
@@ -119,7 +120,8 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 
 /**
  * The packages that connect a family to someone else's renderer, by the
- * family they serve: `connectEditor` and its schema for Editor,
+ * family they serve: `connectCodeEditor` and CodeMirror for Code Editor,
+ * `connectEditor` and its schema for Editor,
  * `connectGraph` and its drivers for Graph, `connectMap` and its drivers for
  * Map, `connectTerminal` and its driver for Terminal, the Sandbox's editor,
  * which draws the Sandbox's source in CodeMirror, and from the plot package,
@@ -129,6 +131,7 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
  * real editor.
  */
 export const CONNECTORS = {
+  'code-editor': SOURCE.codeEditor,
   editor: SOURCE.editor,
   graph: SOURCE.graph,
   map: SOURCE.map,

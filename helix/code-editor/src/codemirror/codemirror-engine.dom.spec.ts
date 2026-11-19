@@ -1,9 +1,10 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { foldedRanges } from '@codemirror/language'
 import { diagnosticCount } from '@codemirror/lint'
 import { EditorView } from '@codemirror/view'
 import type { HelixHeadlessCodeEditor } from '@fusion.dev/helix-headless/code-editor'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, nextFrame, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 let changeBetween: typeof import('./codemirror-engine.js').changeBetween
 let connectCodeEditor: typeof import('./codemirror-engine.js').connectCodeEditor
@@ -134,5 +135,126 @@ describe('flash-changes in CodeMirror', () => {
     )
     await new Promise((resolve) => setTimeout(resolve, 1100))
     expect(lit(view)).toEqual([])
+  })
+})
+
+/* The geometry is a browser's, and happy-dom lays nothing out. */
+const browser = hasLayout() ? test : (): void => {}
+
+/** The lines CodeMirror drew, in order. */
+const linesOf = (view: EditorView): HTMLElement[] => [
+  ...view.contentDOM.querySelectorAll<HTMLElement>(':scope > .cm-line'),
+]
+
+/** The number each drawn line carries. */
+const numbersOf = (view: EditorView): Array<string | undefined> =>
+  linesOf(view).map((line) => line.dataset.line)
+
+const SOURCE = 'interface Order {\n  amount: number\n  paid: boolean\n}'
+
+/** An editor holding `SOURCE`, its value set as a property, as `holding` sets one. */
+const numbered = async (
+  attributes = 'line-numbers',
+): Promise<{ element: HelixHeadlessCodeEditor; view: EditorView }> => {
+  const editor = await connected(attributes)
+  editor.element.value = SOURCE
+  await editor.element.updateComplete
+  return editor
+}
+
+describe('the line numbers', () => {
+  test('are written on the lines they number, one to a line, in no gutter', async () => {
+    const { element, view } = await numbered()
+    expect(numbersOf(view)).toEqual(['1', '2', '3', '4'])
+    expect(part(element, 'view')?.querySelector('.cm-gutters')).toBeNull()
+  })
+
+  test('follow a line the reader adds', async () => {
+    const { element, view } = await connected('line-numbers value="let a = 1"')
+    view.dispatch({ changes: { from: view.state.doc.length, insert: '\nlet b = 2' } })
+    await element.updateComplete
+    expect(numbersOf(view)).toEqual(['1', '2'])
+  })
+
+  test('are drawn only while line-numbers is set', async () => {
+    const { element, view } = await numbered('')
+    expect(numbersOf(view)).toEqual([undefined, undefined, undefined, undefined])
+    element.lineNumbers = true
+    await element.updateComplete
+    expect(numbersOf(view)).toEqual(['1', '2', '3', '4'])
+  })
+
+  test('mark the line of a problem in its tone', async () => {
+    const { element, view } = await numbered()
+    element.diagnostics = [{ from: 20, message: 'Unused', to: 26, tone: 'warning' }]
+    await element.updateComplete
+    expect(
+      linesOf(view).map((line) => line.classList.contains('cm-helix-problem-warning')),
+    ).toEqual([false, true, false, false])
+  })
+
+  /* A face that loads after the editor drew changes its lines' size and
+     leading, and CodeMirror measures nothing until a frame after. The change
+     is made here by hand, so it lands between two frames, where CodeMirror's
+     gutter kept the heights measured before it: on the Button page at 390 the
+     Sandbox's numbers stood higher than their lines and closer together. Read
+     before any frame, each number's box has to cover its own line's first and
+     last rows and no other line's, wrapped or not. A box drawn by a pseudo
+     element is hit as the line that draws it, once it takes the pointer. */
+  for (const wrap of [false, true]) {
+    browser(
+      `stand at the top of their lines when the face changes between two frames${wrap ? ', wrapped' : ''}`,
+      async () => {
+        const { element, view } = await numbered(wrap ? 'line-numbers wrap' : 'line-numbers')
+        await nextFrame()
+        const hit = document.createElement('style')
+        hit.textContent = '.cm-line[data-line]::before { pointer-events: auto !important; }'
+        element.shadowRoot?.append(hit)
+        element.style.fontFamily = 'serif'
+        element.style.fontSize = '23px'
+        element.style.setProperty('--helix-leading-normal', '2')
+        const start = view.scrollDOM.getBoundingClientRect().left + 2
+        const lines = linesOf(view)
+        expect(lines.map((line) => line.dataset.line)).toEqual(['1', '2', '3', '4'])
+        for (const line of lines) {
+          const { bottom, top } = line.getBoundingClientRect()
+          const number = getComputedStyle(line, '::before')
+          expect(number.fontSize).toBe('23px')
+          expect(number.lineHeight).toBe(getComputedStyle(line).lineHeight)
+          expect(element.shadowRoot?.elementFromPoint(start, top + 1)).toBe(line)
+          expect(element.shadowRoot?.elementFromPoint(start, bottom - 1)).toBe(line)
+        }
+      },
+    )
+  }
+
+  browser('fold and unfold a line when its marker is pressed', async () => {
+    const { element, view } = await numbered('line-numbers language="ts"')
+    const first = (): HTMLElement | undefined => linesOf(view)[0]
+    for (let frame = 0; frame < 60 && !first()?.classList.contains('cm-helix-foldable'); frame++) {
+      await nextFrame()
+    }
+    const press = (): void => {
+      const line = first() as HTMLElement
+      const marker = parseFloat(getComputedStyle(line, '::after').width)
+      const { left, top } = line.getBoundingClientRect()
+      line.dispatchEvent(
+        new MouseEvent('mousedown', {
+          bubbles: true,
+          button: 0,
+          cancelable: true,
+          clientX: left - marker / 2,
+          clientY: top + 2,
+        }),
+      )
+    }
+    press()
+    await element.updateComplete
+    expect(foldedRanges(view.state).size).toBe(1)
+    expect(numbersOf(view)).toEqual(['1'])
+    expect(first()?.classList.contains('cm-helix-folded')).toBe(true)
+    press()
+    expect(foldedRanges(view.state).size).toBe(0)
+    expect(numbersOf(view)).toEqual(['1', '2', '3', '4'])
   })
 })
