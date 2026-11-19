@@ -294,12 +294,20 @@
 }
 
 /* The rules for using a family, numbered by the list itself, with the space
-   of a paragraph between two rules. */
+   of a paragraph between two rules. **One column that may shrink**, since a
+   grid item is otherwise as wide as its longest line of code, and an example
+   under a rule pushed the Button page to 463 pixels at 390: its code block
+   scrolls inside itself instead. */
 .practice {
   display: grid;
   gap: var(--helix-space-md);
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   padding-inline-start: var(--helix-space-lg);
+}
+
+.practice > li {
+  min-inline-size: 0;
 }
 
 .practice > li::marker {
