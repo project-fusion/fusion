@@ -151,14 +151,14 @@ describe('a placeholder the page draws', () => {
 
   test('shows in place of the content while it loads, and the content shows once it has', async () => {
     const skeleton = (await mount(markup)) as Skeleton
-    expect(part(skeleton, 'content')?.hidden).toBe(true)
+    expect((part(skeleton, 'content') as HTMLElement | null)?.hidden).toBe(true)
     expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(true)
-    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+    expect((part(skeleton, 'placeholder') as HTMLElement | null)?.hidden).toBe(false)
     skeleton.loading = false
     await skeleton.updateComplete
-    expect(part(skeleton, 'content')?.hidden).toBe(false)
+    expect((part(skeleton, 'content') as HTMLElement | null)?.hidden).toBe(false)
     expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(false)
-    expect(part(skeleton, 'placeholder')?.hidden).toBe(true)
+    expect((part(skeleton, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
   })
 
   test('replaces the shape, which is the slot fallback, and is hidden from screen readers', async () => {
@@ -175,17 +175,17 @@ describe('a placeholder the page draws', () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton loading><p>Card</p></helix-headless-skeleton>',
     )) as Skeleton
-    expect(part(skeleton, 'content')?.hidden).toBe(false)
-    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+    expect((part(skeleton, 'content') as HTMLElement | null)?.hidden).toBe(false)
+    expect((part(skeleton, 'placeholder') as HTMLElement | null)?.hidden).toBe(false)
     skeleton.loading = false
     await skeleton.updateComplete
-    expect(part(skeleton, 'placeholder')?.hidden).toBe(true)
+    expect((part(skeleton, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
   })
 
   test('a placeholder alone is never hidden, loading or not', async () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton></helix-headless-skeleton>',
     )) as Skeleton
-    expect(part(skeleton, 'placeholder')?.hidden).toBe(false)
+    expect((part(skeleton, 'placeholder') as HTMLElement | null)?.hidden).toBe(false)
   })
 })

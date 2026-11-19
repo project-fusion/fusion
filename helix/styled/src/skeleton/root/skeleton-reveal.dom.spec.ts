@@ -111,7 +111,7 @@ describe('the reveal', () => {
     host.loading = false
     await host.updateComplete
     expect(hasState(host, 'revealing')).toBe(true)
-    expect(part(host, 'placeholder')?.hidden).toBe(true)
+    expect((part(host, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
     await flush()
     expect(height[0]?.keyframes).toEqual([{ blockSize: '40px' }, { blockSize: '100px' }])
     expect(height[0]?.options).toEqual({ duration: 320, easing: 'linear' })
