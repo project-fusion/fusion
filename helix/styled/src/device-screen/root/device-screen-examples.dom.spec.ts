@@ -42,9 +42,14 @@ describe('the events example', () => {
     const { screen, ...at } = middle(phone)
     press(screen, 'pointerdown', at)
     press(screen, 'pointerup', at)
+    /* **The ring is read as soon as it is drawn.** It shows for 700ms, and
+       six frames on a loaded WebKit runner came after it had gone: the spec
+       failed twice on a branch that did not touch this family, once its new
+       families moved this one to another shard. */
+    await (phone as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(phone.shadowRoot?.querySelector('[part~="touch"]')).not.toBeNull()
     await idle()
     expect(logged()).toEqual(['helix-device-tap'])
-    expect(phone.shadowRoot?.querySelector('[part~="touch"]')).not.toBeNull()
   })
 
   run('a press on Back is written in the log', async () => {
