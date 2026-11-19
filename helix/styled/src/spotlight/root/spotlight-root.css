@@ -1,0 +1,81 @@
+:host {
+  border-radius: var(--spotlight-radius, var(--helix-radii-md));
+  display: block;
+  position: relative;
+}
+
+/* **Over the content and clipped to its corners**, faded in as a pointer
+   arrives and out where it was as it leaves. */
+[part="glow"],
+[part="edge"] {
+  border-radius: inherit;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* **The hover wash, drawn round the pointer**: the foreground at the wash's
+   own strength, so it shows on a light card and a dark one alike. */
+[part="glow"] {
+  background: radial-gradient(
+    circle var(--spotlight-size, 12rem) at var(--_spotlight-x, 50%) var(--_spotlight-y, 50%),
+    var(
+      --spotlight-color,
+      light-dark(
+        color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
+        color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+      )
+    ),
+    transparent 100%
+  );
+}
+
+/* **The same light, cut to the edge** by the box and its padding box, a few
+   steps stronger, so the border nearest the pointer catches it. */
+[part="edge"] {
+  background: radial-gradient(
+    circle var(--spotlight-size, 12rem) at var(--_spotlight-x, 50%) var(--_spotlight-y, 50%),
+    var(
+      --spotlight-edge-color,
+      light-dark(
+        color-mix(in oklab, var(--helix-color-foreground) 30%, transparent),
+        color-mix(in oklab, var(--helix-color-foreground) 40%, transparent)
+      )
+    ),
+    transparent 100%
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  padding: var(--spotlight-edge-width, var(--helix-border-thin));
+}
+
+:host(:state(lit)) [part="glow"],
+:host(:state(lit)) [part="edge"] {
+  opacity: 1;
+}
+
+/* Nothing follows a pointer where the reader asked for less movement. */
+@media (prefers-reduced-motion: reduce) {
+  [part="glow"],
+  [part="edge"] {
+    display: none;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [part="glow"],
+  [part="edge"] {
+    display: none;
+  }
+}
+
+@media print {
+  [part="glow"],
+  [part="edge"] {
+    display: none;
+  }
+}
