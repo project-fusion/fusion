@@ -1,5 +1,5 @@
 ---
-description: The duration and easing tokens, how components handle reduced motion, and the functions that move your own elements.
+description: The duration and easing tokens, how components handle reduced motion, the effects, and the functions that move your own elements.
 section: Foundations
 title: Motion
 ---
@@ -320,6 +320,56 @@ It names the way for the length of the move, changes the page at once under
 reduced motion or where the browser has no view transitions, and rejects
 where the change does. To keep a header still while the rest of the page
 moves, give it a `view-transition-name` of its own on every page.
+
+## Effects
+
+These families exist for their motion. Put your content inside one, or place
+it on the page. Each one respects reduced motion, and each that runs by itself
+stops while `Motion Toggle` has paused the page.
+
+Light that draws the eye:
+
+- [Shine](/helix/components/shine) sweeps a band of light across an action.
+- [Border Beam](/helix/components/border-beam) sends a light around the edge
+  of something running or live.
+- [Shimmer Text](/helix/components/shimmer-text) sweeps a light across words
+  while the work they name runs.
+
+Following the pointer:
+
+- [Spotlight](/helix/components/spotlight) lights the content and the edge
+  nearest the pointer.
+- [Tilt](/helix/components/tilt) leans content toward the pointer.
+- [Magnetic](/helix/components/magnetic) draws content a little way toward
+  the pointer.
+
+Arriving:
+
+- [Reveal](/helix/components/reveal) brings content in as it scrolls into
+  view.
+- [Highlighter](/helix/components/highlighter) marks words as they come into
+  view.
+- [Confetti](/helix/components/confetti) bursts once an action has finished.
+
+Words and figures:
+
+- [Rotating Text](/helix/components/rotating-text) turns one word in a line
+  through others.
+- [Sliding Number](/helix/components/sliding-number) rolls each digit to a new
+  value.
+
+Backgrounds and the page:
+
+- [Aura](/helix/components/aura) drifts light in the theme's colors.
+- [Strands](/helix/components/strands) draws a ribbon of fine strands of light.
+- [Pattern](/helix/components/pattern) draws hexagons, stars, or contour lines.
+- [Marquee](/helix/components/marquee) scrolls a row round and round.
+- [Scroll Progress](/helix/components/scroll-progress) fills a bar as the page
+  scrolls.
+- [Theme Toggle](/helix/components/theme-toggle) spreads the new color mode
+  from the button.
+- [Cursor](/helix/components/cursor) shows another person's pointer on a
+  shared surface.
 
 ## Motion on your own elements
 
