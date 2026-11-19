@@ -85,6 +85,7 @@ const bleedConverter = {
  * @cssproperty --data-table-editable-hover-background-color - The fill of an editable cell under the pointer. The well by default.
  * @cssproperty --data-table-editing-background-color - The ground under an open cell's field, which covers the cell beside it where the field needs more room than its column. The page's background by default.
  * @cssproperty --data-table-error-color - The color of the words in the line shown while `error-text` is set.
+ * @cssproperty --data-table-flash-color - The wash a row takes when it changes, with `flash-changes`, at its strongest. Defaults to `--helix-color-info` at 14 percent in light mode and 22 in dark.
  * @cssproperty --data-table-footer-gap - The space between the grid and the footer below it.
  * @cssproperty --data-table-footer-item-gap - The space between the pieces of the footer, such as a summary and the pagination.
  * @cssproperty --data-table-grip-color - The color of a row's grip, with `reorderable-rows`.
