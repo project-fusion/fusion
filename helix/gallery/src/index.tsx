@@ -8,6 +8,7 @@ import { avatarArt } from './art/avatar'
 import { badgeArt } from './art/badge'
 import { barChartArt } from './art/bar-chart'
 import { blockquoteArt } from './art/blockquote'
+import { borderBeamArt } from './art/border-beam'
 import { breadcrumbsArt } from './art/breadcrumbs'
 import { buttonArt } from './art/button'
 import { buttonGroupArt } from './art/button-group'
@@ -112,6 +113,7 @@ import { spatialSurfaceChartArt } from './art/spatial-surface-chart'
 import { spatialTreemapArt } from './art/spatial-treemap'
 import { speedDialArt } from './art/speed-dial'
 import { splitterArt } from './art/splitter'
+import { spotlightArt } from './art/spotlight'
 import { statArt } from './art/stat'
 import { stepsArt } from './art/steps'
 import { strandsArt } from './art/strands'
@@ -191,6 +193,7 @@ const art: Record<string, ReactNode> = {
   badge: badgeArt,
   'bar-chart': barChartArt,
   blockquote: blockquoteArt,
+  'border-beam': borderBeamArt,
   breadcrumbs: breadcrumbsArt,
   button: buttonArt,
   'button-group': buttonGroupArt,
@@ -295,6 +298,7 @@ const art: Record<string, ReactNode> = {
   'spatial-treemap': spatialTreemapArt,
   'speed-dial': speedDialArt,
   splitter: splitterArt,
+  spotlight: spotlightArt,
   stat: statArt,
   steps: stepsArt,
   strands: strandsArt,
