@@ -2,7 +2,13 @@
    chart reads these two privates on the transitions that carry a mark from its
    last reading to its new one: a bar's height, a line's shape, a point's place,
    a slice's length, and a cell's color. Hover and focus feedback keeps its own
-   timing, and so do a line drawing itself on and a wash fading in on arrival.
+   timing.
+
+   **An arrival follows the same hook, at the pace it keeps beside a move.** A
+   line drawing itself on and a wash fading in take the slow token, 1.6 times
+   the normal one, so with the hook set they take 1.6 times what it says, and
+   `0s` stops them with the moves. Unset, the arrival is the slow token itself,
+   whatever a theme sets it to.
 
    `--chart-move-duration` and `--chart-move-easing` are the public hooks, and
    they default to what every chart used before they existed:
@@ -18,10 +24,15 @@
 :host {
   --_chart-move-duration: var(--chart-move-duration, var(--helix-duration-normal));
   --_chart-move-easing: var(--chart-move-easing, var(--helix-easing-decelerate));
+  --_chart-arrive-duration: calc(
+    var(--chart-move-duration, calc(var(--helix-duration-slow) / 1.6)) *
+    1.6
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
   :host {
     --_chart-move-duration: var(--helix-duration-normal);
+    --_chart-arrive-duration: var(--helix-duration-slow);
   }
 }
