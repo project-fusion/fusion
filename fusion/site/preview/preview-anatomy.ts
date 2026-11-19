@@ -246,8 +246,6 @@ const draw = (): void => {
     into.hidePopover()
   }
   into.showPopover()
-  /* The page marks the figure drawn, which a picture of the page waits for. */
-  window.parent?.postMessage({ type: 'helix-preview-anatomy-drawn' }, '*')
 }
 
 /**

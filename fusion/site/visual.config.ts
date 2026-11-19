@@ -116,12 +116,19 @@ export default defineConfig({
      clusters timed out on every run, since nothing brings it near. The mask
      covers the zoom and compass controls drawn over the canvas too; the
      frame and credit are still pictured, and the map family's own browser
-     specs draw the clusters. */
+     specs draw the clusters.
+
+     **And a family page's anatomy frame**, below the first screen of the
+     Button page. Chromium paints a cross-origin frame only once it is in
+     view, so a whole-page picture held it empty, measured on November 19,
+     2026, in CI and locally, while the same frame drew for a reader who
+     scrolled to it. The legend under it is still pictured. */
   mask: [
     '[data-site-footer] helix-tag',
     '[data-site-measure]',
     '[data-site-count]',
     '[data-site-points-canvas]',
+    '[data-site-anatomy]',
   ],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
@@ -142,9 +149,7 @@ export default defineConfig({
       name: 'site',
       routes: [
         { name: 'home', path: '/' },
-        /* Once its anatomy frame has drawn its markers, which comes after
-           the elements settle. */
-        { name: 'button', path: '/helix/components/button', selector: '[data-anatomy-drawn]' },
+        { name: 'button', path: '/helix/components/button' },
         { name: 'sandbox', path: '/helix/sandbox' },
         { name: 'theme', path: '/helix/theme', selector: '[data-preview-drawn]' },
         { name: 'maps', path: '/helix/maps' },

@@ -65,21 +65,8 @@ export function AnatomyPreview({ css, html, layout = 'centered', min = ANATOMY_M
       }
     }
     release()
-    /* **Marked once the frame has drawn its markers**, as
-       `data-anatomy-drawn`, which the site's visual check waits for before it
-       pictures a family page. Only this element's own frame is heard. */
-    const drawn = (event: MessageEvent<{ type?: string }>) => {
-      const frame = host.shadowRoot?.querySelector('iframe')?.contentWindow
-      if (event.data?.type === 'helix-preview-anatomy-drawn' && frame && event.source === frame) {
-        host.dataset.anatomyDrawn = ''
-      }
-    }
     addEventListener('blur', release)
-    addEventListener('message', drawn)
-    return () => {
-      removeEventListener('blur', release)
-      removeEventListener('message', drawn)
-    }
+    return () => removeEventListener('blur', release)
   }, [])
 
   /* Eight pixels, for the Preview section's reason: the frame reports through
@@ -94,6 +81,7 @@ export function AnatomyPreview({ css, html, layout = 'centered', min = ANATOMY_M
     <helix-sandbox-preview
       class={sheet.anatomyPreview}
       color-mode={scheme}
+      data-site-anatomy=""
       label="Anatomy preview"
       layout={layout}
       onhelix-resize={measured}
