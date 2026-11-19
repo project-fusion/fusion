@@ -569,7 +569,7 @@ describe('swipe-direction', () => {
     host.swipeDirection = 'bottom'
     await host.updateComplete
     expect(item.swipeToward).toBe('bottom')
-    host.swipeDirection = undefined
+    ;(host as { swipeDirection?: string | undefined }).swipeDirection = undefined
     host.setAttribute('placement', 'top-start')
     await host.updateComplete
     expect(item.swipeToward).toBe('start')
