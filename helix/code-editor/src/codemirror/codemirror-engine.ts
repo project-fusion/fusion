@@ -2,13 +2,19 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirro
 import {
   bracketMatching,
   codeFolding,
-  foldGutter,
+  foldable,
+  foldEffect,
+  foldedRanges,
   foldKeymap,
+  foldState,
   indentOnInput,
   indentUnit,
   type LanguageSupport,
+  language as languageFacet,
   StreamLanguage,
   syntaxHighlighting,
+  syntaxTree,
+  unfoldEffect,
 } from '@codemirror/language'
 import { type Diagnostic, setDiagnostics } from '@codemirror/lint'
 import {
@@ -29,21 +35,19 @@ import {
   type Extension,
   Facet,
   RangeSet,
+  RangeSetBuilder,
   StateEffect,
   StateField,
   Transaction,
 } from '@codemirror/state'
 import {
+  BlockType,
   Decoration,
   type DecorationSet,
   drawSelection,
   EditorView,
-  GutterMarker,
-  gutterLineClass,
   highlightActiveLine,
-  highlightActiveLineGutter,
   keymap,
-  lineNumbers,
   placeholder,
   ViewPlugin,
   type ViewUpdate,
@@ -115,13 +119,14 @@ export const languageNames = (): string[] =>
  * **CodeMirror measures its lines once more when `document.fonts.ready`
  * resolves, and that can be before the code face has started loading**: the
  * face is asked for when the editor first draws text in it, after the promise
- * has settled. The lines were then drawn in the code face while the gutter kept
- * the heights measured in the fallback, so the line numbers drifted from their
- * lines: a picture of the Button page at 390 on November 17, 2026 caught the
- * fourth number about half a line above its line. A face that arrives changes
- * the content's height, and CodeMirror measures again when asked, so it is
- * asked. The Sandbox's editor writes the same plugin: the two share no module
- * that loads CodeMirror's view and still imports on a server.
+ * has settled. The lines were then drawn in the code face while CodeMirror kept
+ * the heights and positions it measured in the fallback. The line numbers and
+ * the fold markers no longer read them, being drawn by the lines themselves,
+ * and the cursor, the selection and the heights CodeMirror scrolls by still
+ * do. A face that arrives changes the content, and CodeMirror measures again
+ * when asked, so it is asked. The Sandbox's editor writes the same plugin: the
+ * two share no module that loads CodeMirror's view and still imports on a
+ * server.
  */
 const remeasureOnFonts: Extension = ViewPlugin.fromClass(
   class {
@@ -144,6 +149,172 @@ const remeasureOnFonts: Extension = ViewPlugin.fromClass(
     }
   },
 )
+
+/** The fold CodeMirror holds on a line, if the reader folded one there. */
+const foldOn = (
+  state: EditorState,
+  from: number,
+  to: number,
+): { from: number; to: number } | null => {
+  let found: { from: number; to: number } | null = null
+  foldedRanges(state).between(from, to, (start, end) => {
+    if (!found || found.from > start) {
+      found = { from: start, to: end }
+    }
+  })
+  return found
+}
+
+/** The class that draws a line's fold marker: open, closed, or none. */
+const foldClass = (state: EditorState, from: number, to: number): string =>
+  foldOn(state, from, to) ? 'cm-helix-folded' : foldable(state, from, to) ? 'cm-helix-foldable' : ''
+
+/**
+ * Each line's number and fold marker, as an attribute and a class the theme
+ * draws at the start of the line, in the line's own box.
+ *
+ * **Each number is drawn by its own line.** CodeMirror's gutter is a column of
+ * its own, and CodeMirror sets each of its numbers and fold markers to a height
+ * it measured or estimated for the line beside it. A height taken before the
+ * lines settled stayed until the next measure: pictures of the Button page at
+ * 390 caught the Sandbox's numbers above their lines on November 17, 2026, and
+ * the Code Editor's gutter is the same column. A number drawn by its line sits
+ * at that line's top, in its face and leading, whatever loads late, and nothing
+ * is measured to put it there. Only the lines on screen are decorated, rebuilt
+ * as they change, and a folded run is one line, numbered by its first, as the
+ * gutter numbered it.
+ *
+ * Pressing a fold marker folds or unfolds its line, as the gutter's did, and
+ * the press places no caret.
+ */
+const numberedLines = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet
+
+    constructor(view: EditorView) {
+      this.decorations = this.number(view)
+    }
+
+    update(update: ViewUpdate): void {
+      if (
+        update.docChanged ||
+        update.viewportChanged ||
+        update.startState.facet(languageFacet) !== update.state.facet(languageFacet) ||
+        update.startState.field(foldState, false) !== update.state.field(foldState, false) ||
+        syntaxTree(update.startState) !== syntaxTree(update.state)
+      ) {
+        this.decorations = this.number(update.view)
+      }
+    }
+
+    number(view: EditorView): DecorationSet {
+      const builder = new RangeSetBuilder<Decoration>()
+      const { state } = view
+      for (const block of view.viewportLineBlocks) {
+        /* A block holding block widgets lists its lines inside it. */
+        const lines = Array.isArray(block.type)
+          ? block.type.filter((inner) => inner.type === BlockType.Text)
+          : block.type === BlockType.Text
+            ? [block]
+            : []
+        for (const { from, to } of lines) {
+          const folds = foldClass(state, from, to)
+          builder.add(
+            from,
+            from,
+            Decoration.line({
+              attributes: { 'data-line': String(state.doc.lineAt(from).number) },
+              ...(folds ? { class: folds } : {}),
+            }),
+          )
+        }
+      }
+      return builder.finish()
+    }
+  },
+  {
+    decorations: (plugin) => plugin.decorations,
+    eventHandlers: {
+      mousedown(event, view) {
+        const line = event.target instanceof Element ? event.target.closest('.cm-line') : null
+        if (
+          event.button !== 0 ||
+          !(line instanceof HTMLElement) ||
+          !line.matches('.cm-helix-foldable, .cm-helix-folded')
+        ) {
+          return false
+        }
+        /* The marker is no element of its own, so where it stands is read
+           from its box: held at the start of the band while the code
+           scrolls under it. */
+        const marker = getComputedStyle(line, '::after')
+        const numbers = parseFloat(getComputedStyle(line, '::before').inlineSize) || 0
+        const width = parseFloat(marker.inlineSize) || 0
+        const start = Math.max(
+          line.getBoundingClientRect().left - width,
+          view.scrollDOM.getBoundingClientRect().left + numbers,
+        )
+        if (event.clientX < start || event.clientX >= start + width) {
+          return false
+        }
+        const at = view.posAtDOM(line, 0)
+        const { from, to } = view.state.doc.lineAt(at)
+        const folded = foldOn(view.state, from, to)
+        const range = folded ?? foldable(view.state, from, to)
+        if (!range) {
+          return false
+        }
+        view.dispatch({ effects: (folded ? unfoldEffect : foldEffect).of(range) })
+        event.preventDefault()
+        return true
+      },
+    },
+  },
+)
+
+/**
+ * The lengths each line places its number and fold marker by, as CodeMirror's
+ * gutter took them: the numbers' room for the last number's digits with `sm`
+ * before them and `2xs` after, and never under three characters; the markers'
+ * room for a closed marker with a pixel each side and `2xs` beyond. The line's
+ * own start is CodeMirror's six pixels, said here so the floats can reach back
+ * across it. Each width of text is rounded up to a 64th of a pixel, as a
+ * browser rounds up a box sized to its text.
+ *
+ * **Where the code starts is set by text, and these lengths only place the
+ * numbers and markers behind it.** A width in `ch` is the advance a face
+ * states, while Linux lays text out in whole pixels, and the Sandbox's band in
+ * `ch` was 0.8px wider there than the gutter had been. The band the code
+ * starts after is sized from hidden text in the theme, and each marker ends
+ * where its line starts.
+ *
+ * Written on the editor's own style, because the theme cuts each property
+ * name at its first underscore.
+ */
+const LENGTHS = [
+  '--_code-editor-line-start: 6px',
+  '--_code-editor-numbers: max(round(down, 3ch, 1px / 64), calc(round(up, var(--_code-editor-digits) * 1ch, 1px / 64) + var(--helix-space-sm) + var(--helix-space-2xs)))',
+  '--_code-editor-folds: calc(round(up, 1ch + 2px, 1px / 64) + var(--helix-space-2xs) * 2)',
+  '--_code-editor-band: calc(var(--_code-editor-numbers) + var(--_code-editor-folds))',
+].join('; ')
+
+/**
+ * The widest number the file can hold, written as nines, which the theme sets
+ * out of sight to size the band the numbers stand in: `9` up to nine lines,
+ * `99` up to ninety-nine. CodeMirror's gutter was sized from the same number,
+ * so the band is as wide as the gutter was, and a short file's numbers line
+ * up with a long one's, as the Sandbox's editor sizes its band.
+ */
+const widestNumber: Extension = EditorView.editorAttributes.compute(['doc'], (state) => {
+  const digits = String(state.doc.lines).length
+  return {
+    class: 'cm-helix-numbered',
+    style: `--_code-editor-digits: ${digits}; --_code-editor-widest: "${'9'.repeat(digits)}"; ${LENGTHS}`,
+  }
+})
+
+/** The line numbers and fold markers, drawn by the lines. */
+const numbering: Extension = [numberedLines, widestNumber]
 
 /** Marks a change the editor made itself, which is not the reader's and goes through no request. */
 const given = Annotation.define<boolean>()
@@ -354,13 +525,27 @@ const flashTheme = EditorView.theme({
   },
 })
 
+/** A rule for each numbered line's number and fold marker, under a selector written once for the line. */
+const drawn = (line: string): string => `${line}[data-line]::before, ${line}[data-line]::after`
+
 /**
- * CodeMirror's parts in the theme's tokens: the gutter in the muted ink, the
- * caret and the selection in the primary, the active line in the sunken
+ * CodeMirror's parts in the theme's tokens: the line numbers in the muted ink,
+ * the caret and the selection in the primary, the active line in the sunken
  * surface, search and the fold markers as Helix draws its own controls.
+ *
+ * **The numbers and the fold markers stand in a band before the content, as
+ * wide as CodeMirror's gutter was.** Each is drawn by its own line, at the
+ * line's top, in its face and leading. Where lines do not wrap, each is a float
+ * held at the band while the code scrolls under it, as the gutter was held;
+ * where they wrap, nothing scrolls sideways, and each is placed against the
+ * whole line, so the active line's wash covers every row of it. Generated text
+ * is read, and CodeMirror's gutter was hidden from the accessibility tree, so
+ * the empty alternative after the slash leaves each number and marker out of
+ * what a line says: behind `@supports`, because a browser without the syntax
+ * drops the whole declaration and would draw nothing.
  */
 const helixTheme = EditorView.theme({
-  '.cm-activeLine, .cm-activeLineGutter': {
+  [`.cm-activeLine, ${drawn('.cm-activeLine')}`]: {
     backgroundColor: 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
   },
   '.cm-content': {
@@ -368,29 +553,100 @@ const helixTheme = EditorView.theme({
     paddingBlock: 'var(--helix-space-xs)',
   },
   '.cm-cursor': { borderLeftColor: 'var(--helix-color-primary)' },
-  '.cm-foldGutter .cm-gutterElement': { paddingInline: 'var(--helix-space-2xs)' },
   '.cm-foldPlaceholder': {
     backgroundColor: 'var(--helix-color-surface-sunken)',
     border: 'none',
     color: 'var(--helix-color-foreground-muted)',
   },
-  '.cm-gutterElement.cm-helix-problem-danger': {
+  '&.cm-helix-numbered .cm-line': { paddingInlineStart: 'var(--_code-editor-line-start)' },
+  /* The band, before the content in the scroller's row, as the gutter was:
+     the widest number with its room, then the markers with theirs. **Both
+     markers, one over the other**, since a face without them draws `⌄` from
+     another face, a little wider than `›`: the gutter took the wider once an
+     open marker was on screen, and moved the code when none was. No height,
+     so a short file stands as tall as its lines. */
+  '&.cm-helix-numbered .cm-scroller::after': {
+    content: '"›\\A⌄"',
+    order: '-1',
+    paddingInline: 'calc(var(--helix-space-2xs) + 1px)',
+    whiteSpace: 'pre',
+  },
+  '&.cm-helix-numbered .cm-scroller::before': {
+    content: 'var(--_code-editor-widest, "9")',
+    minInlineSize: '3ch',
+    order: '-2',
+    paddingInline: 'var(--helix-space-sm) var(--helix-space-2xs)',
+    whiteSpace: 'nowrap',
+  },
+  '&.cm-helix-numbered .cm-scroller::before, &.cm-helix-numbered .cm-scroller::after': {
+    blockSize: '0',
+    boxSizing: 'border-box',
+    flexShrink: '0',
+    pointerEvents: 'none',
+    userSelect: 'none',
+    visibility: 'hidden',
+  },
+  [drawn('.cm-line')]: {
+    boxSizing: 'border-box',
+    color: 'var(--helix-color-foreground-muted)',
+    float: 'inline-start',
+    /* A line's height, which an empty marker's float would not take. */
+    minBlockSize: '1lh',
+    position: 'sticky',
+    textIndent: '0',
+    userSelect: 'none',
+    whiteSpace: 'nowrap',
+  },
+  /* The marker's float follows the number's, which takes the band's start.
+     Drawn empty on a line with nothing to fold, so the active line's wash
+     still crosses the band. */
+  '.cm-line[data-line]::after': {
+    content: '""',
+    inlineSize: 'var(--_code-editor-folds)',
+    insetInlineStart: 'var(--_code-editor-numbers)',
+    marginInline:
+      'calc(-1 * (var(--_code-editor-folds) + var(--_code-editor-line-start))) var(--_code-editor-line-start)',
+    paddingInline: 'calc(var(--helix-space-2xs) + 1px)',
+  },
+  '.cm-line[data-line]::before': {
+    content: 'attr(data-line)',
+    inlineSize: 'var(--_code-editor-numbers)',
+    insetInlineStart: '0',
+    marginInline:
+      'calc(-1 * (var(--_code-editor-band) + var(--_code-editor-line-start))) calc(var(--_code-editor-folds) + var(--_code-editor-line-start))',
+    paddingInline: 'var(--helix-space-sm) var(--helix-space-2xs)',
+    pointerEvents: 'none',
+    textAlign: 'end',
+  },
+  /* The press is the plugin's. */
+  '.cm-line[data-line].cm-helix-foldable::after': { content: '"⌄"', cursor: 'pointer' },
+  '.cm-line[data-line].cm-helix-folded::after': { content: '"›"', cursor: 'pointer' },
+  '@supports (content: "1" / "")': {
+    '.cm-content .cm-line[data-line]::before': { content: 'attr(data-line) / ""' },
+    '.cm-content .cm-line[data-line].cm-helix-foldable::after': { content: '"⌄" / ""' },
+    '.cm-content .cm-line[data-line].cm-helix-folded::after': { content: '"›" / ""' },
+  },
+  [drawn('.cm-line.cm-helix-problem-danger')]: {
     color: 'var(--helix-color-danger)',
     fontWeight: 'var(--helix-weight-semibold)',
   },
-  '.cm-gutterElement.cm-helix-problem-info': { color: 'var(--helix-color-info)' },
-  '.cm-gutterElement.cm-helix-problem-warning': {
+  [drawn('.cm-line.cm-helix-problem-info')]: { color: 'var(--helix-color-info)' },
+  [drawn('.cm-line.cm-helix-problem-warning')]: {
     color: 'var(--helix-color-warning)',
     fontWeight: 'var(--helix-weight-semibold)',
   },
-  '.cm-gutters': {
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: 'var(--helix-color-foreground-muted)',
+  [drawn('.cm-lineWrapping > .cm-line')]: {
+    float: 'none',
+    insetBlock: '0',
+    margin: '0',
+    position: 'absolute',
   },
-  '.cm-lineNumbers .cm-gutterElement': {
-    minInlineSize: '3ch',
-    paddingInline: 'var(--helix-space-sm) var(--helix-space-2xs)',
+  '.cm-lineWrapping > .cm-line[data-line]': { position: 'relative' },
+  '.cm-lineWrapping > .cm-line[data-line]::after': {
+    insetInlineStart: 'calc(-1 * var(--_code-editor-folds))',
+  },
+  '.cm-lineWrapping > .cm-line[data-line]::before': {
+    insetInlineStart: 'calc(-1 * var(--_code-editor-band))',
   },
   '.cm-lintRange-error': {
     backgroundImage: 'none',
@@ -431,7 +687,7 @@ const helixTheme = EditorView.theme({
     borderRadius: 'var(--helix-radii-sm)',
   },
   '&': { blockSize: '100%', color: 'var(--helix-color-foreground)', fontSize: 'inherit' },
-  '&:not(.cm-focused) .cm-activeLine, &:not(.cm-focused) .cm-activeLineGutter': {
+  [`&:not(.cm-focused) .cm-activeLine, ${drawn('&:not(.cm-focused) .cm-activeLine')}`]: {
     backgroundColor: 'transparent',
   },
   '&.cm-focused': { outline: 'none' },
@@ -562,40 +818,31 @@ const lintOf = (state: CodeEditorEngineState, length: number): Diagnostic[] =>
     to: Math.min(Math.max(one.from, one.to), length),
   }))
 
-/** A line number drawn in a problem's tone. */
-class ProblemLine extends GutterMarker {
-  constructor(readonly tone: 'danger' | 'info' | 'warning') {
-    super()
-    this.elementClass = `cm-helix-problem-${tone}`
-  }
-
-  override eq(other: ProblemLine): boolean {
-    return other.tone === this.tone
-  }
-}
-
 /** How bad each tone is, so a line with two problems takes the worse one's. */
 const RANK = { danger: 2, info: 0, warning: 1 } as const
 
-/** Each line with a problem, its number marked in the worst problem's tone. */
-const problemLines = (
-  state: EditorState,
-  diagnostics: readonly CodeEditorDiagnostic[],
-): Extension => {
-  const worst = new Map<number, 'danger' | 'info' | 'warning'>()
-  for (const one of diagnostics) {
-    const line = state.doc.lineAt(Math.min(Math.max(0, one.from), state.doc.length)).from
-    const tone = one.tone ?? 'danger'
-    const held = worst.get(line)
-    if (!held || RANK[tone] > RANK[held]) {
-      worst.set(line, tone)
+/**
+ * Each line with a problem, its number and fold marker drawn in the worst
+ * problem's tone, as a class on the line, found again in each document the
+ * reader's edits make.
+ */
+const problemLines = (diagnostics: readonly CodeEditorDiagnostic[]): Extension =>
+  EditorView.decorations.compute(['doc'], (state) => {
+    const worst = new Map<number, 'danger' | 'info' | 'warning'>()
+    for (const one of diagnostics) {
+      const line = state.doc.lineAt(Math.min(Math.max(0, one.from), state.doc.length)).from
+      const tone = one.tone ?? 'danger'
+      const held = worst.get(line)
+      if (!held || RANK[tone] > RANK[held]) {
+        worst.set(line, tone)
+      }
     }
-  }
-  const marks = [...worst]
-    .sort(([a], [b]) => a - b)
-    .map(([from, tone]) => new ProblemLine(tone).range(from))
-  return gutterLineClass.of(RangeSet.of(marks))
-}
+    return RangeSet.of(
+      [...worst]
+        .sort(([a], [b]) => a - b)
+        .map(([from, tone]) => Decoration.line({ class: `cm-helix-problem-${tone}` }).range(from)),
+    )
+  })
 
 /** The query as CodeMirror's: literal unless it is a regular expression. */
 const queryOf = (query: CodeEditorFindQuery): SearchQuery =>
@@ -699,9 +946,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEng
       state: EditorState.create({
         doc: state.value,
         extensions: [
-          numbers.of(
-            state.lineNumbers ? [lineNumbers(), highlightActiveLineGutter(), foldGutter()] : [],
-          ),
+          numbers.of(state.lineNumbers ? numbering : []),
           remeasureOnFonts,
           history(),
           drawSelection(),
@@ -719,7 +964,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEng
               return { dom, top: true }
             },
           }),
-          problems.of(problemLines(EditorState.create({ doc: state.value }), state.diagnostics)),
+          problems.of(problemLines(state.diagnostics)),
           indentUnit.of('  '),
           EditorState.tabSize.of(2),
           keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap, indentWithTab]),
@@ -819,11 +1064,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEng
       update: (next) => {
         const effects = []
         if (next.lineNumbers !== current.lineNumbers) {
-          effects.push(
-            numbers.reconfigure(
-              next.lineNumbers ? [lineNumbers(), highlightActiveLineGutter(), foldGutter()] : [],
-            ),
-          )
+          effects.push(numbers.reconfigure(next.lineNumbers ? numbering : []))
         }
         if (next.readOnly !== current.readOnly) {
           effects.push(editable.reconfigure(EditorState.readOnly.of(next.readOnly)))
@@ -856,7 +1097,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEng
         if (next.diagnostics !== current.diagnostics || next.value !== doc) {
           view.dispatch(setDiagnostics(view.state, lintOf(next, view.state.doc.length)))
           view.dispatch({
-            effects: problems.reconfigure(problemLines(view.state, next.diagnostics)),
+            effects: problems.reconfigure(problemLines(next.diagnostics)),
           })
         }
         if (next.language !== current.language) {
