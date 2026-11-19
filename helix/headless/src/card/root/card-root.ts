@@ -59,6 +59,8 @@ import { property, state } from 'lit/decorators.js'
  * @use Related content and actions grouped on one surface, often repeated in a grid.
  * @instead drawer - A panel that slides in over the page.
  * @instead drilldown - Pages you step into and back out of.
+ * @anatomy header
+ * @anatomy footer?
  * @documentation https://fusion.dev/helix/components/card
  *
  * @slot - The card's main content.

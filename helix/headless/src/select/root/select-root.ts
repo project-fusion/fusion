@@ -119,6 +119,10 @@ import { over } from '../align.js'
  * @instead combobox - A list long enough that you type to find the value.
  * @instead radio - Up to five options you should see without opening anything.
  * @instead menu - An action that runs when you choose it.
+ * @anatomy label
+ * @anatomy trigger
+ * @anatomy indicator
+ * @anatomy surface
  * @documentation https://fusion.dev/helix/components/select
  *
  * @slot - The options, and any groups of them.

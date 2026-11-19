@@ -101,6 +101,8 @@ const warmth = (): Warmth => {
  * @aliases Hint, Popup label
  * @use A short text that names an icon-only control or adds a detail to it.
  * @instead popover - Anything you click, type in, or select.
+ * @anatomy surface
+ * @anatomy arrow?
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @slot - The trigger, in the wrapping form. The tooltip describes it, as it

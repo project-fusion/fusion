@@ -109,6 +109,9 @@ import { hideOutside } from '../hide-outside.js'
  * @instead tooltip - A short text that names its trigger.
  * @instead menu - A list of commands.
  * @instead megamenu - A site's navigation sections.
+ * @anatomy trigger
+ * @anatomy surface
+ * @anatomy content
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @slot - The contents of the panel.

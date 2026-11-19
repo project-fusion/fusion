@@ -41,6 +41,7 @@ import { styles } from './skeleton-root.css.js'
  * @use The shape of content that is loading, where its layout is known.
  * @instead loader - Work of unknown length with no layout to hold.
  * @instead empty - A region that loaded and holds nothing.
+ * @anatomy skeleton
  * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @csspart content - The box around the content, hidden while `loading`.

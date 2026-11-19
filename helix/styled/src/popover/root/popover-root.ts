@@ -29,6 +29,9 @@ import { styles } from './popover-root.css.js'
  * @instead tooltip - A short text that names its trigger.
  * @instead menu - A list of commands.
  * @instead megamenu - A site's navigation sections.
+ * @anatomy trigger
+ * @anatomy surface
+ * @anatomy content
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.

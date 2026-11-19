@@ -21,6 +21,7 @@
  */
 
 import '@fusion.dev/helix'
+import { drawAnatomy } from './preview-anatomy'
 import { RESTYLED } from './preview-events'
 
 /** Where the map chunk, MapLibre, the graph chunks, and the terminal chunk are, stamped at build time. */
@@ -340,6 +341,8 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountCodeEditors(host, generation)
     mountEditors(host, generation)
     highlightCode(host)
+    /* The family page's numbered parts, where it sent any. */
+    void drawAnatomy(host)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()

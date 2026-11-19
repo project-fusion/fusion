@@ -21,6 +21,8 @@ import { styles } from './announcement-root.css.js'
  * @use A message for every page of a site, shown above its header, such as planned downtime.
  * @instead callout - A message about one section.
  * @instead toast - A reply to an action.
+ * @anatomy content
+ * @anatomy dismiss?
  * @documentation https://fusion.dev/helix/components/announcement
  *
  * @cssproperty --announcement-background-color - The band's fill, in place of the one its separation gives it. A tone's tint still paints over it, so a band that sets this usually carries no tone.

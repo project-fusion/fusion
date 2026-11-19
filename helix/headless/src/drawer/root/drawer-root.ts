@@ -139,6 +139,10 @@ import { startsSwipe } from '../swipe-start.js'
  * @use Details, filters, or navigation that slide in from an edge, with the page still in view.
  * @instead dialog - A decision you answer before going on.
  * @instead drilldown - Pages you step into and back out of.
+ * @anatomy panel
+ * @anatomy header
+ * @anatomy dismiss?
+ * @anatomy content
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.

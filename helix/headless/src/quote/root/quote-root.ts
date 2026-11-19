@@ -36,6 +36,7 @@ import { typedMarks } from '../marks.js'
  * @aliases Q, InlineQuote
  * @use A quotation inside a sentence.
  * @instead blockquote - A passage set apart, including a pull quote.
+ * @anatomy quote
  * @documentation https://fusion.dev/helix/components/quote
  *
  * @slot - The quoted text.

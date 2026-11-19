@@ -24,6 +24,8 @@ import { styles } from './blockquote-root.css.js'
  * @aliases Pullquote, Citation, Excerpt
  * @use A passage set apart from the prose, including a pull quote with `marks`.
  * @instead quote - A few words quoted inside a sentence.
+ * @anatomy blockquote
+ * @anatomy attribution?
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @cssproperty --blockquote-attribution-color - The color of the attribution.

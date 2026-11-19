@@ -23,6 +23,7 @@ import { styles } from './tag-root.css.js'
  * @use A word that classifies content, such as a status or a topic.
  * @instead badge - A count pinned to another element.
  * @instead button - A word that performs an action.
+ * @anatomy label
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.

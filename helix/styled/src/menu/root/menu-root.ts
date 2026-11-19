@@ -25,6 +25,9 @@ import { styles } from './menu-root.css.js'
  * @use Commands that act at once, such as Rename, Duplicate, and Delete.
  * @instead select - A value a form submits.
  * @instead command - Commands you find by typing, from anywhere on the page.
+ * @anatomy trigger
+ * @anatomy surface
+ * @anatomy item
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @cssproperty --menu-backdrop - Filter applied behind a `frosted` or `glass` panel.

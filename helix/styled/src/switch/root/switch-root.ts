@@ -32,6 +32,10 @@ import { styles } from './switch-root.css.js'
  * @aliases Toggle switch, On/off
  * @use One setting that takes effect the moment it changes.
  * @instead checkbox - A choice you review before submitting a form.
+ * @anatomy track
+ * @anatomy thumb
+ * @anatomy label
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/switch
  *
  * @slot - The label that names what the switch turns on.

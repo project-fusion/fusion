@@ -13,6 +13,7 @@ import { docsShell } from '@/components/docs-shell/docs-shell'
 import { SectionHeading } from '@/components/section-heading/section-heading'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import {
+  type AnatomyPart,
   type ApiMember,
   type Element,
   type Example,
@@ -21,6 +22,7 @@ import {
   type PropertyDoc,
 } from '../../../../../../content/catalog/catalog'
 import { sourceUrl } from '../../../../../../utils/source/source'
+import { AnatomyPreview } from './anatomy'
 import { DocumentActions } from './document-actions'
 import api from './page.module.css'
 import { ComponentPreview, type PreviewLayout } from './preview'
@@ -61,6 +63,45 @@ const listed = (words: readonly string[]): string =>
  */
 const after = (text: string): string =>
   /^[A-Z](?![A-Z])/.test(text) ? text[0]?.toLowerCase() + text.slice(1) : text
+
+/**
+ * How a reader reaches a part from their own code: the element's tag, the
+ * `::part()` that styles it, or the `slot` its content is written into.
+ */
+const reached = (part: AnatomyPart): string =>
+  part.kind === 'element'
+    ? `<${part.tag}>`
+    : part.kind === 'part'
+      ? `::part(${part.name})`
+      : `slot="${part.name}"`
+
+/**
+ * The headline example with the template the frame draws the markers from,
+ * each part as `kind:tag:name`. A headless example names the headless tags.
+ *
+ * **Opened, where the root opens.** A Select, a Menu, or a Drawer draws its
+ * surface only while it is open, and most of what it is made of is on that
+ * surface. The first root in the example gets `open` where it does not
+ * already have it, as Dialog's example already does for its own preview.
+ */
+const withAnatomy = (
+  html: string,
+  parts: readonly AnatomyPart[],
+  root: string,
+  opens: boolean,
+): string => {
+  const headless = root.startsWith('helix-headless-')
+  const tokens = parts.map((part) => {
+    const tag = headless ? part.tag.replace(/^helix-/, 'helix-headless-') : part.tag
+    return `${part.kind}:${tag}:${part.name}`
+  })
+  const opened = opens
+    ? html.replace(new RegExp(`<${root}(?=[\\s>])([^>]*)>`), (tag, attributes: string) =>
+        /\sopen(?=[\s=>]|$)/.test(attributes) ? tag : `<${root} open${attributes}>`,
+      )
+    : html
+  return `${opened.trimEnd()}\n<template data-preview-anatomy="${tokens.join(' ')}"></template>\n`
+}
 
 /**
  * **The description column: one share of the table, the same in every table.**
@@ -577,7 +618,18 @@ export default async function FamilyDocs({
   const imports = (tier: 'headless' | 'styled'): string => family.usage[tier].join('\n')
   /* The Guidelines section, and its entry in the rail, where the family says
      when to use it or what to use instead. */
-  const guided = family.use.length > 0 || family.instead.length > 0
+  const guided = family.use.length > 0 || family.instead.length > 0 || family.anatomy.length > 0
+  /* The example the anatomy is drawn over: the styled headline, where there
+     is one, since that is the tier a picture shows. */
+  const pictured = headlines[0]
+  /* Whether the root opens, which the anatomy frame opens it for, and lays
+     out from the top so the surface has room under its trigger. */
+  const openable = family.elements.some(
+    (element) =>
+      (element.tagName === `helix-${family.slug}` ||
+        element.tagName === `helix-headless-${family.slug}`) &&
+      element.properties.some((property) => property.name === 'open'),
+  )
 
   return (
     /* The shell and the rail are the layout's, so the nav survives a navigation
@@ -730,43 +782,98 @@ export default async function FamilyDocs({
                   name as a link, because the answer to "use something else"
                   is a family you can open. The lists are the docs' own prose
                   lists, since each line is a sentence to read. */}
-              <div className={api.guidelines}>
-                {family.use.length > 0 && (
-                  <helix-flex direction="column" gap="xs">
-                    <helix-text as="h3" scale="body-strong">
-                      When to use
-                    </helix-text>
-                    <div data-prose>
-                      <ul>
-                        {family.use.map((line) => (
-                          <li key={line}>
-                            <CodeText>{line}</CodeText>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </helix-flex>
-                )}
-                {family.instead.length > 0 && (
-                  <helix-flex direction="column" gap="xs">
-                    <helix-text as="h3" scale="body-strong">
-                      When to use something else
-                    </helix-text>
-                    <div data-prose>
-                      <ul>
-                        {family.instead.map((one) => (
-                          <li key={one.slug}>
-                            <Link data-link="" href={`/helix/components/${one.slug}`}>
-                              {one.label}
-                            </Link>
-                            : <CodeText>{after(one.description)}</CodeText>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </helix-flex>
-                )}
-              </div>
+              {(family.use.length > 0 || family.instead.length > 0) && (
+                <div className={api.guidelines}>
+                  {family.use.length > 0 && (
+                    <helix-flex direction="column" gap="xs">
+                      <helix-text as="h3" scale="body-strong">
+                        When to use
+                      </helix-text>
+                      <div data-prose>
+                        <ul>
+                          {family.use.map((line) => (
+                            <li key={line}>
+                              <CodeText>{line}</CodeText>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </helix-flex>
+                  )}
+                  {family.instead.length > 0 && (
+                    <helix-flex direction="column" gap="xs">
+                      <helix-text as="h3" scale="body-strong">
+                        When to use something else
+                      </helix-text>
+                      <div data-prose>
+                        <ul>
+                          {family.instead.map((one) => (
+                            <li key={one.slug}>
+                              <Link data-link="" href={`/helix/components/${one.slug}`}>
+                                {one.label}
+                              </Link>
+                              : <CodeText>{after(one.description)}</CodeText>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </helix-flex>
+                  )}
+                </div>
+              )}
+              {/* **The parts, numbered over the running example**, and the
+                  same numbers in a legend under it. The frame finds each part
+                  in the live shadow roots, so a marker follows the part it
+                  names. Each row says how to reach the part from your code:
+                  its tag, its `::part()`, or its slot. */}
+              {family.anatomy.length > 0 && pictured && (
+                <helix-flex direction="column" gap="sm">
+                  <helix-text as="h3" scale="body-strong">
+                    Anatomy
+                  </helix-text>
+                  <AnatomyPreview
+                    css={pictured.example.css}
+                    html={withAnatomy(
+                      pictured.example.html,
+                      family.anatomy,
+                      pictured.tier === 'headless'
+                        ? `helix-headless-${family.slug}`
+                        : `helix-${family.slug}`,
+                      openable,
+                    )}
+                    {...(openable
+                      ? { layout: 'padded' as const }
+                      : pictured.example.layout
+                        ? { layout: pictured.example.layout as PreviewLayout }
+                        : {})}
+                    {...(pictured.example.min ? { min: pictured.example.min } : {})}
+                  />
+                  <ol className={api.anatomy}>
+                    {family.anatomy.map((part, at) => (
+                      <li key={part.name}>
+                        <span aria-hidden="true" className={api.anatomyNumber}>
+                          {at + 1}
+                        </span>
+                        <helix-flex direction="column" gap="2xs">
+                          <helix-flex align-items="baseline" gap="xs" wrap>
+                            <CodeText>{`\`${reached(part)}\``}</CodeText>
+                            {part.optional && (
+                              <helix-text emphasis="muted" scale="caption">
+                                Optional
+                              </helix-text>
+                            )}
+                          </helix-flex>
+                          {part.description && (
+                            <helix-text emphasis="muted" scale="body">
+                              <CodeText>{part.description}</CodeText>
+                            </helix-text>
+                          )}
+                        </helix-flex>
+                      </li>
+                    ))}
+                  </ol>
+                </helix-flex>
+              )}
             </helix-flex>
           )}
 

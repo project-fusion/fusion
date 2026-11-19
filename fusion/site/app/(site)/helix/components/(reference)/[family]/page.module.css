@@ -292,3 +292,35 @@
   gap: var(--helix-space-lg);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
+
+/* The anatomy legend: the number in the disc the frame draws, then how to
+   reach the part and its line. Two columns where there is room, so a legend
+   of five rows is not a long column beside empty space. */
+.anatomy {
+  display: grid;
+  gap: var(--helix-space-sm) var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.anatomy > li {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-sm);
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+/* The frame's disc, the same size and colors, so a number here reads as the
+   number there. */
+.anatomyNumber {
+  background: var(--helix-color-foreground);
+  block-size: 20px;
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-background);
+  font: 600 11px / 20px var(--helix-font-sans);
+  font-variant-numeric: tabular-nums;
+  inline-size: 20px;
+  text-align: center;
+}

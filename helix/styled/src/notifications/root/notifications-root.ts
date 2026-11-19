@@ -26,6 +26,9 @@ import { styles } from './notifications-root.css.js'
  * @category feedback
  * @use A record of events you can return to and mark read.
  * @instead toast - A message that leaves on its own.
+ * @anatomy header
+ * @anatomy mark-all?
+ * @anatomy notification
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications.

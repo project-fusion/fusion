@@ -252,7 +252,10 @@ for (const family of families) {
           '# Anatomy',
           '',
           ...family.anatomy.map(
-            (one, at) => `${at + 1}. \`${one.name}\`${one.optional ? ' (optional)' : ''}`,
+            (one, at) =>
+              `${at + 1}. \`${one.name}\`${one.optional ? ' (optional)' : ''}${
+                one.description ? `: ${lowered(one.description)}` : ''
+              }`,
           ),
           '',
         ]

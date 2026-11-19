@@ -34,6 +34,9 @@ import { property } from 'lit/decorators.js'
  * @use A compact choice of view or mode, such as list or grid, that shows at once.
  * @instead radio - Options that each need a sentence.
  * @instead switch - One setting, on or off.
+ * @anatomy group
+ * @anatomy item
+ * @anatomy label
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.

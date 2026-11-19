@@ -110,6 +110,8 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  * @use Progress through a fixed sequence of stages, such as a checkout.
  * @instead tabs - Sections you visit in any order.
  * @instead number-input - A number you type, such as a quantity.
+ * @anatomy step
+ * @anatomy progress?
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The steps.

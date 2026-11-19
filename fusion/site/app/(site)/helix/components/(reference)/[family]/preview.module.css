@@ -119,3 +119,12 @@
     inset-inline: 0;
   }
 }
+
+/* The anatomy frame, framed as the Preview section's frame is. Block, since
+   the element is inline until it upgrades and its height is set on it. */
+.anatomyPreview {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  overflow: hidden;
+}
