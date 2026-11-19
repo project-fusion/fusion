@@ -190,6 +190,29 @@ describe('tones', () => {
     expect(cells(element)[0]?.hasAttribute('data-tone')).toBe(false)
   })
 
+  /* A page that edits a reading changes the cell's `data-value` or its
+     `data-tone`, and its text is only the words a reader sees. The strip kept
+     the old colors after either edit. */
+  test("a cell takes its new tone when the page edits the table's cell", async () => {
+    const element = await strip('thresholds="0 5" tones="muted accent"', [
+      ['Mon', 1],
+      ['Tue', 9, 'danger'],
+    ])
+    const [mon, tue] = [...(element.parentElement?.querySelectorAll<HTMLElement>('tbody td') ?? [])]
+    if (mon) {
+      mon.dataset.value = '7'
+    }
+    if (tue) {
+      tue.dataset.tone = 'success'
+    }
+    await new Promise((done) => setTimeout(done, 0))
+    await element.updateComplete
+    expect(cells(element).map((cell) => cell.getAttribute('data-tone'))).toEqual([
+      'accent',
+      'success',
+    ])
+  })
+
   /**
    * **The bubble is one element that moves, not one per cell.** Every other
    * chart here anchors a single `Tooltip` to an invisible mark, so this does
