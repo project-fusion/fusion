@@ -258,6 +258,28 @@ They default to `--helix-duration-normal` and `--helix-easing-decelerate`, and
 slow token beside the normal one, so `0s` stops them too. Under reduced
 motion the marks take their new place at once, whatever duration you set.
 
+As you move across a chart with the pointer or the arrow keys, what marks the
+reading glides from one reading to the next: the guide and the band of a
+`Line Chart`, an `Area Chart`, and a `Bar Chart`, the dot and its words on a
+`Sparkline`, and the tooltip of every chart. The glide takes
+`--chart-glide-duration`, `--helix-duration-fast` by default, along
+`--helix-easing-decelerate`, and `0s` places them at once. When the pointer
+arrives from outside the chart, or the keys reach it, each is placed on its
+reading at once. The tooltip shows the new reading's words as it starts to
+move.
+
+When a `Legend` with `toggles` hides a series, the series fades out where it
+stood over `--chart-move-duration`. A `Bar Chart`'s columns shrink to the
+baseline, a stacked segment shrinks to nothing where it stood, an
+`Area Chart`'s band closes, and a `Donut Chart` closes its ring over the slice. The
+marks left and the value axis move to fit what is shown: a number that stays on
+the axis moves to its new level with its rule, a new number fades in, and a
+number the new scale drops fades out. A series shown again fades in and grows
+back. The chart's summary and table say what is shown at once. In Safari, a
+`Line Chart` and an `Area Chart` take the new scale at once with their lines,
+and a hidden series still fades. Under reduced motion the reading's marks and a
+hidden series take their new place at once.
+
 ## 3D charts that grow in and follow their readings
 
 The 3D charts draw their own marks, in SVG and through three.js, so their
