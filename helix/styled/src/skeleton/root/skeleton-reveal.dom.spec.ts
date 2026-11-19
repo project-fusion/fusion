@@ -92,17 +92,21 @@ const skeleton = async () => {
   }
 }
 
-beforeEach(() => {
-  globalThis.ResizeObserver = Observer as unknown as typeof ResizeObserver
-})
-
-afterEach(() => {
-  globalThis.ResizeObserver = original
-  globalThis.matchMedia = originalMatch
-  watchers.clear()
-})
-
 describe('the reveal', () => {
+  /* Inside the block: in the browser every file of a family shares one page,
+     and a hook declared outside one runs before the tests of the other files
+     too, where this observer, which reports only when a test says so, held
+     the revealing example's reveal still. */
+  beforeEach(() => {
+    globalThis.ResizeObserver = Observer as unknown as typeof ResizeObserver
+  })
+
+  afterEach(() => {
+    globalThis.ResizeObserver = original
+    globalThis.matchMedia = originalMatch
+    watchers.clear()
+  })
+
   test('moves the height from the one last drawn while the two sides crossfade on the hooks', async () => {
     const { box, content, height, host, placeholder } = await skeleton()
     // The page puts the content in and takes `loading` off in one task, so
