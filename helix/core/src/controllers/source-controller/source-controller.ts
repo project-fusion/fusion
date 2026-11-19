@@ -69,6 +69,13 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
 }
 
 /**
+ * The attributes of a source that the readers take a reading from: a cell's
+ * number and tone, a row heading's date, a grid's label, and the role that
+ * makes an element a row or a cell of a grid.
+ */
+const READ_ATTRIBUTES = ['data-tone', 'data-value', 'datetime', 'label', 'role']
+
+/**
  * Resolves the element a chart reads from, and follows it.
  *
  * Every chart that takes a `for` wants exactly this, and wants it to behave
@@ -87,6 +94,13 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
  * The element is watched for `childList` and `characterData` alike, because
  * renaming a series edits a text node in place rather than replacing a cell,
  * and nothing in a page has reason to know a chart is reading it.
+ *
+ * **And for the attributes the readers take a reading from**, which are
+ * `READ_ATTRIBUTES`. A cell's `data-value` is its number wherever it is set,
+ * and its text is only the words a reader sees, so an edit that changes the
+ * number changes the attribute. Watched for text alone, every chart kept
+ * drawing the old number after an edit to `data-value`, and a heatmap kept the
+ * old tone after an edit to `data-tone`.
  *
  * **The tree around it is watched as well, for the table that is not there
  * yet.** A framework page renders a chart first and its table once the data
@@ -385,6 +399,7 @@ export class SourceController implements ReactiveController {
       this.host.requestUpdate()
     })
     this.observer.observe(element, {
+      attributeFilter: READ_ATTRIBUTES,
       characterData: true,
       childList: true,
       subtree: true,

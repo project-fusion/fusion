@@ -85,6 +85,18 @@ describe('points', () => {
     expect(points.map((one) => one.y)).toEqual([100, 75, 50, 25, 0])
   })
 
+  /* The number is the cell's `data-value`, and the text is only the words a
+     reader sees, so an edit to a reading can change the attribute alone. The
+     chart drew the old point until something else redrew it. */
+  test('a point moves when the page edits its cell', async () => {
+    const host = await chart(SPEND, 'for="spend"')
+    const cell = document.querySelectorAll<HTMLElement>('#spend tbody td')[3] as HTMLElement
+    cell.dataset.value = '10'
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    expect(dots(host).map((one) => one.y)).toEqual([100, 0, 50, 25, 0])
+  })
+
   test('every further numeric column is a series against the same across', async () => {
     const host = await chart(LOAD, 'for="load"')
     /* Three rows of p50 and two of p95: the second run has no p95, and a point

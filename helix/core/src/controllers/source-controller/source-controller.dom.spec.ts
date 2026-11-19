@@ -141,6 +141,41 @@ describe('a table that changes under it', () => {
     expect(chartOne.controller.rows.map((each) => each.label)).toEqual(['June', 'July'])
   })
 
+  /* A cell's `data-value` is its number, so a page that edits a reading
+     changes the attribute. Watched for text alone, the chart drew the old
+     number. */
+  test('reads a cell again when its `data-value` or `data-tone` changes', async () => {
+    document.body.innerHTML =
+      '<table id="src"><tbody><tr><th>March</th><td data-value="1">One</td></tr></tbody></table>'
+    const chartOne = chart('src')
+    chartOne.controller.hostConnected()
+    const cell = document.querySelector('td') as HTMLElement
+    expect(chartOne.controller.series).toMatchObject([{ points: [{ value: 1 }] }])
+    let before = chartOne.updates()
+    cell.dataset.value = '7'
+    await new Promise((done) => setTimeout(done, 0))
+    expect(chartOne.updates()).toBeGreaterThan(before)
+    expect(chartOne.controller.series).toMatchObject([{ points: [{ value: 7 }] }])
+    before = chartOne.updates()
+    cell.dataset.tone = 'danger'
+    await new Promise((done) => setTimeout(done, 0))
+    expect(chartOne.updates()).toBeGreaterThan(before)
+    expect(chartOne.controller.series).toMatchObject([{ points: [{ tone: 'danger' }] }])
+  })
+
+  /* The table's other attributes are not readings, and a page writing one is
+     not asking the chart to draw again. */
+  test('and not when an attribute nothing reads changes', async () => {
+    document.body.innerHTML =
+      '<table id="src"><tbody><tr><th>March</th><td data-value="1">One</td></tr></tbody></table>'
+    const chartOne = chart('src')
+    chartOne.controller.hostConnected()
+    const before = chartOne.updates()
+    document.querySelector('td')?.setAttribute('class', 'picked')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(chartOne.updates()).toBe(before)
+  })
+
   test('and stops asking once the chart is gone', async () => {
     document.body.innerHTML = '<table id="src"><tbody><tr><td>1</td></tr></tbody></table>'
     const chartOne = chart('src')
