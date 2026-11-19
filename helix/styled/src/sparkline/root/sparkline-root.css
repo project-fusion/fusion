@@ -106,15 +106,20 @@
    its new shape at once, there being nothing to move between. */
 [part="line"],
 [part="area"] {
-  transition: d var(--_chart-move-duration) var(--_chart-move-easing);
+  transition: d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate));
 }
 
 [part="bar"] {
   transition:
-    height var(--_chart-move-duration) var(--_chart-move-easing),
-    width var(--_chart-move-duration) var(--_chart-move-easing),
-    x var(--_chart-move-duration) var(--_chart-move-easing),
-    y var(--_chart-move-duration) var(--_chart-move-easing);
+    height var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    width var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    x var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    y var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate));
 }
 
 /* The hole in the ring, cut out of the drawing so it is one. **On the `<svg>`

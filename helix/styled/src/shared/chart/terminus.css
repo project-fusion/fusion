@@ -38,8 +38,10 @@
 @supports (d: path("M0 0")) {
   [part="terminus"]:not([data-jumped]) {
     transition:
-      inset-block-start var(--_chart-move-duration) var(--_chart-move-easing),
-      inset-inline-start var(--_chart-move-duration) var(--_chart-move-easing);
+      inset-block-start var(--_chart-move-duration, var(--helix-duration-normal))
+      var(--_chart-move-easing, var(--helix-easing-decelerate)),
+      inset-inline-start var(--_chart-move-duration, var(--helix-duration-normal))
+      var(--_chart-move-easing, var(--helix-easing-decelerate));
   }
 
   :host([terminus="ring"]) [part="terminus"] {
