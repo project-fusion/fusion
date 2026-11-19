@@ -68,6 +68,8 @@
   /* Wraps where it runs out of room, so a row of controls cannot widen the page.
      Measured October 31, 2026: seven controls took a 390 page to 644. */
   flex-wrap: wrap;
+  /* The box the focus ring travels in is placed against. */
+  position: relative;
   gap: var(--toolbar-gap, var(--helix-space-2xs));
   padding: var(--toolbar-padding, var(--helix-space-none));
 }

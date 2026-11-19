@@ -6,6 +6,7 @@ import {
   glyphPath,
   HelixActivateEvent,
   HelixElement,
+  FocusMarkController,
   HoverMarkController,
   IndicatorController,
   isRtl,
@@ -106,6 +107,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
+ * @csspart focus - The focus ring, which travels from tab to tab as the arrow keys move focus along the strip. It carries the place and size of the control with focus as the indicator does, its corners, outline width, and offset, `data-placed` while focus shows on one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it.
  * @csspart highlight - The wash under the pointer, which glides from tab to tab while a mouse or pen moves along them. It carries the tab's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart indicator - The marker that moves to the selected tab. It carries the selected tab's
  *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
@@ -118,6 +120,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @csspart scroll-start-mark - The glyph on that button, where none is slotted.
  * @csspart tabs - The tab list.
  *
+ * @cssstate focus-gliding - While the focus ring is on a tab, so it draws the ring in place of each tab's own.
  * @cssstate gliding - While a mouse or pen is over a tab, so the highlight draws the hover wash in place of each tab's own.
  */
 @customElement('helix-headless-tabs')
@@ -147,6 +150,14 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     active: () => this.tabs.find((tab) => tab.selected),
     indicator: () => this.partNamed('indicator'),
     observe: () => this.tabs,
+    surface: () => this.partNamed('tabs'),
+  })
+
+  /** Moves the focus ring from tab to tab as the arrow keys move focus. */
+  protected readonly focusRing = new FocusMarkController(this, {
+    gliding: (on) => this.toggleState('focus-gliding', on),
+    items: () => this.tabs,
+    mark: () => this.partNamed('focus'),
     surface: () => this.partNamed('tabs'),
   })
 
@@ -607,6 +618,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
         <span part="highlight" aria-hidden="true" hidden></span>
         <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
+        <span part="focus" aria-hidden="true" hidden></span>
         ${this.renderScroll(1)}
       </div>
       <div part="panels"><slot name="panels" @slotchange=${this.handleSlotChange}></slot></div>`
