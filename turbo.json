@@ -709,16 +709,23 @@
     "samples": { "cache": false },
 
     // The same narrowing as `frame`, for the same wait: the spec bundles reach
-    // the tiers through `@fusion.dev/helix`'s graph and the harness through
-    // `@fusion.dev/helix-testing`, and nothing of `helix-docs`.
+    // the tiers through `@fusion.dev/helix`'s graph, the harness through
+    // `@fusion.dev/helix-testing`, and the syntax colors the Code Editor's
+    // engine draws with through `@fusion.dev/helix-sandbox`'s built
+    // `highlight`, and nothing of `helix-docs`.
     "specs": {
-      "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-testing#build"],
+      "dependsOn": [
+        "@fusion.dev/helix#build",
+        "@fusion.dev/helix-sandbox#build",
+        "@fusion.dev/helix-testing#build"
+      ],
       // The connectors' specs import their package's own source, and the
       // headless tier is bundled from its source too, so one class registers
       // each element. No `build` this task depends on hashes those, so the
       // whole of each `src` is an input: a change under an unchanged spec
       // bundles anew.
       "inputs": [
+        "$TURBO_ROOT$/helix/code-editor/src/**/*.ts",
         "$TURBO_ROOT$/helix/headless/src/**/*.ts",
         "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
         "$TURBO_ROOT$/helix/graph/src/**/*.ts",
