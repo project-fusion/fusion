@@ -178,6 +178,10 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   @property({ attribute: 'drop-lines', reflect: true, type: Boolean })
   dropLines = false
 
+  /** The column of text that puts each point in a group, by its heading. None by default. */
+  @property({ attribute: 'group-by' })
+  groupBy = ''
+
   /**
    * Grows the points in from the floor the first time the chart comes
    * into view with readings, one after another in the order of the table, so the drawing arrives the way a
@@ -204,10 +208,6 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    */
   @property({ attribute: 'grow-again', reflect: true, type: Boolean })
   growAgain = false
-
-  /** The column of text that puts each point in a group, by its heading. None by default. */
-  @property({ attribute: 'group-by' })
-  groupBy = ''
 
   /**
    * Draws no box: no edges, grid, numbers, or names, so the readings stand

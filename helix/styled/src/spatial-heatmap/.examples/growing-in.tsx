@@ -39,7 +39,7 @@ export function Example() {
   const add = () =>
     setDays((before) => {
       const last = before.at(-1)?.[0] ?? 0
-      return [...before.slice(1), [last + 1, Math.round(Math.random() * 10)]]
+      return [...before.slice(1), [last + 1, ((last + 1) * 7 + 3) % 10]]
     })
 
   return (

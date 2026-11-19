@@ -184,6 +184,10 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    */
   static words = 'helix-spatial-treemap'
 
+  /** The column of text that gathers the rows into groups, by its heading. None by default. */
+  @property({ attribute: 'group-by' })
+  groupBy = ''
+
   /**
    * Grows the blocks in from the floor the first time the chart comes
    * into view with readings, one after another in the order of the table, so the drawing arrives the way a
@@ -210,10 +214,6 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    */
   @property({ attribute: 'grow-again', reflect: true, type: Boolean })
   growAgain = false
-
-  /** The column of text that gathers the rows into groups, by its heading. None by default. */
-  @property({ attribute: 'group-by' })
-  groupBy = ''
 
   /**
    * Draws no box: no edges, grid, numbers, or names, so the readings stand
