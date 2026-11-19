@@ -69,6 +69,12 @@ export {
   type DismissOptions,
 } from './controllers/dismiss-controller/dismiss-controller.js'
 export {
+  type DragBounds,
+  DragDismissController,
+  type DragDismissOptions,
+  type DragRelease,
+} from './controllers/drag-dismiss-controller/drag-dismiss-controller.js'
+export {
   DrilldownController,
   type DrilldownOptions,
 } from './controllers/drilldown-controller/drilldown-controller.js'
@@ -266,6 +272,7 @@ export {
 export { helixEventNames, registerEventNames } from './events/names.js'
 export { HelixElement, internalsOf, whenHydrated } from './helix-element/helix-element.js'
 export {
+  DRAGS_RULE,
   LAYERS_RULE,
   MIRROR_RULE,
   SCROLLER_RULE,

@@ -124,6 +124,26 @@ describe('a swipe', () => {
     expect(ends).toEqual([[0, 0, 0, 0]])
   })
 
+  test('a pointer that stood still before it lifted was going nowhere', () => {
+    const { ends, surface } = setup()
+    surface.dispatchEvent(pointer('pointerdown', 100, 100, 0))
+    window.dispatchEvent(pointer('pointermove', 140, 100, 10))
+    window.dispatchEvent(pointer('pointermove', 180, 100, 20))
+    window.dispatchEvent(pointer('pointerup', 180, 100, 400))
+    expect(ends[0]?.slice(0, 3)).toEqual([80, 0, 0])
+  })
+
+  test('the speed is the last 100 milliseconds of the drag', () => {
+    const { ends, surface } = setup()
+    surface.dispatchEvent(pointer('pointerdown', 100, 100, 0))
+    window.dispatchEvent(pointer('pointermove', 110, 100, 200))
+    window.dispatchEvent(pointer('pointermove', 120, 100, 400))
+    window.dispatchEvent(pointer('pointermove', 170, 100, 450))
+    window.dispatchEvent(pointer('pointerup', 220, 100, 500))
+    // 100 pixels in the last 100 milliseconds, where the whole drag averaged 0.24.
+    expect(ends[0]?.[2]).toBeCloseTo(1)
+  })
+
   test('the click that ends a swipe is swallowed', () => {
     const { button, surface } = setup()
     let clicked = 0

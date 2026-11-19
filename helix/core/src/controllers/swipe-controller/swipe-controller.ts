@@ -4,13 +4,36 @@ import type { SwipeAxis } from '../../utils/swipe/swipe.js'
 /** How far a press has to travel before it is a swipe, in pixels, by default. */
 const SLOP = 8
 
+/**
+ * How far back the speed at a release is read, in milliseconds. Long enough to
+ * smooth over one uneven reading, and short enough that a finger which slowed
+ * before it lifted is let go slowly.
+ */
+const RECENT = 100
+
 export interface SwipeOptions {
   /** The axis a swipe is read along, or `undefined` while swiping is off. */
   axis: () => SwipeAxis | undefined
 
   /**
+   * Called when the browser takes a swipe over for a scroll of its own. Where
+   * it is not given, `end` is called with nothing moved, which puts a host that
+   * reads distance back where it began.
+   */
+  cancel?: () => void
+
+  /**
+   * Whether the surface takes the pointer once a press becomes a swipe, so
+   * every move and the release come to it wherever the pointer goes. The
+   * capture is let go at the release and on a cancel.
+   */
+  capture?: boolean
+
+  /**
    * Called on the release, with how far the pointer went and how fast it was
-   * going, in pixels per millisecond, on each axis.
+   * going, in pixels per millisecond, on each axis, over its last 100
+   * milliseconds. A pointer that stood still for that long before it lifted
+   * was going nowhere.
    */
   end: (dx: number, dy: number, vx: number, vy: number) => void
 
@@ -71,8 +94,11 @@ export class SwipeController implements ReactiveController {
   /** Where the press began, while one is down. */
   private origin: Sample | undefined
 
-  /** The last two readings, for the speed. */
+  /** The readings of the last `RECENT` milliseconds, for the speed. */
   private samples: Sample[] = []
+
+  /** The surface holding the pointer, where `capture` asked it to take it. */
+  private captured: HTMLElement | undefined
 
   /** Whether the press has become a swipe. */
   private swiping = false
@@ -139,12 +165,21 @@ export class SwipeController implements ReactiveController {
         return
       }
       this.swiping = true
-      this.options.surface()?.setAttribute('data-swiping', '')
+      const surface = this.options.surface()
+      surface?.setAttribute('data-swiping', '')
+      if (this.options.capture && surface) {
+        /* A pointer the browser no longer counts as down, such as one a
+           script made up, cannot be captured, and the window still hears it. */
+        try {
+          surface.setPointerCapture(event.pointerId)
+          this.captured = surface
+        } catch {
+          this.captured = undefined
+        }
+      }
     }
-    this.samples = [
-      ...this.samples.slice(-1),
-      { t: event.timeStamp, x: event.clientX, y: event.clientY },
-    ]
+    const at = { t: event.timeStamp, x: event.clientX, y: event.clientY }
+    this.samples = [...this.samples.filter((one) => at.t - one.t <= RECENT), at]
     this.options.move(dx, dy)
   }
 
@@ -154,10 +189,13 @@ export class SwipeController implements ReactiveController {
       return
     }
     const swiped = this.swiping
-    const [before, last] = [this.samples[0], this.samples[this.samples.length - 1]]
-    const elapsed = before && last ? last.t - before.t : 0
-    const vx = before && last && elapsed > 0 ? (last.x - before.x) / elapsed : 0
-    const vy = before && last && elapsed > 0 ? (last.y - before.y) / elapsed : 0
+    /* Over the last `RECENT` milliseconds, the release included, so a pointer
+       that stood still before it lifted was going nowhere. */
+    const at = { t: event.timeStamp, x: event.clientX, y: event.clientY }
+    const first = [...this.samples, at].find((one) => at.t - one.t <= RECENT)
+    const elapsed = first ? at.t - first.t : 0
+    const vx = first && elapsed > 0 ? (at.x - first.x) / elapsed : 0
+    const vy = first && elapsed > 0 ? (at.y - first.y) / elapsed : 0
     this.stop()
     if (!swiped) {
       return
@@ -175,16 +213,27 @@ export class SwipeController implements ReactiveController {
     }
     const swiped = this.swiping
     this.stop()
-    if (swiped) {
+    if (!swiped) {
+      return
+    }
+    if (this.options.cancel) {
+      this.options.cancel()
+    } else {
       this.options.end(0, 0, 0, 0)
     }
   }
 
-  /** Forgets the press and stops listening for it. */
+  /** Forgets the press, lets go of the pointer, and stops listening for it. */
   private stop(): void {
     window.removeEventListener('pointermove', this.handleMove)
     window.removeEventListener('pointerup', this.handleUp)
     window.removeEventListener('pointercancel', this.handleCancel)
+    const captured = this.captured
+    const pointer = this.pointer
+    this.captured = undefined
+    if (captured && pointer !== undefined && captured.hasPointerCapture?.(pointer)) {
+      captured.releasePointerCapture(pointer)
+    }
     this.options.surface()?.removeAttribute('data-swiping')
     this.origin = undefined
     this.pointer = undefined

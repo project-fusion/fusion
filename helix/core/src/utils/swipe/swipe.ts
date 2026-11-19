@@ -116,3 +116,154 @@ export const swipeStep = (dx: number, vx: number, width: number, rtl: boolean): 
   }
   return 0
 }
+
+/**
+ * How much of a drag past a bound a surface follows at first. The share falls
+ * the further it goes, as iOS's rubber band does, so a surface pulled past its
+ * open end moves less and less and never runs away from the finger.
+ */
+const GIVE = 0.55
+
+/**
+ * How far a surface is drawn past a bound, for a drag that went `over` pixels
+ * past it, on a surface `size` pixels long along the drag.
+ */
+export const resist = (over: number, size: number): number => {
+  if (over <= 0) {
+    return 0
+  }
+  return size > 0 ? size * (1 - 1 / ((over * GIVE) / size + 1)) : over * GIVE
+}
+
+/**
+ * Where a surface dragged to `travel` is drawn: where the finger is between
+ * `min` and `max`, and with resistance past either.
+ */
+export const resisted = (travel: number, min: number, max: number, size: number): number => {
+  if (travel < min) {
+    return min - resist(min - travel, size)
+  }
+  return travel > max ? max + resist(travel - max, size) : travel
+}
+
+/** A release on its way to rest: how long it takes, and where it is after `elapsed` milliseconds. */
+export interface Glide {
+  /** The travel `elapsed` milliseconds after the release. */
+  at: (elapsed: number) => number
+
+  /** How long the glide takes, in milliseconds. */
+  duration: number
+}
+
+/**
+ * The glide off the edge after a release that dismisses: from `from` to `to`,
+ * starting at `velocity`, in pixels per millisecond, and taking at most
+ * `longest` milliseconds.
+ *
+ * **It leaves at the speed it was let go.** Thrown fast enough to cover the
+ * distance in `longest`, it keeps that speed to the edge. Let go slowly, or
+ * moving back, it starts at that speed and gathers pace evenly, so the speed
+ * never jumps at the release.
+ */
+export const exitGlide = (from: number, to: number, velocity: number, longest: number): Glide => {
+  const distance = to - from
+  const duration =
+    velocity > 0 ? Math.max(1, Math.min(longest, distance / velocity)) : Math.max(1, longest)
+  const gather = (2 * (distance - velocity * duration)) / duration ** 2
+  return {
+    at: (elapsed) => {
+      const t = Math.min(Math.max(elapsed, 0), duration)
+      return from + velocity * t + (gather * t * t) / 2
+    },
+    duration,
+  }
+}
+
+/** How many time constants long a settling glide is, so its push has all but died by its end. */
+const DECAY = 8
+
+/** A curve's progress at `share` of its length, read from evenly spaced samples. */
+const along = (curve: readonly number[], share: number): number => {
+  const steps = curve.length - 1
+  if (steps < 1) {
+    return share
+  }
+  const at = Math.min(Math.max(share, 0), 1) * steps
+  const index = Math.min(Math.floor(at), steps - 1)
+  const before = curve[index] ?? 0
+  const after = curve[index + 1] ?? 1
+  return before + (after - before) * (at - index)
+}
+
+/**
+ * The glide back to rest after a release that does not dismiss: along the
+ * host's curve from `from` to `to`, in at most `duration` milliseconds, with
+ * the speed it was let go at carried in. `curve` is the curve's progress at
+ * evenly spaced points from its start to its end, the browser's reading of a
+ * timing function such as `--helix-easing-spring`.
+ *
+ * **A spring starts from standing, and a release usually does not.** Run from
+ * its start, `--helix-easing-spring` covers a tenth of the way in its first
+ * quarter and then half of it in the next twelfth, so a surface let go moving
+ * toward its rest slowed almost to a stop and then lurched: measured in
+ * Chromium on November 19, 2026, 16 pixels a frame before the release, then
+ * 8, 4, 1, 3, 5 and 29. Moving toward its rest, the glide enters the curve at
+ * the first point that moves as fast as the release, and fits its length so
+ * it starts at the release's speed, within half and the whole of `duration`.
+ *
+ * **What the curve cannot match is pushed and spent.** The difference between
+ * the release's speed and the curve's, all of it for a release moving away
+ * from rest or standing on it, is added as a push that starts at that speed
+ * and dies away, `v·t·e^(−t/τ)` with τ an eighth of the glide: a flick away
+ * from rest carries the surface on a little before the curve brings it back,
+ * and the push has spent all but a few ten-thousandths of itself by the end.
+ */
+export const settleGlide = (
+  from: number,
+  to: number,
+  velocity: number,
+  duration: number,
+  curve: readonly number[] = [0, 1],
+): Glide => {
+  const distance = to - from
+  const steps = curve.length - 1
+  let enter = 0
+  let length = Math.max(1, duration)
+  let push = velocity
+  if (distance !== 0 && velocity * distance > 0 && steps >= 1) {
+    /* How steep the curve has to be, in progress per share of its length, to
+       move at the release's speed over the whole duration. */
+    const needed = (velocity * length) / distance
+    let best = 0
+    let steepest = Number.NEGATIVE_INFINITY
+    for (let index = 0; index < steps && (curve[index] ?? 1) < 1; index += 1) {
+      const slope = ((curve[index + 1] ?? 1) - (curve[index] ?? 0)) * steps
+      if (slope >= needed || slope > steepest) {
+        best = index
+        steepest = slope
+      }
+      if (slope >= needed) {
+        break
+      }
+    }
+    const start = curve[best] ?? 0
+    if (steepest > 0 && start < 1) {
+      enter = best / steps
+      const left = 1 - enter
+      const fit = (distance * steepest * left) / (velocity * (1 - start))
+      length = Math.min(Math.max(fit, (duration * left) / 2), Math.max(1, duration))
+      push = velocity - (distance * steepest * left) / (length * (1 - start))
+    }
+  }
+  const start = along(curve, enter)
+  const tau = length / DECAY
+  return {
+    at: (elapsed) => {
+      const t = Math.min(Math.max(elapsed, 0), length)
+      const share = enter + ((1 - enter) * t) / length
+      const progress = start < 1 ? (along(curve, share) - start) / (1 - start) : 1
+      return from + distance * progress + push * t * Math.exp(-t / tau)
+    },
+    duration: length,
+  }
+}

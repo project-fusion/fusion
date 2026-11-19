@@ -205,3 +205,18 @@ export const SHUT_RULE = '[data-shut]{rotate:-90deg}:host(:dir(rtl)) [data-shut]
  * leaves the page its scroll.
  */
 export const TOUCHES_RULE = '[data-touches]{touch-action:none}'
+
+/**
+ * Keeps the page's pan off the axis a surface is dragged along, and leaves it
+ * the other one.
+ *
+ * **A drag the browser reads as a pan is the browser's**, as for
+ * `TOUCHES_RULE`: it scrolls and sends `pointercancel`, so a drawer or a
+ * message dragged toward its edge would stop under the finger. A surface
+ * dragged across keeps the vertical pan for the page, and one dragged up or
+ * down the horizontal. `DragDismissController` marks the surface
+ * `data-drags="x"` or `data-drags="y"` while it can be dragged, and takes the
+ * mark off while it cannot, such as a closed drawer or one with
+ * `swipe="false"`.
+ */
+export const DRAGS_RULE = '[data-drags=x]{touch-action:pan-y}[data-drags=y]{touch-action:pan-x}'
