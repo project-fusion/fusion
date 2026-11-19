@@ -104,7 +104,7 @@ const scaleOf = (host: HTMLElement, box: DOMRect): Place => {
  * `display: contents`, as a table's row is, the boxes of what it draws, through
  * its shadow root and its slots. A row of cells moves as its cells.
  */
-const boxesOf = (element: Element): HTMLElement[] => {
+export const boxesOf = (element: Element): HTMLElement[] => {
   if (getComputedStyle(element).display !== 'contents') {
     return element instanceof HTMLElement ? [element] : []
   }

@@ -533,6 +533,7 @@ export {
   type TextFinderOptions,
   textFinder,
 } from './utils/find-text/find-text.js'
+export { type FlashChangeOptions, flashChange } from './utils/flash-change/flash-change.js'
 export { focusTarget } from './utils/focus-target/focus-target.js'
 export {
   autofocusTarget,
