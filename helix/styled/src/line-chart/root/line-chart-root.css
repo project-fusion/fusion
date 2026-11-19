@@ -261,8 +261,10 @@
   transition:
     d var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
-    stroke-dasharray var(--helix-duration-slow) step-end allow-discrete,
-    stroke-dashoffset var(--helix-duration-slow) var(--helix-easing-decelerate);
+    stroke-dasharray var(--_chart-arrive-duration, var(--helix-duration-slow)) step-end
+    allow-discrete,
+    stroke-dashoffset var(--_chart-arrive-duration, var(--helix-duration-slow))
+    var(--helix-easing-decelerate);
 }
 
 @starting-style {
@@ -289,7 +291,7 @@
   transition:
     d var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
-    opacity var(--helix-duration-slow) var(--helix-easing-decelerate);
+    opacity var(--_chart-arrive-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate);
 }
 
 @starting-style {
