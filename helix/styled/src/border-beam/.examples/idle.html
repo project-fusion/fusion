@@ -1,0 +1,27 @@
+<!-- @summary The light goes when the work stops, and comes back when it starts again. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-border-beam id="sync">
+    <helix-card
+      id="sync-text"
+      separation="outlined"
+    >Syncing two of five folders.</helix-card>
+  </helix-border-beam>
+
+  <helix-button id="toggle">Stop syncing</helix-button>
+</helix-flex>
+
+<script type="module">
+  const sync = document.getElementById('sync')
+  const text = document.getElementById('sync-text')
+  const toggle = document.getElementById('toggle')
+
+  // `idle` takes the light away while nothing is running.
+  toggle.addEventListener('click', () => {
+    sync.idle = !sync.idle
+    text.textContent = sync.idle ? 'Sync stopped.' : 'Syncing two of five folders.'
+    toggle.textContent = sync.idle ? 'Start syncing' : 'Stop syncing'
+  })
+</script>

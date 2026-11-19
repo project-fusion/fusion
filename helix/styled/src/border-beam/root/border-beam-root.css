@@ -1,0 +1,66 @@
+:host {
+  border-radius: var(--border-beam-radius, var(--helix-radii-md));
+  display: block;
+  position: relative;
+}
+
+/* **A soft spot, cut to the edge by two masks**, the box and its padding box,
+   so it follows whatever corners the box has. The element's script moves it
+   around the edge at one speed. **As wide as a `Card`'s border, and drawn on
+   it**, so the light reads as the border catching it and not as a second
+   line beside it. Full strength at its center and falling away to nothing
+   along the edge, in the light's own color, so an ink light on a light page
+   is a dark run along the border and on a dark page a bright one. */
+[part="beam"] {
+  /* Where the light starts, at the corner, and half the box's shorter side,
+     which caps its size on a small box. The element's script sets both. */
+  --_border-beam-x: 0px;
+  --_border-beam-y: 0px;
+  --_border-beam-reach: 4rem;
+  background: radial-gradient(
+    circle min(var(--border-beam-size, 4rem), var(--_border-beam-reach)) at
+      var(--_border-beam-x, 0px) var(--_border-beam-y, 0px),
+    var(--border-beam-color, var(--helix-color-accent)),
+    color-mix(in oklab, var(--border-beam-color, var(--helix-color-accent)) 45%, transparent) 45%,
+    transparent 100%
+  );
+  border-radius: inherit;
+  inset: 0;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  padding: var(--border-beam-width, var(--helix-border-thin));
+  pointer-events: none;
+  position: absolute;
+}
+
+/* The work has stopped, and the light goes with it. */
+:host([idle]) [part="beam"] {
+  display: none;
+}
+
+/* **A steady edge, where the reader asked for less movement**, so the box
+   still says it is at work without anything traveling. */
+@media (prefers-reduced-motion: reduce) {
+  [part="beam"] {
+    animation: none;
+    background: color-mix(
+      in oklab,
+      var(--border-beam-color, var(--helix-color-accent)) 55%,
+      transparent
+    );
+  }
+}
+
+/* Forced colors keep their own edges, and a printed page has no work going on. */
+@media (forced-colors: active) {
+  [part="beam"] {
+    display: none;
+  }
+}
+
+@media print {
+  [part="beam"] {
+    display: none;
+  }
+}
