@@ -43,11 +43,6 @@
     var(--_chart-move-easing, var(--helix-easing-decelerate));
 }
 
-[part~="terminus-hidden"] {
-  display: block;
-  opacity: 0;
-}
-
 @supports (d: path("M0 0")) {
   [part~="terminus"]:not([data-jumped]) {
     transition:

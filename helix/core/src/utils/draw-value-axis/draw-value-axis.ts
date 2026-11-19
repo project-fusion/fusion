@@ -48,7 +48,7 @@ export const drawValueAxis = (
       ({ leaving, level }) =>
         html`<span
           ?hidden=${leaving}
-          part=${leaving ? 'tick tick-leaving' : 'tick'}
+          part="tick${leaving ? ' tick-leaving' : ''}"
           style=${`inset-block-start: ${leaving ? heldInside(place(level)) : place(level)}%`}
           >${format(level)}</span
         >`,

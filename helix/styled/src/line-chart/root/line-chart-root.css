@@ -474,3 +474,12 @@
     transition-property: opacity, visibility;
   }
 }
+
+/* **The mark of a series a legend hid fades out with its line**, where it
+   stood, on the fade the shared terminus sheet times. It is `hidden` on the
+   headless tier, where nothing fades it, and drawn here while it fades. Here
+   and not in the shared sheet, since a Sparkline hides no series. */
+[part~="terminus-hidden"] {
+  display: block;
+  opacity: 0;
+}

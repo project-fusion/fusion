@@ -1326,7 +1326,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
           const at = leaving ? heldInside(scale(level)) : scale(level)
           return html`<span
             ?hidden=${leaving}
-            part=${leaving ? 'tick tick-leaving' : 'tick'}
+            part="tick${leaving ? ' tick-leaving' : ''}"
             style=${sideways ? `inset-inline-start: ${at}%` : `inset-block-start: ${at}%`}
             >${format(level)}</span
           >`
@@ -1381,7 +1381,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
           ({ leaving, level }) => {
             const at = leaving ? heldInside(y(level)) : y(level)
             return svg`<line
-              part=${leaving ? 'gridline gridline-leaving' : 'gridline'}
+              part="gridline${leaving ? ' gridline-leaving' : ''}"
               style=${sideways ? `translate: ${at}px 0` : `translate: 0 ${at}px`}
               visibility=${leaving ? 'hidden' : nothing}
               x1="0"
