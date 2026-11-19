@@ -293,6 +293,19 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
 
+/* The rules for using a family, numbered by the list itself, with the space
+   of a paragraph between two rules. */
+.practice {
+  display: grid;
+  gap: var(--helix-space-md);
+  margin: 0;
+  padding-inline-start: 1.25em;
+}
+
+.practice > li::marker {
+  font-weight: 600;
+}
+
 /* The anatomy legend: the number in the disc the frame draws, then how to
    reach the part and its line. Two columns where there is room, so a legend
    of five rows is not a long column beside empty space. */

@@ -412,6 +412,7 @@ export {
   type ExampleSource,
   type Family,
   findInCatalog,
+  type Practice,
   type PropertyDoc,
   publishedBy,
   type Render,
@@ -431,5 +432,6 @@ export type {
   HelixModule,
   InheritedFrom,
   Instead,
+  PracticeEntry,
   TypeText,
 } from './types.js'

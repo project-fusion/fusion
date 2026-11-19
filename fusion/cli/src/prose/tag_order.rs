@@ -49,8 +49,9 @@ use crate::rules::{Context, Finding, Report, Unwritten, Written};
 /// interleaving. `@cssstate` came later and joins the second pair at its end,
 /// being the third thing a stylesheet names. `@family` came later too, and sits
 /// after `@category`, both saying where a component belongs. `@use`,
-/// `@instead`, and `@anatomy` are a family root's design guidance, and sit
-/// after `@aliases`: the names a family answers to, then when to choose it.
+/// `@instead`, `@anatomy`, and `@practice` are a family root's design
+/// guidance, and sit after `@aliases`: the names a family answers to, then
+/// when to choose it and how to use it.
 const SECTIONS: [&[&str]; 8] = [
     &["summary"],
     &["description"],
@@ -64,6 +65,7 @@ const SECTIONS: [&[&str]; 8] = [
         "use",
         "instead",
         "anatomy",
+        "practice",
         "documentation",
     ],
     &["slot"],

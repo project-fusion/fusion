@@ -251,6 +251,16 @@ export interface AnatomyPart {
   tag: string
 }
 
+/**
+ * One rule for using a family, as its guidance writes it: the rule, why it
+ * holds, and the slug of the example that shows it, where the rule names one.
+ */
+export interface Practice {
+  example: string
+  reason: string
+  rule: string
+}
+
 export interface Family {
   aliases: string[]
   /**
@@ -265,6 +275,8 @@ export interface Family {
   instead: Alternative[]
   /** The situations the family is for, from `@use`, at most three. */
   use: string[]
+  /** The rules for using the family once it is chosen, from `@practice`. */
+  practice: Practice[]
   /**
    * The native elements the family stands in for, from `@replaces`: `button`,
    * or `input[type=checkbox]`. `helix scan` reports each one a page writes.
@@ -748,7 +760,8 @@ export const catalog = (
          holds them to, so either one is the family's answer. A family that
          writes its guidance on the headless root alone still publishes it. */
       const guided = roots.find(
-        (entry) => entry.helix?.use || entry.helix?.instead || entry.helix?.anatomy,
+        (entry) =>
+          entry.helix?.use || entry.helix?.instead || entry.helix?.anatomy || entry.helix?.practice,
       )?.helix
 
       return {
@@ -816,6 +829,11 @@ export const catalog = (
         })),
         label: startCase(slug),
         package: root ? published(root) : '',
+        practice: (guided?.practice ?? []).map((one) => ({
+          example: one.example ?? '',
+          reason: one.reason ?? '',
+          rule: one.rule,
+        })),
         replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
         since: root?.helix?.since ?? '',
         slug,

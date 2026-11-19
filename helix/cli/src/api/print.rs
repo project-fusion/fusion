@@ -7,7 +7,8 @@ use serde_json::Value;
 use super::text;
 
 /// A family's guidance under its summary: when to use it, the families to use
-/// instead, and its anatomy. A family that writes none prints nothing here.
+/// instead, its anatomy, and the rules for using it. A family that writes none
+/// prints nothing here.
 fn guidance(family: &Value) {
     let uses: Vec<String> = family["use"]
         .as_array()
@@ -51,6 +52,25 @@ fn guidance(family: &Value) {
     if !anatomy.is_empty() {
         say!();
         say!("anatomy: {}", anatomy.join(", "));
+    }
+    let practice: Vec<String> = family["practice"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|one| {
+            let rule = text(&one["rule"]);
+            match one["reason"].as_str() {
+                Some(reason) => format!("{rule} {reason}"),
+                None => rule,
+            }
+        })
+        .collect();
+    if !practice.is_empty() {
+        say!();
+        say!("practice:");
+        for line in &practice {
+            say!("  {line}");
+        }
     }
 }
 

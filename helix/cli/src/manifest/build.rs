@@ -896,8 +896,8 @@ fn slug(word: &str) -> bool {
             .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit() || one == '-')
 }
 
-/// The family's design guidance: when to use it, what to use instead, and its
-/// anatomy.
+/// The family's design guidance: when to use it, what to use instead, its
+/// anatomy, and the rules for using it.
 ///
 /// **Every one of each tag, in the order written**, because each is a list
 /// whose order is the order the reference page reads them in. `@use` is one
@@ -905,7 +905,9 @@ fn slug(word: &str) -> bool {
 /// already uses, and a line with no dash keeps its family and has no
 /// description, so `helix component`'s `guidance` can name the line that is
 /// missing one. `@anatomy` is a comma list of part, slot, and csspart names,
-/// and a trailing `?` marks a name as optional.
+/// and a trailing `?` marks a name as optional. `@practice` is a rule for
+/// using the family and its reason, `<rule> - <reason>`, with one of the
+/// family's examples named first in braces where the rule needs code.
 ///
 /// Nothing is checked here. A family that is not a family, or a part the
 /// element does not publish, is published as written, and the `guidance` rule
@@ -952,6 +954,41 @@ fn guidance(documented: &Documented, block: &mut serde_json::Map<String, Value>)
     if !anatomy.is_empty() {
         block.insert("anatomy".to_owned(), json!(anatomy));
     }
+    let practice: Vec<Value> = every("practice")
+        .iter()
+        .map(|text| practiced(text))
+        .collect();
+    if !practice.is_empty() {
+        block.insert("practice".to_owned(), json!(practice));
+    }
+}
+
+/// One `@practice` line: `{example} <rule> - <reason>`, where the leading
+/// example, in braces as `@event` writes a type, is optional. The rule ends
+/// at the first ` - `, since a reason may itself hold a dash, and a line with
+/// none keeps its rule and has no reason, so the `guidance` rule can name it.
+fn practiced(text: &str) -> Value {
+    let (example, rest) = match text
+        .strip_prefix('{')
+        .and_then(|after| after.split_once('}'))
+    {
+        Some((example, rest)) => (Some(example.trim()), rest.trim()),
+        None => (None, text),
+    };
+    let mut one = serde_json::Map::new();
+    match rest.split_once(" - ") {
+        Some((rule, reason)) => {
+            one.insert("rule".to_owned(), json!(rule.trim()));
+            one.insert("reason".to_owned(), json!(reason.trim()));
+        }
+        None => {
+            one.insert("rule".to_owned(), json!(rest.trim()));
+        }
+    }
+    if let Some(example) = example.filter(|example| !example.is_empty()) {
+        one.insert("example".to_owned(), json!(example));
+    }
+    Value::Object(one)
 }
 
 fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) -> Option<Value> {

@@ -101,6 +101,7 @@ describe('catalog', () => {
     expect(pagination?.use).toEqual([])
     expect(pagination?.instead).toEqual([])
     expect(pagination?.anatomy).toEqual([])
+    expect(pagination?.practice).toEqual([])
   })
 
   test('guidance comes from the root that writes it, with each alternative labeled', () => {
@@ -117,6 +118,10 @@ describe('catalog', () => {
                 helix: {
                   anatomy: [{ name: 'trigger' }, { name: 'header', optional: true }],
                   instead: [{ description: 'A value a form submits.', family: 'number-input' }],
+                  practice: [
+                    { example: 'grouped', reason: 'It registers all three.', rule: 'Group items.' },
+                    { rule: 'Close it.' },
+                  ],
                   use: ['Commands that act at once.'],
                 },
                 name: 'HelixHeadlessMenu',
@@ -131,6 +136,10 @@ describe('catalog', () => {
     expect(menu?.use).toEqual(['Commands that act at once.'])
     expect(menu?.instead).toEqual([
       { description: 'A value a form submits.', label: 'Number Input', slug: 'number-input' },
+    ])
+    expect(menu?.practice).toEqual([
+      { example: 'grouped', reason: 'It registers all three.', rule: 'Group items.' },
+      { example: '', reason: '', rule: 'Close it.' },
     ])
     expect(menu?.anatomy.map(({ name, optional }) => ({ name, optional }))).toEqual([
       { name: 'trigger', optional: false },
