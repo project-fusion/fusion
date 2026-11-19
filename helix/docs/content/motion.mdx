@@ -382,7 +382,7 @@ Backgrounds and the page:
 
 ## Motion on your own elements
 
-Five functions in `@fusion.dev/helix-core` give elements you write yourself
+Six functions in `@fusion.dev/helix-core` give elements you write yourself
 the motion Helix's own families have, with no component around them:
 
 - `moveItems` slides the items of a list to their new places.
@@ -390,6 +390,7 @@ the motion Helix's own families have, with no component around them:
 - `countTo` counts a figure to a new number.
 - `followPointer` writes where a mouse or pen is over an element.
 - `burstConfetti` bursts confetti out of an element once an action is done.
+- `flashChange` lights up an element that changed, and fades.
 
 Each one works on any element, in any framework, and needs no Helix
 stylesheet. Times and curves default to the tokens above, and to the values
@@ -518,3 +519,29 @@ followPointer(document.querySelector('.card'))
 `data-following` is on the element while the two are written. A touch is not
 followed, since a finger is on the element only while it presses. Pass `moved`
 and `left` to hear the same positions in script.
+
+### What changed
+
+`flashChange` lights up what changed. Call it on an element after you change
+it, such as a cell a live feed updated or a sentence an agent rewrote. A quiet
+wash of the info color holds for `--helix-duration-slow` and fades over twice
+that. The wash is drawn over the element's background and under its text, so
+nothing moves, and the element looks as it did once the wash is gone. A row is
+washed through its cells. A second call on the same element carries on from
+the strength drawn. Under reduced motion the wash still shows, since it says
+what changed, and it goes over `--helix-duration-fade` with no rise.
+
+```js
+import { flashChange } from '@fusion.dev/helix-core'
+
+const cell = document.querySelector('#latency')
+cell.textContent = '224 ms'
+flashChange(cell)
+```
+
+Two families do this for you. With `flash-changes`, a `Data Table` lights up
+each row whose values change when you set `rows` again, and each row that
+arrives, known by `row-key`, and a `Code Editor` lights up the lines a new
+`value` or an agent's edit changed, leaving the lines you type alone.
+`--data-table-flash-color` and `--code-editor-flash-color` set the wash.
+
