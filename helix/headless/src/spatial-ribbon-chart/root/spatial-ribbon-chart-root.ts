@@ -13,6 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
+  ReadingsMotionController,
   spokenReading,
   words,
   wordsLocale,
@@ -27,6 +28,7 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+import { barItems } from '../../spatial-bar-chart/bars.js'
 import {
   boundsOf,
   boxView,
@@ -39,7 +41,13 @@ import {
   turned,
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
-import { type DrawnRibbon, type RibbonField, ribbonsDrawn, ribbonsOf } from '../ribbons.js'
+import {
+  type DrawnRibbon,
+  type RibbonField,
+  ribbonsBetween,
+  ribbonsDrawn,
+  ribbonsOf,
+} from '../ribbons.js'
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -156,6 +164,8 @@ const SERIES = 24
  * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --spatial-ribbon-chart-move-duration - How long the ribbons take to move to a new table's readings: a reading the table keeps rises or falls to its new value, a reading it adds grows from zero, and a reading it drops sinks to zero. Unset, a new table is drawn at once. The growth under `grow` keeps its own timing.
+ * @cssproperty --spatial-ribbon-chart-move-easing - The curve the ribbons move to new readings along.
  * @cssproperty --spatial-ribbon-chart-shade - How far a ribbon's face turns from the light, from 0 for a level top. The component writes it on each face, and the stylesheet that shades the face reads it.
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys.
@@ -173,6 +183,33 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
    * `registerWords('de', { 'helix-spatial-ribbon-chart': { emptyText: 'Keine Werte' } })`.
    */
   static words = 'helix-spatial-ribbon-chart'
+
+  /**
+   * Grows the ribbons in from the floor the first time the chart comes
+   * into view with readings, each place across a little after the one before it, so the drawing arrives the way a
+   * page's own picture does. The growth is fast at first, slows to rest,
+   * and never passes a reading.
+   *
+   * Under `prefers-reduced-motion`, or where the page has paused its motion
+   * through `pauseMotion` or `Motion Toggle`, the ribbons stand at their
+   * readings from the start. A later table grows the ribbons it adds, each
+   * from the floor, so a reading that arrives while the chart is in view
+   * arrives the same way. The readings it keeps move to their new values on `--spatial-ribbon-chart-move-duration`, and stand there at once where it is unset.
+   */
+  @property({ reflect: true, type: Boolean })
+  grow = false
+
+  /**
+   * Grows the ribbons in again each time the chart comes back into view
+   * after it left it, as a pane does when it is opened again, where `grow`
+   * alone grows them the first time only. Only a chart that grows takes it.
+   *
+   * While it is out of view the ribbons stand at the floor, so the first
+   * frame after it returns is the start of the growth and never a flash of
+   * the whole drawing.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
 
   /**
    * Draws no box: no edges, grid, numbers, or names, so the readings stand
@@ -234,6 +271,28 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
   /** The reading the keys rested on last, so a change of it can be told. */
   private told = -1
 
+  /**
+   * Moves the ribbons from one table to the next, and grows them in under
+   * `grow`, timed by `--spatial-ribbon-chart-move-duration` and
+   * `--spatial-ribbon-chart-move-easing`.
+   */
+  protected readonly motion = new ReadingsMotionController<RibbonField>(this, {
+    between: ribbonsBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: barItems,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--spatial-ribbon-chart-move-duration'),
+        easing: style.getPropertyValue('--spatial-ribbon-chart-move-easing'),
+      }
+    },
+  })
+
+  /** The ribbons drawn last, kept so a frame of their move can be told. */
+  private lastShown: RibbonField | undefined
+
   /** Carries a host `aria-labelledby` and `aria-describedby` to the plot. */
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('plot'),
@@ -254,6 +313,16 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
 
   /** The field last read, and the rows and columns it was read from. */
   private memo: { columns: unknown; field: RibbonField; rows: unknown } | undefined
+
+  /**
+   * The ribbons as drawn this frame, which a renderer draws: `field` at
+   * rest, and while the readings move, every reading between its last value
+   * and its new one, in `field`'s order, then each reading the last table
+   * had and the new one does not, sinking to zero.
+   */
+  get shown(): RibbonField {
+    return this.motion.drawn ?? this.field
+  }
 
   /** The reading the keys or the pointer rest on, as its place in `field.cells`, or `-1`. */
   get active(): number {
@@ -280,7 +349,9 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
    * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
    * reading the keys moved to leaves it. Called by the connector.
    */
-  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+  requestActive(at: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    /* A reading sinking away is not one the keys walk. */
+    const index = at < this.field.cells.length ? at : -1
     if (kind === 'touch') {
       this.pointer.tapTo(index)
     } else if (index >= 0 || !this.pointer.keyed) {
@@ -305,7 +376,11 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
    */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    this.pointer.grid = Math.max(1, this.field.series.length)
+    const field = this.field
+    this.pointer.grid = Math.max(1, field.series.length)
+    /* Decided before the table is drawn, so a ribbon that grows never shows
+       at its height first. */
+    this.motion.follow(field, field.readings > 0)
   }
 
   override connectedCallback(): void {
@@ -331,9 +406,14 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
     /* Told only on a change, so a renderer draws again only when it must:
        the field is read once for each table, so a new one is a change. */
     const field = this.field
+    const shown = this.shown
     if (field !== this.last) {
       this.last = field
+      this.lastShown = shown
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (shown !== this.lastShown) {
+      this.lastShown = shown
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told) {
       this.told = this.pointer.at
@@ -445,17 +525,25 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
     const view = wordsFitted(this.plotRoom.room, (words) =>
       boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
-    const ribbons = ribbonsDrawn(field, view.projection).sort(
+    /* Between two tables, the box and the ribbons are drawn from the readings
+       on their way, in the frame of the new ones, so the drawing holds still. */
+    const drawn = this.motion.moving ? this.shown : field
+    const moving =
+      drawn === field
+        ? view
+        : boxView(drawn.axes, this.camera, [], this.noBox, view.words, wordsLocale(this))
+    const ribbons = ribbonsDrawn(drawn, view.projection).sort(
       (one, other) => one.depth - other.depth,
     )
     const places = ribbons.flatMap((ribbon) => ribbon.readings)
-    this.placed = places
+    /* A reading sinking away is not found by the pointer. */
+    this.placed = places.filter((place) => place.index < field.cells.length)
     const active = places.find((place) => place.index === at)
     const cell = field.cells[at]
     const bounds = this.drag.frame(
       this.noBox
         ? boundsOf(
-            ribbons.flatMap((ribbon) => ribbon.outline),
+            ribbonsDrawn(field, view.projection).flatMap((ribbon) => ribbon.outline),
             0.1,
           )
         : view.bounds,
@@ -473,7 +561,7 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${ribbons.map((ribbon) => this.renderRibbon(ribbon))}${
+      >${this.noBox ? nothing : drawBox(moving)}${ribbons.map((ribbon) => this.renderRibbon(ribbon))}${
         active
           ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.06"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(cell?.row)}</foreignObject>`
           : nothing

@@ -13,6 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
+  ReadingsMotionController,
   spokenReading,
   words,
   wordsLocale,
@@ -38,6 +39,8 @@ import {
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
 import {
+  blockItems,
+  blocksBetween,
   blocksDrawn,
   type DrawnBlock,
   paintOrder,
@@ -163,6 +166,8 @@ const SERIES = 24
  * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --spatial-treemap-move-duration - How long the blocks take to move to a new table's readings: a block the table keeps moves to its new part of the floor and its new height, a block it adds grows from the middle of its part, and a block it drops shrinks away. Unset, a new table is drawn at once. The growth under `grow` keeps its own timing.
+ * @cssproperty --spatial-treemap-move-easing - The curve the blocks move to new readings along.
  * @cssproperty --spatial-treemap-shade - How far a block's face turns from the light, from 0 for its top. The component writes it on each face, and the stylesheet that shades the face reads it.
  *
  * @cssstate active - While a block is shown, under the pointer or the keys.
@@ -178,6 +183,33 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    * `registerWords('de', { 'helix-spatial-treemap': { emptyText: 'Keine Werte' } })`.
    */
   static words = 'helix-spatial-treemap'
+
+  /**
+   * Grows the blocks in from the floor the first time the chart comes
+   * into view with readings, one after another in the order of the table, so the drawing arrives the way a
+   * page's own picture does. The growth is fast at first, slows to rest,
+   * and never passes a reading.
+   *
+   * Under `prefers-reduced-motion`, or where the page has paused its motion
+   * through `pauseMotion` or `Motion Toggle`, the blocks stand at their
+   * readings from the start. A later table grows the blocks it adds, each
+   * from the floor, so a reading that arrives while the chart is in view
+   * arrives the same way. The blocks it keeps move to their new parts of the floor and their new heights on `--spatial-treemap-move-duration`, and stand there at once where it is unset.
+   */
+  @property({ reflect: true, type: Boolean })
+  grow = false
+
+  /**
+   * Grows the blocks in again each time the chart comes back into view
+   * after it left it, as a pane does when it is opened again, where `grow`
+   * alone grows them the first time only. Only a chart that grows takes it.
+   *
+   * While it is out of view the blocks stand at the floor, so the first
+   * frame after it returns is the start of the growth and never a flash of
+   * the whole drawing.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
 
   /** The column of text that gathers the rows into groups, by its heading. None by default. */
   @property({ attribute: 'group-by' })
@@ -234,6 +266,28 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
 
   /** The block the keys rested on last, so a change of it can be told. */
   private told = -1
+
+  /**
+   * Moves the blocks from one table to the next, and grows them in under
+   * `grow`, timed by `--spatial-treemap-move-duration` and
+   * `--spatial-treemap-move-easing`.
+   */
+  protected readonly motion = new ReadingsMotionController<TreemapField>(this, {
+    between: blocksBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: blockItems,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--spatial-treemap-move-duration'),
+        easing: style.getPropertyValue('--spatial-treemap-move-easing'),
+      }
+    },
+  })
+
+  /** The blocks drawn last, kept so a frame of their move can be told. */
+  private lastShown: TreemapField | undefined
 
   /** Carries a host `aria-labelledby` and `aria-describedby` to the plot. */
   protected readonly aria = new AriaForwardController(this, {
@@ -292,7 +346,9 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
    * reading the keys moved to leaves it. Called by the connector.
    */
-  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+  requestActive(at: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    /* A block shrinking away is not a reading. */
+    const index = at < this.field.blocks.length ? at : -1
     if (kind === 'touch') {
       this.pointer.tapTo(index)
     } else if (index >= 0 || !this.pointer.keyed) {
@@ -307,6 +363,23 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    */
   placeReading(at: { x: number; y: number } | undefined): void {
     this.place = at
+  }
+
+  /**
+   * The blocks as drawn this frame, which a renderer draws: `field` at rest,
+   * and while the readings move, every block between its last place and its
+   * new one, in `field`'s order, then each block the last table had and the
+   * new one does not, shrinking away.
+   */
+  get shown(): TreemapField {
+    return this.motion.drawn ?? this.field
+  }
+
+  /** Decided before the table is drawn, so a block that grows never shows at its height first. */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    const field = this.field
+    this.motion.follow(field, field.blocks.length > 0)
   }
 
   override connectedCallback(): void {
@@ -329,9 +402,14 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
     /* Told only on a change, so a renderer draws again only when it must:
        the field is read once for each table, so a new one is a change. */
     const field = this.field
+    const shown = this.shown
     if (field !== this.last) {
       this.last = field
+      this.lastShown = shown
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (shown !== this.lastShown) {
+      this.lastShown = shown
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told) {
       this.told = this.pointer.at
@@ -441,12 +519,21 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
     const view = wordsFitted(this.plotRoom.room, (words) =>
       boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
-    const blocks = blocksDrawn(field, view.projection)
+    /* Between two tables, the box and the blocks are drawn from the readings
+       on their way, in the frame of the new ones, so the drawing holds still. */
+    const drawn = this.motion.moving ? this.shown : field
+    const moving =
+      drawn === field
+        ? view
+        : boxView(drawn.axes, this.camera, [], this.noBox, view.words, wordsLocale(this))
+    const blocks = blocksDrawn(drawn, view.projection)
     const active = blocks[at]
     const bounds = this.drag.frame(
       this.noBox
         ? boundsOf(
-            blocks.flatMap((block) => block.corners),
+            (drawn === field ? blocks : blocksDrawn(field, view.projection)).flatMap(
+              (block) => block.corners,
+            ),
             0.1,
           )
         : view.bounds,
@@ -464,12 +551,12 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, blocks).map(
+      >${this.noBox ? nothing : drawBox(moving)}${paintOrder(view.projection, blocks).map(
         (block) =>
           /* The ring straight after its block, so the blocks in front cover
              it as they cover the block: drawn over them all, it traced their
              faces and read as theirs. */
-          svg`${this.renderBlock(field, block, at)}${block === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
+          svg`${this.renderBlock(drawn, block, at)}${block === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
       )}${
         /* Over everything, faint and dashed, so a block the keys reach behind
            others is still found: where it shows, the ring above covers it. */

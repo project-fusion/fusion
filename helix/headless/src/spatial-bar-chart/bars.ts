@@ -10,6 +10,11 @@
 import {
   type Drawn,
   depthOrder,
+  keysOf,
+  type MotionItem,
+  type MotionShares,
+  mix,
+  mixAxis,
   type PagePoint,
   type Projection,
   pathData,
@@ -39,6 +44,11 @@ export interface BarCell {
   label: string
   /** Which row of the grid in depth it stands in: its series, or the one row of a stacked chart. */
   lane: number
+  /**
+   * What the cell is known by from one table to the next, on a field drawn
+   * between two while the readings move. A table's own field has none.
+   */
+  key?: string | undefined
   /** The row it was read from, counting from zero. */
   row: number
   /** The tone the cell names with `data-tone`, which colors its own bar, where it names one. */
@@ -403,10 +413,23 @@ export interface FloorPlate {
 }
 
 /**
+ * The cells of `field` that are its table's own, each with the category it
+ * stands under: on a field drawn between two tables, the cells it adds for
+ * bars that are shrinking away follow them, and are left out. A cell's
+ * category is its place in the grid, which on a field between two holds
+ * while the cell slides along the floor.
+ */
+const ownCells = (field: BarField): Array<{ across: number; cell: BarCell }> =>
+  field.cells
+    .slice(0, field.categories.length * Math.max(field.series.length, 1))
+    .map((cell, index) => ({ across: Math.floor(index / Math.max(field.series.length, 1)), cell }))
+
+/**
  * The places on the floor of a row, one for each category in each lane,
  * whether a bar stands there or not: a square a little wider than a bar's
  * footprint, turned as the bars are, where zero stands on the value axis,
- * along the row `layout` lays.
+ * along the row `layout` lays. Between two tables, each place slides with
+ * its bar.
  */
 export const floorOf = (
   field: BarField,
@@ -417,8 +440,8 @@ export const floorOf = (
   const floor = inBox(field.axes.y, 0) * field.axes.extent[1]
   const half = (spacing * PLATE) / 2
   const seen = new Set<string>()
-  return field.cells.flatMap((cell): FloorPlate[] => {
-    const key = `${cell.across} ${cell.lane}`
+  return ownCells(field).flatMap(({ across, cell }): FloorPlate[] => {
+    const key = `${across} ${cell.lane}`
     if (seen.has(key)) {
       return []
     }
@@ -431,7 +454,7 @@ export const floorOf = (
       projection.at(x - half, y + half, floor),
     ]
     const front = corners.reduce((low, one) => (one.y > low.y ? one : low))
-    return [{ across: cell.across, corners, d: pathData(corners), front }]
+    return [{ across, corners, d: pathData(corners), front }]
   })
 }
 
@@ -469,9 +492,9 @@ export const namesOf = (
     }
   }
   const tones = new Map<number, string>()
-  for (const cell of field.cells) {
-    if (cell.tone && cell.value !== undefined && !tones.has(cell.across)) {
-      tones.set(cell.across, cell.tone)
+  for (const { across, cell } of ownCells(field)) {
+    if (cell.tone && cell.value !== undefined && !tones.has(across)) {
+      tones.set(across, cell.tone)
     }
   }
   const all: RowName[] = field.categories.flatMap((text, across): RowName[] => {
@@ -522,31 +545,96 @@ export const namesOf = (
   return []
 }
 
-/** How long one bar takes to grow in, in milliseconds. */
-const GROW = 1000
-
-/** How long each bar waits after the one before it, and the longest the last one waits. */
-const STAGGER = 110
-const SPREAD = 660
-
-/** The wait between one category's bars and the next one's, as they grow in. */
-const stepOf = (categories: number): number =>
-  categories > 1 ? Math.min(STAGGER, SPREAD / (categories - 1)) : 0
+/** The key a cell is known by from one table to the next: its category's key and its series'. */
+const cellKey = (category: string, series: string): string => `${category}\u0001${series}`
 
 /**
- * How much of its height a bar of category `across` has reached `elapsed`
- * milliseconds after the bars began to grow in, from 0 to 1. **In reading
- * order**, each category a little after the one before it, and fast at first
- * and slow to rest, never past its value.
+ * The key of each cell of `field`, in the order of its cells: its
+ * category's name and its series', each numbered where it comes again. A
+ * field drawn between two tables carries each cell's key with it.
  */
-export const grownAt = (across: number, categories: number, elapsed: number): number => {
-  const t = (elapsed - across * stepOf(categories)) / GROW
-  if (t <= 0) {
-    return 0
-  }
-  return t >= 1 ? 1 : 1 - (1 - t) ** 3
+export const barKeys = (field: BarField): string[] => {
+  const categories = keysOf(field.categories)
+  const series = keysOf(field.series)
+  return field.cells.map(
+    (cell) => cell.key ?? cellKey(categories[cell.across] ?? cell.label, series[cell.depth] ?? ''),
+  )
 }
 
-/** How long the bars of `categories` take to grow in, the last one included, in milliseconds. */
-export const growTime = (categories: number): number =>
-  GROW + stepOf(categories) * Math.max(0, categories - 1)
+/** Each cell of `field` as the chart's motion knows it: by its key, growing in with its category. */
+export const barItems = (field: BarField): MotionItem[] => {
+  const keys = barKeys(field)
+  return field.cells.map((cell, index) => ({ key: keys[index] as string, step: cell.across }))
+}
+
+/** A cell `share` of the way from the floor to its reading: its block and where it starts, both from zero. */
+const grownTo = (cell: BarCell, share: number): Pick<BarCell, 'from' | 'value'> => ({
+  from: cell.from * share,
+  value: cell.value === undefined ? undefined : cell.value * share,
+})
+
+/**
+ * The bars `at` the shares between `from` and `to`, which the chart draws
+ * while its readings move: `to`'s cells, each at its share of the way from
+ * its reading in `from` to its reading in `to`, then each cell `from` had
+ * and `to` does not, shrinking to the floor. **A cell moves along the floor
+ * as well as up**, so a category added before it slides it across. The axes
+ * move with `at.axes`, and the value axis's ticks are the new ones from the
+ * start. With no `from`, every bar grows from the floor.
+ */
+export const barsBetween = (
+  from: BarField | undefined,
+  to: BarField,
+  at: MotionShares,
+): BarField => {
+  const keys = barKeys(to)
+  const before = new Map<string, BarCell>()
+  if (from) {
+    const had = barKeys(from)
+    from.cells.forEach((cell, index) => {
+      before.set(had[index] as string, cell)
+    })
+  }
+  const cells: BarCell[] = to.cells.map((cell, index) => {
+    const key = keys[index] as string
+    const share = at.share(key)
+    const old = before.get(key)
+    if (!old || at.floor(key) || old.value === undefined) {
+      return { ...cell, key, ...grownTo(cell, share) }
+    }
+    if (cell.value === undefined) {
+      /* A reading that went shrinks where it stood. */
+      return share >= 1 ? { ...cell, key } : { ...old, key, ...grownTo(old, 1 - share) }
+    }
+    return {
+      ...cell,
+      across: mix(old.across, cell.across, share),
+      from: mix(old.from, cell.from, share),
+      key,
+      lane: mix(old.lane, cell.lane, share),
+      value: mix(old.value, cell.value, share),
+    }
+  })
+  const kept = new Set(keys)
+  for (const [key, old] of before) {
+    const share = at.share(key)
+    if (!kept.has(key) && share < 1 && old.value !== undefined) {
+      cells.push({ ...old, key, ...grownTo(old, 1 - share) })
+    }
+  }
+  if (!from || at.axes >= 1) {
+    return { ...to, cells }
+  }
+  const [fx, fy, fz] = from.axes.extent
+  const [tx, ty, tz] = to.axes.extent
+  return {
+    ...to,
+    axes: {
+      extent: [mix(fx, tx, at.axes), mix(fy, ty, at.axes), mix(fz, tz, at.axes)],
+      x: mixAxis(from.axes.x, to.axes.x, at.axes),
+      y: mixAxis(from.axes.y, to.axes.y, at.axes),
+      z: mixAxis(from.axes.z, to.axes.z, at.axes),
+    },
+    cells,
+  }
+}

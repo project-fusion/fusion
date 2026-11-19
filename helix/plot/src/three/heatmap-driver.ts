@@ -13,7 +13,7 @@ import {
   Vector3,
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import type { Corners, Place } from '../connect-plot/connect-plot.js'
+import type { Corners, Place, PlotColors } from '../connect-plot/connect-plot.js'
 import type {
   SpatialHeatmapDriver,
   SpatialHeatmapField,
@@ -62,6 +62,9 @@ const SPAN = 1.9
  * **Each reading is a prism on a slab**, as tall as the chart's own drawing
  * stands it and in its tone, lit from above and the upper left, with each
  * edge set a little apart from its face. A day with nothing in it is a tile.
+ * **The prisms grow in and move to new readings as the chart's own drawing
+ * does**: the chart works out each frame, and the driver draws it with the
+ * view held still.
  *
  * **Dragging turns the relief, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.
@@ -123,97 +126,112 @@ export const threeHeatmapDriver = (
     return geometry
   }
 
-  return {
-    draw: (next, colors) => {
-      field = next
-      const unit = SPAN / Math.max(next.columns, next.rows, 1)
-      const tile = new Color(colors.extra.tile ?? colors.ground)
-      const page = new Color(colors.page)
-      const { emphasis, through } = colors.look
-      const solids: BufferGeometry[] = []
-      const lines: BufferGeometry[] = []
-      tops = next.cells.map((cell) => {
-        const tone = cell.tone ? new Color(colors.extra[`tone-${cell.tone}`] ?? colors.ink) : tile
-        /* As the chart's own drawing paints them: `outlined` fades the faces
+  /**
+   * Builds the prisms of `next`, and where `whole`, frames the view around
+   * the relief and follows its corners, as a new table is. A frame of a move
+   * holds the view where the new table framed it.
+   */
+  const build = (next: SpatialHeatmapField, colors: PlotColors, whole: boolean): void => {
+    field = next
+    const unit = SPAN / Math.max(next.columns, next.rows, 1)
+    const tile = new Color(colors.extra.tile ?? colors.ground)
+    const page = new Color(colors.page)
+    const { emphasis, through } = colors.look
+    const solids: BufferGeometry[] = []
+    const lines: BufferGeometry[] = []
+    tops = next.cells.map((cell) => {
+      const tone = cell.tone ? new Color(colors.extra[`tone-${cell.tone}`] ?? colors.ink) : tile
+      /* As the chart's own drawing paints them: `outlined` fades the faces
            toward the page and draws the edges in the tone, and `subtle` is a
            faint wash under the same edges. */
-        const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
-        const tall = Math.max(cell.height, TILE) * unit
-        const x = (cell.column + 0.5 - next.columns / 2) * unit
-        const z = (cell.row + 0.5 - next.rows / 2) * unit
-        const box = new BoxGeometry(unit * FOOTPRINT, tall, unit * FOOTPRINT)
-        box.translate(x, FLOOR + tall / 2, z)
-        solids.push(painted(box, color))
-        lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
-        return new Vector3(x, FLOOR + tall, z)
-      })
-      const area = emphasis === 'subtle' ? 0.2 : 1
-      lookThrough(prismMaterial, area * through)
-      lookThrough(edgeMaterial, through)
-      prisms.geometry.dispose()
-      edges.geometry.dispose()
-      prisms.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
-      edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
-      for (const one of [...solids, ...lines]) {
-        one.dispose()
-      }
-      /* The slab under the whole grid, as the chart's own drawing lays it. */
-      base.scale.set(
-        (next.columns + 2 * MARGIN) * unit,
-        THICKNESS * unit,
-        (next.rows + 2 * MARGIN) * unit,
-      )
-      base.position.set(0, FLOOR - (THICKNESS * unit) / 2, 0)
-      baseMaterial.color.setStyle(colors.extra.base ?? colors.grid)
-      base.visible = next.cells.length > 0
-      /* **Framed around the relief, from the isometric angle the chart's own
+      const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
+      const tall = Math.max(cell.height, TILE) * unit
+      const x = (cell.column + 0.5 - next.columns / 2) * unit
+      const z = (cell.row + 0.5 - next.rows / 2) * unit
+      const box = new BoxGeometry(unit * FOOTPRINT, tall, unit * FOOTPRINT)
+      box.translate(x, FLOOR + tall / 2, z)
+      solids.push(painted(box, color))
+      lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
+      return new Vector3(x, FLOOR + tall, z)
+    })
+    const area = emphasis === 'subtle' ? 0.2 : 1
+    lookThrough(prismMaterial, area * through)
+    lookThrough(edgeMaterial, through)
+    prisms.geometry.dispose()
+    edges.geometry.dispose()
+    prisms.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
+    edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
+    for (const one of [...solids, ...lines]) {
+      one.dispose()
+    }
+    /* The slab under the whole grid, as the chart's own drawing lays it. */
+    base.scale.set(
+      (next.columns + 2 * MARGIN) * unit,
+      THICKNESS * unit,
+      (next.rows + 2 * MARGIN) * unit,
+    )
+    base.position.set(0, FLOOR - (THICKNESS * unit) / 2, 0)
+    baseMaterial.color.setStyle(colors.extra.base ?? colors.grid)
+    base.visible = next.cells.length > 0
+    if (!whole) {
+      return
+    }
+    /* **Framed around the relief, from the isometric angle the chart's own
          drawing is seen from**, so the drawing does not jump when the
          renderer takes over; later drawings keep the angle the reader has
          turned to. */
-      const tallest = Math.max(TILE, ...next.cells.map((cell) => cell.height)) * unit
-      const wide = (next.columns + 2 * MARGIN) * unit
-      const deep = (next.rows + 2 * MARGIN) * unit
-      const high = tallest + THICKNESS * unit
-      stage.frame(
-        new Vector3(-wide / 2, FLOOR - THICKNESS * unit, -deep / 2),
-        new Vector3(wide / 2, FLOOR - THICKNESS * unit + high, deep / 2),
-        framed ? undefined : new Vector3(1, 1, 1),
-      )
-      framed = true
-      /* **The two ends of the front edge, at the foot of the slab**, under the
+    const tallest = Math.max(TILE, ...next.cells.map((cell) => cell.height)) * unit
+    const wide = (next.columns + 2 * MARGIN) * unit
+    const deep = (next.rows + 2 * MARGIN) * unit
+    const high = tallest + THICKNESS * unit
+    stage.frame(
+      new Vector3(-wide / 2, FLOOR - THICKNESS * unit, -deep / 2),
+      new Vector3(wide / 2, FLOOR - THICKNESS * unit + high, deep / 2),
+      framed ? undefined : new Vector3(1, 1, 1),
+    )
+    framed = true
+    /* **The two ends of the front edge, at the foot of the slab**, under the
          first column and the last, along the long edge nearer the reader, as
          the chart's own drawing names them, and the corners of the box round
          the relief, which its labels stand clear of. Followed on the page as
          the view turns. */
-      unfollow?.()
-      const foot = FLOOR - THICKNESS * unit
-      const corners: Vector3[] = []
-      for (const x of [-wide / 2, wide / 2]) {
-        for (const z of [deep / 2, -deep / 2]) {
-          corners.push(new Vector3(x, foot, z), new Vector3(x, foot + high, z))
-        }
+    unfollow?.()
+    const foot = FLOOR - THICKNESS * unit
+    const corners: Vector3[] = []
+    for (const x of [-wide / 2, wide / 2]) {
+      for (const z of [deep / 2, -deep / 2]) {
+        corners.push(new Vector3(x, foot, z), new Vector3(x, foot + high, z))
       }
-      unfollow = stage.track(corners, (at) => {
-        if (!at) {
-          cornered?.(undefined)
-          return
-        }
-        /* The feet of the four uprights: the last row's side, then the
+    }
+    unfollow = stage.track(corners, (at) => {
+      if (!at) {
+        cornered?.(undefined)
+        return
+      }
+      /* The feet of the four uprights: the last row's side, then the
            first's, under the first column and then the last. Seen from
            above, the nearer side stands lower on the page. */
-        const [lastStart, firstStart, lastEnd, firstEnd] = [0, 2, 4, 6].map(
-          (index) => at[index] as Place,
-        ) as [Place, Place, Place, Place]
-        const last = lastStart.y + lastEnd.y >= firstStart.y + firstEnd.y
-        cornered?.({
-          end: last ? lastEnd : firstEnd,
-          outline: at,
-          start: last ? lastStart : firstStart,
-        })
+      const [lastStart, firstStart, lastEnd, firstEnd] = [0, 2, 4, 6].map(
+        (index) => at[index] as Place,
+      ) as [Place, Place, Place, Place]
+      const last = lastStart.y + lastEnd.y >= firstStart.y + firstEnd.y
+      cornered?.({
+        end: last ? lastEnd : firstEnd,
+        outline: at,
+        start: last ? lastStart : firstStart,
       })
+    })
+  }
+
+  return {
+    draw: (next, colors) => {
+      build(next, colors, true)
     },
     focus: (index) => {
       stage.setMarker(tops[index])
+    },
+    move: (next, colors) => {
+      build(next, colors, false)
     },
     onCorners: (listener) => {
       cornered = listener

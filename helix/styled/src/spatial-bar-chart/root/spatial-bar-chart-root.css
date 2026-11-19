@@ -12,6 +12,14 @@
   --spatial-bar-chart-tone-warning: var(--helix-color-warning-mark);
 }
 
+/* **The bars move to new readings as a flat chart's do**, on `decelerate`,
+   which is monotonic, so no frame draws a value the data does not hold. Set
+   on the host, so a rule a page writes on the element wins over this one. */
+:host {
+  --spatial-bar-chart-move-duration: var(--helix-duration-normal);
+  --spatial-bar-chart-move-easing: var(--helix-easing-decelerate);
+}
+
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {

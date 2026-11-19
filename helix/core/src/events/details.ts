@@ -170,8 +170,12 @@ export interface ActivateDetail extends ChangeDetail {
 
 /** Detail carried by `helix-plot-change`. */
 export interface PlotChangeDetail {
-  /** `data` for the points or the axes, which are drawn again; `focus` for the point the keys rest on. */
-  kind: 'data' | 'focus'
+  /**
+   * `data` for the points or the axes, which are drawn again; `move` for a
+   * frame of the points moving to new readings, drawn again in the colors
+   * last read; `focus` for the point the keys rest on.
+   */
+  kind: 'data' | 'focus' | 'move'
 }
 
 /** Detail carried by `helix-plot-turn`. */

@@ -6,7 +6,7 @@
  * did, and a missing reading drawn as zero digs a pit that is not there.
  */
 
-import { ticks } from '@fusion.dev/helix-core'
+import { type MotionItem, type MotionShares, mix, mixAxis, ticks } from '@fusion.dev/helix-core'
 import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
 
 /** One place on the grid: where it stands across and in depth, and its reading, where the table has one. */
@@ -210,3 +210,64 @@ export const contoursOf = (field: SurfaceField, levels: readonly number[]): Cont
 /** The levels a surface's contour lines run at: its height's ticks strictly between its lowest and highest reading. */
 export const contourLevels = (field: SurfaceField): number[] =>
   field.axes.y.ticks.filter((tick) => tick > field.lowest && tick < field.highest)
+
+/** The key a place on the grid is known by from one table to the next: where it stands across and in depth. */
+const placeKey = (cell: SurfaceCell): string => `${cell.x}\u0001${cell.z}`
+
+/** Each place on the grid as the chart's motion knows it: by where it stands, growing in a row across at a time. */
+export const surfaceItems = (field: SurfaceField): MotionItem[] =>
+  field.cells.map((cell, index) => ({
+    key: placeKey(cell),
+    step: Math.floor(index / Math.max(field.depths.length, 1)),
+  }))
+
+/** Whether two lists of places are the same places. */
+const samePlaces = (one: readonly number[], other: readonly number[]): boolean =>
+  one.length === other.length && one.every((place, at) => place === other[at])
+
+/**
+ * The surface `at` the shares between `from` and `to`, which the chart draws
+ * while its readings move: **each place rises or falls from its old height to
+ * its new one**, a place that gains a reading rises from the lowest reading,
+ * and one that loses its reading sinks to it and then opens. The height's
+ * axis and its ramp move with `at.axes`, and the contour lines are drawn at
+ * the new levels through the surface as it moves. With no `from`, the
+ * surface rises from a sheet at its lowest reading.
+ *
+ * **A grid whose places changed cannot be matched**, place for place, so it
+ * is drawn as `to` at once.
+ */
+export const surfaceBetween = (
+  from: SurfaceField | undefined,
+  to: SurfaceField,
+  at: MotionShares,
+): SurfaceField => {
+  if (from && !(samePlaces(from.acrosses, to.acrosses) && samePlaces(from.depths, to.depths))) {
+    return to
+  }
+  const moved = from !== undefined && at.axes < 1
+  const lowest = moved ? mix(from.lowest, to.lowest, at.axes) : to.lowest
+  const highest = moved ? mix(from.highest, to.highest, at.axes) : to.highest
+  const cells = to.cells.map((cell, index): SurfaceCell => {
+    const share = at.share(placeKey(cell))
+    const old = from?.cells[index]
+    if (cell.value === undefined) {
+      /* A reading that went sinks where it stood. */
+      return old?.value !== undefined && share < 1
+        ? { ...old, value: mix(old.value, lowest, share) }
+        : cell
+    }
+    const start = !old || old.value === undefined || at.floor(placeKey(cell)) ? lowest : old.value
+    return { ...cell, value: mix(start, cell.value, share) }
+  })
+  const field: SurfaceField = {
+    ...to,
+    axes: moved ? { ...to.axes, y: mixAxis(from.axes.y, to.axes.y, at.axes) } : to.axes,
+    cells,
+    contours: [],
+    highest,
+    lowest,
+  }
+  field.contours = contoursOf(field, contourLevels(to))
+  return field
+}

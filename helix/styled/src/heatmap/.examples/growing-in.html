@@ -1,0 +1,153 @@
+<!-- @summary Four weeks of commits that grow in a week at a time the first time they are seen. Adding a day grows the new day in. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-heatmap
+    for="commits"
+    grow
+    label="Commits, last four weeks"
+    rows="7"
+    thresholds="1 3 5 7 9"
+    tones="1 2 3 4 5"
+  >
+    <table
+      data-hidden-visually
+      id="commits"
+    >
+      <caption>Commits</caption>
+      <tbody>
+      <tr>
+        <th scope="row">Day 1</th>
+        <td>0</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2</th>
+        <td>7</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3</th>
+        <td>4</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4</th>
+        <td>1</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 5</th>
+        <td>8</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 6</th>
+        <td>5</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 7</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 8</th>
+        <td>9</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 9</th>
+        <td>6</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 10</th>
+        <td>3</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 11</th>
+        <td>0</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 12</th>
+        <td>7</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 13</th>
+        <td>4</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 14</th>
+        <td>1</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 15</th>
+        <td>8</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 16</th>
+        <td>5</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 17</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 18</th>
+        <td>9</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 19</th>
+        <td>6</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 20</th>
+        <td>3</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 21</th>
+        <td>0</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 22</th>
+        <td>7</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 23</th>
+        <td>4</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 24</th>
+        <td>1</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 25</th>
+        <td>8</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 26</th>
+        <td>5</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 27</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 28</th>
+        <td>9</td>
+      </tr>
+      </tbody>
+    </table>
+  </helix-heatmap>
+
+  <helix-button id="add">Add a day</helix-button>
+</helix-flex>
+
+<!-- The script adds the next day to the table and drops the oldest, so the
+     strip keeps four weeks. The new day grows in. -->
+<script type="module">
+  let next = 29
+  document.getElementById('add').addEventListener('click', () => {
+    const body = document.querySelector('#commits tbody')
+    const row = document.createElement('tr')
+    const value = Math.round(Math.random() * 10)
+    row.innerHTML = `<th scope="row">Day ${next}</th><td>${value}</td>`
+    next += 1
+    body.append(row)
+    body.rows[0]?.remove()
+  })
+</script>

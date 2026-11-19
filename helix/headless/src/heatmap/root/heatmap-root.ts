@@ -10,11 +10,13 @@ import {
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
   HelixResizeEvent,
+  keysOf,
   MixinChartSource,
   MixinChartStatus,
   markRegion,
   numberConverter,
   pressedValue,
+  ReadingsMotionController,
   rangeAdd,
   requestValue,
   StatusController,
@@ -28,7 +30,16 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { inSequence, rectangleOf } from '../rectangle.js'
-import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
+import {
+  fits,
+  type HeatField,
+  heatBetween,
+  heatItems,
+  monthPage,
+  overviewOf,
+  type Reading,
+  toneOf,
+} from './buckets.js'
 
 /**
  * A `<time datetime>` value as its day and short month in `locale`, such as
@@ -245,6 +256,34 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   gap = 2
 
   /**
+   * Grows the cells in the first time the strip comes into view with
+   * readings, a column at a time from the first, so the drawing arrives the
+   * way a page's own picture does. Each cell starts empty and its reading
+   * climbs to its own, its tone stepping up through the tones between, fast
+   * at first and slow to rest. A cell's own `data-tone` shows as its column
+   * starts.
+   *
+   * Under `prefers-reduced-motion`, or where the page has paused its motion
+   * through `pauseMotion` or `Motion Toggle`, the cells take their tones from
+   * the start. A later table grows the cells it adds the same way, such as
+   * the newest day of a strip that keeps the latest.
+   */
+  @property({ reflect: true, type: Boolean })
+  grow = false
+
+  /**
+   * Grows the cells in again each time the strip comes back into view after
+   * it left it, as a pane does when it is opened again, where `grow` alone
+   * grows them the first time only. Only a strip that grows takes it.
+   *
+   * While it is out of view the cells stand empty, so the first frame after
+   * it returns is the start of the growth and never a flash of the whole
+   * strip.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
+
+  /**
    * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
    *
    * **Set this only to overrule what the strip actually draws.** The arithmetic
@@ -433,6 +472,65 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('strip'),
   })
+
+  /** Grows the cells in under `grow`, and moves them to new readings on `moveTiming`. */
+  protected readonly motion = new ReadingsMotionController<HeatField>(this, {
+    between: heatBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: heatItems,
+    timing: () => this.moveTiming(),
+  })
+
+  /**
+   * How long a cell's reading takes to move to a new one, and its curve. The
+   * flat strip moves none: a cell changes tone through the stylesheet's own
+   * transition of its color. A spatial heatmap, whose prisms rise and fall,
+   * reads its own hooks.
+   */
+  protected moveTiming(): { duration: string; easing: string } {
+    return { duration: '', easing: '' }
+  }
+
+  /** The readings drawn, read once for each table and each width. */
+  private heatMemo:
+    | { field: HeatField; rows: unknown; room: number; series: unknown; tall: number }
+    | undefined
+
+  /**
+   * The drawn readings as the strip's motion moves them: each by its row's
+   * label, newest kept, with the highest reading in the table.
+   */
+  protected get heatField(): HeatField {
+    const [series, rows, room, tall] = [this.series, this.sourceRows, this.room, this.rowCount]
+    const memo = this.heatMemo
+    if (memo?.series !== series || memo.rows !== rows || memo.room !== room || memo.tall !== tall) {
+      const points = this.points
+      const first = Math.max(0, points.length - room)
+      const drawn = points.slice(first)
+      const keys = keysOf(drawn.map((_, index) => rows[first + index]?.label ?? ''))
+      this.heatMemo = {
+        field: {
+          cells: drawn.map((point, index) => ({ ...point, key: keys[index] as string })),
+          highest: points.reduce<number>(
+            (high, point) => (point.value !== undefined && point.value > high ? point.value : high),
+            0,
+          ),
+          rows: tall,
+        },
+        room,
+        rows,
+        series,
+        tall,
+      }
+    }
+    return (this.heatMemo as { field: HeatField }).field
+  }
+
+  /** The drawn readings as they stand this frame: on their way while they grow or move, and as the table holds them at rest. */
+  protected get movingField(): HeatField {
+    return this.motion.drawn ?? this.heatField
+  }
 
   private observer: ResizeObserver | undefined = undefined
 
@@ -719,6 +817,10 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
     this.pointer.grid = this.rowCount
+    /* Decided before the strip is drawn, so a cell that grows never shows its
+       tone first. */
+    const field = this.heatField
+    this.motion.follow(field, field.cells.length > 0)
   }
 
   /**
@@ -840,8 +942,11 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     const grid = readable && this.selectionMode !== undefined
     const keys = this.selectionMode ? this.keysOf(cells) : []
     const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
+    /* Each cell's tone as it stands this frame, which a growing cell climbs
+       to. */
+    const moving = this.movingField.cells
     const drawn = cells.map((reading, index) => {
-      const tone = toneOf(reading, bounds, palette)
+      const tone = toneOf(moving[index] ?? reading, bounds, palette)
       const active = this.pointer.at === index
       const picked = chosen.has(keys[index] ?? '')
       if (grid) {

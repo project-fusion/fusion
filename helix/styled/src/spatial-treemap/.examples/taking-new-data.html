@@ -1,0 +1,85 @@
+<!-- @summary Blocks that rise from the floor the first time they are seen, and take their new sizes and heights when the table changes. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="services"
+  >
+    <caption>Requests and response time by service</caption>
+    <thead>
+      <tr>
+        <th scope="col">Service</th>
+        <th scope="col">Team</th>
+        <th scope="col">Requests</th>
+        <th scope="col">p95 response (ms)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Search</th>
+        <td>Web</td>
+        <td data-value="4200">4200</td>
+        <td data-value="180">180</td>
+      </tr>
+      <tr>
+        <th scope="row">Checkout</th>
+        <td>Web</td>
+        <td data-value="2600">2600</td>
+        <td data-value="320">320</td>
+      </tr>
+      <tr>
+        <th scope="row">Accounts</th>
+        <td>Core</td>
+        <td data-value="1800">1800</td>
+        <td data-value="140">140</td>
+      </tr>
+      <tr>
+        <th scope="row">Catalog</th>
+        <td>Core</td>
+        <td data-value="3100">3100</td>
+        <td data-value="210">210</td>
+      </tr>
+      <tr>
+        <th scope="row">Images</th>
+        <td>Media</td>
+        <td data-value="2200">2200</td>
+        <td data-value="90">90</td>
+      </tr>
+      <tr>
+        <th scope="row">Payments</th>
+        <td>Core</td>
+        <td data-value="1500">1500</td>
+        <td data-value="380">380</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-spatial-treemap
+    for="services"
+    group-by="Team"
+    grow
+    label="Requests and response time by service"
+  ></helix-spatial-treemap>
+
+  <helix-button id="refresh">Refresh data</helix-button>
+</helix-flex>
+
+<!-- The script rewrites the numbers in the table. The chart reads the table
+     and moves to the new numbers. -->
+<script type="module">
+  document.getElementById('refresh').addEventListener('click', () => {
+    const ranges = [[800, 5000], [60, 420]]
+    for (const row of document.querySelectorAll('#services tbody tr')) {
+      const cells = [...row.querySelectorAll('td')].slice(1)
+      cells.forEach((cell, index) => {
+        const [low, high] = ranges[index]
+        const value = low + Math.round(Math.random() * (high - low))
+        cell.dataset.value = String(value)
+        cell.textContent = String(value)
+      })
+    }
+  })
+</script>

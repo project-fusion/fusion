@@ -13,8 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
-  motionPaused,
-  reducedMotion,
+  ReadingsMotionController,
   shortNumber,
   spokenReading,
   words,
@@ -44,13 +43,13 @@ import {
 import {
   type BarField,
   type BarLayout,
+  barItems,
+  barsBetween,
   barsDrawn,
   barsOf,
   climbing,
   type DrawnBar,
   floorOf,
-  grownAt,
-  growTime,
   heightened,
   namesOf,
   paintOrder,
@@ -97,6 +96,19 @@ const SERIES = 24
  */
 const toned = (tone: string | undefined): string | undefined =>
   tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
+
+/**
+ * Readings on their way between two tables, scaled as `sized` is from
+ * `read`: a row whose bars have a size stands its value axis taller, and
+ * climbs less, by the same measure as the table it is moving to.
+ */
+const scaledAs = (shown: BarField, read: BarField, sized: BarField): BarField =>
+  sized === read
+    ? shown
+    : {
+        ...heightened(shown, sized.axes.extent[1] / read.axes.extent[1]),
+        ...(sized.climb === undefined ? {} : { climb: sized.climb }),
+      }
 
 /** The frame that holds `frame` and every one of `points`. */
 const around = (frame: Frame, points: readonly { x: number; y: number }[]): Frame => {
@@ -221,6 +233,8 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @csspart tooltip-value - A column's value inside the tooltip.
  * @csspart value - The value of a bar whose cell names a tone, written above it in the chart's own drawing.
  *
+ * @cssproperty --spatial-bar-chart-move-duration - How long the bars take to move to a new table's readings: a bar the table keeps rises or falls to its new value, a bar it adds grows from the floor, and a bar it drops shrinks to the floor. Unset, a new table is drawn at once. The growth under `grow` keeps its own timing.
+ * @cssproperty --spatial-bar-chart-move-easing - The curve the bars move to new readings along.
  * @cssproperty --spatial-bar-chart-shade - How far a bar's face turns from the light, from 0 for its top. The component writes it on each face, and the stylesheet that shades the face reads it.
  * @cssproperty --spatial-bar-chart-tone-accent - The color of a bar whose cell says `data-tone="accent"`.
  * @cssproperty --spatial-bar-chart-tone-danger - The color of a bar whose cell says `data-tone="danger"`.
@@ -252,9 +266,10 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    *
    * Under `prefers-reduced-motion`, or where the page has paused its motion
    * through `pauseMotion` or `Motion Toggle`, the bars stand at their height
-   * from the start. A later table draws the bars it already had at their
-   * height, and grows the bars it adds, each from the floor, so a reading that
-   * arrives while the chart is in view arrives the same way.
+   * from the start. A later table grows the bars it adds, each from the
+   * floor, so a reading that arrives while the chart is in view arrives the
+   * same way. The bars it keeps move to their new values on
+   * `--spatial-bar-chart-move-duration`, and stand at once where it is unset.
    */
   @property({ reflect: true, type: Boolean })
   grow = false
@@ -391,31 +406,26 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   private sizes: ResizeObserver | undefined
 
   /**
-   * How far the bars have grown in: waiting to be seen, growing since a
-   * moment, or `undefined` once they stand at their height. `grew` says the
-   * first table has been drawn, so a later one is not grown again.
+   * Moves the bars from one table to the next, and grows them in under
+   * `grow`, timed by `--spatial-bar-chart-move-duration` and
+   * `--spatial-bar-chart-move-easing`.
    */
-  @state()
-  private growth: { since?: number } | undefined
+  protected readonly motion = new ReadingsMotionController<BarField>(this, {
+    between: barsBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: barItems,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--spatial-bar-chart-move-duration'),
+        easing: style.getPropertyValue('--spatial-bar-chart-move-easing'),
+      }
+    },
+  })
 
-  private grew = false
-
-  /**
-   * The bars a later table added, by category label, each growing from the
-   * floor: when it started, and its place among the bars that came with it, so
-   * several arriving together follow one another as the first table's do. A
-   * bar leaves the map once it stands.
-   */
-  private readonly fresh = new Map<string, { count: number; index: number; since: number }>()
-
-  /** The categories of the table drawn last, so a later table's new ones are known. */
-  private drawnLabels: Set<string> | undefined
-
-  /** Watches for the chart to leave the view, after which `grow-again` has it grow in once more. */
-  private gone: IntersectionObserver | undefined
-
-  /** Watches for the chart to come into view, which starts the bars growing. */
-  private seen: IntersectionObserver | undefined
+  /** The bars drawn last, kept so a frame of their move can be told. */
+  private lastShown: BarField | undefined
 
   /** Carries a host `aria-labelledby` and `aria-describedby` to the plot. */
   protected readonly aria = new AriaForwardController(this, {
@@ -452,6 +462,16 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     | { columns: unknown; field: BarField; rows: unknown; series: unknown; stacked: boolean }
     | undefined
 
+  /**
+   * The bars as drawn this frame, which a renderer draws: `field` at rest,
+   * and while the readings move, every cell between its last reading and
+   * its new one, in `field`'s order, then each cell the last table had and
+   * the new one does not, shrinking to the floor.
+   */
+  get shown(): BarField {
+    return this.motion.drawn ?? this.field
+  }
+
   /** The bar the keys or the pointer rest on, as its place in `field.cells`, or `-1`. */
   get active(): number {
     return this.pointer.at
@@ -477,7 +497,9 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
    * reading the keys moved to leaves it. Called by the connector.
    */
-  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+  requestActive(at: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    /* A bar shrinking away is not a reading. */
+    const index = at < this.field.cells.length ? at : -1
     if (kind === 'touch') {
       this.pointer.tapTo(index)
     } else if (index >= 0 || !this.pointer.keyed) {
@@ -504,50 +526,9 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     super.willUpdate(changed)
     const field = this.field
     this.pointer.grid = Math.max(1, field.series.length)
-    /* The first table with readings is the one grown in. Decided before it
-       is drawn, so its bars never show at their height first. */
-    const labels = new Set(field.categories)
-    const moves =
-      typeof IntersectionObserver === 'function' &&
-      typeof requestAnimationFrame === 'function' &&
-      !reducedMotion() &&
-      !motionPaused()
-    if (this.grow && !this.grew && field.readings > 0) {
-      this.grew = true
-      this.growth = moves ? {} : undefined
-    } else if (this.grow && this.grew && field.readings > 0 && this.drawnLabels && moves) {
-      /* A later table keeps the bars it had standing and grows the ones it
-         adds. Still waiting to be seen, or growing every bar, there is nothing
-         to add: the bars about to grow include them. */
-      const added = [...labels].filter((label) => !this.drawnLabels?.has(label))
-      if (added.length > 0 && !this.growth) {
-        const since = performance.now()
-        added.forEach((label, index) => {
-          this.fresh.set(label, { count: added.length, index, since })
-        })
-        this.followFresh()
-      }
-    }
-    if (field.readings > 0) {
-      this.drawnLabels = labels
-    }
-  }
-
-  /** Draws each frame until the bars a later table added stand. */
-  private followFresh(): void {
-    const frame = (): void => {
-      const now = performance.now()
-      for (const [label, one] of this.fresh) {
-        if (now - one.since >= growTime(one.count)) {
-          this.fresh.delete(label)
-        }
-      }
-      this.requestUpdate()
-      if (this.fresh.size > 0) {
-        requestAnimationFrame(frame)
-      }
-    }
-    requestAnimationFrame(frame)
+    /* Decided before the table is drawn, so a bar that grows never shows
+       at its height first. */
+    this.motion.follow(field, field.readings > 0)
   }
 
   override disconnectedCallback(): void {
@@ -555,10 +536,6 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     this.sizes?.disconnect()
     this.sizes = undefined
     this.measured = undefined
-    this.seen?.disconnect()
-    this.seen = undefined
-    this.gone?.disconnect()
-    this.gone = undefined
   }
 
   /** The element the size observer watches, so a drawing drawn again is watched again. */
@@ -651,68 +628,12 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     return { field: heightened(field, times), unit }
   }
 
-  /** Starts the bars growing once the chart comes into view, and draws each frame until they stand. */
-  private watchGrowth(): void {
-    if (!this.growth || this.growth.since !== undefined || this.seen) {
-      return
-    }
-    this.seen = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting || !this.growth) {
-          return
-        }
-        this.seen?.disconnect()
-        this.seen = undefined
-        const since = performance.now()
-        this.growth = { since }
-        const length = growTime(this.field.categories.length)
-        const frame = (): void => {
-          if (this.growth?.since !== since) {
-            return
-          }
-          if (performance.now() - since >= length) {
-            this.growth = undefined
-            this.watchExit()
-            return
-          }
-          this.requestUpdate()
-          requestAnimationFrame(frame)
-        }
-        requestAnimationFrame(frame)
-      },
-      { threshold: 0.4 },
-    )
-    this.seen.observe(this)
-  }
-
-  /**
-   * Under `grow-again`, waits for the chart to leave the view, then puts the
-   * bars back at the floor and waits to be seen, so growing again starts from
-   * the same place the first time did.
-   */
-  private watchExit(): void {
-    if (!this.growAgain || this.gone) {
-      return
-    }
-    this.gone = new IntersectionObserver(([entry]) => {
-      if (!entry || entry.isIntersecting) {
-        return
-      }
-      this.gone?.disconnect()
-      this.gone = undefined
-      this.fresh.clear()
-      this.growth = {}
-    })
-    this.gone.observe(this)
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     /* Moved on the page, it is drawn already and not drawn again, so it
-       watches its box and its first sight again here. */
+       watches its box again here. */
     if (this.hasUpdated) {
       this.measure()
-      this.watchGrowth()
     }
     /* The bar under a pointer is found by what the pointer is over, so the
        controller's search along one axis stays out. */
@@ -733,13 +654,18 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.measure()
-    this.watchGrowth()
     /* Told only on a change, so a renderer draws again only when it must:
-       the field is read once for each table, so a new one is a change. */
+       the field is read once for each table, so a new one is a change, and
+       each frame of a move is one too. */
     const field = this.field
+    const shown = this.shown
     if (field !== this.last) {
       this.last = field
+      this.lastShown = shown
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (shown !== this.lastShown) {
+      this.lastShown = shown
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told) {
       this.told = this.pointer.at
@@ -857,22 +783,17 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     const room = this.room
     const sized = lined && room?.bar ? this.sized(read, view.projection, lined, room) : undefined
     const field = sized?.field ?? read
-    /* The frame and the words are measured on the bars at their height, so
-       the drawing holds still while they grow. */
+    /* The frame and the words are measured on the bars at their new
+       readings, so the drawing holds still while they move. */
     const full = barsDrawn(field, view.projection, layout)
-    const growth = this.growth
-    const since = growth?.since
-    const elapsed = since === undefined ? 0 : performance.now() - since
-    const categories = field.categories.length
-    const now = performance.now()
-    const bars = growth
-      ? barsDrawn(field, view.projection, layout, (one) => grownAt(one.across, categories, elapsed))
-      : this.fresh.size > 0
-        ? barsDrawn(field, view.projection, layout, (one) => {
-            const added = this.fresh.get(one.label)
-            return added ? grownAt(added.index, added.count, now - added.since) : 1
-          })
-        : full
+    /* Between two tables, the bars and the box are drawn from the readings
+       on their way, scaled as the row's own are. */
+    const drawn = this.motion.moving ? scaledAs(this.shown, read, field) : field
+    const moving =
+      drawn === field
+        ? view
+        : boxView(drawn.axes, this.camera, [], bare, view.words, wordsLocale(this))
+    const bars = drawn === field ? full : barsDrawn(drawn, view.projection, layout)
     const floor = lined && !this.noBox ? floorOf(field, view.projection, lined) : []
     const active = bars.find((bar) => bar.index === at)
     const cell = field.cells[at]
@@ -940,6 +861,12 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
             y: fits.y + (fits.height - high) / 2,
           }
         : fits
+    /* Between two tables, the floor and its names slide with the bars. */
+    const plates =
+      drawn === field || floor.length === 0 || !lined
+        ? floor
+        : floorOf(drawn, view.projection, lined)
+    const written = plates === floor ? names : namesOf(drawn, plates, size)
     const bounds = this.drag.frame(placed, view.on([0, 0, 0]))
     const pixel = pixelOf(bounds)
     const font = Math.round(size * 10_000) / 10_000
@@ -959,12 +886,12 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         /* A filter on a shape is measured in the drawing's own units, and
            WebKit draws none of CSS's on a shape, so the glow is a blur of
            its own, of 8 CSS pixels at any scale. */
-        bars.some((bar) => field.cells[bar.index]?.tone)
+        bars.some((bar) => drawn.cells[bar.index]?.tone)
           ? svg`<defs><filter height="160%" id="helix-spatial-bar-chart-glow" width="500%" x="-200%" y="-30%"><feGaussianBlur stdDeviation=${(pixel ?? 0.006) * 8}></feGaussianBlur></filter></defs>`
           : nothing
-      }${bare ? nothing : drawBox(view)}${floor.map(
+      }${bare ? nothing : drawBox(moving)}${plates.map(
         (plate) => svg`<path d=${plate.d} part="floor"></path>`,
-      )}${names.map(
+      )}${written.map(
         (name) =>
           svg`<text data-tone=${name.tone ?? nothing} dominant-baseline="central" font-size=${font} part="tick" style="${name.tone ? `--chart-series: var(--spatial-bar-chart-tone-${name.tone})` : ''}" text-anchor="middle" x=${shortNumber(name.x)} y=${shortNumber(name.y)}>${name.text}</text>`,
       )}${paintOrder(view.projection, bars).map(
@@ -972,7 +899,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
           /* The ring straight after its bar, so the bars in front cover it as
              they cover the bar: drawn over them all, it traced their faces
              and read as theirs. */
-          svg`${field.cells[bar.index]?.tone ? svg`<path d=${bar.drawn.outline} fill="none" filter="url(#helix-spatial-bar-chart-glow)" part="glow" style="--chart-series: var(--spatial-bar-chart-tone-${field.cells[bar.index]?.tone})"></path>` : nothing}${this.renderBar(field, bar, at)}${bar === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
+          svg`${drawn.cells[bar.index]?.tone ? svg`<path d=${bar.drawn.outline} fill="none" filter="url(#helix-spatial-bar-chart-glow)" part="glow" style="--chart-series: var(--spatial-bar-chart-tone-${drawn.cells[bar.index]?.tone})"></path>` : nothing}${this.renderBar(drawn, bar, at)}${bar === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
       )}${values.map((value) => {
         /* Over the bar as it stands, so the value rises as the bar grows. */
         const crown = bars.find((bar) => bar.index === value.index)?.drawn.crown ?? value.y + size

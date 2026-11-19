@@ -27,6 +27,8 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --spatial-bar-chart-bar-size - How wide each bar of a `row` or a `diagonal` stands on the page, whatever the number of bars: the row is as long as its bars make it, centered in the plot, and the tallest bar stands as high as the plot has room for, and no taller than the row is long and a quarter again, so one bar stands as a block. `fits` says how many bars the plot holds. Unset, the row fills the plot's width.
  * @cssproperty --spatial-bar-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
+ * @cssproperty --spatial-bar-chart-move-duration - How long the bars take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-bar-chart-move-easing - The curve the bars move to new readings along. Defaults to `--helix-easing-decelerate`, so a bar slows as it arrives and never passes its value.
  */
 @customElement('helix-spatial-bar-chart')
 export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {

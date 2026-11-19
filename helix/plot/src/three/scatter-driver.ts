@@ -72,6 +72,8 @@ const ringed = (inside: number): CanvasTexture => {
  * **The points stand in a box**, each axis' range from one side of it to the
  * other, with a grid on its floor and two of its walls at the ticks, and the
  * axes named along its edges. Each group is a color of the theme's series.
+ * **The points grow in and move to new readings as the chart's own drawing
+ * does**: the chart works out each frame, and the driver draws it.
  *
  * **Dragging turns the box, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.

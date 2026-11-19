@@ -15,6 +15,7 @@ import {
   Vector3,
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import type { PlotColors } from '../connect-plot/connect-plot.js'
 import type {
   SpatialTreemapDriver,
   TreemapField,
@@ -47,7 +48,9 @@ export interface ThreeTreemapDriverOptions {
  * **Each block stands on its part of the floor, from zero to its height**,
  * or as one slab where the table gives no heights, in a box with the
  * height's grid on two of its walls, lit from above. Each group takes a
- * series color from the theme.
+ * series color from the theme. **The blocks grow in and move to new readings
+ * as the chart's own drawing does**: the chart works out each frame, and the
+ * driver draws it with the view held still.
  *
  * **Dragging turns the box, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.
@@ -104,67 +107,79 @@ export const threeTreemapDriver = (
     return geometry
   }
 
-  return {
-    draw: (next, colors, font) => {
-      field = next
-      const [ex, ey, ez] = next.axes.extent ?? [1, 1, 1]
-      const zero = inBox(next.axes.y, 0) * ey
-      const page = new Color(colors.page)
-      const { emphasis, through } = colors.look
-      const solids: BufferGeometry[] = []
-      const lines: BufferGeometry[] = []
-      drawnBlocks = []
-      tops = new Map()
-      next.blocks.forEach((block, index) => {
-        const tone = new Color(colors.groups[block.groupIndex % colors.groups.length] ?? colors.ink)
-        /* As the chart's own drawing paints them: `outlined` fades the faces
+  /** Builds the blocks of `next`, and frames the view around them where `framed`, as a new table is. */
+  const build = (next: TreemapField, colors: PlotColors, font: string, framed: boolean): void => {
+    field = next
+    const [ex, ey, ez] = next.axes.extent ?? [1, 1, 1]
+    const zero = inBox(next.axes.y, 0) * ey
+    const page = new Color(colors.page)
+    const { emphasis, through } = colors.look
+    const solids: BufferGeometry[] = []
+    const lines: BufferGeometry[] = []
+    drawnBlocks = []
+    tops = new Map()
+    next.blocks.forEach((block, index) => {
+      const tone = new Color(colors.groups[block.groupIndex % colors.groups.length] ?? colors.ink)
+      /* As the chart's own drawing paints them: `outlined` fades the faces
            toward the page and draws the edges in the group's color, and
            `subtle` is a faint wash under the same edges. */
-        const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
-        const top = inBox(next.axes.y, next.height === '' ? 1 : (block.height ?? 0)) * ey
-        const tall = Math.max(Math.abs(top - zero), 1e-3)
-        const [x0, x1] = [
-          inBox(next.axes.x, block.area.x0) * ex,
-          inBox(next.axes.x, block.area.x1) * ex,
-        ]
-        const [z0, z1] = [
-          inBox(next.axes.z, block.area.z0) * ez,
-          inBox(next.axes.z, block.area.z1) * ez,
-        ]
-        const box = new BoxGeometry(Math.abs(x1 - x0), tall, Math.abs(z1 - z0))
-        const [x, z] = [(x0 + x1) / 2, (z0 + z1) / 2]
-        box.translate(x, Math.min(top, zero) + tall / 2, z)
-        solids.push(painted(box, color))
-        lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
-        drawnBlocks.push(index)
-        tops.set(index, new Vector3(x, Math.max(top, zero), z))
-      })
-      lookThrough(blockMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
-      lookThrough(edgeMaterial, through)
-      blocks.geometry.dispose()
-      edges.geometry.dispose()
-      blocks.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
-      edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
-      for (const one of [...solids, ...lines]) {
-        one.dispose()
-      }
-      stage.setAxes(next.axes, colors, font)
-      /* Framed around the box, or with no box around the blocks alone, so
+      const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
+      const top =
+        inBox(next.axes.y, (next.height === '' ? 1 : (block.height ?? 0)) * (block.grown ?? 1)) * ey
+      const tall = Math.max(Math.abs(top - zero), 1e-3)
+      const [x0, x1] = [
+        inBox(next.axes.x, block.area.x0) * ex,
+        inBox(next.axes.x, block.area.x1) * ex,
+      ]
+      const [z0, z1] = [
+        inBox(next.axes.z, block.area.z0) * ez,
+        inBox(next.axes.z, block.area.z1) * ez,
+      ]
+      const box = new BoxGeometry(Math.abs(x1 - x0), tall, Math.abs(z1 - z0))
+      const [x, z] = [(x0 + x1) / 2, (z0 + z1) / 2]
+      box.translate(x, Math.min(top, zero) + tall / 2, z)
+      solids.push(painted(box, color))
+      lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
+      drawnBlocks.push(index)
+      tops.set(index, new Vector3(x, Math.max(top, zero), z))
+    })
+    lookThrough(blockMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
+    lookThrough(edgeMaterial, through)
+    blocks.geometry.dispose()
+    edges.geometry.dispose()
+    blocks.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
+    edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
+    for (const one of [...solids, ...lines]) {
+      one.dispose()
+    }
+    stage.setAxes(next.axes, colors, font)
+    if (!framed) {
+      return
+    }
+    /* Framed around the box, or with no box around the blocks alone, so
          they fill the view. */
-      if (colors.look.box || tops.size === 0) {
-        stage.frame(
-          new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
-          new Vector3(HALF * ex, HALF * ey, HALF * ez),
-        )
-      } else {
-        const around = new Box3().setFromBufferAttribute(
-          blocks.geometry.getAttribute('position') as BufferAttribute,
-        )
-        stage.frame(around.min, around.max)
-      }
+    if (colors.look.box || tops.size === 0) {
+      stage.frame(
+        new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
+        new Vector3(HALF * ex, HALF * ey, HALF * ez),
+      )
+    } else {
+      const around = new Box3().setFromBufferAttribute(
+        blocks.geometry.getAttribute('position') as BufferAttribute,
+      )
+      stage.frame(around.min, around.max)
+    }
+  }
+
+  return {
+    draw: (next, colors, font) => {
+      build(next, colors, font, true)
     },
     focus: (index) => {
       stage.setMarker(field ? tops.get(index) : undefined)
+    },
+    move: (next, colors, font) => {
+      build(next, colors, font, false)
     },
     onHover: (listener) => stage.onHover(listener),
     onPlace: (listener) => stage.onPlace(listener),

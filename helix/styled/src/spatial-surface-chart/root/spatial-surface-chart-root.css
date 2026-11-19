@@ -169,3 +169,11 @@
     stroke: Canvas;
   }
 }
+
+/* **The surface moves to new readings as a flat chart's do**, on `decelerate`,
+   which is monotonic, so no frame draws a value the data does not hold. Set
+   on the host, so a rule a page writes on the element wins over this one. */
+:host {
+  --spatial-surface-chart-move-duration: var(--helix-duration-normal);
+  --spatial-surface-chart-move-easing: var(--helix-easing-decelerate);
+}

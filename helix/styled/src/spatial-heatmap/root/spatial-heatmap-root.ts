@@ -29,6 +29,8 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --spatial-heatmap-cell-size - The largest a cell grows, along its edge. The strip is never wider than its box, and draws smaller cells to fit.
  * @cssproperty --spatial-heatmap-left-shade - How much less light the left face is than the top, as a step of OKLCH lightness from 0 to 1. 0.07 by default.
+ * @cssproperty --spatial-heatmap-move-duration - How long the prisms take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-heatmap-move-easing - The curve the prisms move to new readings along. Defaults to `--helix-easing-decelerate`, so a prism slows as it arrives and never passes its reading.
  * @cssproperty --spatial-heatmap-right-shade - How much less light the right face is than the top, as a step of OKLCH lightness from 0 to 1. 0.14 by default.
  * @cssproperty --spatial-heatmap-selected-color - The color of the dashed edges of a selected prism, under `selection-mode`. By default, white on a dark face and black on a light one.
  */

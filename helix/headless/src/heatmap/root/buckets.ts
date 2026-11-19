@@ -8,7 +8,7 @@
  * screenshot of a strip.
  */
 
-import { extremesOf } from '@fusion.dev/helix-core'
+import { extremesOf, type MotionItem, type MotionShares, mix } from '@fusion.dev/helix-core'
 
 /** A reading, reduced to what the bucketing needs. */
 export interface Reading {
@@ -161,4 +161,60 @@ export const monthPage = (
     return past
   }
   return forward ? whens.length - 1 : 0
+}
+
+/** A reading as the strip's motion knows it: by its row's label, numbered where a label comes again. */
+export interface HeatCell extends Reading {
+  key: string
+}
+
+/**
+ * The readings a strip draws, as its motion moves them: each drawn cell by
+ * its key, how many cells stand in a column, and the highest reading in the
+ * table, which a spatial heatmap's heights are measured against.
+ */
+export interface HeatField {
+  cells: HeatCell[]
+  highest: number
+  rows: number
+}
+
+/** Each cell as the strip's motion knows it: by its key, growing in a column at a time. */
+export const heatItems = (field: HeatField): MotionItem[] =>
+  field.cells.map((cell, index) => ({
+    key: cell.key,
+    step: Math.floor(index / Math.max(1, field.rows)),
+  }))
+
+/**
+ * The strip `at` the shares between `from` and `to`, which it draws while its
+ * readings move. **A cell both hold moves from its old reading to its new
+ * one**, and its tone follows the reading through the buckets between.
+ * **A cell only `to` holds grows from empty**: it has no tone until it starts,
+ * then its reading climbs from zero, or a cell's own `data-tone` shows at
+ * once. A cell `from` held and `to` does not is gone at once, since every
+ * cell after it has taken a step along the strip.
+ */
+export const heatBetween = (
+  from: HeatField | undefined,
+  to: HeatField,
+  at: MotionShares,
+): HeatField => {
+  const before = new Map((from?.cells ?? []).map((cell) => [cell.key, cell]))
+  const cells = to.cells.map((cell): HeatCell => {
+    const share = at.share(cell.key)
+    const old = before.get(cell.key)
+    if (!old || at.floor(cell.key) || old.value === undefined) {
+      if (share <= 0) {
+        return { key: cell.key, value: undefined }
+      }
+      return { ...cell, value: cell.value === undefined ? undefined : cell.value * share }
+    }
+    return {
+      ...cell,
+      value: cell.value === undefined ? undefined : mix(old.value, cell.value, share),
+    }
+  })
+  const highest = from && at.axes < 1 ? mix(from.highest, to.highest, at.axes) : to.highest
+  return { ...to, cells, highest }
 }

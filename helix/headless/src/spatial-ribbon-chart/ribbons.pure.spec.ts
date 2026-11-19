@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { projectionOf } from '@fusion.dev/helix-core'
-import { ribbonsDrawn, ribbonsOf } from './ribbons.js'
+import { ribbonsBetween, ribbonsDrawn, ribbonsOf } from './ribbons.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({
@@ -37,5 +37,35 @@ describe('the ribbons', () => {
     for (const face of first?.faces ?? []) {
       expect(face.d).toMatch(/^M/)
     }
+  })
+})
+
+describe('moving between two tables', () => {
+  const at = (share: number, floor = false) => ({
+    axes: share,
+    floor: () => floor,
+    share: () => share,
+  })
+
+  test('a reading both tables hold moves, and its ribbon passes through it where it slides', () => {
+    const from = ribbonsOf([row('Mon', 4, 6), row('Tue', 8, 2)], [0, 1])
+    const to = ribbonsOf([row('Sun', 2, 2), row('Mon', 6, 6), row('Tue', 8, 2)], [0, 1])
+    const half = ribbonsBetween(from, to, at(0.5))
+    const monday = half.cells[2]
+    expect(monday?.value).toBe(5)
+    expect(monday?.across).toBe(0.5)
+    const drawn = ribbonsDrawn(half, projectionOf({ tilt: 25, turn: 42 }))
+    expect(drawn[0]?.readings.map((one) => one.index)).toEqual([0, 2, 4])
+  })
+
+  test('a reading the new table drops sinks in its own series, and a dropped series goes at once', () => {
+    const from = ribbonsOf([row('Mon', 4, 6), row('Tue', 8, 2)], [0, 1])
+    const to = ribbonsOf([row('Mon', 4)], [0])
+    const half = ribbonsBetween(from, to, at(0.5))
+    /* Tuesday's first series sinks; the second series is gone. */
+    expect(half.cells).toHaveLength(2)
+    expect(half.cells[1]?.label).toBe('Tue')
+    expect(half.cells[1]?.depth).toBe(0)
+    expect(half.cells[1]?.value).toBe(4)
   })
 })

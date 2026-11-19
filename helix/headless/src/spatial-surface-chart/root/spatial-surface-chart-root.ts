@@ -13,6 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
+  ReadingsMotionController,
   spokenReading,
   words,
   wordsLocale,
@@ -42,7 +43,7 @@ import {
   turned,
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
-import { levelOf, type SurfaceField, surfaceOf } from '../grid.js'
+import { levelOf, type SurfaceField, surfaceBetween, surfaceItems, surfaceOf } from '../grid.js'
 
 /**
  * Where the light comes from, in the box: from the left, above, and a little
@@ -169,6 +170,8 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --spatial-surface-chart-level - How high a face of the surface stands between the lowest reading and the highest, from 0 to 1: its corners' average. The component writes it on each face, and the stylesheet that colors the face along the ramp reads it.
+ * @cssproperty --spatial-surface-chart-move-duration - How long the surface takes to move to a new table's readings: each place rises or falls to its new height, a place that gains a reading rises from the lowest one, and a place that loses its reading sinks to it. A grid whose places changed is drawn at once. Unset, a new table is drawn at once. The rise under `grow` keeps its own timing.
+ * @cssproperty --spatial-surface-chart-move-easing - The curve the surface moves to new readings along.
  * @cssproperty --spatial-surface-chart-shade - How far a face of the surface turns from the light, as a share of lightness to take from its color, from 0 facing it to about 0.3. The component writes it on each face, and the stylesheet that shades the face reads it.
  *
  * @cssstate active - While a place is shown, under the pointer or the keys.
@@ -194,6 +197,36 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    */
   @property({ reflect: true, type: Boolean })
   contours = false
+
+  /**
+   * Raises the surface from a flat sheet at its lowest reading the first
+   * time the chart comes into view with readings, each row across a little
+   * after the one before it, so the drawing arrives the way a page's own
+   * picture does. The rise is fast at first, slows to rest, and never passes
+   * a reading.
+   *
+   * Under `prefers-reduced-motion`, or where the page has paused its motion
+   * through `pauseMotion` or `Motion Toggle`, the surface stands at its
+   * readings from the start. A later table raises each place it gives a
+   * reading the same way, so a reading that arrives while the chart is in
+   * view arrives as the first ones did. The places it keeps rise or fall to
+   * their new heights on `--spatial-surface-chart-move-duration`, and stand
+   * there at once where it is unset.
+   */
+  @property({ reflect: true, type: Boolean })
+  grow = false
+
+  /**
+   * Raises the surface again each time the chart comes back into view after
+   * it left it, as a pane does when it is opened again, where `grow` alone
+   * raises it the first time only. Only a chart that grows takes it.
+   *
+   * While it is out of view the surface lies flat, so the first frame after
+   * it returns is the start of the rise and never a flash of the whole
+   * drawing.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
 
   /**
    * Draws no box: no edges, grid, numbers, or names, so the readings stand
@@ -260,6 +293,28 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   /** The place the keys rested on last, so a change of it can be told. */
   private told = -1
 
+  /**
+   * Moves the surface from one table to the next, and raises it under
+   * `grow`, timed by `--spatial-surface-chart-move-duration` and
+   * `--spatial-surface-chart-move-easing`.
+   */
+  protected readonly motion = new ReadingsMotionController<SurfaceField>(this, {
+    between: surfaceBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: surfaceItems,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--spatial-surface-chart-move-duration'),
+        easing: style.getPropertyValue('--spatial-surface-chart-move-easing'),
+      }
+    },
+  })
+
+  /** The surface drawn last, kept so a frame of its move can be told. */
+  private lastShown: SurfaceField | undefined
+
   /** Carries a host `aria-labelledby` and `aria-describedby` to the plot. */
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('plot'),
@@ -283,6 +338,15 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
 
   /** The field last read, and the rows it was read from. */
   private memo: { field: SurfaceField; rows: unknown } | undefined
+
+  /**
+   * The surface as drawn this frame, which a renderer draws: `field` at
+   * rest, and while the readings move, each place between its last height
+   * and its new one, with the contour lines through it.
+   */
+  get shown(): SurfaceField {
+    return this.motion.drawn ?? this.field
+  }
 
   /** The place the keys or the pointer rest on, as its place in `field.cells`, or `-1`. */
   get active(): number {
@@ -333,7 +397,11 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    this.pointer.grid = Math.max(1, this.field.depths.length)
+    const field = this.field
+    this.pointer.grid = Math.max(1, field.depths.length)
+    /* Decided before the table is drawn, so a surface that rises never shows
+       at its height first. */
+    this.motion.follow(field, field.readings > 0)
   }
 
   override connectedCallback(): void {
@@ -355,9 +423,14 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     /* Told only on a change, so a renderer draws again only when it must:
        the field is read once for each table, so a new one is a change. */
     const field = this.field
+    const shown = this.shown
     if (field !== this.last) {
       this.last = field
+      this.lastShown = shown
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (shown !== this.lastShown) {
+      this.lastShown = shown
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told) {
       this.told = this.pointer.at
@@ -481,10 +554,17 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * triangle of the other three. The chart's own drawing, until a renderer
    * has drawn and where none is connected.
    */
-  private renderFallback(field: SurfaceField, at: number): TemplateResult {
+  private renderFallback(read: SurfaceField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
+      boxView(read.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
+    /* Between two tables, the box and the surface are drawn from the readings
+       on their way, in the frame of the new ones, so the drawing holds still. */
+    const field = this.motion.moving ? this.shown : read
+    const moving =
+      field === read
+        ? view
+        : boxView(field.axes, this.camera, [], this.noBox, view.words, wordsLocale(this))
     const depths = field.depths.length
     const boxed = field.cells.map((cell): BoxPoint | undefined =>
       cell.value === undefined
@@ -533,7 +613,22 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     const active = places.find((place) => place.index === at)
     const row = field.cells[at]?.row
     const bounds = this.drag.frame(
-      this.noBox ? boundsOf(places, 0.1) : view.bounds,
+      this.noBox
+        ? boundsOf(
+            read.cells.flatMap((cell) =>
+              cell.value === undefined
+                ? []
+                : [
+                    view.on([
+                      inBox(read.axes.x, cell.x),
+                      inBox(read.axes.y, cell.value),
+                      inBox(read.axes.z, cell.z),
+                    ]),
+                  ],
+            ),
+            0.1,
+          )
+        : view.bounds,
       view.on([0, 0, 0]),
     )
     const short = (value: number): number => Math.round(value * 1000) / 1000
@@ -549,7 +644,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${faces.map(
+      >${this.noBox ? nothing : drawBox(moving)}${faces.map(
         (face) =>
           svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>${this.contours ? this.renderContoursIn(field, face.square, view.on) : nothing}`,
       )}${

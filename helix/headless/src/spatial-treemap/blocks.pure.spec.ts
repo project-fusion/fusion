@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { projectionOf } from '@fusion.dev/helix-core'
-import { blocksDrawn, type FloorArea, paintOrder, squarified, treemapOf } from './blocks.js'
+import {
+  blockItems,
+  blocksBetween,
+  blocksDrawn,
+  type FloorArea,
+  paintOrder,
+  squarified,
+  treemapOf,
+} from './blocks.js'
 
 const row = (label: string, team: string, ...values: Array<number | undefined>) => ({
   cells: [
@@ -132,5 +140,39 @@ describe('the order of painting', () => {
     const projection = projectionOf({ tilt: 30, turn: 130 })
     const order = paintOrder(projection, blocksDrawn(field, projection))
     expect(new Set(order.map((block) => block.index)).size).toBe(30)
+  })
+})
+
+describe('moving between two tables', () => {
+  const at = (share: number, floor = false) => ({
+    axes: share,
+    floor: () => floor,
+    share: () => share,
+  })
+
+  test('with no table before, every block rises from the floor on its own part of it', () => {
+    const field = treemapOf([row('a', '', 6, 10), row('b', '', 4, 20)], [1, 2], 'Team')
+    expect(blockItems(field).map((item) => item.step)).toEqual([0, 1])
+    const half = blocksBetween(undefined, field, at(0.5, true))
+    expect(half.blocks[0]?.grown).toBe(0.5)
+    expect(half.blocks[0]?.area).toEqual(field.blocks[0]?.area as FloorArea)
+    const projection = projectionOf({ tilt: 25, turn: 42 })
+    const [low] = blocksDrawn(half, projection)
+    const [high] = blocksDrawn(field, projection)
+    expect(Math.abs((low?.drawn.peak.y ?? 0) - (high?.drawn.peak.y ?? 0))).toBeGreaterThan(0)
+  })
+
+  test('a kept block moves to its new part and height, an added one opens from its middle, and a dropped one shrinks away', () => {
+    const from = treemapOf([row('a', '', 6, 10), row('b', '', 4, 20)], [1, 2], 'Team')
+    const to = treemapOf([row('a', '', 6, 30), row('c', '', 6, 20)], [1, 2], 'Team')
+    const half = blocksBetween(from, to, at(0.5))
+    expect(half.blocks[0]?.height).toBe(20)
+    const added = half.blocks[1]
+    const target = to.blocks[1]?.area as FloorArea
+    expect(added?.grown).toBe(0.5)
+    expect(areaOf(added?.area as FloorArea)).toBeLessThan(areaOf(target))
+    expect(half.blocks[2]?.label).toBe('b')
+    expect(half.blocks[2]?.grown).toBe(0.5)
+    expect(blocksBetween(from, to, at(1)).blocks).toHaveLength(2)
   })
 })
