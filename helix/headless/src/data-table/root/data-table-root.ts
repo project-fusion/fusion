@@ -494,6 +494,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart menu-entry-start - The leading column of a row in a column's menu, on the column.
  * @csspart menu-entry-surface - Forwarded from the row, on the column. Not shown in the table.
  * @csspart menu-header - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no submenu.
+ * @csspart menu-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart menu-live - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no loading or empty text.
  * @csspart menu-loading - Forwarded from the column's menu, on the column. Not shown in the table.
  * @csspart menu-search-field - Forwarded from the column's menu, on the column. Not shown in the table.
@@ -3371,7 +3372,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }`,
     ].filter((group) => group !== nothing)
     return html`<${menu}
-      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header, highlight: menu-highlight,
         live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface,
         title: menu-title"
       @helix-before-check=${this.keepMenuCheck}

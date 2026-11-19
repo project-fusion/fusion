@@ -160,6 +160,7 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * @csspart overflow-back-mark - The glyph on the back control of a submenu.
  * @csspart overflow-empty - The text shown when the menu has no items.
  * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart overflow-live - The overflow menu's live region, which repeats the empty and loading text for screen readers.
  * @csspart overflow-loading - The text shown while the items are loading.
  * @csspart overflow-option - One destination in the overflow menu, a link to its address. Checked where it is the current one.
@@ -655,7 +656,7 @@ export class HelixHeadlessNavigation extends HelixElement {
     return html`<${menu}
       part="overflow"
       exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
-        header: overflow-header, live: overflow-live, loading: overflow-loading,
+        header: overflow-header, highlight: overflow-highlight, live: overflow-live, loading: overflow-loading,
         search-field: overflow-search-field, surface: overflow-surface,
         title: overflow-title"
       label=${this.moreLabel}

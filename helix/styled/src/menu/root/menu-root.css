@@ -225,7 +225,7 @@
   position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
-  z-index: -1;
+  z-index: var(--helix-layer-beneath);
 }
 
 [part="highlight"][data-placed] {

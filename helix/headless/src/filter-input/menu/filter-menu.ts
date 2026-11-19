@@ -93,6 +93,7 @@ import '../../menu/index.js'
  * @csspart menu-back-mark - The icon on the back button.
  * @csspart menu-empty - Shown when there are no fields to offer.
  * @csspart menu-header - The bar above a field's page, with the back button and the field's name.
+ * @csspart menu-highlight - Forwarded from the menu: the wash on the row with focus, which glides from row to row.
  * @csspart menu-live - The inner menu's `live` part: the region that screen readers announce the empty and loading messages from.
  * @csspart menu-loading - Shown while the fields are loading.
  * @csspart menu-search-field - The inner menu's filter field, drawn with `filterable`.
@@ -345,7 +346,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     const item = this.tag('menu-item')
     return html`<${menu}
       part="menu"
-      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header, highlight: menu-highlight,
         live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title"
       label=${this.label || this.fallbackLabel}
       @helix-before-select=${this.handleSelect}
