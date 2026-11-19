@@ -144,7 +144,7 @@
   document.getElementById('add').addEventListener('click', () => {
     const body = document.querySelector('#commits tbody')
     const row = document.createElement('tr')
-    const value = Math.round(Math.random() * 10)
+    const value = (next * 7 + 3) % 10
     row.innerHTML = `<th scope="row">Day ${next}</th><td>${value}</td>`
     next += 1
     body.append(row)
