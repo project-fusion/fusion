@@ -47,9 +47,9 @@ import { derive } from '../../../tree.js'
  *
  * **The web's**: the invoker commands, `close(value)` and `returnValue`,
  * `snapTo()`, a `<form method="dialog">` closing it, the page's scroll held
- * still, the swipe's travel written as `--drawer-swipe-x` and
- * `--drawer-swipe-y`, and a description drawn from the words at the start
- * of its body. React Native has no command or form to take, and moves the
+ * still, the snap point written as `--drawer-swipe-x` and `--drawer-swipe-y`,
+ * `dragging` from the first move of a drag until its release lands, and a
+ * description drawn from the words at the start of its body. React Native has no command or form to take, and moves the
  * panel itself.
  *
  * **Held to `helix-drawer`.** `helix system check` compares the props, the
@@ -77,7 +77,7 @@ export default headless('drawer', {
     close: bare(),
     toggle: bare(['newState', 'oldState']),
   },
-  states: ['entering', 'exiting', 'open', 'settled', 'snapped'],
+  states: ['dragging', 'entering', 'exiting', 'open', 'settled', 'snapped'],
   derived: {
     dismissal: derive('drawer-dismissal'),
     dismissName: derive('drawer-dismiss-name'),

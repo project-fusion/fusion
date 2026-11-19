@@ -18,6 +18,7 @@ import {
 } from './shapes.js'
 import { ORB_STATES, type OrbParams, type OrbState } from './states.js'
 
+export * from './orb-inks.js'
 export * from './shapes.js'
 export * from './states.js'
 
@@ -112,6 +113,11 @@ export class OrbClock {
    */
   private get span(): number {
     return MORPH_NEAR + MORPH_REACH * this.reach
+  }
+
+  /** How long is left of the change at `now`, in milliseconds, `0` when there is none. */
+  left(now: number): number {
+    return this.morphAt === 0 ? 0 : Math.max(0, this.span - (now - this.morphAt))
   }
 
   /** How far through the change at `now`, `1` when there is none. */

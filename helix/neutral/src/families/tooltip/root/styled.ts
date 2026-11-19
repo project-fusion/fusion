@@ -74,27 +74,57 @@ export default styles(
           /* From 0.96, as every floating panel enters, and the way out
              accelerates away. */
           scale: 0.96,
-          transition: list(
-            ['opacity', fast, token('easing-accelerate')],
-            ['scale', fast, token('easing-accelerate')],
-            ['display', fast, 'allow-discrete'],
-            ['overlay', fast, 'allow-discrete'],
-          ),
         }),
         /* The way in, with the overshoot an arrival has. */
-        rule(
-          { part: { 'data-placed': true } },
-          {
-            opacity: 1,
-            scale: 1,
+        rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1 }),
+        native([
+          rule({
             transition: list(
-              ['opacity', fast, token('easing-standard')],
-              ['scale', fast, token('easing-emphasized')],
+              ['opacity', fast, token('easing-accelerate')],
+              ['scale', fast, token('easing-accelerate')],
               ['display', fast, 'allow-discrete'],
               ['overlay', fast, 'allow-discrete'],
             ),
-          },
-        ),
+          }),
+          rule(
+            { part: { 'data-placed': true } },
+            {
+              transition: list(
+                ['opacity', fast, token('easing-standard')],
+                ['scale', fast, token('easing-emphasized')],
+                ['display', fast, 'allow-discrete'],
+                ['overlay', fast, 'allow-discrete'],
+              ),
+            },
+          ),
+        ]),
+        /* **A bubble that stays open follows its anchor to a new place** over
+           `--tooltip-move-duration`, as a chart's bubble follows its reading,
+           on a curve that slows as it arrives. Unset, it moves at once, and
+           reduced motion moves it at once whatever the hook says. */
+        web([
+          rule({
+            transition: list(
+              ['opacity', fast, token('easing-accelerate')],
+              ['scale', fast, token('easing-accelerate')],
+              ['display', fast, 'allow-discrete'],
+              ['overlay', fast, 'allow-discrete'],
+              ['translate', measured('tooltip-move-duration', '0s'), token('easing-decelerate')],
+            ),
+          }),
+          rule(
+            { part: { 'data-placed': true } },
+            {
+              transition: list(
+                ['opacity', fast, token('easing-standard')],
+                ['scale', fast, token('easing-emphasized')],
+                ['display', fast, 'allow-discrete'],
+                ['overlay', fast, 'allow-discrete'],
+                ['translate', measured('tooltip-move-duration', '0s'), token('easing-decelerate')],
+              ),
+            },
+          ),
+        ]),
       ]),
       /* The point, half buried under the bubble on the edge facing the trigger. */
       on('arrow', [

@@ -36,8 +36,9 @@ import { derive } from '../../../tree.js'
  * as it shows; the hold a pointer or focus anywhere in the stack makes, since
  * a phone has no pointer and holds its clocks on a touch; Escape on an action
  * passed in, which is the page's own view on a phone; `pause()` and
- * `resume()`; and the swipe's travel written as `--toast-swipe-x` and
- * `--toast-swipe-y`.
+ * `resume()`; and `dragging`, from the first move of a swipe until its
+ * release lands, while an inline `translate` moves the message and its
+ * release glides on `--toast-release-duration` and `--toast-release-easing`.
  *
  * **Held to `helix-toast-item`.** `helix system check` compares the props,
  * the event, the states, the regions, and the parts with what the manifest
@@ -54,7 +55,7 @@ export default headless('toast-item', {
   events: {
     dismiss: { cancelable: true, detail: ['label'], gives: { label: 'dismissed' } },
   },
-  states: ['closed', 'entering', 'exiting', 'paused', 'settled', 'waiting'],
+  states: ['closed', 'dragging', 'entering', 'exiting', 'paused', 'settled', 'waiting'],
   derived: {
     dismissed: derive('toast-item-dismissed'),
     dismissName: derive('toast-item-dismiss-name'),

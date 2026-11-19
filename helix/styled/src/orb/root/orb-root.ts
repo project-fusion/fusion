@@ -11,8 +11,10 @@ import {
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import {
+  firstMilliseconds,
   ORB_MIN_RADIUS,
   OrbClock,
+  OrbInks,
   type OrbState,
   orbDotColor,
   orbShown,
@@ -51,6 +53,9 @@ const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
  *
  * Colors come from `--orb-color` and `--orb-ground`. Each dot's color is mixed
  * toward the ground color by its depth, so depth holds when the theme changes.
+ * A color your stylesheet sets per state, such as
+ * `helix-orb:state(done) { --orb-color: green }`, crosses with the shape and
+ * lands with it.
  *
  * The animation stops when the orb is off screen or in a background tab. With
  * `prefers-reduced-motion`, it draws one still frame.
@@ -219,7 +224,7 @@ export class HelixOrb extends HelixElement {
   private readonly gate = new PaintGateController(this, {
     canRun: () => !!this.context && !this.lost && !this.own,
     onFrame: (delta) => {
-      this.paint(delta)
+      this.paint(delta, true)
     },
     onMotion: (reduced) => {
       if (reduced) {
@@ -480,8 +485,18 @@ export class HelixOrb extends HelixElement {
     this.gate.play()
   }
 
-  /** One frame: core's dots for the clock, painted back to front in the canvas's two colors. */
-  private paint(dt: number): void {
+  /** The two colors on the screen, crossing to new ones with the shape. */
+  private readonly inks = new OrbInks()
+
+  /**
+   * One frame: core's dots for the clock, painted back to front in the
+   * canvas's two colors.
+   *
+   * @param framed Whether the loop drew it, so a frame follows to finish a
+   *   crossing of colors. The gate has cleared its booking by then, so
+   *   `running` cannot say.
+   */
+  private paint(dt: number, framed = false): void {
     const ctx = this.context
     const size = this.box
     if (!ctx || size <= 0) {
@@ -494,9 +509,18 @@ export class HelixOrb extends HelixElement {
     const painted = getComputedStyle(ctx.canvas)
     /* Carried on an inert property for the reason the colors are. */
     const speed = Number.parseFloat(painted.animationIterationCount)
-    const ink = readColorAlpha(painted.color) ?? GRAY
-    const ground = readColorAlpha(painted.textDecorationColor) ?? GRAY
-    const dots = this.clock.frame(size, performance.now(), dt, speed, this.gate.reduced)
+    const now = performance.now()
+    const [ink, ground] = this.inks.cross(
+      readColorAlpha(painted.color) ?? GRAY,
+      readColorAlpha(painted.textDecorationColor) ?? GRAY,
+      {
+        alone: firstMilliseconds(painted.transitionDuration),
+        left: this.clock.left(now),
+        now,
+        snap: this.gate.reduced || !framed,
+      },
+    )
+    const dots = this.clock.frame(size, now, dt, speed, this.gate.reduced)
     ctx.clearRect(0, 0, size, size)
     for (const dot of dots) {
       const color = orbDotColor(dot, ink, ground)

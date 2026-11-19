@@ -101,6 +101,7 @@ export default headless('navigation', {
           'back-mark': true,
           empty: true,
           header: true,
+          highlight: true,
           live: true,
           loading: true,
           'search-field': true,

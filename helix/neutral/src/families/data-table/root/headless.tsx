@@ -22,8 +22,10 @@ import { events, props } from './api.js'
  *
  * **The web's**: the rows a page serves, `estimate`, `cellStyles`, the drag's
  * preview, a column moved by its grip, `row-parts`, the view a page saves and
- * restores, the export, the `selection` region, and the cells a reader edits
- * in place, with their rules, saves, and `batch-edits`.
+ * restores, the export, the `selection` region, the cells a reader edits in
+ * place, with their rules, saves, and `batch-edits`, the wash `flash-changes`
+ * lights a changed row with, and the highlight that glides along a column's
+ * menu.
  *
  * **Held to `helix-data-table`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says.
@@ -320,6 +322,7 @@ export default headless('data-table', {
           'menu-back-mark': props.selectable,
           'menu-empty': props.selectable,
           'menu-header': props.selectable,
+          'menu-highlight': props.selectable,
           'menu-live': props.selectable,
           'menu-loading': props.selectable,
           'menu-search-field': props.selectable,

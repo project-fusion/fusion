@@ -25,7 +25,9 @@ import root from './headless.js'
  *
  * **A change to either color ends a transition the web's script hears**, on
  * the fast duration, which reduced motion shortens and never to nothing, so
- * a still orb paints a frame in a new theme's colors.
+ * a still orb paints a frame in a new theme's colors. **The value steps at
+ * the start**, so the script reads the new color on the frame it changes and
+ * crosses to it itself, at the shape's pace during a change of state.
  */
 export default styles(
   root,
@@ -69,7 +71,7 @@ export default styles(
        way. */
     on('canvas', [
       rule({
-        web: { animationIterationCount: hook.speed },
+        web: { animationIterationCount: hook.speed, transitionTimingFunction: 'step-start' },
         blockSize: '100%',
         color: hook.color,
         display: 'block',

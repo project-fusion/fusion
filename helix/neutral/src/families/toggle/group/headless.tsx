@@ -65,7 +65,7 @@ export default headless('toggle-group', {
   },
   /* `gliding` while a mouse or pen is over an item, so the highlight draws
      the hover wash in place of each item's own. */
-  states: ['gliding', 'invalid', 'settled'],
+  states: ['focusGliding', 'gliding', 'invalid', 'settled'],
   collection: {
     allowEmptySelection: 'allowEmptySelection',
     defaultProp: 'defaultValue',
@@ -131,6 +131,15 @@ export default headless('toggle-group', {
             part="indicator"
           />
           <Slot />
+          {/* The web's focus ring, which travels from control to control as the
+              arrow keys move focus along the row. Hidden until a stylesheet shows
+              it. A phone draws each control's own ring. */}
+          <View
+            ariaHidden
+            hidden
+            part="focus"
+            platform="web"
+          />
         </View>
         <Slot name="end" />
       </View>

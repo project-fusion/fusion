@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToggleGroup } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as focusRingStyles } from '../../shared/focus-ring/focus-ring.css.js'
 import { styles } from './toggle-group.generated.css.js'
 
 /**
@@ -63,7 +64,7 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
   @property({ reflect: true })
   separation?: 'plain'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [focusRingStyles, styles]
 }
 
 declare global {

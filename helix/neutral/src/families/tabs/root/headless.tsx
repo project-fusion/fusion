@@ -35,8 +35,9 @@ export default headless('tabs', {
     beforeSelect: cancelable(['value']),
   },
   /* `gliding` while a mouse or pen is over a tab, so the highlight draws the
-     hover wash in place of each tab's own. */
-  states: ['gliding', 'settled'],
+     hover wash in place of each tab's own, and `focus-gliding` while the
+     web's focus ring is on a tab, so it draws the ring in place of the tab's. */
+  states: ['focusGliding', 'gliding', 'settled'],
   collection: {
     defaultProp: 'defaultActive',
     /* **The keys come round from the last tab, and choose where they
@@ -90,6 +91,15 @@ export default headless('tabs', {
         >
           <Slot name="indicator" />
         </View>
+        {/* The web's focus ring, which travels from control to control as the
+            arrow keys move focus along the row. Hidden until a stylesheet shows
+            it. A phone draws each control's own ring. */}
+        <View
+          ariaHidden
+          hidden
+          part="focus"
+          platform="web"
+        />
         {props.scrollControls && (
           <Pressable
             ariaHidden

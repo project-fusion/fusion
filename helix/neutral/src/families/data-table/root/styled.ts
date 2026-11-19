@@ -10,6 +10,7 @@ import {
   mix,
   native,
   product,
+  scheme,
   sum,
   token,
   web,
@@ -425,10 +426,16 @@ export default styles(
          hand, a sort included. The table reads these from its script, so they are set here
          rather than read with a fallback, and a page setting either on the element
          wins over this rule. A phone moves nothing: its rows stand in their new
-         places at once. */
+         places at once. **A changed row lights up in the info color**, the
+         wash core's `flashChange` draws by default: with no brand, a wash of
+         the primary or the accent reads as the hover or a selected row. */
       on('host', [
         web([
           rule({
+            '--data-table-flash-color': scheme(
+              mix(token('color-info'), 14, 'transparent'),
+              mix(token('color-info'), 22, 'transparent'),
+            ),
             '--data-table-move-duration': token('duration-normal'),
             '--data-table-move-easing': token('easing-standard'),
           }),

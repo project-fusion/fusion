@@ -133,7 +133,7 @@ export default headless('terminal', {
         </View>
         <Wrap
           draws="toolbar"
-          exports={{ toolbar: true }}
+          exports={{ focus: true, toolbar: true }}
           gives={{ label: props.controlsLabel }}
           part="controls"
         >
@@ -227,6 +227,7 @@ export default headless('terminal', {
           'find-close-spinner': true,
           'find-close-text': true,
           'find-controls': true,
+          'find-controls-focus': true,
           'find-controls-toolbar': true,
           'find-count': true,
           'find-field': true,

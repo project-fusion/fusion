@@ -2,10 +2,12 @@ import drawerDismiss from '../../../fragments/drawer-dismiss.js'
 import drawerPlacement from '../../../fragments/drawer-placement.js'
 import { oneOf } from '../../../render.js'
 import {
+  difference,
   first,
   fn,
   inherited,
   list,
+  measured,
   mix,
   product,
   scheme,
@@ -26,9 +28,10 @@ import root from './headless.js'
  * `frosted` are the translucent grounds over the theme's blur.
  *
  * **It slides in from past its edge and back out**, and follows the finger
- * while a swipe moves it, where the web writes the travel as
- * `--drawer-swipe-x` and `--drawer-swipe-y`. The header and the footer stay
- * put while the content between them scrolls.
+ * while a drag moves it, where the web moves it by an inline `translate` and
+ * writes the snap point it rests at as `--drawer-swipe-x` and
+ * `--drawer-swipe-y`, and fades the scrim by `--drawer-drag-progress`. The
+ * header and the footer stay put while the content between them scrolls.
  *
  * **Its first and last rows keep clear of the window's safe area** along
  * the edges it meets, the status bar and the home indicator on a phone.
@@ -111,6 +114,16 @@ export default styles(
       /* The host draws nothing, and holds the panel's size and the scrim's tint. */
       on('host', [
         rule({ own: { drawerSize: hook.size }, display: 'contents' }),
+        /* **A released panel goes back on the spring**, over at most the slow
+           step, and goes off the edge at the speed it was let go. The drawer
+           reads these from its script, so this rule sets them, and a page
+           setting either on the element wins over it. */
+        web([
+          rule({
+            '--drawer-release-duration': token('duration-slow'),
+            '--drawer-release-easing': token('easing-spring'),
+          }),
+        ]),
         rule({
           own: {
             drawerGround: hook.backgroundColor(token('color-surface-overlay')),
@@ -160,6 +173,13 @@ export default styles(
         web([
           rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
           rule({ open: true, supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
+          /* **The scrim fades with the drag**, from whole at the smallest snap
+             point to gone off the edge. A `::backdrop` takes custom properties
+             from its dialog. */
+          rule([{ dragging: true }, { dragging: true, open: true }], {
+            opacity: difference(1, measured('drawer-drag-progress', 0)),
+            transition: 'none',
+          }),
         ]),
       ]),
       on('panel', [step]),
@@ -281,19 +301,27 @@ export default styles(
           }),
         ]),
       ]),
-      /* The page's own panning stays off the swipe's axis, and the content
-         keeps its own scrolling down. */
-      on(['panel', 'content'], [web([rule({ touchAction: 'pan-y' })])]),
+      /* **The content region keeps its own vertical scrolling.** The panel
+         leaves the page only the pan across its drag, from `DRAGS_RULE` in
+         core. The drawer marks the content for the drag while it does not
+         scroll along it; while it does, it gives up only the horizontal pan. */
+      on({ part: 'content', selector: '[part="content"]:not([data-drags])' }, [
+        web([rule({ touchAction: 'pan-y' })]),
+      ]),
       on('panel', [
-        web([rule({ placement: ['bottom', 'top'] }, { touchAction: 'pan-x' })]),
-        /* Under the finger while it moves, and back to the slide once it lets go. As
-           specific as the open rule above, which it has to beat. */
-        rule(
-          { open: true, part: { 'data-swiping': true } },
-          { transition: 'none', web: { userSelect: 'none' } },
-        ),
+        /* **At its snap point from the first move until the release lands**,
+           with no transition: the script moves it by `translate` and glides it
+           on its release. After the open rule, which it has to beat. A phone
+           moves the panel itself. */
+        web([
+          rule([{ dragging: true }, { dragging: true, open: true }], {
+            transform: fn('translate', hook.swipeX, hook.swipeY),
+            transition: 'none',
+            userSelect: 'none',
+          }),
+        ]),
         /* **Under reduced motion the panel fades in place and does not slide**, and
-           stays where a swipe puts it, with no transition on the transform. */
+           a finger still moves it through the script's `translate`. */
         rule(
           { reducedMotion: true },
           { transform: fn('translate', hook.swipeX, hook.swipeY), transition: fading },

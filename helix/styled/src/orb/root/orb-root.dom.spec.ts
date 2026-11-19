@@ -112,26 +112,39 @@ describe('orb', () => {
     'a color that changes with the state crosses with the shape, and one drawn once snaps',
     async () => {
       type Color = [number, number, number, number]
+      /* The element's own two: core's crossing of the colors, and the clock
+         whose change of state it lands with. */
       type Crossing = Upgraded & {
-        crossColors(ink: Color, ground: Color, duration: string, snap: boolean): [Color, Color]
+        clock: { left(now: number): number }
+        inks: {
+          cross(
+            ink: Color,
+            ground: Color,
+            ask: { alone: number; left: number; now: number; snap: boolean },
+          ): [Color, Color]
+        }
       }
       const red: Color = [200, 0, 0, 1]
       const blue: Color = [0, 0, 200, 1]
       const ground: Color = [255, 255, 255, 1]
       const host = (await mount('<helix-orb></helix-orb>')) as Crossing
       await host.updateComplete
-      expect(host.crossColors(red, ground, '0.12s', false)[0]).toEqual(red)
+      const cross = (ink: Color, snap = false): [Color, Color] => {
+        const now = performance.now()
+        return host.inks.cross(ink, ground, { alone: 120, left: host.clock.left(now), now, snap })
+      }
+      expect(cross(red)[0]).toEqual(red)
       host.state = 'working'
       await host.updateComplete
       /* Far past the stylesheet's beat, and well inside the shape's span, the ink
        is still on its way. */
-      host.crossColors(blue, ground, '0.12s', false)
+      cross(blue)
       await new Promise((resolve) => setTimeout(resolve, 200))
-      const [ink] = host.crossColors(blue, ground, '0.12s', false)
+      const [ink] = cross(blue)
       expect(ink[0]).toBeGreaterThan(20)
       expect(ink[2]).toBeLessThan(180)
       /* A frame nothing follows takes the new color whole. */
-      expect(host.crossColors(red, ground, '0.12s', true)[0]).toEqual(red)
+      expect(cross(red, true)[0]).toEqual(red)
     },
   )
 

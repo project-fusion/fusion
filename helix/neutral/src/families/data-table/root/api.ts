@@ -38,6 +38,7 @@ export const props = {
   estimate: 32,
   expanded: string(),
   filter: string(),
+  flashChanges: web(false),
   gapLabel: 'Skip to page {page}',
   hideColumnLabel: 'Hide column',
   label: '',

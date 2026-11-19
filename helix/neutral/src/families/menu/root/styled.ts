@@ -2,8 +2,10 @@ import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
+  hookOf,
   list,
   measured,
+  mix,
   native,
   product,
   safeArea,
@@ -56,6 +58,7 @@ export default styles(
     own: {
       menuBleed: null,
       menuFrom: null,
+      menuItemGlide: null,
       menuItemRadius: null,
       menuMaterialBackdrop: null,
       menuMaterialFill: null,
@@ -167,6 +170,9 @@ export default styles(
           maxBlockSize: hook.maxBlockSize(measured('floating-available-block-size', 'none')),
           overflowY: 'auto',
           minInlineSize: hook.minInlineSize('12rem'),
+          /* Its own stack, so the web's highlight sits behind the rows and still
+             above the fill. */
+          isolation: web('isolate'),
           paddingBlock: token('space-xs'),
           paddingInline: token('space-none'),
         }),
@@ -297,6 +303,64 @@ export default styles(
       ]),
       on({ region: 'default', slotted: 'helix-menu-section' }, [
         rule({ platform: 'native', drilled: true }, { own: { menuSectionHeading: 'none' } }),
+      ]),
+      /* **The highlight, one wash that glides from row to row** as focus
+         moves, in place of each row's own, which goes while the menu is
+         `gliding`. It lands where focus arrives and fades in, and slides only
+         once `data-gliding` says it has arrived. Behind the rows, so their
+         words and a pressed row's fill stay on top. Each row draws its own
+         system highlight under forced colors. A phone lights the row. */
+      on('highlight', [
+        web([
+          rule({
+            backgroundColor: hookOf('menu', 'item-hover-background-color', token('color-hover')),
+            blockSize: measured('indicator-block-size', 0),
+            borderRadius: own.menuItemRadius(token('radii-none')),
+            display: 'block',
+            inlineSize: measured('indicator-inline-size', 0),
+            insetBlockStart: 0,
+            insetInlineStart: 0,
+            opacity: 0,
+            pointerEvents: 'none',
+            position: 'absolute',
+            transition: ['opacity', token('duration-fast'), token('easing-standard')],
+            translate: [measured('indicator-x', '0px'), measured('indicator-y', '0px')],
+            zIndex: token('layer-beneath'),
+          }),
+          rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+          rule(
+            { part: { 'data-gliding': true } },
+            {
+              transition: list(
+                ['translate', token('duration-normal'), token('easing-emphasized')],
+                ['inline-size', token('duration-normal'), token('easing-emphasized')],
+                ['block-size', token('duration-normal'), token('easing-emphasized')],
+                ['background-color', token('duration-normal'), token('easing-standard')],
+                ['opacity', token('duration-fast'), token('easing-standard')],
+              ),
+            },
+          ),
+          /* On a destructive row, that row's wash, 12% of the danger hue. */
+          rule(
+            { part: { 'data-tone': 'danger' } },
+            {
+              backgroundColor: hookOf(
+                'menu',
+                'item-hover-background-color',
+                mix(token('color-danger'), 12, 'transparent'),
+              ),
+            },
+          ),
+          rule({ forcedColors: true }, { display: 'none' }),
+        ]),
+      ]),
+      /* Each row's own wash goes while the highlight draws it. A flyout's rows
+         take it back, since they inherit this through their parent. */
+      on({ part: 'host', selector: ':host(:state(gliding)) ::slotted(*)' }, [
+        web([
+          rule({ own: { menuItemGlide: 'transparent' } }),
+          rule({ forcedColors: true }, { own: { menuItemGlide: 'initial' } }),
+        ]),
       ]),
       /* What a collection says in place of rows, quiet and centered. */
       on(

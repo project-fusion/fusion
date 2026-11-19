@@ -60,6 +60,7 @@ export default headless('video-playlist-menu', {
         'back-mark': true,
         empty: true,
         header: true,
+        highlight: true,
         live: true,
         loading: true,
         'search-field': true,

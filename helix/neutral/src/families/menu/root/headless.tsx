@@ -56,9 +56,10 @@ import { bind, derive } from '../../../tree.js'
  *
  * **The web's**: `submenus="flyout"`, a panel beside its row, which a phone
  * drills into in place; the filter, `for`, and `targets`; a context menu
- * placed at the pointer; and the rows a mouse resting on them focuses. A
- * phone has one panel at a time, no pointer to rest, and no document to
- * find an element in by its id.
+ * placed at the pointer; the rows a mouse resting on them focuses; and the
+ * highlight that glides from row to row as focus moves, `gliding` while it
+ * is on one. A phone has one panel at a time, no pointer to rest, and no
+ * document to find an element in by its id, and lights the row it presses.
  *
  * **Held to `helix-menu`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest
@@ -124,6 +125,7 @@ export default headless('menu', {
     'drilled',
     'entering',
     'exiting',
+    'gliding',
     'mark',
     'open',
     'placedBottom',
@@ -189,6 +191,14 @@ export default headless('menu', {
         restoreFocus="held"
         role="menu"
       >
+        {/* The web's wash on the row with focus, which glides from row to row.
+            Hidden until a stylesheet shows it. */}
+        <View
+          ariaHidden
+          hidden
+          part="highlight"
+          platform="web"
+        />
         {state.drilled && (
           <View part="header">
             <Pressable

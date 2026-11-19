@@ -58,8 +58,6 @@ export default styles(
       itemPadding: token('space-sm'),
       radius: token('radii-sm'),
       shadow: token('shadow-floating'),
-      swipeX: 0,
-      swipeY: 0,
       timerSize: token('space-2xs'),
       toneColor: own.toastSeverity(token('color-foreground-muted')),
     }),
@@ -107,6 +105,15 @@ export default styles(
           /* The region's width, which already keeps the inset off both edges. */
           maxInlineSize: '100%',
         }),
+        /* **A released message goes back on the spring**, over at most the
+           slow step, and leaves at the speed it was let go. The message reads
+           these from its script, and a page setting either wins over this. */
+        web([
+          rule({
+            '--toast-release-duration': token('duration-slow'),
+            '--toast-release-easing': token('easing-spring'),
+          }),
+        ]),
         /* It makes room as it arrives, by an animation: no first-frame transition. */
         web([
           rule(
@@ -177,6 +184,9 @@ export default styles(
               translate: 'none',
             },
           ),
+          /* Swiped away, it leaves along the swipe alone, so it does not also
+             drop toward its edge as it fades. */
+          rule({ closed: true, dragging: true }, { translate: 'none' }),
         ]),
       ]),
       /* Hidden and still laid out while it leaves. A waiting message takes no box. */
@@ -208,21 +218,13 @@ export default styles(
           position: 'relative',
           overflow: 'hidden',
         }),
-        /* The page's own panning stays on, here and on each part inside, and
-           the swipe takes the rest. */
-        web([rule({ touchAction: 'pan-y' })]),
         /* A phone lays the mark and the words in a line, and the actions on
            a line of their own under the words, as the web's two columns do. */
         native([rule({ flexWrap: 'wrap' })]),
-        /* Under the finger while a swipe moves it, and back to rest as it lets go. */
-        rule(
-          { part: { 'data-swiping': true } },
-          {
-            transition: 'none',
-            translate: [hook.swipeX, hook.swipeY],
-            web: { userSelect: 'none' },
-          },
-        ),
+        /* **Under the finger from the first move until the release lands**,
+           with no transition on the item: the script moves it with
+           `translate` and glides it on its release. A phone moves it itself. */
+        web([rule({ dragging: true }, { transition: 'none', userSelect: 'none' })]),
         /* It arrives from the edge the stack stands along. */
         rule(
           { reducedMotion: false },
@@ -268,7 +270,7 @@ export default styles(
           gridArea: '1 / 1',
           marginInlineEnd: token('space-sm'),
         }),
-        web([rule({ marginBlockStart: fn('round', markDrop, '1px'), touchAction: 'pan-y' })]),
+        web([rule({ marginBlockStart: fn('round', markDrop, '1px') })]),
         native([rule({ marginBlockStart: markDrop })]),
       ]),
       on('icon-mark', [rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
@@ -285,12 +287,31 @@ export default styles(
         /* Never quite nothing wide, so the actions' whole line never fits
            beside it, and they wrap under it with no mark before it too. */
         native([rule({ flex: '1 1 0', minInlineSize: 1 })]),
-        web([rule({ touchAction: 'pan-y' })]),
       ]),
-      /* A block holding the words lays them out as the region does, and keeps the swipe. */
-      on({ part: 'content', inner: '> slot' }, [
-        web([rule({ display: 'block', touchAction: 'pan-y' })]),
-      ]),
+      /* A block holding the words lays them out as the region does. Words
+         slotted bare take their touch behavior from the box they are laid
+         out in, and a slot draws none. */
+      on({ part: 'content', inner: '> slot' }, [web([rule({ display: 'block' })])]),
+      /* **The page keeps the pan across the swipe, on the regions inside as
+         well.** `DRAGS_RULE` in core sets it on the item, which is a scroll
+         container and stops it reaching through, so each region inside, and
+         the words' slot, says it again for the axis the item is marked with. */
+      on(
+        {
+          part: 'item',
+          selector:
+            '[part="item"][data-drags="x"] > *, [part="item"][data-drags="x"] [part="content"] > slot',
+        },
+        [web([rule({ touchAction: 'pan-y' })])],
+      ),
+      on(
+        {
+          part: 'item',
+          selector:
+            '[part="item"][data-drags="y"] > *, [part="item"][data-drags="y"] [part="content"] > slot',
+        },
+        [web([rule({ touchAction: 'pan-x' })])],
+      ),
       /* A title in a heavier weight, and a line of detail quieter under it. */
       on({ region: 'heading', slotted: '*' }, [
         rule({ display: 'block', fontWeight: hook.headingWeight }),
@@ -311,7 +332,6 @@ export default styles(
             { paddingInlineStart: sum(token('size-icon'), token('space-sm')) },
           ),
         ]),
-        web([rule({ touchAction: 'pan-y' })]),
       ]),
       on({ region: 'actions', slotted: '*' }, [rule({ marginBlockStart: token('space-xs') })]),
       /* An outlined button takes an edge that reads on the toast. */
@@ -346,7 +366,6 @@ export default styles(
         web([
           rule({
             insetBlockStart: sum(padding, fn('round', closeDrop, '1px')),
-            touchAction: 'pan-y',
           }),
         ]),
         native([rule({ insetBlockStart: sum(padding, closeDrop) })]),
@@ -380,7 +399,6 @@ export default styles(
           position: 'absolute',
           transformOrigin: '0 50%',
         }),
-        web([rule({ touchAction: 'pan-y' })]),
         rule({ dir: 'rtl' }, { transformOrigin: '100% 50%' }),
         /* Under reduced motion as well: the bar is the one place that says how long is left. */
         rule({ reducedMotion: true }, { animation: drain }),

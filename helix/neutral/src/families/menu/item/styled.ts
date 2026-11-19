@@ -51,6 +51,7 @@ export default styles(
     own: {
       menuBleed: null,
       menuFrom: null,
+      menuItemGlide: null,
       menuItemInk: null,
       menuItemPress: null,
       menuItemRadius: null,
@@ -65,7 +66,9 @@ export default styles(
     const fast = token('duration-fast')
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const column = sum(token('size-icon'), token('space-xs'))
-    const lit = hook.itemHoverBackgroundColor
+    /* **The menu's highlight draws the wash while it glides**, and says so
+       through `--_menu-item-glide`, which takes each row's own away. */
+    const lit = own.menuItemGlide(hook.itemHoverBackgroundColor)
     const mark = {
       blockSize: token('size-icon'),
       gridColumn: 4,
@@ -263,6 +266,12 @@ export default styles(
           rule({ submenuStarted: true }, { '--menu-item-start': column }),
           rule({ submenuMarked: true }, { '--menu-item-end': column }),
         ]),
+      ]),
+      /* **A flyout's rows light themselves.** They inherit the menu's word
+         that its highlight draws the wash, and the highlight is on the
+         panel, which they are not on. */
+      on({ part: 'surface', selector: '[part="surface"] ::slotted(*)' }, [
+        web([rule({ own: { menuItemGlide: 'initial' } })]),
       ]),
       /* The flyout, the menu's own surface beside the row. */
       on('surface', [

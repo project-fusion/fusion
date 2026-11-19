@@ -33,7 +33,9 @@ export default headless('toolbar', {
     stopAtEnds: false,
   },
   events: {},
-  states: ['horizontal', 'nested', 'settled', 'vertical'],
+  /* `focus-gliding` while the web's focus ring is on a control, so it draws
+     the ring in place of each control's own. */
+  states: ['focusGliding', 'horizontal', 'nested', 'settled', 'vertical'],
   toolbar: { orientation: 'orientation', stopAtEnds: 'stopAtEnds' },
   render: ({ props }) => (
     <View
@@ -43,6 +45,15 @@ export default headless('toolbar', {
       role="toolbar"
     >
       <Slot />
+      {/* The web's focus ring, which travels from control to control as the
+          arrow keys move focus along the row. Hidden until a stylesheet shows
+          it. A phone draws each control's own ring. */}
+      <View
+        ariaHidden
+        hidden
+        part="focus"
+        platform="web"
+      />
     </View>
   ),
 })

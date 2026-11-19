@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTabs } from '@fusion.dev/helix-headless/tabs'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as focusRingStyles } from '../../shared/focus-ring/focus-ring.css.js'
 import { styles } from './tabs-root.generated.css.js'
 
 /**
@@ -70,7 +71,7 @@ import { styles } from './tabs-root.generated.css.js'
  */
 @customElement('helix-tabs')
 export class HelixTabs extends HelixHeadlessTabs {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [focusRingStyles, styles]
 
   /**
    * When the close mark of each `dismissible` tab shows.

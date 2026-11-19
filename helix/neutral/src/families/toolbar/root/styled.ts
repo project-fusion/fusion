@@ -98,6 +98,8 @@ export default styles(
         /* Wraps where it runs out of room, so a row of controls cannot widen the
            page. Measured October 31, 2026: seven controls took a 390 page to 644. */
         flexWrap: 'wrap',
+        /* The box the web's focus ring travels in is placed against. */
+        position: web('relative'),
         gap: hook.gap,
         /* A control wider than the toolbar cuts its label, so the row stays inside it. */
         flex: '1 1 auto',

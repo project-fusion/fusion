@@ -93,6 +93,10 @@ export default styles(
             maxInlineSize: '100%',
             paddingBlock: 0,
             position: 'relative',
+            /* **The content and the placeholder share one grid cell** on the
+               web, so the host is as tall as what shows, and the content keeps
+               its own height. */
+            web: { alignItems: 'start', display: 'grid', gridTemplateAreas: '"stack"' },
           },
         ),
         /* Content that is a block fills its line, and the skeleton with it. */
@@ -165,7 +169,7 @@ export default styles(
           }),
         ]),
         rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
-        rule({ loading: false, wrapping: true }, { display: 'none' }),
+        native([rule({ loading: false, wrapping: true }, { display: 'none' })]),
       ]),
       /* The sweep, on a layer of its own so it is moved and not drawn again,
        and an element rather than `::after`, so a page reaches it as
@@ -216,14 +220,18 @@ export default styles(
         rule({ shape: 'circle' }, { borderRadius: token('radii-full') }),
         /* The shape lies over the content's box. */
         rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
-        /* Once `loading` goes, the shape goes. */
-        rule({ loading: false, wrapping: true }, { display: 'none' }),
+        /* Once `loading` goes, the shape goes on a phone. The web's element
+           hides the placeholder that holds it, and crossfades the two. */
+        native([rule({ loading: false, wrapping: true }, { display: 'none' })]),
       ]),
       keyframes('helix-skeleton-pulse', { '50%': { opacity: 0.4 } }),
       /* Written out: the vocabulary names no `:empty`. */
       on({ part: 'host', selector: ':host(:not(:defined):not(:empty))' }, [
         web([
           rule({
+            alignItems: 'start',
+            display: 'grid',
+            gridTemplateAreas: '"stack"',
             blockSize: 'auto',
             inlineSize: 'fit-content',
             maxInlineSize: '100%',
@@ -232,13 +240,52 @@ export default styles(
         ]),
       ]),
       on('content', [
-        rule({ wrapping: true }, { display: 'block' }),
+        rule({ wrapping: true }, { display: 'block', web: { gridArea: 'stack' } }),
+        /* Hidden while a placeholder the page drew stands in for it. A `display`
+           above outranks the browser's own rule for `hidden`. */
+        web([rule({ part: { hidden: true }, wrapping: true }, { display: 'none' })]),
         native([rule({ loading: true, wrapping: true }, { visibility: 'hidden' })]),
       ]),
       /* Written out: the vocabulary names no `:empty`. */
       on({ part: 'content', selector: ':host(:not(:defined):not(:empty)) [part="content"]' }, [
-        web([rule({ display: 'block' })]),
+        web([rule({ display: 'block', gridArea: 'stack' })]),
       ]),
+      /* **The box around the shape**: none of its own on a placeholder alone,
+         and around content, the content's grid cell, which the shape
+         stretches over. The web's element hides it once the content has
+         loaded. A phone lays it over the content's box. */
+      on('placeholder', [
+        web([
+          rule({ display: 'contents' }),
+          rule(
+            { wrapping: true },
+            { alignSelf: 'stretch', display: 'block', gridArea: 'stack', position: 'relative' },
+          ),
+          rule({ part: { hidden: true } }, { display: 'none' }),
+          rule({ part: { hidden: true }, wrapping: true }, { display: 'none' }),
+        ]),
+        native([
+          rule({ blockSize: '100%', inlineSize: '100%' }),
+          rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
+        ]),
+      ]),
+      /* Written out: the vocabulary names no `:empty`. */
+      on(
+        {
+          part: 'placeholder',
+          selector: ':host(:not(:defined):not(:empty)) [part="placeholder"]',
+        },
+        [
+          web([
+            rule({
+              alignSelf: 'stretch',
+              display: 'block',
+              gridArea: 'stack',
+              position: 'relative',
+            }),
+          ]),
+        ],
+      ),
       /* Written out: the vocabulary names no `:empty`. */
       on({ part: 'skeleton', selector: ':host(:not(:defined):not(:empty)) [part="skeleton"]' }, [
         web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
@@ -247,19 +294,12 @@ export default styles(
       on({ part: 'lines', selector: ':host(:not(:defined):not(:empty)) [part="lines"]' }, [
         web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
       ]),
-      /* Written out: the vocabulary names no `:empty`. */
+      /* Written out: the vocabulary names no `:empty`. A served page carries
+         no `hidden` until the element upgrades, so `loading` decides there. */
       on(
         {
-          part: 'skeleton',
-          selector: ':host(:not(:defined):not(:empty):not([loading])) [part="skeleton"]',
-        },
-        [web([rule({ display: 'none' })])],
-      ),
-      /* Written out: the vocabulary names no `:empty`. */
-      on(
-        {
-          part: 'lines',
-          selector: ':host(:not(:defined):not(:empty):not([loading])) [part="lines"]',
+          part: 'placeholder',
+          selector: ':host(:not(:defined):not(:empty):not([loading])) [part="placeholder"]',
         },
         [web([rule({ display: 'none' })])],
       ),
@@ -275,6 +315,41 @@ export default styles(
           selector: ':host([loading]:not(:defined):not(:empty)) [part="content"]',
         },
         [web([rule({ visibility: 'hidden' })])],
+      ),
+      /* **Turning `loading` off crossfades the placeholder into the content in
+         one place**, and turning it on crossfades back, while the box's height
+         moves from one to the other, so nothing below it jumps. The script
+         reads the timing, sets `revealing` for the move, and runs the fades
+         and the height together. The side leaving keeps showing over the box
+         out of the flow, so the side arriving sets the height. The box clips
+         at its foot while it moves, so a shadow or a focus ring still shows
+         at its sides and its top. */
+      on('host', [
+        web([
+          rule({
+            '--skeleton-reveal-duration': token('duration-slow'),
+            '--skeleton-reveal-easing': token('easing-standard'),
+          }),
+          rule({ revealing: true }, { clipPath: 'inset(-100vmax -100vmax 0 -100vmax)' }),
+        ]),
+      ]),
+      on(
+        ['content', 'placeholder'],
+        [
+          web([
+            rule(
+              { part: { hidden: true }, revealing: true },
+              { display: 'block', inset: 0, position: 'absolute' },
+            ),
+          ]),
+        ],
+      ),
+      on(
+        {
+          part: 'content',
+          selector: ':host([loading]:state(wrapping):state(revealing)) [part="content"]',
+        },
+        [web([rule({ visibility: 'visible' })])],
       ),
       keyframes('helix-skeleton-sweep', {
         from: { translate: '-50% 0' },
