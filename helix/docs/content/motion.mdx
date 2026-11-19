@@ -208,6 +208,20 @@ its offset, and it shows at full strength in the frame focus arrives. It
 follows only focus that shows, so a click draws none. Under reduced motion it
 moves at once, and under forced colors each control draws its own system ring.
 
+## Loading that ends in place
+
+A `Skeleton` around content crossfades to it when you take `loading` off. The
+placeholder fades out as the content fades in, in the same place, and the
+box's height moves from the placeholder's to the content's over the same beat,
+so nothing below it jumps. Setting `loading` again crossfades back. Where the
+content is not on the page until it loads, draw the placeholder yourself in
+the skeleton's `placeholder` slot, laid out as the content will be, and put the
+skeleton inside the card that holds it so the card's edge moves with the box.
+The move takes `--skeleton-reveal-duration`, `--helix-duration-slow` by
+default, along `--skeleton-reveal-easing`, `--helix-easing-standard` by
+default, and `0ms` turns it off. Under reduced motion the height changes at
+once and the two sides crossfade over `--helix-duration-fade`.
+
 ## Figures that count
 
 A new `value` on a `Stat` or a `Trend` counts to the new number from the one
@@ -382,7 +396,7 @@ Backgrounds and the page:
 
 ## Motion on your own elements
 
-Six functions in `@fusion.dev/helix-core` give elements you write yourself
+Seven functions in `@fusion.dev/helix-core` give elements you write yourself
 the motion Helix's own families have, with no component around them:
 
 - `moveItems` slides the items of a list to their new places.
@@ -391,6 +405,8 @@ the motion Helix's own families have, with no component around them:
 - `followPointer` writes where a mouse or pen is over an element.
 - `burstConfetti` bursts confetti out of an element once an action is done.
 - `flashChange` lights up an element that changed, and fades.
+- `resizeFrom` moves an element's height from where it was to where it lays
+  out next.
 
 Each one works on any element, in any framework, and needs no Helix
 stylesheet. Times and curves default to the tokens above, and to the values
