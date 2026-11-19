@@ -13,58 +13,82 @@
       <tr>
         <th scope="col">Shopper</th>
         <th scope="col">Age</th>
-        <th scope="col">Visits a month</th>
         <th scope="col">Yearly spend</th>
+        <th scope="col">Visits a month</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <th scope="row">Ada</th>
         <td data-value="24">24</td>
-        <td data-value="3">3</td>
         <td data-value="420">420</td>
+        <td data-value="3">3</td>
       </tr>
       <tr>
         <th scope="row">Grace</th>
         <td data-value="31">31</td>
-        <td data-value="6">6</td>
         <td data-value="980">980</td>
+        <td data-value="6">6</td>
       </tr>
       <tr>
         <th scope="row">Lin</th>
         <td data-value="38">38</td>
-        <td data-value="8">8</td>
         <td data-value="1450">1450</td>
+        <td data-value="8">8</td>
       </tr>
       <tr>
         <th scope="row">Mae</th>
         <td data-value="45">45</td>
-        <td data-value="5">5</td>
         <td data-value="1120">1120</td>
+        <td data-value="5">5</td>
       </tr>
       <tr>
         <th scope="row">Noor</th>
         <td data-value="52">52</td>
-        <td data-value="9">9</td>
         <td data-value="2100">2100</td>
+        <td data-value="9">9</td>
       </tr>
       <tr>
         <th scope="row">Omar</th>
         <td data-value="29">29</td>
-        <td data-value="2">2</td>
         <td data-value="360">360</td>
+        <td data-value="2">2</td>
       </tr>
       <tr>
         <th scope="row">Rui</th>
         <td data-value="61">61</td>
-        <td data-value="7">7</td>
         <td data-value="1680">1680</td>
+        <td data-value="7">7</td>
       </tr>
       <tr>
         <th scope="row">Sven</th>
         <td data-value="35">35</td>
-        <td data-value="4">4</td>
         <td data-value="760">760</td>
+        <td data-value="4">4</td>
+      </tr>
+      <tr>
+        <th scope="row">Tess</th>
+        <td data-value="42">42</td>
+        <td data-value="1300">1300</td>
+        <td data-value="6">6</td>
+      </tr>
+      <tr>
+        <th scope="row">Uma</th>
+        <td data-value="27">27</td>
+        <td data-value="540">540</td>
+        <td data-value="3">3</td>
+      </tr>
+      <tr>
+        <th scope="row">Vic</th>
+        <td data-value="56">56</td>
+        <td data-value="1900">1900</td>
+        <td data-value="8">8</td>
+      </tr>
+      <tr>
+        <th scope="row">Wen</th>
+        <td data-value="48">48</td>
+        <td data-value="1250">1250</td>
+        <td data-value="5">5</td>
       </tr>
     </tbody>
   </table>
@@ -82,7 +106,7 @@
      and moves to the new numbers. -->
 <script type="module">
   document.getElementById('refresh').addEventListener('click', () => {
-    const ranges = [[20, 70], [1, 12], [200, 2800]]
+    const ranges = [[20, 70], [200, 2800], [1, 12]]
     for (const row of document.querySelectorAll('#shoppers tbody tr')) {
       const cells = [...row.querySelectorAll('td')].slice(0)
       cells.forEach((cell, index) => {
