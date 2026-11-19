@@ -3,6 +3,7 @@ import { HelixHeadlessLineChart } from '@fusion.dev/helix-headless/line-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as motionStyles } from '../../shared/chart/motion.css.js'
+import { styles as rescaleStyles } from '../../shared/chart/rescale.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
@@ -39,7 +40,8 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
  *
- * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. The line drawing on and the wash fading in as the chart arrives take 1.6 times as long. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-glide-duration - How long the guide, the band, and the tooltip take to glide from one reading to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places them at once, and under reduced motion they move at once, whatever it says. They are placed where their reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. The line drawing on and the wash fading in as the chart arrives take 1.6 times as long. A series a legend hides fades out over the same time, and the value axis and its rules move to the new scale with the marks. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`, and to `--helix-easing-standard` for a window of readings sliding along. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-stroke - Thickness of a series drawn as a line. Line Chart, Area Chart's top edge, and Bar Chart's `lines` all read this one property. Each family's own width property overrides it.
  *   family, Area Chart's top edge and Bar Chart's `lines`, since the three read one shared
@@ -128,6 +130,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
 
   static override styles: CSSResultGroup = [
     motionStyles,
+    rescaleStyles,
     seriesStyles,
     statusStyles,
     tooltipStyles,

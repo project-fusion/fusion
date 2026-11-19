@@ -40,6 +40,7 @@ import { styles } from './tooltip-root.css.js'
  * @cssproperty --tooltip-font-size - The size of the bubble's words.
  * @cssproperty --tooltip-gap - The space between two things slotted into the bubble, such as a glyph and its words.
  * @cssproperty --tooltip-max-inline-size - The widest the bubble grows before its text wraps.
+ * @cssproperty --tooltip-move-duration - How long an open bubble takes to follow its anchor to a new place, along `--helix-easing-decelerate`. Defaults to `0s`, which moves it at once. A chart's reading bubble sets it while it glides from reading to reading. Under reduced motion the bubble moves at once.
  * @cssproperty --tooltip-padding - The space between the bubble's edge and its words.
  * @cssproperty --tooltip-radius - The bubble's corner radius.
  */

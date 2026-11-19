@@ -52,7 +52,7 @@
  * series and the fade reads as depth under it; a line chart may hold several,
  * and gradients stacked over one another read as a third color wherever they
  * cross rather than as two series that overlap. */
-[part="area"] {
+[part~="area"] {
   /* The wash follows the theme's material policy rather than holding its own
      number. 0.16 is the strength this chart was drawn at and the multiplier is
      the language it is drawn in, so a glass theme thickens every wash on the
@@ -106,7 +106,7 @@
 
 /* Centered on the level it names, for the reason `BarChart` gives: a number
    whose top edge is on the line reads as belonging to the band under it. */
-[part="tick"] {
+[part~="tick"] {
   inset-inline-end: 0;
   /* One line of its own height, so half of it is the room over the plot. */
   line-height: 1;
@@ -167,7 +167,7 @@
 /* The mark takes its series' color the same way the line does. `color` rather
    than `background-color`, because `chart/terminus.css` paints every shape from
    `currentColor` and a ring needs its border to match its fill. */
-[part="terminus"] {
+[part~="terminus"] {
   color: var(--chart-series);
 }
 
@@ -177,7 +177,7 @@
    and `vector-effect` keeps it round in the stretched drawing, for the reason
    the line gives. */
 [part~="marker"],
-[part="marker-ring"] {
+[part~="marker-ring"] {
   fill: none;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -188,7 +188,7 @@
   stroke-width: var(--line-chart-marker-size, 6px);
 }
 
-[part="marker-ring"] {
+[part~="marker-ring"] {
   stroke: var(--line-chart-marker-ring-color, var(--helix-color-background));
   stroke-width: calc(var(--line-chart-marker-size, 6px) + 2 * var(--helix-border-thin));
 }
@@ -207,7 +207,7 @@
   mask-image: var(--_line-chart-holes);
 }
 
-[part="area"] {
+[part~="area"] {
   fill: var(--chart-series);
 }
 
@@ -221,6 +221,16 @@
   stroke-dasharray: 3 3;
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
+}
+
+/* **The guide and the band glide from reading to reading** as the pointer or
+   the keys move, over `--chart-glide-duration` along a curve that slows as it
+   arrives and never passes the reading. Each is drawn new where its reading
+   is when a reading is shown from none, so neither slides in. */
+[part="guide"],
+[part="band"] {
+  transition: translate var(--_chart-glide-duration, var(--helix-duration-fast))
+    var(--helix-easing-decelerate);
 }
 
 /*
@@ -264,7 +274,38 @@
     stroke-dasharray var(--_chart-arrive-duration, var(--helix-duration-slow)) step-end
     allow-discrete,
     stroke-dashoffset var(--_chart-arrive-duration, var(--helix-duration-slow))
-    var(--helix-easing-decelerate);
+    var(--helix-easing-decelerate),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
+}
+
+/*
+ *  A series a legend hid fades out where it stood, while the others and the
+ *  scale move to fit what is left.
+ *
+ * The tier below keeps its line, wash, marks, and terminus where they were
+ * last drawn, with `visibility="hidden"` or `hidden`, which the transitions
+ * here hold off until the fade has run. Shown again, the series fades in and
+ * moves from there to its place on the scale of the moment. Safari moves no
+ * path's shape, so there it fades in at its new place.
+ */
+[part~="line-hidden"],
+[part~="area-hidden"],
+[part~="marker-hidden"],
+[part~="marker-ring-hidden"] {
+  opacity: 0;
+}
+
+/* The marks ride their line to its new shape, at its pace, and fade with it. */
+[part~="marker"],
+[part~="marker-ring"] {
+  transition:
+    d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
 }
 
 @starting-style {
@@ -287,15 +328,27 @@
   }
 }
 
-[part="area"] {
+[part~="area"] {
   transition:
     d var(--_chart-move-duration, var(--helix-duration-normal))
     var(--_chart-move-easing, var(--helix-easing-decelerate)),
-    opacity var(--_chart-arrive-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate);
+    opacity var(--_chart-arrive-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate),
+    visibility var(--_chart-arrive-duration, var(--helix-duration-slow));
+}
+
+/* Faded out over the move, where its arrival fades it in over the slower
+   arrival beat. */
+[part~="area-hidden"] {
+  transition:
+    d var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    opacity var(--_chart-move-duration, var(--helix-duration-normal))
+    var(--_chart-move-easing, var(--helix-easing-decelerate)),
+    visibility var(--_chart-move-duration, var(--helix-duration-normal));
 }
 
 @starting-style {
-  [part="area"] {
+  [part~="area"] {
     opacity: 0;
   }
 }
@@ -310,7 +363,7 @@
 /*
  *  The grid, unless `gridlines` is `none`, and the slot the pointer is in.
  */
-[part="gridline"] {
+[part~="gridline"] {
   stroke: var(--line-chart-gridline-color, var(--helix-color-border));
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
@@ -338,7 +391,7 @@
     forced-color-adjust: none;
   }
 
-  [part="marker-ring"] {
+  [part~="marker-ring"] {
     stroke: Canvas;
   }
 }
@@ -365,7 +418,7 @@
   );
 }
 
-:host([emphasis="subtle"]) [part="area"] {
+:host([emphasis="subtle"]) [part~="area"] {
   fill: light-dark(
     color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background)),
     color-mix(in oklab, var(--chart-series) 70%, var(--helix-color-background))
@@ -410,4 +463,14 @@
   overflow: hidden;
   position: absolute;
   white-space: nowrap;
+}
+
+/* **Where the browser moves no path's shape, as in Safari, the scale takes
+   its new levels at once**, with the lines it measures, as the terminus does.
+   The levels a new scale adds or drops still fade. */
+@supports not (d: path("M0 0")) {
+  [part~="tick"],
+  [part~="gridline"] {
+    transition-property: opacity, visibility;
+  }
 }

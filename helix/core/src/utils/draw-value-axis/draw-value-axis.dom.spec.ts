@@ -32,4 +32,34 @@ describe('a value axis', () => {
     expect(axis.getAttribute('aria-hidden')).toBe('true')
     expect(axis.getAttribute('style')).toBe('--x-axis: 4ch')
   })
+
+  test('keeps a number both scales have as the same element, and the dropped ones hidden', () => {
+    const box = document.createElement('div')
+    const draw = (domain: [number, number], before?: [number, number]) =>
+      render(
+        drawValueAxis(
+          domain,
+          (value) => 100 - (value / domain[1]) * 100,
+          (value) => `${value}`,
+          () => '',
+          before,
+        ),
+        box,
+      )
+    draw([0, 1000])
+    const kept = [...box.querySelectorAll('[part="tick"]')].find((one) => one.textContent === '0')
+    draw([0, 400], [0, 1000])
+    expect([...box.querySelectorAll('[part="tick"]')].find((one) => one.textContent === '0')).toBe(
+      kept as Element,
+    )
+    const leaving = [...box.querySelectorAll('[part~="tick-leaving"]')] as HTMLElement[]
+    expect(leaving.map((one) => one.textContent)).toEqual(['600', '800', '1000'])
+    expect(leaving.every((one) => one.hidden)).toBe(true)
+    /* At their place on the new scale, held inside the plot. */
+    expect(leaving.map((one) => one.getAttribute('style'))).toEqual([
+      'inset-block-start: 0%',
+      'inset-block-start: 0%',
+      'inset-block-start: 0%',
+    ])
+  })
 })

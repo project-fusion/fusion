@@ -742,3 +742,45 @@ describe('a chart that hears its readings', () => {
     expect(one.heard).toEqual([])
   })
 })
+
+/** The next frame, after every frame callback asked for before it. */
+const frame = (): Promise<void> =>
+  new Promise((resolve) => {
+    requestAnimationFrame(() => resolve())
+  })
+
+/* The bubble is placed a microtask after it opens, having been measured
+   first, so it glides only once a frame has been drawn with it in place:
+   marked sooner, it would slide in from the corner of the window. */
+describe('the reading bubble', () => {
+  test('glides from the second frame after it arrives, and not before', async () => {
+    const one = scene(4)
+    const bubble = one.host.shadowRoot?.querySelector('[part="tooltip-anchor"]') as HTMLElement
+    move(one, 71, 100)
+    one.point.hostUpdated()
+    expect(bubble.hasAttribute('data-gliding')).toBe(false)
+    await frame()
+    expect(bubble.hasAttribute('data-gliding')).toBe(false)
+    await frame()
+    expect(bubble.hasAttribute('data-gliding')).toBe(true)
+  })
+
+  test('drawn new, as a reading is shown from none, arrives again', async () => {
+    const one = scene(4)
+    const root = one.host.shadowRoot as ShadowRoot
+    move(one, 71, 100)
+    one.point.hostUpdated()
+    await frame()
+    await frame()
+    root.querySelector('[part="tooltip-anchor"]')?.remove()
+    const fresh = document.createElement('span')
+    fresh.setAttribute('part', 'tooltip-anchor')
+    root.append(fresh)
+    move(one, 171, 100)
+    one.point.hostUpdated()
+    expect(fresh.hasAttribute('data-gliding')).toBe(false)
+    await frame()
+    await frame()
+    expect(fresh.hasAttribute('data-gliding')).toBe(true)
+  })
+})

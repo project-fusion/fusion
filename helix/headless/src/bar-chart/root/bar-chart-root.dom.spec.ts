@@ -360,6 +360,40 @@ describe('a series a legend hid', () => {
     /* One series is left, so the down arrow walks the readings, as it does on
        a chart of one series, and never rests on the hidden one. */
     expect(part(host, 'live')?.textContent).toBe('Mar: Referral 9 (2 of 2)')
+    /* Its columns stay, of no length on the baseline and hidden, so a
+       stylesheet can shrink and fade them, and the one left takes the room. */
+    const hidden = [...(host.shadowRoot?.querySelectorAll('[part~="bar-hidden"]') ?? [])]
+    expect(hidden.map((one) => one.getAttribute('data-series'))).toEqual(['1', '1'])
+    expect(hidden.every((one) => one.getAttribute('height') === '0')).toBe(true)
+    expect(hidden.every((one) => one.getAttribute('width') === '0')).toBe(true)
+    expect(hidden.every((one) => one.getAttribute('visibility') === 'hidden')).toBe(true)
+  })
+
+  test('stacked, is a segment of no length where it stood', async () => {
+    await import('../../legend/index.js')
+    const mix = `<table id="mix">
+      <thead><tr><th>Quarter</th><th>New</th><th>Renewed</th><th>Lost</th></tr></thead>
+      <tbody><tr><th>Q1</th><td>10</td><td>20</td><td>5</td></tr></tbody>
+    </table>`
+    const host = await chart(
+      `${mix}<helix-headless-legend for="mix" hidden-series="Renewed"></helix-headless-legend>`,
+      'for="mix" stacked',
+    )
+    const legend = document.querySelector('helix-headless-legend') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await legend.updateComplete
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const bars = [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])]
+    const [fresh, renewed, lost] = bars
+    expect(renewed?.getAttribute('part')).toContain('bar-hidden')
+    expect(renewed?.getAttribute('height')).toBe('0')
+    /* At the top of the segment below it, where the one above now starts. */
+    const top = (one: Element | undefined): number => Number(one?.getAttribute('y'))
+    const bottom = (one: Element | undefined): number =>
+      top(one) + Number(one?.getAttribute('height'))
+    expect(top(renewed)).toBeCloseTo(top(fresh))
+    expect(bottom(lost)).toBeCloseTo(top(fresh))
   })
 })
 

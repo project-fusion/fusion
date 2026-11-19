@@ -87,6 +87,36 @@ describe('the draw-in', () => {
   })
 })
 
+/* What follows the pointer glides on its own beat, and a hidden series fades
+   while the scale moves. Under reduced motion `motion.css` puts both beats
+   back on the tokens, which the base layer shortens to nothing. */
+describe('the moves a reader starts', () => {
+  test('glide the guide, the band, and the bubble over `--chart-glide-duration`', () => {
+    const text = sheet()
+    expect(text).toContain(
+      '--_chart-glide-duration: var(--chart-glide-duration, var(--helix-duration-fast))',
+    )
+    expect(text).toContain(
+      'transition: translate var(--_chart-glide-duration, var(--helix-duration-fast)) var(--helix-easing-decelerate)',
+    )
+    expect(resting('[part="tooltip-anchor"][data-gliding]').join('')).toContain(
+      '--tooltip-move-duration: var(--_chart-glide-duration, var(--helix-duration-fast))',
+    )
+  })
+
+  test('fade a hidden series out, and move the scale with the marks', () => {
+    expect(
+      resting(
+        '[part~="line-hidden"], [part~="area-hidden"], [part~="marker-hidden"], [part~="marker-ring-hidden"]',
+      ).join(''),
+    ).toContain('opacity: 0')
+    expect(resting('[part~="tick-leaving"]').join('')).toContain('opacity: 0')
+    expect(resting('[part~="gridline"]').join('')).toContain(
+      'translate var(--_chart-move-duration, var(--helix-duration-normal)) var(--_chart-move-easing, var(--helix-easing-decelerate))',
+    )
+  })
+})
+
 /** Where each drawn name's text lands across the page, from the text itself. */
 const names = (host: HTMLElement): Array<{ left: number; right: number; text: string }> =>
   [...(host.shadowRoot?.querySelectorAll('[part~="label"]') ?? [])].map((one) => {

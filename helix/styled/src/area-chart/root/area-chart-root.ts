@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAreaChart } from '@fusion.dev/helix-headless/area-chart'
 import type { CSSResultGroup } from 'lit'
 import { styles as motionStyles } from '../../shared/chart/motion.css.js'
+import { styles as rescaleStyles } from '../../shared/chart/rescale.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
@@ -47,7 +48,8 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot.
  * @cssproperty --area-chart-overlap-opacity - How much of each band shows under `overlap`, where the bands in front let the ones behind show through.
  * @cssproperty --area-chart-width - Thickness of a band's top edge. Overrides `--chart-stroke`.
- * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. The wash fading in as the chart arrives takes 1.6 times as long. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-glide-duration - How long the guide and the tooltip take to glide from one reading to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places them at once, and under reduced motion they move at once, whatever it says. They are placed where their reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. The wash fading in as the chart arrives takes 1.6 times as long. A series a legend hides fades out over the same time, and the value axis and its rules move to the new scale with the marks. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-stroke - Thickness of a band's top edge. Area Chart, Line Chart, and Bar Chart's `lines` all read this one property. `--area-chart-width` overrides it here.
  */
@@ -61,6 +63,7 @@ export class HelixAreaChart extends HelixHeadlessAreaChart {
 
   static override styles: CSSResultGroup = [
     motionStyles,
+    rescaleStyles,
     seriesStyles,
     statusStyles,
     tooltipStyles,

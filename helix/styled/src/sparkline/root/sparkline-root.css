@@ -244,6 +244,20 @@
   z-index: var(--helix-layer-raised);
 }
 
+/* **The dot and its words glide from reading to reading** as the pointer or
+   the keys move, over `--chart-glide-duration` along a curve that slows as
+   it arrives and never passes the reading. The words are the new reading's
+   from the first frame. Both are drawn new where the reading is when a
+   reading is shown from none, so neither slides in. */
+[part="cursor"],
+[part="readout"] {
+  transition:
+    inset-block-start var(--_chart-glide-duration, var(--helix-duration-fast))
+    var(--helix-easing-decelerate),
+    inset-inline-start var(--_chart-glide-duration, var(--helix-duration-fast))
+    var(--helix-easing-decelerate);
+}
+
 /* On a right-to-left page the inline start is the right, so a mark hangs left
    of its reading and is brought back the other way, as the terminus is. */
 :host(:dir(rtl)) [part="cursor"],

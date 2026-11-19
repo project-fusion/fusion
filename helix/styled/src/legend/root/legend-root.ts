@@ -22,6 +22,13 @@ import { styles } from './legend-root.css.js'
  * Under `toggles`, each name is a button. A hidden series' entry fades and
  * its swatch empties to an outline, so the color stays readable.
  *
+ * A chart reading the same table moves as a series is hidden or shown. The
+ * series fades out where it stood, a column shrinks to the baseline and a
+ * band closes, and the value axis and its rules move to fit the series left,
+ * over the chart's `--chart-move-duration`. Shown again, the series fades and
+ * grows back. The chart's summary and table say what is shown at once, and
+ * under reduced motion the chart takes its new state at once.
+ *
  * @since 0.1.0
  * @status stable
  * @category charts

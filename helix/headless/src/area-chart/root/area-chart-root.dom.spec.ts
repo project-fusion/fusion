@@ -137,7 +137,12 @@ describe('stacking', () => {
 
   test('rules the levels over the bands, leaving the floor to the baseline', async () => {
     const host = await chart(SOURCES, 'for="sources"')
-    const ys = all(host, 'gridline').map((line) => Number(line.getAttribute('y1')))
+    /* Each rule is moved to its level by `translate`, so a stylesheet can
+       move it to a new one. */
+    const ys = all(host, 'gridline').map((line) =>
+      Number(/translate: 0 ([\d.]+)px/.exec(line.getAttribute('style') ?? '')?.[1]),
+    )
+    expect(ys.every((y) => Number.isFinite(y))).toBe(true)
     expect(ys.length).toBeGreaterThan(0)
     expect(ys).not.toContain(100)
     expect(part(host, 'baseline')?.getAttribute('y1')).toBe('100')
@@ -254,6 +259,23 @@ describe('a band a legend hid', () => {
     }
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('Jan, Direct 6 (1 of 3)')
+  })
+
+  /* Its band closes where it stood and stays, hidden, so a stylesheet can
+     fade it as it closes. */
+  test('stays, closed and hidden, among the bands', async () => {
+    await import('../../legend/index.js')
+    const host = await chart(
+      `${SOURCES}<helix-headless-legend for="sources" hidden-series="Search"></helix-headless-legend>`,
+      'for="sources"',
+    )
+    const legend = document.querySelector('helix-headless-legend') as unknown as Chart
+    await legend.updateComplete
+    await host.updateComplete
+    const hidden = [...(host.shadowRoot?.querySelectorAll('[part~="area-hidden"]') ?? [])]
+    expect(hidden).toHaveLength(1)
+    expect(hidden[0]?.getAttribute('visibility')).toBe('hidden')
+    expect(host.shadowRoot?.querySelectorAll('[part~="line-hidden"]')).toHaveLength(1)
   })
 })
 

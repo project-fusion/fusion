@@ -228,6 +228,7 @@ export class ChartPointerController implements ReactiveController {
     this.series = -1
     this.keyed = false
     this.said = { at: -1, series: -1 }
+    this.glideFrom(null)
   }
 
   /**
@@ -331,9 +332,50 @@ export class ChartPointerController implements ReactiveController {
       return
     }
     this.moved = false
-    this.host.renderRoot
-      .querySelector<HTMLElement & { reposition?: () => void }>('[part="tooltip-anchor"]')
-      ?.reposition?.()
+    const bubble = this.host.renderRoot.querySelector<HTMLElement & { reposition?: () => void }>(
+      '[part="tooltip-anchor"]',
+    )
+    bubble?.reposition?.()
+    this.glideFrom(bubble)
+  }
+
+  /** The bubble last drawn, which glides between readings once it has arrived. */
+  private bubble: Element | null = null
+
+  /** The frames that let a new bubble glide. */
+  private glide = 0
+
+  /**
+   * Marks the bubble `data-gliding` once it has been placed and painted, so a
+   * stylesheet that moves it only under `data-gliding` never slides it in.
+   *
+   * **A bubble is drawn new each time a reading is shown from none**, as the
+   * pointer arrives or a key reaches the plot, and the chart takes it away
+   * again as the reading is put away. So a new bubble is an arrival, and it is
+   * placed where its reading is at once.
+   *
+   * **Two frames, where a hover mark waits one.** `Tooltip` places its bubble
+   * a microtask after it opens, having measured it first, so the style the
+   * browser resolved last still has the bubble unplaced. Marked in the next
+   * frame, the bubble would glide in from the window's corner to its first
+   * place. The second frame comes after a frame drawn with it in place.
+   */
+  private glideFrom(bubble: Element | null): void {
+    if (bubble === this.bubble) {
+      return
+    }
+    this.bubble = bubble
+    cancelAnimationFrame(this.glide)
+    this.glide = 0
+    if (!bubble || typeof requestAnimationFrame !== 'function') {
+      return
+    }
+    this.glide = requestAnimationFrame(() => {
+      this.glide = requestAnimationFrame(() => {
+        this.glide = 0
+        bubble.toggleAttribute('data-gliding', bubble.isConnected)
+      })
+    })
   }
 
   /**
