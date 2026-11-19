@@ -634,7 +634,7 @@ fn every() -> Vec<Rule> {
             fix: None,
             name: "guidance",
             run: Runner::Source(guidance::run),
-            summary: "a family's guidance names real families and parts, and its two roots agree",
+            summary: "every stable family writes guidance that names real families and parts",
         },
         Rule {
             fix: None,

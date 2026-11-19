@@ -247,6 +247,33 @@ for (const family of families) {
           '',
         ]
       : []),
+    ...(family.practice.length > 0
+      ? [
+          `# Using ${family.label}`,
+          '',
+          ...family.practice.flatMap((one, at) => {
+            const example =
+              family.examples.find(
+                (it) => one.example && it.slug === one.example && it.tier === 'styled',
+              ) ?? family.examples.find((it) => one.example && it.slug === one.example)
+            return [
+              `${at + 1}. **${one.rule}**${one.reason ? ` ${one.reason}` : ''}`,
+              ...(example
+                ? [
+                    '',
+                    '   ```html',
+                    ...example.html
+                      .trim()
+                      .split('\n')
+                      .map((line) => `   ${line}`),
+                    '   ```',
+                  ]
+                : []),
+            ]
+          }),
+          '',
+        ]
+      : []),
     ...(family.anatomy.length > 0
       ? [
           '# Anatomy',

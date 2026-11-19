@@ -618,7 +618,11 @@ export default async function FamilyDocs({
   const imports = (tier: 'headless' | 'styled'): string => family.usage[tier].join('\n')
   /* The Guidelines section, and its entry in the rail, where the family says
      when to use it or what to use instead. */
-  const guided = family.use.length > 0 || family.instead.length > 0 || family.anatomy.length > 0
+  const guided =
+    family.use.length > 0 ||
+    family.instead.length > 0 ||
+    family.anatomy.length > 0 ||
+    family.practice.length > 0
   /* The example the anatomy is drawn over: the styled headline, where there
      is one, since that is the tier a picture shows. */
   const pictured = headlines[0]
@@ -820,6 +824,44 @@ export default async function FamilyDocs({
                     </helix-flex>
                   )}
                 </div>
+              )}
+              {/* **How to use the family once it is chosen**, each rule in
+                  bold with its reason under it, and the example it names
+                  under that, in each tier the family ships it in. */}
+              {family.practice.length > 0 && (
+                <helix-flex direction="column" gap="sm">
+                  <helix-text as="h3" scale="body-strong">
+                    Using {family.label}
+                  </helix-text>
+                  <ol className={api.practice}>
+                    {family.practice.map((one) => (
+                      <li key={one.rule}>
+                        <helix-flex direction="column" gap="2xs">
+                          <helix-text scale="body-strong">
+                            <CodeText>{one.rule}</CodeText>
+                          </helix-text>
+                          {one.reason && (
+                            <helix-text emphasis="muted" scale="body">
+                              <CodeText>{one.reason}</CodeText>
+                            </helix-text>
+                          )}
+                          {family.examples
+                            .filter((example) => one.example && example.slug === one.example)
+                            .map((example) => (
+                              <helix-code-block data-tier={example.tier} key={example.tier}>
+                                <span
+                                  // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
+                                  dangerouslySetInnerHTML={{
+                                    __html: highlight(example.html.trim(), 'html'),
+                                  }}
+                                />
+                              </helix-code-block>
+                            ))}
+                        </helix-flex>
+                      </li>
+                    ))}
+                  </ol>
+                </helix-flex>
               )}
               {/* **The parts, numbered over the running example**, and the
                   same numbers in a legend under it. The frame finds each part

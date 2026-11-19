@@ -198,6 +198,15 @@ export interface AnatomyEntry {
   optional?: boolean
 }
 
+/** One rule for using a family, from `@practice`. */
+export interface PracticeEntry {
+  /** One of the family's examples, by slug, shown under the rule. */
+  example?: string
+  /** Why the rule holds. Absent where the line has no dash. */
+  reason?: string
+  rule: string
+}
+
 /**
  * Fields Helix adds to the manifest beyond the CEM spec.
  *
@@ -226,6 +235,12 @@ export interface HelixMetadata {
    * the order they are numbered. `optional` is set where the name ends in `?`.
    */
   anatomy?: AnatomyEntry[]
+
+  /**
+   * The rules for using the family once it is chosen, one per `@practice
+   * <rule> - <reason>`, at most three, each with the example it names.
+   */
+  practice?: PracticeEntry[]
 
   /**
    * The native control the element draws its content inside, from
