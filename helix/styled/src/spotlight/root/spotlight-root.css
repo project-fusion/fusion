@@ -1,6 +1,9 @@
+/* **A grid of one, so the content fills the box.** In a grid or a flex row
+   the host stretches to its neighbors' height, and a `Card` inside kept its
+   own, so the light's edge ran round an empty band below it. */
 :host {
   border-radius: var(--spotlight-radius, var(--helix-radii-md));
-  display: block;
+  display: grid;
   position: relative;
 }
 
