@@ -1,0 +1,103 @@
+<!-- @summary A profile that loads inside its card behind a skeleton laid out as the profile, and crossfades in when it arrives while the card grows to fit it. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-card separation="outlined">
+    <helix-skeleton
+      id="profile"
+      label="Loading the profile"
+      loading
+    >
+      <helix-flex
+        direction="column"
+        gap="md"
+        slot="placeholder"
+      >
+        <helix-flex
+          align-items="center"
+          gap="sm"
+        >
+          <helix-skeleton shape="circle"></helix-skeleton>
+          <helix-flex
+            direction="column"
+            gap="2xs"
+          >
+            <helix-skeleton
+              class="line-name"
+              shape="text"
+            ></helix-skeleton>
+            <helix-skeleton
+              class="line-role"
+              shape="text"
+            ></helix-skeleton>
+          </helix-flex>
+        </helix-flex>
+        <helix-skeleton
+          lines="2"
+          shape="text"
+        ></helix-skeleton>
+      </helix-flex>
+    </helix-skeleton>
+  </helix-card>
+  <helix-text emphasis="muted">Profiles are read from the team directory, which updates every hour.</helix-text>
+  <helix-button id="reload">Reload the profile</helix-button>
+</helix-flex>
+
+<script type="module">
+  const profile = document.getElementById('profile')
+  const people = [
+    {
+      bio: 'Writes the programs that run on the Analytical Engine and keeps the notes the team works from. Ask her about the tables for the Bernoulli numbers.',
+      name: 'Ada Lovelace',
+      role: 'Analyst, Engines team',
+    },
+    {
+      bio: 'Leads the compiler work. Her team turned a page of English into the first program a machine could read, and she still keeps the moth from the logbook on her desk. She answers messages in the morning.',
+      name: 'Grace Hopper',
+      role: 'Lead engineer, Compilers',
+    },
+  ]
+  let next = 0
+
+  const details = (person) => {
+    const details = document.createElement('helix-flex')
+    details.setAttribute('direction', 'column')
+    details.setAttribute('gap', 'md')
+    details.innerHTML = `
+      <helix-flex align-items="center" gap="sm">
+        <helix-avatar></helix-avatar>
+        <helix-flex direction="column">
+          <helix-text as="h3" scale="title"></helix-text>
+          <helix-text emphasis="muted"></helix-text>
+        </helix-flex>
+      </helix-flex>
+      <helix-text></helix-text>`
+    details.querySelector('helix-avatar').setAttribute('name', person.name)
+    const [name, role, bio] = details.querySelectorAll('helix-text')
+    name.textContent = person.name
+    role.textContent = person.role
+    bio.textContent = person.bio
+    return details
+  }
+
+  // Put the loaded profile in and take `loading` off in the same task. The
+  // skeleton crossfades to the profile while the card grows to fit it.
+  const load = () => {
+    profile.loading = true
+    setTimeout(() => {
+      profile.querySelector(':scope > :not([slot])')?.remove()
+      profile.append(details(people[next % people.length]))
+      next += 1
+      profile.loading = false
+    }, 1200)
+  }
+
+  document.getElementById('reload').addEventListener('click', load)
+  load()
+</script>

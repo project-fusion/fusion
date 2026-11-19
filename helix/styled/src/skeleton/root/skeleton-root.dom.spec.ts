@@ -101,9 +101,23 @@ describe('skeleton around content', () => {
     expect(rule(':host([loading]:state(wrapping)) [part="content"]')).toContain(
       'visibility: hidden',
     )
-    expect(rule(':host(:state(wrapping):not([loading])) [part="skeleton"]')).toContain(
-      'display: none',
-    )
+    // The base tier hides the box around the shape once the content has
+    // loaded, and the sheet says so again over its own `display`.
+    expect(rule(':host(:state(wrapping)) [part="placeholder"][hidden]')).toContain('display: none')
+  })
+
+  /* The content and the placeholder stack in one cell, so the box is as tall
+     as the side that shows, and a card inside keeps its own height where the
+     placeholder is taller. */
+  test('stacks the content and the placeholder in one grid cell', () => {
+    expect(rule(':host(:state(wrapping))')).toContain('display: grid')
+    expect(rule(':host(:state(wrapping))')).toContain('align-items: start')
+    expect(rule(':host(:state(wrapping)) [part="content"]')).toContain('grid-area: stack')
+    expect(rule(':host(:state(wrapping)) [part="placeholder"]')).toContain('grid-area: stack')
+    expect(rule(':host(:state(wrapping)) [part="placeholder"]')).toContain('align-self: stretch')
+    // On a placeholder alone the box draws nothing, so the host sizes the
+    // shape as it did before the box was there.
+    expect(rule('[part="placeholder"]')).toContain('display: contents')
   })
 
   /* `:empty` counts a line break as content, so a skeleton written across two
@@ -127,7 +141,7 @@ describe('skeleton around content', () => {
     expect(rule(':host([loading]:not(:defined):not(:empty)) [part="content"]')).toContain(
       'visibility: hidden',
     )
-    expect(rule(':host(:not(:defined):not(:empty):not([loading])) [part="skeleton"]')).toContain(
+    expect(rule(':host(:not(:defined):not(:empty):not([loading])) [part="placeholder"]')).toContain(
       'display: none',
     )
   })
@@ -194,6 +208,6 @@ describe('a paragraph of lines', () => {
 
   test('over content, the paragraph takes the content box and steps aside after', () => {
     expect(rule(':host(:state(wrapping)) [part="lines"]')).toContain('position: absolute')
-    expect(rule(':host(:state(wrapping):not([loading])) [part="lines"]')).toContain('display: none')
+    expect(rule(':host(:state(wrapping)) [part="placeholder"][hidden]')).toContain('display: none')
   })
 })

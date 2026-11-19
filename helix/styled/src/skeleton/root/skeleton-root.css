@@ -43,6 +43,12 @@
   inline-size: var(--skeleton-size, var(--helix-size-avatar));
 }
 
+/* The box around the shape draws none of its own on a placeholder alone, so
+   the shape is sized by the host as if the box were not there. */
+[part="placeholder"] {
+  display: contents;
+}
+
 /*
  *  The base fill, and nothing animated on this element at all.
  */
@@ -156,7 +162,15 @@
  */
 :host(:state(wrapping)),
 :host(:not(:defined):not(:empty)) {
+  /* **The content and the placeholder share one grid cell**, so the host is
+     as tall as what shows. The skeleton's own shape has no height and
+     stretches over the content's box; a placeholder the page draws is as
+     tall as it is drawn. The content keeps its own height, so a card is
+     never stretched to the placeholder's. */
+  align-items: start;
   block-size: auto;
+  display: grid;
+  grid-template-areas: "stack";
   inline-size: fit-content;
   max-inline-size: 100%;
   padding-block: 0;
@@ -166,6 +180,15 @@
 :host(:state(wrapping)) [part="content"],
 :host(:not(:defined):not(:empty)) [part="content"] {
   display: block;
+  grid-area: stack;
+}
+
+:host(:state(wrapping)) [part="placeholder"],
+:host(:not(:defined):not(:empty)) [part="placeholder"] {
+  align-self: stretch;
+  display: block;
+  grid-area: stack;
+  position: relative;
 }
 
 /* Around a block, the line, as the block takes alone. */
@@ -182,16 +205,54 @@
   position: absolute;
 }
 
-:host(:state(wrapping):not([loading])) [part="skeleton"],
-:host(:not(:defined):not(:empty):not([loading])) [part="skeleton"],
-:host(:state(wrapping):not([loading])) [part="lines"],
-:host(:not(:defined):not(:empty):not([loading])) [part="lines"] {
+/* The base tier hides the placeholder once the content has loaded, and the
+   content while a placeholder the page drew stands in for it. A `display`
+   above outranks the browser's own rule for `hidden`, so it is said again. A
+   served page carries neither until the element upgrades, so `loading` decides
+   there. */
+[part="placeholder"][hidden],
+:host(:state(wrapping)) [part="content"][hidden],
+:host(:state(wrapping)) [part="placeholder"][hidden],
+:host(:not(:defined):not(:empty):not([loading])) [part="placeholder"] {
   display: none;
 }
 
 :host([loading]:state(wrapping)) [part="content"],
 :host([loading]:not(:defined):not(:empty)) [part="content"] {
   visibility: hidden;
+}
+
+/*
+ * **Turning `loading` off crossfades the placeholder into the content in one
+ * place**, and turning it on crossfades back, while the box's height moves
+ * from one to the other over the same beat, so nothing below it jumps. The
+ * script sets `:state(revealing)` for the length of the move and runs the
+ * fades and the height together, from `--skeleton-reveal-duration` along
+ * `--skeleton-reveal-easing`.
+ *
+ * The side that is leaving keeps showing, laid over the box out of the flow,
+ * so the side arriving alone sets the height the box moves to. The box clips
+ * at its foot while it moves and nowhere else, so a shadow or a focus ring on
+ * the content still shows at its sides and its top.
+ */
+:host {
+  --skeleton-reveal-duration: var(--helix-duration-slow);
+  --skeleton-reveal-easing: var(--helix-easing-standard);
+}
+
+:host(:state(revealing)) {
+  clip-path: inset(-100vmax -100vmax 0 -100vmax);
+}
+
+:host(:state(revealing)) [part="content"][hidden],
+:host(:state(revealing)) [part="placeholder"][hidden] {
+  display: block;
+  inset: 0;
+  position: absolute;
+}
+
+:host([loading]:state(wrapping):state(revealing)) [part="content"] {
+  visibility: visible;
 }
 
 /* Around a field, the shapes of its pieces, each placed where the script

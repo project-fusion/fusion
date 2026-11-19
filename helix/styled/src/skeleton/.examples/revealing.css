@@ -1,0 +1,9 @@
+/* The widths a name and a role land on, so the lines stand where the words
+   will be. Unequal, as `preview.css` explains. */
+.line-name {
+  inline-size: 10rem;
+}
+
+.line-role {
+  inline-size: 7rem;
+}
