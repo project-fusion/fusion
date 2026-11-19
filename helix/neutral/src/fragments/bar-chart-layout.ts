@@ -235,11 +235,7 @@ export default fragment(
         rule(upright, { insetInlineEnd: 0, lineHeight: 1, translate: [0, '-50%'] }),
         rule(sideways, { translate: ['-50%', 0] }),
         web([rule({ ...sideways, dir: 'rtl' }, { translate: ['50%', 0] })]),
-        /* The last number across ends at the plot's end, rather than past it. */
-        web([
-          rule({ ...sideways, child: 'last' }, { translate: ['-100%', 0] }),
-          rule({ ...sideways, child: 'last', dir: 'rtl' }, { translate: ['100%', 0] }),
-        ]),
+
         native([
           rule(
             { ...upright, part: { 'data-axis': 'secondary' } },
@@ -257,9 +253,27 @@ export default fragment(
         {
           part: 'tick',
           selector:
-            ':host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"]',
+            ':host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part~="tick"]',
         },
         [web([rule({ insetInlineEnd: 'auto', insetInlineStart: 0 })])],
+      ),
+      /* Written out: the last number across, of those the scale keeps, ends
+         at the plot's end, rather than past it. */
+      on(
+        {
+          part: 'tick',
+          selector:
+            ':host([orientation="horizontal"]) [part~="tick"]:nth-last-child(1 of :not([part~="tick-leaving"]))',
+        },
+        [web([rule({ translate: ['-100%', 0] })])],
+      ),
+      on(
+        {
+          part: 'tick',
+          selector:
+            ':host([orientation="horizontal"]:dir(rtl)) [part~="tick"]:nth-last-child(1 of :not([part~="tick-leaving"]))',
+        },
+        [web([rule({ translate: ['100%', 0] })])],
       ),
       /* A phone stands the scales and the names around the plot in the room
          the host leaves for them, each as long as the plot: the numbers in a

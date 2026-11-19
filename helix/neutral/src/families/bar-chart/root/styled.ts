@@ -41,8 +41,9 @@ import root from './headless.js'
  * `orientation="horizontal"`, and the numbers of a scale stand in a column
  * or a row of their own beside the plot, each centered on its level.
  *
- * **Web only:** the columns growing in and easing to new readings, the
- * crosshair, printing, and the fade of the other categories easing in. A
+ * **Web only:** the columns growing in and easing to new readings over
+ * `--chart-move-duration`, a series a legend hides shrinking to the baseline
+ * as it fades, the band gliding from category to category, the crosshair, printing, and the fade of the other categories easing in. A
  * phone mixes a tone's swatch at the resting share.
  */
 export default styles(
@@ -84,6 +85,9 @@ export default styles(
   },
   ({ hook, include, on, own, rule }) => {
     const easing = token('easing-decelerate')
+    /* The privates the shared chart motion sheet sets from the public hooks. */
+    const move = measured('_chart-move-duration', token('duration-normal'))
+    const moveEasing = measured('_chart-move-easing', easing)
     const radius = hook.barRadius
     const half = quotient(hook.barStroke, 2)
     const sideways = { orientation: 'horizontal' } as const
@@ -229,12 +233,20 @@ export default styles(
         web([
           rule({
             transition: list(
-              ['height', token('duration-normal'), easing],
-              ['width', token('duration-normal'), easing],
-              ['x', token('duration-normal'), easing],
-              ['y', token('duration-normal'), easing],
+              ['height', move, moveEasing],
+              ['width', move, moveEasing],
+              ['x', move, moveEasing],
+              ['y', move, moveEasing],
+              ['opacity', move, moveEasing],
+              ['visibility', move],
             ),
           }),
+          /* **A series a legend hid shrinks to the baseline and fades**, while
+             the columns left take the room it gave up and the scale fits them.
+             The tier below keeps each column as one of no length, hidden,
+             which `visibility` above holds off until the fade has run. Shown
+             again, it grows back out of the baseline as it fades in. */
+          rule({ also: { 'bar-hidden': true } }, { opacity: 0 }),
         ]),
       ]),
       /* Written out: the columns drawn again over a path of them stand where the reader moved them. */
@@ -261,6 +273,17 @@ export default styles(
       ]),
       on('band', [
         rule({ fill: hook.bandColor }),
+        /* From category to category over `--chart-glide-duration`, along a
+           curve that slows as it arrives and never passes the category. */
+        web([
+          rule({
+            transition: list([
+              'translate',
+              measured('_chart-glide-duration', token('duration-fast')),
+              easing,
+            ]),
+          }),
+        ]),
         /* A phone draws it as a box behind the columns' canvas, as long as the plot across the measure. */
         native([
           rule({ backgroundColor: hook.bandColor, pointerEvents: 'none', position: 'absolute' }),
@@ -286,6 +309,11 @@ export default styles(
           strokeWidth: hook.lineWidth(measured('_chart-stroke', '2px')),
           vectorEffect: 'non-scaling-stroke',
         }),
+        /* A line a legend hid fades out where it stood, as its columns do. */
+        web([
+          rule({ transition: list(['opacity', move, moveEasing], ['visibility', move]) }),
+          rule({ also: { 'line-hidden': true } }, { opacity: 0 }),
+        ]),
       ]),
       include(barChartTreatments),
       on('bar-wash-start', [

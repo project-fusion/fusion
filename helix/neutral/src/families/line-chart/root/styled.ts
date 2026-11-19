@@ -1,11 +1,11 @@
 import chartStatus from '../../../fragments/chart-status.js'
 import chartTooltip from '../../../fragments/chart-tooltip.js'
+import lineChartMotion from '../../../fragments/line-chart-motion.js'
 import printExact from '../../../fragments/print-exact.js'
 import terminus from '../../../fragments/terminus.js'
 import { oneOf } from '../../../render.js'
 import {
   inherited,
-  list,
   measured,
   mix,
   native,
@@ -38,9 +38,10 @@ import root from './headless.js'
  * read through the lines.
  *
  * **Web only:** the lines drawing on as they arrive and easing to new
- * readings, the dashes of a `dashed` series held still while they do, the
- * hole a `ring` terminus cuts out of the lines, the crosshair, printing, and
- * forced colors.
+ * readings over `--chart-move-duration`, the dashes of a `dashed` series held
+ * still while they do, a series a legend hides fading out where it stood, the
+ * guide and the band gliding from reading to reading, the hole a `ring`
+ * terminus cuts out of the lines, the crosshair, printing, and forced colors.
  */
 export default styles(
   root,
@@ -66,7 +67,6 @@ export default styles(
   ({ hook, include, on, rule }) => {
     const series = measured('chart-series')
     const stroke = hook.width(inherited('chart-stroke', '2px'))
-    const easing = token('easing-decelerate')
     return [
       include(chartStatus),
       include(chartTooltip),
@@ -247,21 +247,8 @@ export default styles(
           }),
         ]),
       ]),
-      /* A chart never animates through a value it does not have. */
+      include(lineChartMotion),
       on('line', [
-        web([
-          rule({
-            transition: list(
-              ['d', token('duration-normal'), easing],
-              ['stroke-dasharray', token('duration-slow'), 'step-end', 'allow-discrete'],
-              ['stroke-dashoffset', token('duration-slow'), easing],
-            ),
-          }),
-          rule(
-            { startingStyle: true },
-            { strokeDasharray: ['1000px', '100000px'], strokeDashoffset: '1000px' },
-          ),
-        ]),
         /* A series `dashed` names, and none of the drawing-on. */
         rule({ also: { 'line-dashed': true } }, { strokeDasharray: hook.dash }),
         web([
@@ -269,17 +256,6 @@ export default styles(
             { also: { 'line-dashed': true }, startingStyle: true },
             { strokeDasharray: hook.dash, strokeDashoffset: 0 },
           ),
-        ]),
-      ]),
-      on('area', [
-        web([
-          rule({
-            transition: list(
-              ['d', token('duration-normal'), easing],
-              ['opacity', token('duration-slow'), easing],
-            ),
-          }),
-          rule({ startingStyle: true }, { opacity: 0 }),
         ]),
       ]),
       on('plot', [rule({ web: { cursor: 'crosshair' } })]),

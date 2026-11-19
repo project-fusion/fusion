@@ -23,8 +23,9 @@ import {
  * `data-material` on the columns of the series `outlined`, `subtle`, and
  * `glass` name. With nothing to draw it says so, `error-text` before
  * `loading-text` and `empty-text`. **Web only:** the hidden table, the
- * summary, the Listen button, a reading under a mouse, and the columns easing
- * in.
+ * summary, the Listen button, a reading under a mouse, the columns easing
+ * in, and a hidden series and a dropped level fading out where they stood, the
+ * `-hidden` and `-leaving` parts.
  */
 export default headless('bar-chart', {
   props: {
@@ -111,6 +112,7 @@ export default headless('bar-chart', {
             part="ticks"
           >
             <View
+              also={{ 'tick-leaving': entry.leaving }}
               data-axis={entry.which}
               part="tick"
               style={{ '--chart-tick-at': entry.at }}
@@ -138,6 +140,7 @@ export default headless('bar-chart', {
               part="gridlines"
             >
               <Path
+                also={{ 'gridline-leaving': entry.leaving }}
                 d={entry.d}
                 part="gridline"
               />
@@ -236,10 +239,18 @@ export default headless('bar-chart', {
           platform="web"
         >
           <View
-            also={{ 'bar-end': true, 'bar-end-negative': true, 'bar-negative': true }}
+            also={{
+              'bar-end': true,
+              'bar-end-negative': true,
+              'bar-hidden': true,
+              'bar-negative': true,
+            }}
             part="bar"
           />
-          <View part="line" />
+          <View
+            also={{ 'line-hidden': true }}
+            part="line"
+          />
           <View part="bar-wash-start" />
           <View part="bar-wash-end" />
         </View>

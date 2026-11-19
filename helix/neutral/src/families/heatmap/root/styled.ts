@@ -156,7 +156,11 @@ export default styles(
             inlineSize: width,
             /* **A cell takes its new reading's color over a moment** rather
                than at once, so a grid that refreshes shows which cells changed. */
-            transition: ['background-color', token('duration-normal'), token('easing-decelerate')],
+            transition: [
+              'background-color',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
           }),
           /* What each tone a cell names is worth, which a page sets through its hook. */
           rule({ 'data-tone': '1' }, { own: { heatmapPaint: hook.tone1 } }),
@@ -223,6 +227,15 @@ export default styles(
       on('mark', [
         rule({ blockSize: '1px', inlineSize: '1px', pointerEvents: 'none' }),
         web([rule({ position: 'absolute' })]),
+      ]),
+      /* The bubble glides from cell to cell once it has arrived, as the other
+         charts' bubbles do: see `shared/chart/tooltip.css`. */
+      on({ part: 'tooltip-anchor', selector: '[part="tooltip-anchor"][data-gliding]' }, [
+        web([
+          rule({
+            '--tooltip-move-duration': measured('_chart-glide-duration', token('duration-fast')),
+          }),
+        ]),
       ]),
       on('tooltip-anchor', [
         web([rule({ inset: 0, pointerEvents: 'none', position: 'absolute' })]),

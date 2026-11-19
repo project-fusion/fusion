@@ -108,11 +108,13 @@ describe('the moves a reader starts', () => {
   })
 
   test('fade a hidden series out, and move the scale with the marks', () => {
-    expect(
-      resting(
-        '[part~="line-hidden"], [part~="area-hidden"], [part~="marker-hidden"], [part~="marker-ring-hidden"]',
-      ).join(''),
-    ).toContain('opacity: 0')
+    /* The generated sheet names each hidden part with the part it is set
+       alongside, `[part~="line"][part~="line-hidden"]` once unweighted. */
+    for (const one of ['line', 'area', 'marker', 'marker-ring']) {
+      expect(sheet()).toMatch(
+        new RegExp(`\\[part~="${one}"\\]\\[part~="${one}-hidden"\\][^{]*\\{[^}]*opacity: 0`),
+      )
+    }
     expect(resting('[part~="tick-leaving"]').join('')).toContain('opacity: 0')
     expect(resting('[part~="gridline"]').join('')).toContain(
       'translate var(--_chart-move-duration, var(--helix-duration-normal)) var(--_chart-move-easing, var(--helix-easing-decelerate))',

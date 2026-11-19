@@ -36,8 +36,9 @@ import root from './headless.js'
  * three quarters of the series, so it keeps its color where a mix toward the
  * page went gray.
  *
- * **Web only:** the bands fading in and easing to new readings, the
- * crosshair, printing, and the strength `--area-chart-fill-strength` gives a
+ * **Web only:** the bands fading in and easing to new readings over
+ * `--chart-move-duration`, a part a legend hides fading as its band closes,
+ * the guide gliding from reading to reading, the crosshair, printing, and the strength `--area-chart-fill-strength` gives a
  * band, which a phone mixes at the resting share.
  */
 export default styles(
@@ -57,6 +58,10 @@ export default styles(
   ({ hook, include, on, rule }) => {
     const series = measured('chart-series')
     const easing = token('easing-decelerate')
+    /* The privates the shared chart motion sheet sets from the public hooks. */
+    const move = measured('_chart-move-duration', token('duration-normal'))
+    const moveEasing = measured('_chart-move-easing', easing)
+    const arrive = measured('_chart-arrive-duration', token('duration-slow'))
     return [
       include(chartStatus),
       include(chartTooltip),
@@ -150,6 +155,18 @@ export default styles(
             insetInlineStart: measured('chart-guide-x'),
             pointerEvents: 'none',
             position: 'absolute',
+          }),
+        ]),
+        /* From reading to reading over `--chart-glide-duration`, along a curve
+           that slows as it arrives. Drawn new where its reading is when a
+           reading is shown from none. */
+        web([
+          rule({
+            transition: list([
+              'translate',
+              measured('_chart-glide-duration', token('duration-fast')),
+              token('easing-decelerate'),
+            ]),
           }),
         ]),
       ]),
@@ -265,11 +282,45 @@ export default styles(
           web([
             rule({
               transition: list(
-                ['d', token('duration-normal'), easing],
-                ['opacity', token('duration-slow'), easing],
+                ['d', move, moveEasing],
+                ['opacity', arrive, easing],
+                ['visibility', arrive],
               ),
             }),
             rule({ startingStyle: true }, { opacity: 0 }),
+          ]),
+        ],
+      ),
+      /* **A part a legend hid fades as its band closes**, while the bands
+         above settle onto the one below and the scale fits the parts left.
+         The tier below keeps the band hidden, which `visibility` here holds
+         off until the fade has run. Shown again, it fades in at the arrival's
+         pace as it opens. Safari moves no path's shape, so there the band
+         closes at once. */
+      on('area', [web([rule({ also: { 'area-hidden': true } }, { opacity: 0 })])]),
+      on('line', [web([rule({ also: { 'line-hidden': true } }, { opacity: 0 })])]),
+      on({ part: 'area', selector: '[part~="area-hidden"], [part~="line-hidden"]' }, [
+        web([
+          rule({
+            transition: list(
+              ['d', move, moveEasing],
+              ['opacity', move, moveEasing],
+              ['visibility', move],
+            ),
+          }),
+        ]),
+      ]),
+      /* **Where the browser moves no path's shape, as in Safari, the scale
+         takes its new levels at once**, with the bands it measures. The
+         levels a new scale adds or drops still fade. */
+      on(
+        ['tick', 'gridline'],
+        [
+          web([
+            rule(
+              { supports: 'not (d: path("M0 0"))' },
+              { transitionProperty: 'opacity, visibility' },
+            ),
           ]),
         ],
       ),

@@ -49,7 +49,8 @@ import {
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a reading shown under a mouse, the drawing
  * mirrored on a right-to-left page, and the bands fading in and easing to new
- * readings, which a phone draws at once.
+ * readings, which a phone draws at once, and a hidden part and a dropped level
+ * fading out where they stood, the `-hidden` and `-leaving` parts.
  */
 export default headless('area-chart', {
   props: {
@@ -124,6 +125,7 @@ export default headless('area-chart', {
             part="ticks"
           >
             <View
+              also={{ 'tick-leaving': entry.leaving }}
               part="tick"
               style={{ '--chart-tick-y': entry.y }}
             >
@@ -150,12 +152,14 @@ export default headless('area-chart', {
               part="bands"
             >
               <Path
+                also={{ 'area-hidden': entry.hidden }}
                 d={entry.wash}
                 data-series={entry.series}
                 part="area"
                 style={{ '--chart-series': entry.color }}
               />
               <Path
+                also={{ 'line-hidden': entry.hidden }}
                 d={entry.line}
                 data-series={entry.series}
                 part="line"
@@ -168,6 +172,7 @@ export default headless('area-chart', {
               part="gridlines"
             >
               <Path
+                also={{ 'gridline-leaving': entry.leaving }}
                 d={entry.d}
                 part="gridline"
               />

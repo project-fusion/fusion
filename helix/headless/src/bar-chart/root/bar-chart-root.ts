@@ -29,23 +29,26 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  heldInside,
+  levelsOf,
   MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Row,
+  ScaleMemory,
   type Series,
   type SeriesPoint,
   type StackEnd,
   seriesIndex,
   seriesKey,
-  ticks,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import '../../tooltip/index.js'
 
 /**
@@ -148,10 +151,11 @@ import '../../tooltip/index.js'
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart axis - The numbers of one scale: the primary unless `value-axis` is `none`, and both when `secondary` splits the chart into two scales.
- * @csspart band - The category band under the pointer.
+ * @csspart band - The category band under the pointer, moved to its slot with `translate`, so a stylesheet can glide it from one to the next.
  * @csspart bar - One column. Under `stacked`, one segment of a category's column. Past one column a pixel, a path of the columns of one series that share a `data-tone` and a side of zero, each a rectangle in it.
  * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`, and never on a path of columns.
  * @csspart bar-end-negative - A far end below zero, whose far end is its bottom, or its inline start when the bars run across. Set together with `bar-end`.
+ * @csspart bar-hidden - A column of a series a legend hid, shrunk to nothing on the baseline where it stood and `visibility="hidden"`, so a stylesheet can fade it as it shrinks and grow it back when the series is shown. Under `stacked`, a segment of no length where it stood in the stack. Set together with `bar`, and never on a path of columns.
  * @csspart bar-negative - A bar below zero, standing alone or any segment of a stack below it, whose base is its top, or its inline end when the bars run across. On a path of columns, every column in it is below zero. Set together with `bar`.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
@@ -159,11 +163,13 @@ import '../../tooltip/index.js'
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One gridline across the plot, unless `gridlines` is `none`.
+ * @csspart gridline-leaving - A gridline at a level the scale no longer has, kept hidden at its place on the new scale, so a stylesheet can fade it out as it moves. Set together with `gridline`.
  * @csspart group - One category's columns, together. Past one column a pixel, every category's columns, together.
  * @csspart group-active - The group the tooltip describes. Set together with `group`. Past one column a pixel, that category's columns drawn again over the rest, each at least two pixels thick.
  * @csspart label - One category's name, placed along the row by `--chart-label-start` and `--chart-label-size`, or down the column under `orientation="horizontal"`, with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of category names, or the column of them under `orientation="horizontal"`, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - A series drawn as a line, named in `lines`.
+ * @csspart line-hidden - The `line` of a series a legend hid, kept where it was last drawn and hidden, so a stylesheet can fade it out. Set together with `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -174,6 +180,7 @@ import '../../tooltip/index.js'
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - One number on an axis.
+ * @csspart tick-leaving - A number the scale no longer has, kept `hidden` at its place on the new scale, held inside the plot, so a stylesheet can fade it out as it moves. Set together with `tick`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The tooltip's arrow, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the reading, on the bubble's top edge. Set together with `tooltip-arrow`.
@@ -507,6 +514,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
 
     const { domain, floor, other, widest, y, z } = this.frameOf(series, categories.length)
     const sideways = this.orientation === 'horizontal'
+    this.domainBefore = this.scaleBefore.before(domain)
+    const otherBefore = z === undefined ? undefined : this.otherScaleBefore.before(other)
 
     /* The second axis wears its series' color when exactly one series is on it,
        which is the case worth helping and the only one a single color can
@@ -529,7 +538,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         ? nothing
         : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
-      z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
+      z === undefined
+        ? nothing
+        : this.renderAxis(z, other, 'secondary', sideways, widest, tint, otherBefore)
     }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
   }
 
@@ -659,26 +670,30 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
        ordinary chart takes exactly the path it took before this existed. */
     const against = (one: Series): ((value: number) => number) =>
       z !== undefined && own(one) ? z : y
-    const columns: BarColumn[] = barColumns(
+    /* A series a legend hid takes no room in the slot, and keeps its tone.
+       Its columns stay, `drawn` among the others, shrunk to nothing where they
+       stood, so a stylesheet can fade them as they shrink. */
+    const drawn: BarColumn[] = barColumns(
       series,
       categories.length,
-      (name) => this.showsSeries(name),
+      () => true,
       lined,
       (one, count) => this.slotsOf(one, count),
-    )
+    ).map((column) => ({ ...column, hidden: !this.showsSeries(column.one.name) }))
+    const columns = drawn.filter(({ hidden }) => !hidden)
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
        it**, by core's `barBox` and `barRect`: turning the plot with `rotate`
        leaves its grid cell while the names, a separate row, stay put. */
     const layout: BarLayout = barLayout(columns.length, this.stacked, categories.length, floor)
     const { share, slot } = layout
-    const marks = this.drawMarks(series, columns, layout, against, { floor, y, z })
+    const marks = this.drawMarks(series, drawn, layout, against, { floor, y, z })
     /* The category the tooltip describes, drawn again over the paths, at
        least `BAR_SHOWN_THICKNESS` pixels thick: thinner than a pixel, a
        column a reader moved to by key could not be seen. */
     const at = this.pointer.at
     const room = Math.max(slot, (BAR_SHOWN_THICKNESS * this.unitsPerPixel()) / share)
     const columnsAt = <T>(index: number, draw: Parameters<typeof barColumnsAt<T>>[4]): T[] =>
-      barColumnsAt(columns, index, this.stacked, against, draw)
+      barColumnsAt(drawn, index, this.stacked, against, draw)
     const bar = (
       value: number,
       index: number,
@@ -689,9 +704,12 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       end?: StackEnd,
       named?: string,
       wide?: number,
+      hidden = false,
     ): TemplateResult =>
       this.renderBar(barBox(layout, value, index, depth, scale, from, wide), {
         end,
+        floor: layout.floor,
+        hidden,
         ink: barToned(named),
         sinks: value < (from ?? 0),
         tone,
@@ -713,8 +731,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             ? nothing
             : svg`<g data-active part="group group-active">${columnsAt(
                 at,
-                (value, depth, tone, scale, from, end, named) =>
-                  bar(value, at, depth, tone, scale, from, end, named, room),
+                (value, depth, tone, scale, from, end, named, hidden) =>
+                  bar(value, at, depth, tone, scale, from, end, named, room, hidden),
               )}</g>`
         }`
 
@@ -788,7 +806,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
              category and a line crosses all of them, so it belongs to the plot
              rather than to any one slot. */
           series.map((one) =>
-            lined.has(seriesKey(one.name)) && this.showsSeries(one.name)
+            lined.has(seriesKey(one.name))
               ? this.renderLine(one, series.indexOf(one), slot, against(one), sideways)
               : nothing,
           )
@@ -894,7 +912,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     /* The device pixels along the axis, which a path of more categories than
        pixels is drawn to. */
     const pixel = units / ratio
-    const key = `${dense ? pixel : 'apart'} ${this.stacked} ${this.orientation} ${this.lines} ${this.secondary} ${this.outlined} ${this.subtle} ${this.glass} ${columns.map(({ tone }) => tone).join(',')}`
+    const key = `${dense ? pixel : 'apart'} ${this.stacked} ${this.orientation} ${this.lines} ${this.secondary} ${this.outlined} ${this.subtle} ${this.glass} ${columns.map(({ hidden, tone }) => `${tone}${hidden ? '-' : ''}`).join(',')}`
     const held = this.marked
     if (
       held !== undefined &&
@@ -907,13 +925,16 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     ) {
       return held.marks
     }
+    /* A path of columns draws only the series shown: past a column a pixel,
+       no column is seen shrinking. */
+    const shown = columns.filter(({ hidden }) => !hidden)
     const marks = dense
       ? this.renderPaths(
           barPaths(
             { abreast: layout.abreast, count, pixel, sideways, slot: layout.slot },
             (index, add) =>
               barColumnsAt(
-                columns,
+                shown,
                 index,
                 this.stacked,
                 against,
@@ -933,9 +954,11 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             index,
             this.stacked,
             against,
-            (value, depth, tone, scale, from, end, named) =>
+            (value, depth, tone, scale, from, end, named, hidden) =>
               this.renderBar(barBox(layout, value, index, depth, scale, from), {
                 end,
+                floor: layout.floor,
+                hidden,
                 ink: barToned(named),
                 sinks: value < (from ?? 0),
                 tone,
@@ -953,10 +976,27 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    */
   private renderBar(
     box: ColumnBox,
-    column: { end: StackEnd | undefined; ink: string | undefined; sinks: boolean; tone: number },
+    column: {
+      end: StackEnd | undefined
+      /** Where zero is along the measure, which a hidden column shrinks to. */
+      floor?: number
+      hidden?: boolean
+      ink: string | undefined
+      sinks: boolean
+      tone: number
+    },
   ): TemplateResult {
     const { end, ink, sinks, tone } = column
-    const { height, width, x, y } = barRect(box, this.orientation === 'horizontal')
+    const hidden = column.hidden === true
+    /* A column of a hidden series is a line of no length on the baseline, at
+       the edge of the room its neighbors now share, so it shrinks to the
+       baseline as they close over it. In a stack it is a segment of no length
+       where it stood, which its value of zero already makes it. */
+    const placed =
+      hidden && !this.stacked
+        ? { ...box, along: column.floor ?? box.along, size: 0, thickness: 0 }
+        : box
+    const { height, width, x, y } = barRect(placed, this.orientation === 'horizontal')
     const below = end === 'negative'
     const { emphasis, material } = this.treatmentOf(tone)
     return svg`<rect
@@ -967,7 +1007,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       data-tone=${ink ?? nothing}
       height=${height}
       style=${this.paintOf(tone, ink)}
-      part="bar${sinks ? ' bar-negative' : ''}${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
+      part="bar${sinks ? ' bar-negative' : ''}${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}${hidden ? ' bar-hidden' : ''}"
+      visibility=${hidden ? 'hidden' : nothing}
       width=${width}
       x=${x}
       y=${y}
@@ -1055,6 +1096,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     sideways: boolean,
     widest: number,
     tint?: string,
+    before: readonly [number, number] | undefined = which === 'primary'
+      ? this.domainBefore
+      : undefined,
   ): TemplateResult {
     const sizing = sideways ? undefined : `--bar-chart-axis: ${widest}ch`
     const format = formatNumbers(wordsLocale(this))
@@ -1064,13 +1108,20 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       part="axis"
       style=${[sizing, tint].filter(Boolean).join('; ') || nothing}
     >
-      ${ticks(domain).map(
-        (level) =>
-          html`<span
-            part="tick"
-            style=${sideways ? `inset-inline-start: ${scale(level)}%` : `inset-block-start: ${scale(level)}%`}
+      ${repeat(
+        levelsOf(domain, before),
+        (one) => one.level,
+        ({ leaving, level }) => {
+          /* A number the scale dropped stays, hidden, at its place on the new
+             scale held inside the plot, so a stylesheet can fade it out. */
+          const at = leaving ? heldInside(scale(level)) : scale(level)
+          return html`<span
+            ?hidden=${leaving}
+            part="tick${leaving ? ' tick-leaving' : ''}"
+            style=${sideways ? `inset-inline-start: ${at}%` : `inset-block-start: ${at}%`}
             >${format(level)}</span
-          >`,
+          >`
+        },
       )}
     </div>`
   }
@@ -1112,13 +1163,26 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
               : svg`<line part="gridline" x1=${at} x2=${at} y1="0" y2="100" />`,
           )
       : []
+    /* Keyed by level and moved by `translate`, so a rule a new scale keeps
+       moves to its new level, and one it drops stays hidden for its fade. */
     const levels = this.rulesValue
-      ? ticks(domain).map((level) =>
-          sideways
-            ? svg`<line part="gridline" x1=${y(level)} x2=${y(level)} y1="0" y2="100" />`
-            : svg`<line part="gridline" x1="0" x2="100" y1=${y(level)} y2=${y(level)} />`,
+      ? repeat(
+          levelsOf(domain, this.domainBefore),
+          (one) => one.level,
+          ({ leaving, level }) => {
+            const at = leaving ? heldInside(y(level)) : y(level)
+            return svg`<line
+              part="gridline${leaving ? ' gridline-leaving' : ''}"
+              style=${sideways ? `translate: ${at}px 0` : `translate: 0 ${at}px`}
+              visibility=${leaving ? 'hidden' : nothing}
+              x1="0"
+              x2=${sideways ? '0' : '100'}
+              y1="0"
+              y2=${sideways ? '100' : '0'}
+            />`
+          },
         )
-      : []
+      : nothing
     return svg`${categories}${levels}`
   }
 
@@ -1142,7 +1206,16 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       return nothing
     }
     const { height, width, x, y } = barBand(at, count, sideways)
-    return svg`<rect height=${height} part="band" width=${width} x=${x} y=${y} />`
+    /* Moved by `translate`, a property a stylesheet can transition in every
+       engine, which the `x` and `y` attributes are not. */
+    return svg`<rect
+      height=${height}
+      part="band"
+      style=${`translate: ${x}px ${y}px`}
+      width=${width}
+      x="0"
+      y="0"
+    />`
   }
 
   /**
@@ -1162,6 +1235,15 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       )}
     </div>`
   }
+
+  /** The primary scale drawn before this one, whose levels the axis and the rules leave from. */
+  private readonly scaleBefore = new ScaleMemory()
+
+  /** The second scale drawn before this one, whose levels its axis leaves from. */
+  private readonly otherScaleBefore = new ScaleMemory()
+
+  /** The primary scale before the one this render draws, from `scaleBefore`. */
+  private domainBefore: readonly [number, number] | undefined
 
   /** Each series drawn as a line, held against the scale and the axis it was drawn on. */
   private drawnLines = new WeakMap<
@@ -1202,6 +1284,20 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
        the path it already has. */
     const columns = Math.round((this.axisPixels() || 0) * (globalThis.devicePixelRatio || 1))
     const held = this.drawnLines.get(one)
+    /* A series a legend hid keeps the line it was last drawn with, hidden,
+       so a stylesheet can fade it out where it stood while the columns and
+       the scale move. Hidden since the chart first drew it, it has none. */
+    if (!this.showsSeries(one.name)) {
+      return held
+        ? svg`<path
+            d=${held.path}
+            data-series=${seriesIndex(depth)}
+            part="line line-hidden"
+            style="--chart-series: var(--chart-series-${seriesIndex(depth)})"
+            visibility="hidden"
+          />`
+        : html`${nothing}`
+    }
     const path =
       held &&
       held.y === y &&

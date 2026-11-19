@@ -131,16 +131,42 @@ export default styles(
        points takes its new shape at once, there being nothing to move between. */
     on(
       ['line', 'area'],
-      [web([rule({ transition: ['d', token('duration-normal'), token('easing-decelerate')] })])],
+      [
+        web([
+          rule({
+            transition: [
+              'd',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
+          }),
+        ]),
+      ],
     ),
     on('bar', [
       web([
         rule({
           transition: list(
-            ['height', token('duration-normal'), token('easing-decelerate')],
-            ['width', token('duration-normal'), token('easing-decelerate')],
-            ['x', token('duration-normal'), token('easing-decelerate')],
-            ['y', token('duration-normal'), token('easing-decelerate')],
+            [
+              'height',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
+            [
+              'width',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
+            [
+              'x',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
+            [
+              'y',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
           ),
         }),
       ]),
@@ -222,6 +248,31 @@ export default styles(
           rule({
             insetBlockStart: measured('sparkline-y'),
             insetInlineStart: measured('sparkline-x'),
+          }),
+        ]),
+      ],
+    ),
+    /* **The dot and its words glide from reading to reading** as the pointer
+       or the keys move, over `--chart-glide-duration` along a curve that slows
+       as it arrives. The words are the new reading's from the first frame. Both
+       are drawn new where the reading is when a reading is shown from none. */
+    on(
+      ['cursor', 'readout'],
+      [
+        web([
+          rule({
+            transition: list(
+              [
+                'inset-block-start',
+                measured('_chart-glide-duration', token('duration-fast')),
+                token('easing-decelerate'),
+              ],
+              [
+                'inset-inline-start',
+                measured('_chart-glide-duration', token('duration-fast')),
+                token('easing-decelerate'),
+              ],
+            ),
           }),
         ]),
       ],

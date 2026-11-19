@@ -47,8 +47,8 @@ import {
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a reading shown under a mouse, the hole a
  * `ring` terminus cuts out of the lines, the drawing mirrored on a
- * right-to-left page, and the lines drawing on as they arrive and easing to
- * new readings, which a phone draws at once.
+ * right-to-left page, and the motion: the lines drawing on and easing to new
+ * readings, and the `-hidden` and `-leaving` parts fading out where they stood.
  */
 export default headless('line-chart', {
   props: {
@@ -130,6 +130,7 @@ export default headless('line-chart', {
             part="ticks"
           >
             <View
+              also={{ 'tick-leaving': entry.leaving }}
               part="tick"
               style={{ '--chart-tick-y': entry.y }}
             >
@@ -172,6 +173,7 @@ export default headless('line-chart', {
               part="gridlines"
             >
               <Path
+                also={{ 'gridline-leaving': entry.leaving }}
                 d={entry.d}
                 part="gridline"
               />
@@ -188,13 +190,14 @@ export default headless('line-chart', {
               part="series"
             >
               <Path
+                also={{ 'area-hidden': entry.hidden }}
                 d={entry.wash}
                 data-series={entry.series}
                 part="area"
                 style={{ '--chart-series': entry.color }}
               />
               <Path
-                also={{ 'line-dashed': entry.dashed }}
+                also={{ 'line-dashed': entry.dashed, 'line-hidden': entry.hidden }}
                 d={entry.line}
                 data-series={entry.series}
                 part="line"
@@ -207,18 +210,20 @@ export default headless('line-chart', {
               part="markers"
             >
               <Path
+                also={{ 'marker-ring-hidden': entry.hidden }}
                 d={entry.ring}
                 data-series={entry.series}
                 part="marker-ring"
               />
               <Path
+                also={{ 'marker-hidden': entry.hidden }}
                 d={entry.marks}
                 data-series={entry.series}
                 part="marker"
                 style={{ '--chart-series': entry.color }}
               />
               <Path
-                also={{ 'marker-lone': true }}
+                also={{ 'marker-hidden': entry.hidden, 'marker-lone': true }}
                 d={entry.lone}
                 data-series={entry.series}
                 part="marker"
@@ -233,6 +238,7 @@ export default headless('line-chart', {
           part="termini"
         >
           <View
+            also={{ 'terminus-hidden': entry.hidden }}
             ariaHidden
             part="terminus"
             style={{

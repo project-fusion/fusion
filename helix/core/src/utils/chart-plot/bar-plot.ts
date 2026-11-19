@@ -142,6 +142,12 @@ export const barFrame = (
 
 /** One series drawn as columns: its place in the slot and its place in the palette. */
 export interface BarColumn {
+  /**
+   * Whether a legend hid the series. The web's chart keeps its columns among
+   * the others, shrunk to nothing where they stood, so a stylesheet can fade
+   * them as they shrink. A phone draws only the series shown.
+   */
+  hidden?: boolean
   one: Series
   slots: (SeriesPoint | undefined)[]
   tone: number
@@ -256,6 +262,7 @@ export type BarDraw<T> = (
   from: number | undefined,
   end: StackEnd | undefined,
   named: string | undefined,
+  hidden: boolean,
 ) => T
 
 /**
@@ -272,14 +279,19 @@ const stackAt = <T>(
   const scales = [...new Set(columns.map(({ one }) => against(one)))]
   return scales.flatMap((scale) => {
     const mine = columns.filter(({ one }) => against(one) === scale)
-    const values = mine.map(({ slots }) => slots[index]?.value)
+    /* A hidden series is none of the stack, so its segment has no length
+       and the ones beyond it close over where it stood. */
+    const values = mine.map(({ hidden, slots }) => {
+      const value = slots[index]?.value
+      return hidden && value !== undefined ? 0 : value
+    })
     const spans = stackSpans(values)
     const ends = stackFarEnds(values)
-    return mine.flatMap(({ slots, tone }, place) => {
+    return mine.flatMap(({ hidden, slots, tone }, place) => {
       const span = spans[place]
       return span === undefined
         ? []
-        : [draw(span[1], 0, tone, scale, span[0], ends[place], slots[index]?.tone)]
+        : [draw(span[1], 0, tone, scale, span[0], ends[place], slots[index]?.tone, hidden === true)]
     })
   })
 }
@@ -288,6 +300,11 @@ const stackAt = <T>(
  * A category's columns, side by side or stacked, as `draw` makes each. A
  * blank cell is no column at all, and a column alone is a stack of one, so
  * it is its own far end, above zero or below it.
+ *
+ * **A hidden series keeps its place among the columns**, so a column is the
+ * same element whether its neighbors are hidden or not. Its depth is the
+ * place of the next column shown, which a hidden one leaves to it, so its
+ * column of no length stands at the edge they share, and it is no far end.
  */
 export const barColumnsAt = <T>(
   columns: readonly BarColumn[],
@@ -295,25 +312,33 @@ export const barColumnsAt = <T>(
   stacked: boolean,
   against: (one: Series) => Scale,
   draw: BarDraw<T>,
-): T[] =>
-  stacked
-    ? stackAt(columns, index, against, draw)
-    : columns.flatMap(({ slots, one, tone }, depth) => {
-        const point = slots[index]
-        return point === undefined
-          ? []
-          : [
-              draw(
-                point.value,
-                depth,
-                tone,
-                against(one),
-                undefined,
-                stackFarEnds([point.value])[0],
-                point.tone,
-              ),
-            ]
-      })
+): T[] => {
+  if (stacked) {
+    return stackAt(columns, index, against, draw)
+  }
+  let depth = 0
+  return columns.flatMap(({ hidden, slots, one, tone }) => {
+    const point = slots[index]
+    const at = depth
+    if (!hidden) {
+      depth += 1
+    }
+    return point === undefined
+      ? []
+      : [
+          draw(
+            point.value,
+            at,
+            tone,
+            against(one),
+            undefined,
+            hidden ? undefined : stackFarEnds([point.value])[0],
+            point.tone,
+            hidden === true,
+          ),
+        ]
+  })
+}
 
 export type { StackEnd } from './bar-stack.js'
 export { stackEnds, stackedReadings, stackFarEnds, stackSpans } from './bar-stack.js'

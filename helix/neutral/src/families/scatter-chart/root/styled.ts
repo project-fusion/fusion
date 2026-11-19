@@ -25,7 +25,8 @@ import root from './headless.js'
  *
  * **Web only:** every other level across hidden once the chart is narrow,
  * which a phone's chart leaves out of its list, the point the reading rests
- * on growing as it arrives, the crosshair, printing, and forced colors.
+ * on growing as it arrives, a series a legend hides fading out where it
+ * stood, the crosshair, printing, and forced colors.
  */
 export default styles(
   root,
@@ -49,6 +50,9 @@ export default styles(
     const series = measured('chart-series')
     const diameter = own.scatterChartDiameter(hook.pointSize)
     const beside = sum(measured('scatter-chart-axis-size'), hook.gap)
+    /* The privates the shared chart motion sheet sets from the public hooks. */
+    const move = measured('_chart-move-duration', token('duration-normal'))
+    const moveEasing = measured('_chart-move-easing', token('easing-decelerate'))
     return [
       include(chartStatus),
       include(chartTooltip),
@@ -133,12 +137,27 @@ export default styles(
           web([
             rule({
               transition: list(
-                ['d', token('duration-normal'), token('easing-decelerate')],
-                ['stroke-width', token('duration-normal'), token('easing-decelerate')],
+                ['d', move, moveEasing],
+                ['stroke-width', move, moveEasing],
+                ['opacity', move, moveEasing],
+                ['visibility', move],
               ),
             }),
           ]),
         ],
+      ),
+      /* **A series a legend hid fades out where it stood**, while the others
+         move to the scale that fits them. The tier below keeps its points
+         with each path hidden, which `visibility` above holds off until the
+         fade has run. The paths fade and the group keeps its opacity. Shown
+         again, the points fade in and move from there to their new places. */
+      on(
+        {
+          part: 'point',
+          selector:
+            '[part~="points-hidden"] > [part="point"], [part~="points-hidden"] > [part="point-ring"]',
+        },
+        [web([rule({ opacity: 0 })])],
       ),
       on('point-ring', [
         rule({

@@ -172,10 +172,22 @@ export default styles(
         web([
           rule({
             transition: list(
-              ['r', token('duration-normal'), token('easing-decelerate')],
+              [
+                'r',
+                measured('_chart-move-duration', token('duration-normal')),
+                measured('_chart-move-easing', token('easing-decelerate')),
+              ],
               ['stroke', token('duration-fast'), token('easing-decelerate')],
-              ['stroke-dasharray', token('duration-normal'), token('easing-decelerate')],
-              ['stroke-dashoffset', token('duration-normal'), token('easing-decelerate')],
+              [
+                'stroke-dasharray',
+                measured('_chart-move-duration', token('duration-normal')),
+                measured('_chart-move-easing', token('easing-decelerate')),
+              ],
+              [
+                'stroke-dashoffset',
+                measured('_chart-move-duration', token('duration-normal')),
+                measured('_chart-move-easing', token('easing-decelerate')),
+              ],
               ['stroke-width', token('duration-fast'), token('easing-decelerate')],
             ),
           }),
@@ -183,7 +195,15 @@ export default styles(
         ]),
       ]),
       on('track', [
-        web([rule({ transition: ['r', token('duration-normal'), token('easing-decelerate')] })]),
+        web([
+          rule({
+            transition: [
+              'r',
+              measured('_chart-move-duration', token('duration-normal')),
+              measured('_chart-move-easing', token('easing-decelerate')),
+            ],
+          }),
+        ]),
       ]),
       on('segment', [rule({ web: { cursor: 'crosshair' } })]),
       /* A half circle, opening downward, from nine o'clock. */

@@ -34,6 +34,7 @@ import {
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
+import { repeat } from 'lit/directives/repeat.js'
 import '../../tooltip/index.js'
 
 export type { ScatterField, ScatterPoint } from '@fusion.dev/helix-core'
@@ -167,6 +168,7 @@ const coefficientIn = (locale: string): Intl.NumberFormat => {
  * @csspart point-active - The point of the row the reading rests on, one for each series with a point in that row, drawn over the others as an element of its own and placed by `--chart-point-x` and `--chart-point-y`. Under `size-by`, it carries its size as `--chart-point-weight`.
  * @csspart point-ring - The points of a `point` path again, under it, to stroke a little wider in the page's color, so each point keeps its edge where it overlaps another.
  * @csspart points - The points of one series that do not overlap one another, as a group of their `point-ring` and `point` paths. Its opacity is each point's, so where points overlap they darken. Carries its series color as `--chart-series`.
+ * @csspart points-hidden - The `points` of a series a legend hid, kept where they were last drawn, with each path `visibility="hidden"`, so a stylesheet can fade them out while the others move to the new scale. Set alongside `points`.
  * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
  * @csspart svg - The drawing surface the gridlines and the trend lines sit on.
@@ -627,6 +629,9 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     </div>`
   }
 
+  /** Each series' points as they were last drawn while it was shown, by its depth. */
+  private readonly shownPoints = new Map<number, readonly ScatterPoint[]>()
+
   /**
    * Every shown series' points, as `points` groups of `point-ring` and
    * `point` paths, held against the field and the sizes they were drawn at.
@@ -658,22 +663,40 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     const measured = plot !== undefined && widest > 0
     const ringOf = (point: ScatterPoint): number =>
       this.rings.get(point.weight === undefined ? '' : String(point.weight)) ?? widest
-    /* Each series' points as layers of paths, a path a size: core's `scatterLayers`. */
-    const layers = scatterLayers(field, { height, width }, ratio, measured ? ringOf : undefined)
-    const marks = svg`${layers.map(({ depth, paths }) => {
-      const index = seriesIndex(depth)
-      const styled = paths.map(({ d, weight }) => ({
-        d,
-        style: weight === undefined ? nothing : `--chart-point-weight: ${weight}`,
-      }))
-      return svg`<g
+    /* Each series' points as layers of paths, a path a size: core's
+       `scatterLayers`. A series a legend hid keeps the points it was last
+       drawn with, hidden, so a stylesheet can fade them out where they stood.
+       Each series keeps its place among the groups, so no series' points
+       travel to another's. */
+    const layers = scatterLayers(
+      field,
+      { height, width },
+      ratio,
+      measured ? ringOf : undefined,
+      this.shownPoints,
+    )
+    const marks = svg`${repeat(
+      layers,
+      ({ depth, layer }) => `${depth} ${layer}`,
+      ({ depth, hidden, paths }) => {
+        const index = seriesIndex(depth)
+        const unseen = hidden ? 'hidden' : nothing
+        const styled = paths.map(({ d, weight }) => ({
+          d,
+          style: weight === undefined ? nothing : `--chart-point-weight: ${weight}`,
+        }))
+        return svg`<g
           data-series=${index}
-          part="points"
+          part="points${hidden ? ' points-hidden' : ''}"
           style="--chart-series: var(--chart-series-${index})"
         >${styled.map(
-          ({ d, style }) => svg`<path d=${d} part="point-ring" style=${style} />`,
-        )}${styled.map(({ d, style }) => svg`<path d=${d} part="point" style=${style} />`)}</g>`
-    })}`
+          ({ d, style }) =>
+            svg`<path d=${d} part="point-ring" style=${style} visibility=${unseen} />`,
+        )}${styled.map(
+          ({ d, style }) => svg`<path d=${d} part="point" style=${style} visibility=${unseen} />`,
+        )}</g>`
+      },
+    )}`
     this.painted = { field, key, marks }
     return marks
   }

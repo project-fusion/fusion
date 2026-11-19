@@ -25,16 +25,14 @@ import {
  * lines of best fit, and both scales stand at the levels core picks.
  *
  * **The points and the reading are two layers**, so moving the reading
- * leaves the points as they are.
- *
- * **The plot is read**, as Line Chart's is: by the arrow keys on the web, and
- * on a phone by a tap or a drag to the nearest point and as one adjustable
- * control. The bubble is a Tooltip over the point, with its row. With nothing
- * to draw it says so, as the other charts do.
+ * leaves the points as they are. **The plot is read**, as Line Chart's is:
+ * by the arrow keys on the web, and on a phone by a tap or a drag to the
+ * nearest point and as one adjustable control. The bubble is a Tooltip over
+ * the point, with its row. With nothing to draw it says so, as the others do.
  *
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
- * Listen button `sonify` draws, a reading shown under a mouse, and the plane
- * held left to right on a right-to-left page.
+ * Listen button `sonify` draws, a reading shown under a mouse, the plane held
+ * left to right on a right-to-left page, and `points-hidden` fading out.
  */
 export default headless('scatter-chart', {
   props: {
@@ -175,6 +173,7 @@ export default headless('scatter-chart', {
             part="layers"
           >
             <View
+              also={{ 'points-hidden': entry.hidden }}
               ariaHidden
               data-series={entry.series}
               part="points"

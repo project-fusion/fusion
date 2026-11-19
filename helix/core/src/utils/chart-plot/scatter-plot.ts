@@ -151,6 +151,10 @@ export interface ScatterPath {
 /** One layer of a series' points, in its palette place. */
 export interface ScatterLayer {
   readonly depth: number
+  /** Whether a legend hid the series, whose points stay where they were last drawn, hidden. */
+  readonly hidden?: boolean
+  /** The layer's place among its series' layers, which keys it with `depth`. */
+  readonly layer: number
   readonly paths: readonly ScatterPath[]
 }
 
@@ -159,12 +163,18 @@ export interface ScatterLayer {
  * `box` in pixels, a point in the layer that leaves its ring whole, at most
  * `SCATTER_LAYERS`, where `ringOf` gives each point's ring. Before the rings
  * are measured, every point is in one layer.
+ *
+ * Given `kept`, each series shown writes its points there, and a series a
+ * legend hid is drawn from the points it was last shown with, `hidden`, so
+ * the web's chart can fade them out where they stood. The series then come
+ * in the order of their columns, so none takes another's place.
  */
 export const scatterLayers = (
   field: ScatterField,
   box: { readonly height: number; readonly width: number },
   ratio: number,
   ringOf: ((point: ScatterPoint) => number) | undefined,
+  kept?: Map<number, readonly ScatterPoint[]>,
 ): ScatterLayer[] => {
   const series = new Map<number, ScatterPoint[]>()
   for (const point of field.points) {
@@ -175,13 +185,26 @@ export const scatterLayers = (
       series.set(point.depth, [point])
     }
   }
-  return [...series].flatMap(([depth, points]) => {
+  type Drawn = [number, readonly ScatterPoint[], boolean]
+  const drawn: Drawn[] =
+    kept === undefined
+      ? [...series].map(([depth, points]): Drawn => [depth, points, false])
+      : field.yNames.flatMap((_, depth): Drawn[] => {
+          const shown = series.get(depth)
+          if (shown) {
+            kept.set(depth, shown)
+            return [[depth, shown, false]]
+          }
+          const held = kept.get(depth)
+          return held ? [[depth, held, true]] : []
+        })
+  return drawn.flatMap(([depth, points, hidden]) => {
     const placed = points.map((point) => ({
       width: ringOf === undefined ? 0 : ringOf(point),
       x: (point.x / PLOT_WIDTH) * box.width,
       y: (point.y / PLOT_HEIGHT) * box.height,
     }))
-    return layersOf(placed, ringOf === undefined ? 1 : SCATTER_LAYERS, ratio).map((layer) => {
+    return layersOf(placed, ringOf === undefined ? 1 : SCATTER_LAYERS, ratio).map((layer, deep) => {
       const sized = new Map<number | undefined, string[]>()
       for (const at of layer) {
         const point = points[at] as ScatterPoint
@@ -193,7 +216,12 @@ export const scatterLayers = (
           sized.set(point.weight, [dot])
         }
       }
-      return { depth, paths: [...sized].map(([weight, dots]) => ({ d: dots.join(''), weight })) }
+      return {
+        depth,
+        ...(hidden ? { hidden: true } : {}),
+        layer: deep,
+        paths: [...sized].map(([weight, dots]) => ({ d: dots.join(''), weight })),
+      }
     })
   })
 }

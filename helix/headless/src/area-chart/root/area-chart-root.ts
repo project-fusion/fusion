@@ -17,8 +17,9 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  heldInside,
   latestShares,
-  levelRules,
+  levelsOf,
   MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
@@ -27,12 +28,14 @@ import {
   percentIn,
   type Row,
   reportRuntime,
+  ScaleMemory,
   seriesIndex,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import '../../tooltip/index.js'
 
 /** The table as parts of a total, as core reads it: which columns, what each holds, and the running sums. */
@@ -142,15 +145,18 @@ export type { AreaStack }
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - One part's band.
+ * @csspart area-hidden - The band of a part a legend hid, closed to nothing where it stood and hidden, so a stylesheet can fade it as it closes. Set alongside `area`.
  * @csspart axis - The numbers of the scale beside the plot, unless `value-axis` is `none`.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
- * @csspart guide - A rule down the reading a pointer is resting on.
+ * @csspart gridline-leaving - A rule at a level the scale no longer has, kept hidden at its place on the new scale, so a stylesheet can fade it out as it moves. Set alongside `gridline`.
+ * @csspart guide - A rule down the reading a pointer is resting on, moved to it with `translate`, so a stylesheet can glide it from one to the next.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The top edge of one part's band.
+ * @csspart line-hidden - The top edge of a part a legend hid, hidden. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -161,6 +167,7 @@ export type { AreaStack }
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
+ * @csspart tick-leaving - A number the scale no longer has, kept `hidden` at its place on the new scale, held inside the plot, so a stylesheet can fade it out as it moves. Set alongside `tick`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
@@ -304,6 +311,12 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
 
   private warnedAboutNegatives = false
 
+  /** The scale drawn before this one, whose levels the axis and the rules leave from. */
+  private readonly scaleBefore = new ScaleMemory()
+
+  /** The scale before the one this render draws, from `scaleBefore`. */
+  private domainBefore: readonly [number, number] | undefined
+
   /**
    * Measures the axis and says which reading names fit on it, which are the
    * names drawn and the readings `category` gridlines rule.
@@ -392,6 +405,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
        the names underneath are a row of equal columns, and a reading at the
        edge of the box sits half a slot away from its own name. */
     const { x, y } = axisScales(domain, rows.length)
+    this.domainBefore = this.scaleBefore.before(domain)
     return html`${this.drawsAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
       ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}${this.renderSonify()}${this.renderTable()}`
   }
@@ -409,6 +423,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       (value) => (y(value) / PLOT_HEIGHT) * 100,
       this.share ? (value) => percent.format(value) : formatNumbers(locale),
       (widest) => `--area-chart-axis: ${widest}ch`,
+      this.domainBefore,
     )
   }
 
@@ -446,7 +461,15 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${order.map((depth) => this.renderLayer(stack.layers[depth] ?? [], depth, x, y))}
+        ${order.map((depth) =>
+          this.renderLayer(
+            stack.layers[depth] ?? [],
+            depth,
+            x,
+            y,
+            !this.showsSeries(stack.names[depth] ?? ''),
+          ),
+        )}
         ${this.renderGridlines(x, y, domain, count)}
         <line part="baseline" x1="0" x2=${PLOT_WIDTH} y1=${PLOT_HEIGHT} y2=${PLOT_HEIGHT} />
         ${this.renderGuide(x)}
@@ -455,12 +478,20 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     </div>`
   }
 
-  /** One band: everything under its top edge, and the edge itself. */
+  /**
+   * One band: everything under its top edge, and the edge itself.
+   *
+   * `hidden` is a part a legend hid, which the stack has already closed to
+   * nothing where it stood. Its band and edge stay, with `area-hidden` and
+   * `line-hidden` and `visibility="hidden"`, so a stylesheet can fade them as
+   * the band closes and the bands above settle onto it.
+   */
   protected renderLayer(
     layer: number[],
     depth: number,
     x: (value: number) => number,
     y: (value: number) => number,
+    hidden = false,
   ): TemplateResult | typeof nothing {
     const band = areaBand(layer, { x, y }, this.curve ?? 'straight')
     if (band === undefined) {
@@ -471,14 +502,16 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     return svg`<path
         d=${wash}
         data-series=${index}
-        part="area"
+        part="area${hidden ? ' area-hidden' : ''}"
         style="--chart-series: var(--chart-series-${index})"
+        visibility=${hidden ? 'hidden' : nothing}
       /><path
         d=${path}
         data-series=${index}
         fill="none"
-        part="line"
+        part="line${hidden ? ' line-hidden' : ''}"
         style="--chart-series: var(--chart-series-${index})"
+        visibility=${hidden ? 'hidden' : nothing}
       />`
   }
 
@@ -502,12 +535,25 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
           )
       : []
     /* The floor is the baseline's, and a gridline drawn on top of it is the
-       same rule twice. */
+       same rule twice. Keyed by level and moved by `translate`, so a rule a
+       new scale keeps moves to its new level, and one it drops stays hidden
+       for its fade. */
     const across = this.rulesValue
-      ? levelRules(domain, y, domain[0]).map(
-          (level) => svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${level} y2=${level} />`,
+      ? repeat(
+          levelsOf(domain, this.domainBefore).filter(({ level }) => level > domain[0]),
+          (one) => one.level,
+          ({ leaving, level }) =>
+            svg`<line
+              part="gridline${leaving ? ' gridline-leaving' : ''}"
+              style=${`translate: 0 ${leaving ? heldInside(y(level)) : y(level)}px`}
+              visibility=${leaving ? 'hidden' : nothing}
+              x1="0"
+              x2=${PLOT_WIDTH}
+              y1="0"
+              y2="0"
+            />`,
         )
-      : []
+      : nothing
     return svg`${down}${across}`
   }
 
@@ -522,7 +568,16 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     if (at < 0) {
       return nothing
     }
-    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
+    /* At the plot's start and moved by `translate`, a property a stylesheet
+       can transition in every engine, which the `x1` attribute is not. */
+    return svg`<line
+      part="guide"
+      style=${`translate: ${x(at)}px 0`}
+      x1="0"
+      x2="0"
+      y1="0"
+      y2=${PLOT_HEIGHT}
+    />`
   }
 
   /**

@@ -135,31 +135,45 @@ export const lineMarks = (
 
 /** Where a series ended, as percentages of the drawing's box, with its palette slot. */
 export interface LineEnd {
+  /** Whether a legend hid the series, whose mark stays where it last stood, hidden. */
+  readonly hidden?: boolean
   readonly index: number
   readonly x: number
   readonly y: number
+}
+
+/** The scales one series is drawn with, and whether a legend hid it, as `lineEnds` reads them. */
+export interface DrawnScales extends AxisScales {
+  readonly hidden?: boolean
 }
 
 /**
  * Where each series `shows` keeps ended, as percentages of the drawing's own
  * box, which `preserveAspectRatio="none"` does not stretch. A series of one
  * reading is a point and has no end to mark.
+ *
+ * `scales` is one pair for every series, or each series' own: the web's
+ * chart keeps a series a legend hid at the scales it was last shown with,
+ * marked `hidden`, so its mark fades out where it stood. A series it gives
+ * nothing for is not marked.
  */
 export const lineEnds = (
   series: readonly Series[],
   shows: (name: string) => boolean,
-  scales: AxisScales,
+  scales: AxisScales | ((one: Series) => DrawnScales | undefined),
 ): LineEnd[] =>
   series.flatMap((one, depth) => {
     const last = one.points.at(-1)
-    if (!shows(one.name) || !last || one.points.length < 2) {
+    const drawn: DrawnScales | undefined = typeof scales === 'function' ? scales(one) : scales
+    if (!shows(one.name) || !drawn || !last || one.points.length < 2) {
       return []
     }
     return [
       {
+        ...(drawn.hidden ? { hidden: true } : {}),
         index: seriesIndex(depth),
-        x: (scales.x(last.at) / PLOT_WIDTH) * 100,
-        y: (scales.y(last.value) / PLOT_HEIGHT) * 100,
+        x: (drawn.x(last.at) / PLOT_WIDTH) * 100,
+        y: (drawn.y(last.value) / PLOT_HEIGHT) * 100,
       },
     ]
   })
