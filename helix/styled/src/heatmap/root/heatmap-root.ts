@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessHeatmap } from '@fusion.dev/helix-headless/heatmap'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles } from './heatmap-root.css.js'
@@ -55,6 +56,8 @@ import '../../tooltip/index.js'
  * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
+ * @cssproperty --chart-move-easing - The curve a mark moves to a new reading along. Defaults to `--helix-easing-decelerate`. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --heatmap-cell-height - How tall a cell is. One row of tall, narrow cells looks like a status page.
  * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
@@ -79,7 +82,7 @@ import '../../tooltip/index.js'
 export class HelixHeatmap extends HelixHeadlessHeatmap {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [styles, sonifyStyles, statusMarkStyles]
+  static override styles: CSSResultGroup = [motionStyles, styles, sonifyStyles, statusMarkStyles]
 
   /**
    * How strongly the cells are drawn, as on every chart.
