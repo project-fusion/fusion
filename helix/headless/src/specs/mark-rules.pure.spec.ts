@@ -39,6 +39,7 @@ const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ['MIRROR_RULE', /data-mirror/],
   ['SHUT_RULE', /data-shut/],
   ['TOUCHES_RULE', /data-touches/],
+  ['DRAGS_RULE', /new DragDismissController\b/],
 ]
 
 /** The rules a module's code calls for, in declaration order. */
@@ -99,5 +100,9 @@ describe('the rules for the marks an element writes', () => {
     expect(writers('SPOKEN_RULE')).toContain('textarea/root/textarea-root.ts')
     expect(writers('MIRROR_RULE')).toContain('icon/root/icon-root.ts')
     expect(writers('SHUT_RULE')).toContain('object-inspector/root/object-inspector-root.ts')
+    expect(writers('DRAGS_RULE')).toEqual([
+      'drawer/root/drawer-root.ts',
+      'toast/item/toast-item.ts',
+    ])
   })
 })

@@ -26,6 +26,8 @@ import { styles } from './toast-item.css.js'
  * @cssproperty --toast-heading-weight - Weight of the heading in the `heading` slot.
  * @cssproperty --toast-item-padding - Space between the message's edge and its contents.
  * @cssproperty --toast-radius - Rounding of the panel's corners.
+ * @cssproperty --toast-release-duration - The longest a released message takes to go off the window, or to go back to its place. Defaults to `--helix-duration-slow`. `0ms` lands it at once.
+ * @cssproperty --toast-release-easing - The curve a released message goes back to its place along. Defaults to `--helix-easing-spring`.
  * @cssproperty --toast-shadow - Shadow under the panel. Follows `--helix-shadow-floating`. A
  *   floating surface can sit over any content, so it has a shadow by default.
  * @cssproperty --toast-timer-size - Thickness of the bar that counts down a timed message.

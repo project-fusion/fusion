@@ -5,7 +5,9 @@ type Arrival = { carried: string; name: string }
 // The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: "Press a message's close control", name: 'No events yet' }]
+const RESTING: Arrival[] = [
+  { carried: "Press a message's close control, or swipe it away", name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,10 +20,7 @@ export function Example() {
   }
 
   const dismissed = (event: CustomEvent<{ label: string }>) => {
-    say(
-      'helix-dismiss',
-      `the close button on "${event.detail.label}" was pressed, and the event bubbles`,
-    )
+    say('helix-dismiss', `"${event.detail.label}" is being dismissed, and the event bubbles`)
   }
 
   return (

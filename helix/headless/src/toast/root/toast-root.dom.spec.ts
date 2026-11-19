@@ -556,7 +556,7 @@ describe('a pointer or focus in the stack', () => {
 })
 
 describe('swipe-direction', () => {
-  test('tells every message the edge it swipes toward, the end unless set', async () => {
+  test('tells every message the edge it swipes toward, the edge its stack sits at unless set', async () => {
     const host = (await mount(`<helix-headless-toast>
       <helix-headless-toast-item>One</helix-headless-toast-item>
     </helix-headless-toast>`)) as HTMLElement & {
@@ -569,5 +569,9 @@ describe('swipe-direction', () => {
     host.swipeDirection = 'bottom'
     await host.updateComplete
     expect(item.swipeToward).toBe('bottom')
+    host.swipeDirection = undefined
+    host.setAttribute('placement', 'top-start')
+    await host.updateComplete
+    expect(item.swipeToward).toBe('start')
   })
 })

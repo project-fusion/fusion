@@ -1,0 +1,49 @@
+<!-- @summary A sheet that stays open while its note has unsaved changes. Drag it down and it springs back, because the page refuses `helix-before-close`. Save the note to close it. -->
+<!-- @min 420 -->
+<helix-button
+  command="--show"
+  commandfor="note"
+  emphasis="solid"
+  tone="primary"
+>
+  Write a note
+</helix-button>
+
+<helix-drawer
+  id="note"
+  label="Note"
+  placement="bottom"
+>
+  <span slot="header">Note</span>
+  <helix-textarea
+    id="note-text"
+    label="Note"
+    placeholder="Type, then drag the sheet down"
+  ></helix-textarea>
+  <helix-button
+    emphasis="solid"
+    id="note-save"
+    slot="footer"
+    tone="primary"
+  >
+    Save
+  </helix-button>
+</helix-drawer>
+
+<script type="module">
+  const note = document.getElementById('note')
+  const text = document.getElementById('note-text')
+  let saved = ''
+
+  // An unsaved note keeps the sheet open, however it is asked to close.
+  note.addEventListener('helix-before-close', (event) => {
+    if (text.value !== saved) {
+      event.preventDefault()
+    }
+  })
+
+  document.getElementById('note-save').addEventListener('click', () => {
+    saved = text.value
+    note.close()
+  })
+</script>

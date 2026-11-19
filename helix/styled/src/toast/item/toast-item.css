@@ -40,6 +40,13 @@
      past one inset: 8 pixels from one edge and 24 from the other at 320 and
      360. */
   max-inline-size: 100%;
+  /* **A released message goes back on the spring**, over at most the slow
+     step, and leaves at the speed it was let go, in no more than that. The
+     message reads these from its script, so this rule sets them, and a page
+     setting either on the element wins over it. Reduced motion takes the
+     token to 0.01ms, and a release then lands at once. */
+  --toast-release-duration: var(--helix-duration-slow);
+  --toast-release-easing: var(--helix-easing-spring);
 }
 
 [part="item"] {
@@ -249,13 +256,16 @@ slot[name="icon"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Under the finger while a swipe moves it, and back to rest when it lets go.
-   Only while swiping, so a message at rest has no transform of its own. The
-   browser keeps the vertical pan, on the regions inside as well, the item
-   being a scroll container that stops the rule reaching through it. */
-[part="item"],
-[part="item"] > * {
+/* **The page keeps the pan across the swipe, on the regions inside as
+   well.** `DRAGS_RULE` in `core` sets it on the item, which is a scroll
+   container and stops it reaching through, so each region inside says it
+   again for the axis the item is marked with. */
+[part="item"][data-drags="x"] > * {
   touch-action: pan-y;
+}
+
+[part="item"][data-drags="y"] > * {
+  touch-action: pan-x;
 }
 
 /* **And the slot itself, given a box for it.** Words slotted with no element
@@ -264,13 +274,27 @@ slot[name="icon"]::slotted(*) {
    A block holding the words lays them out exactly as the region did. */
 [part="content"] > slot {
   display: block;
+}
+
+[part="item"][data-drags="x"] [part="content"] > slot {
   touch-action: pan-y;
 }
 
-[part="item"][data-swiping] {
+[part="item"][data-drags="y"] [part="content"] > slot {
+  touch-action: pan-x;
+}
+
+/* **Under the finger from the first move until the release lands**, with no
+   transition on the item: the script moves it with `translate` and glides it
+   on its release. Swiped away, it leaves along the swipe alone, so the
+   message does not also drop toward its edge as it fades. */
+:host(:state(dragging)) [part="item"] {
   transition: none;
-  translate: var(--toast-swipe-x, 0) var(--toast-swipe-y, 0);
   user-select: none;
+}
+
+:host(:state(dragging)[data-closed]) {
+  translate: none;
 }
 
 /* How long is left, and only where a duration was given. */

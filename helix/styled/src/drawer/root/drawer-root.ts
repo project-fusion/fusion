@@ -44,6 +44,8 @@ import { styles } from './drawer-root.css.js'
  *   the other three sides, so the first line clears the window's edge. Falls back to
  *   `--drawer-padding`, so setting that alone sets all four sides.
  * @cssproperty --drawer-radius - Corner radius on the edges that face the page.
+ * @cssproperty --drawer-release-duration - The longest a released panel takes to go off its edge, or to go back to rest. Defaults to `--helix-duration-slow`. `0ms` lands it at once.
+ * @cssproperty --drawer-release-easing - The curve a released panel goes back to rest along. Defaults to `--helix-easing-spring`.
  * @cssproperty --drawer-scrim - The tint over the page behind the drawer. Set it on the host, because a `var()` written inside `::backdrop` cannot read a token.
  * @cssproperty --drawer-shadow - Shadow under the panel. Follows `--helix-shadow-floating`. A
  *   floating surface can sit over any content, so it has a shadow by default.

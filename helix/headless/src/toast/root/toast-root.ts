@@ -63,8 +63,9 @@ import { joinSaid, messageWords } from '../words.js'
  * to render them from: it appends a message of the region's own tier and
  * removes it once it has been dismissed and has finished leaving. Messages
  * you render yourself stay yours, and the region never removes them. A touch
- * or a pen swipes a message away toward the end of the line, or toward the
- * edge `swipe-direction` names.
+ * or a pen swipes a message away toward the edge the stack sits at, the end
+ * of the line unless `placement` puts it at the start, or toward the edge
+ * `swipe-direction` names.
  *
  * **`undoable()` offers to take an action back**, which replaces a
  * confirmation dialog for an action that can be undone: do the action, then
@@ -205,7 +206,9 @@ export class HelixHeadlessToast extends HelixElement {
 
   /**
    * The edge a touch or a pen swipes a message toward to dismiss it: `end`,
-   * the end of the line, or `start`, `top` or `bottom`. Unset is `end`.
+   * the end of the line, or `start`, `top`, or `bottom`. Unset is the inline
+   * edge the stack sits at: `start` for a `placement` ending in `start`, and
+   * `end` for every other.
    */
   @property({ attribute: 'swipe-direction' })
   swipeDirection?: 'bottom' | 'end' | 'start' | 'top'
@@ -599,7 +602,7 @@ export class HelixHeadlessToast extends HelixElement {
       if (item.regionHeld !== held) {
         item.regionHeld = held
       }
-      const toward = this.swipeDirection ?? 'end'
+      const toward = this.swipeDirection ?? (this.placement?.endsWith('start') ? 'start' : 'end')
       if (item.swipeToward !== toward) {
         item.swipeToward = toward
       }
@@ -1091,7 +1094,7 @@ export class HelixHeadlessToast extends HelixElement {
       this.restack()
       this.place()
     }
-    if (changed.has('swipeDirection')) {
+    if (changed.has('swipeDirection') || changed.has('placement')) {
       this.inform()
     }
   }

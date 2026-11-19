@@ -208,7 +208,14 @@ describe('what a message is to a screen reader', () => {
 })
 
 describe('a swipe', () => {
-  const swipe = (found: Item, dx: number, pointerType = 'touch'): HTMLElement => {
+  /* happy-dom has no layout, so the message is given a size. Each step is a
+     second after the last, so a swipe is slow unless a test says otherwise,
+     and the release lands at once: the headless tier sets no release timing. */
+  const swipe = (
+    found: Item,
+    dx: number,
+    { every = 1000, pointerType = 'touch' }: { every?: number; pointerType?: string } = {},
+  ): HTMLElement => {
     const box = found.shadowRoot?.querySelector('[part="item"]') as HTMLElement
     box.getBoundingClientRect = () => ({ height: 60, width: 300 }) as DOMRect
     const at = (type: string, x: number, time: number, target: EventTarget): void => {
@@ -225,45 +232,83 @@ describe('a swipe', () => {
       target.dispatchEvent(event)
     }
     at('pointerdown', 0, 0, box)
-    at('pointermove', dx, 1000, window)
+    at('pointermove', dx, every, window)
     return box
   }
-  const release = (x: number): void => {
+  const release = (x: number, time = 2000): void => {
     const event = new PointerEvent('pointerup', {
       bubbles: true,
       button: 0,
       clientX: x,
       pointerId: 5,
     })
-    Object.defineProperty(event, 'timeStamp', { value: 2000 })
+    Object.defineProperty(event, 'timeStamp', { value: time })
     window.dispatchEvent(event)
   }
 
   test('follows the finger toward the end of the line, and past halfway dismisses', async () => {
-    const found = (await mount(
-      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
-    )) as Item
-    await found.updateComplete
+    const found = await message()
+    const heard: string[] = []
+    found.addEventListener('helix-dismiss', () => heard.push('helix-dismiss'))
     const box = swipe(found, 200)
-    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('200px')
+    expect(box.style.translate).toBe('200px 0px')
+    expect(hasState(found, 'dragging')).toBe(true)
     release(200)
+    await found.updateComplete
+    expect(heard).toEqual(['helix-dismiss'])
+    expect(found.open).toBe(false)
+    expect(hasState(found, 'dragging')).toBe(false)
+  })
+
+  test('a quick flick dismisses from a short distance', async () => {
+    const found = await message()
+    swipe(found, 40, { every: 20 })
+    release(40, 20)
     await found.updateComplete
     expect(found.open).toBe(false)
   })
 
   test('short of halfway it goes back, and a mouse moves nothing', async () => {
-    const found = (await mount(
-      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
-    )) as Item
-    await found.updateComplete
+    const found = await message()
     const box = swipe(found, 60)
     release(60)
     await found.updateComplete
     expect(found.open).toBe(true)
-    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('')
-    swipe(found, 200, 'mouse')
-    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('')
+    expect(box.style.translate).toBe('')
+    swipe(found, 200, { pointerType: 'mouse' })
+    expect(box.style.translate).toBe('')
     release(200)
+  })
+
+  test('a refused dismissal goes back to its place', async () => {
+    const found = await message()
+    found.addEventListener('helix-dismiss', (event) => event.preventDefault())
+    const box = swipe(found, 200)
+    release(200)
+    await found.updateComplete
+    expect(found.open).toBe(true)
+    expect(box.style.translate).toBe('')
+  })
+
+  test('toward the left on a right-to-left page, where the end of the line is', async () => {
+    const found = await message('dir="rtl"')
+    const box = swipe(found, -200)
+    expect(box.style.translate).toBe('-200px 0px')
+    release(-200)
+    await found.updateComplete
+    expect(found.open).toBe(false)
+  })
+
+  test('the message is marked with the axis it swipes along, and taken off once it goes', async () => {
+    const found = await message()
+    const box = found.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+    expect(box.getAttribute('data-drags')).toBe('x')
+    ;(found as Item & { swipeToward: string }).swipeToward = 'bottom'
+    await found.updateComplete
+    expect(box.getAttribute('data-drags')).toBe('y')
+    ;(found as Item & { dismiss(): boolean }).dismiss()
+    await found.updateComplete
+    expect(box.hasAttribute('data-drags')).toBe(false)
   })
 })
 

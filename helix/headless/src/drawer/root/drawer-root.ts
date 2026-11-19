@@ -5,6 +5,8 @@ import {
   CommandController,
   coversPress,
   customElement,
+  DRAGS_RULE,
+  DragDismissController,
   drawDismiss,
   drawDismissGlyph,
   edgeOffset,
@@ -24,13 +26,11 @@ import {
   raiseAbove,
   reflectElements,
   refocusWithin,
-  SwipeController,
   type SwipeEdge,
   settleSwipe,
   snapTravel,
   swipeAxis,
   swipeEdge,
-  towardEdge,
   unlockScroll,
   words,
 } from '@fusion.dev/helix-core'
@@ -65,13 +65,24 @@ import { startsSwipe } from '../swipe-start.js'
  * still close it. `closedby="none"` keeps it open on all three as well, and
  * `closedby="closerequest"` keeps it open on a press outside.
  *
- * **A touch or a pen swipes it away**, toward the edge it came from, resolved
- * against the writing direction. A swipe past halfway, or a quick one, closes
- * it through the same request as every other way out. `snap-points` lists the
- * fractions of the panel a reader can leave on screen, such as `0.5 1` for a
- * sheet that rests half open: it opens at the smallest, and a swipe settles at
- * the nearest. While a swipe moves the panel, the distance is written on it as
- * `--drawer-swipe-x` and `--drawer-swipe-y`. `swipe="false"` turns swiping off.
+ * **A touch or a pen drags it closed**, toward the edge it came from, resolved
+ * against the writing direction, from anywhere on the panel but a field or
+ * content that scrolls along the drag. The panel follows the finger, and past
+ * its open end it gives less and less. A drag past halfway, or a quick flick
+ * from any distance, closes it through the same request as every other way
+ * out, so a `helix-before-close` listener can refuse it, and then the panel
+ * springs back. Let go, the panel carries on at the speed it was moving: off
+ * the edge, or back to rest along `--drawer-release-easing`. The panel takes
+ * an inline `translate` only while a drag and its release run, and the host
+ * has `:state(dragging)` for that time. While it moves, the backdrop can fade
+ * with `--drawer-drag-progress`. A mouse does not drag it, since a mouse drag
+ * selects text, and `swipe="false"` turns dragging off.
+ *
+ * `snap-points` lists the fractions of the panel a reader can leave on screen,
+ * such as `0.5 1` for a sheet that rests half open: it opens at the smallest,
+ * and a drag settles at the nearest, or at the next one along for a flick.
+ * The offset of the snap point it rests at is written on the panel as
+ * `--drawer-swipe-x` and `--drawer-swipe-y`.
  *
  * `snap` is the snap point the panel rests at, and `:state(snapped)` is on the
  * host while that is less than the whole panel. `snapTo()` moves it to
@@ -147,9 +158,13 @@ import { startsSwipe } from '../swipe-start.js'
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
- * @cssproperty --drawer-swipe-x - How far a swipe, or a snap point, has moved the panel across, in pixels, toward the right.
- * @cssproperty --drawer-swipe-y - How far a swipe, or a snap point, has moved the panel down, in pixels.
+ * @cssproperty --drawer-drag-progress - How far a drag, and the glide after it, has taken the panel from its smallest snap point to off its edge, from `0` to `1`. Written only while the host has `:state(dragging)`.
+ * @cssproperty --drawer-release-duration - The longest a released panel takes to go, or to go back to rest. Unset, it lands at once.
+ * @cssproperty --drawer-release-easing - The curve a released panel goes back to rest along, with the speed it was let go carried in.
+ * @cssproperty --drawer-swipe-x - How far the snap point the panel rests at moves it across, in pixels, toward the right.
+ * @cssproperty --drawer-swipe-y - How far the snap point the panel rests at moves it down, in pixels.
  *
+ * @cssstate dragging - From the moment a finger starts dragging the panel until its release has come to rest, on screen or off it.
  * @cssstate entering - From the moment the drawer opens until its entrance has finished.
  * @cssstate exiting - From the moment the drawer closes until its exit has finished.
  * @cssstate open - While the drawer is open.
@@ -157,6 +172,8 @@ import { startsSwipe } from '../swipe-start.js'
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
+  protected static override markRules = [DRAGS_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-drawer': { dismissLabel: 'Schließen' } })`.
@@ -346,19 +363,65 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     return (swipeAxis(this.edge) === 'x' ? box?.width : box?.height) ?? 0
   }
 
-  /* Swipe to dismiss. The controller says where the pointer is; what it means
-     here, a snap point or a close, is settled by `settleSwipe`. */
-  protected readonly swipes = new SwipeController(this, {
-    axis: () => (this.open && this.swipe ? swipeAxis(this.edge) : undefined),
-    end: (dx, dy, vx, vy) => this.settle(dx, dy, vx, vy),
-    move: (dx, dy) => this.place(Math.max(0, this.rest + towardEdge(this.edge, dx, dy))),
+  /** How far toward its edge the panel rests at its smallest snap point, in pixels, on a panel `size` long. */
+  private floor(size: number): number {
+    return snapTravel(size, parseSnapPoints(this.snapPoints)[0] ?? 1)
+  }
+
+  /* Dragged closed. The controller moves the panel and carries the release;
+     what a release means here, a snap point or a close, is settled by
+     `settleSwipe`, and the close is the same request as every other way out. */
+  protected readonly drags = new DragDismissController(this, {
+    /* A drawer that refuses to close gives past its smallest snap point. */
+    bounds: (size) => ({
+      max: this.refusesDismissal ? this.floor(size) : Number.POSITIVE_INFINITY,
+      min: 0,
+    }),
+    decide: ({ size, travel, velocity }) => {
+      const shown = settleSwipe({
+        points: parseSnapPoints(this.snapPoints),
+        size,
+        travel,
+        velocity,
+      })
+      if (shown === 0) {
+        return true
+      }
+      this.restAt(shown)
+      return false
+    },
+    dismiss: () => !this.refusesDismissal && this.requestOpen(false),
+    edge: () => (this.open && this.swipe ? this.edge : undefined),
+    landed: () => {
+      this.panel?.style.removeProperty('--drawer-drag-progress')
+      if (!this.open) {
+        this.finishClose()
+      }
+    },
+    mark: (on) => this.toggleState('dragging', on),
+    moved: (travel, size) => {
+      const floor = this.floor(size)
+      const progress = size > floor ? (travel - floor) / (size - floor) : 0
+      this.panel?.style.setProperty(
+        '--drawer-drag-progress',
+        String(Math.round(Math.min(1, Math.max(0, progress)) * 1000) / 1000),
+      )
+    },
+    rest: () => this.rest,
     start: (target, event) =>
       startsSwipe(target, event.pointerType, swipeAxis(this.edge), this.partNamed('content')),
     surface: () => this.panel,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--drawer-release-duration'),
+        easing: style.getPropertyValue('--drawer-release-easing'),
+      }
+    },
   })
 
   /**
-   * Writes how far the panel sits toward its edge, as the two properties the
+   * Writes how far the panel rests toward its edge, as the two properties the
    * styled tier translates it by. Nothing is written at rest.
    */
   private place(travel: number): void {
@@ -373,23 +436,18 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     panel.style.setProperty('--drawer-swipe-y', px(y))
   }
 
-  /** Brings a released swipe to rest: at a snap point, or closed through the request. */
-  private settle(dx: number, dy: number, vx: number, vy: number): void {
-    const edge = this.edge
-    const size = this.extent
-    const shown = settleSwipe({
-      points: parseSnapPoints(this.snapPoints),
-      size,
-      travel: Math.max(0, this.rest + towardEdge(edge, dx, dy)),
-      velocity: towardEdge(edge, vx, vy),
-    })
-    if (shown === 0 && !this.refusesDismissal && this.requestOpen(false)) {
-      return
-    }
-    if (shown !== 0) {
-      this.restAt(shown)
-    } else {
-      this.place(this.rest)
+  /**
+   * Takes the closed panel out of the top layer and puts it back at rest.
+   * After a drag closed it, this waits for its glide off the edge.
+   */
+  private finishClose(): void {
+    this.rest = 0
+    this.shown = 1
+    this.place(0)
+    this.markSnap()
+    const panel = this.panel
+    if (panel?.open) {
+      panel.close()
     }
   }
 
@@ -626,6 +684,63 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  /** Watches the content region and what is slotted into it for a change of size. */
+  private contentSizes: ResizeObserver | undefined
+
+  /**
+   * Marks the content region with the drag's axis while it does not scroll
+   * along it, and takes the mark off while it does.
+   *
+   * **The content region is a scroller, and a scroller's `touch-action` is its
+   * own.** Left to the styled sheet's `pan-y`, a sheet's words handed every
+   * downward drag to the browser, which canceled it: measured in Chromium on
+   * November 19, 2026, a touch drag on the text of a bottom sheet ended in
+   * `pointercancel` after two moves. Marked, a drag on words that do not
+   * scroll moves the panel, and content that scrolls along the drag keeps its
+   * scroll, as `startsSwipe` reads it.
+   */
+  private markContent(): void {
+    const content = this.partNamed('content')
+    if (!content) {
+      return
+    }
+    const axis = this.open && this.swipe ? swipeAxis(this.edge) : undefined
+    const scrolls =
+      axis === 'x'
+        ? content.scrollWidth > content.clientWidth
+        : content.scrollHeight > content.clientHeight
+    if (axis !== undefined && !scrolls) {
+      content.setAttribute('data-drags', axis)
+    } else {
+      content.removeAttribute('data-drags')
+    }
+  }
+
+  /** Watches the content region, and each element slotted into it, for a change of size. */
+  private watchContent(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      this.markContent()
+      return
+    }
+    this.contentSizes ??= new ResizeObserver(() => this.markContent())
+    this.contentSizes.disconnect()
+    const content = this.partNamed('content')
+    if (content) {
+      this.contentSizes.observe(content)
+    }
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
+    for (const one of slot?.assignedElements({ flatten: true }) ?? []) {
+      this.contentSizes.observe(one)
+    }
+    this.markContent()
+  }
+
+  /** The body's slot changed: its description, and whether it scrolls. */
+  private readonly handleBodyChange = (): void => {
+    this.describeByBody()
+    this.watchContent()
+  }
+
   /** A `<form method="dialog">` slotted into the drawer closes it, as in `Dialog`. */
   private readonly handleSubmit = (event: SubmitEvent): void => {
     closeOnDialogSubmit(event, (value) => this.close(value))
@@ -643,6 +758,8 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     super.disconnectedCallback()
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('submit', this.handleSubmit)
+    this.contentSizes?.disconnect()
+    this.contentSizes = undefined
     unlockScroll(this)
   }
 
@@ -650,16 +767,18 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     super.updated(changed)
     this.nameByHeader()
     this.describeByBody()
-    if (changed.has('open') && !this.open) {
-      this.rest = 0
-      this.shown = 1
-      this.place(0)
-      this.markSnap()
+    /* Closed by a drag, the panel stays in the top layer, and at its snap
+       point, until its glide off the edge lands: see `finishClose`. */
+    if (changed.has('open') && !this.open && !this.drags.dragging) {
+      this.finishClose()
     }
     if (this.open && this.modal) {
       lockScroll(this)
     } else {
       unlockScroll(this)
+    }
+    if (changed.has('open') || changed.has('swipe') || changed.has('placement')) {
+      this.watchContent()
     }
     /* After render, and only on a difference: `showModal()` on an open dialog
        throws and `close()` on a shut one fires a second `close` event.
@@ -728,7 +847,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       })
       /* At the smallest snap point, once the panel has a size to measure. */
       this.restAt(parseSnapPoints(this.snapPoints)[0] ?? 1)
-    } else if (!this.open && panel.open) {
+    } else if (!this.open && panel.open && !this.drags.dragging) {
       panel.close()
     }
   }
@@ -770,7 +889,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       @keydown=${this.handleKeydown}
     >
       <div part="header"><slot name="header" @slotchange=${this.nameByHeader}></slot></div>
-      <div part="content"><slot @slotchange=${this.describeByBody}></slot></div>
+      <div part="content"><slot @slotchange=${this.handleBodyChange}></slot></div>
       <div part="footer"><slot name="footer"></slot></div>
       ${
         this.dismissible

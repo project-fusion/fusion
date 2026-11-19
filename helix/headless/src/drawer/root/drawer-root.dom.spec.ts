@@ -361,13 +361,19 @@ describe('Escape on a drawer that is not modal', () => {
   })
 })
 
-describe('swiping it away', () => {
+describe('dragging it closed', () => {
   /* happy-dom has no layout, so the panel is given a size, and the pointer is
-     a touch, which is what swipes. */
+     a touch, which is what drags. Each step is a second after the last, so a
+     drag is slow unless a test says otherwise, and the release lands at once:
+     the headless tier sets no release timing. */
   const swipe = async (
     drawer: Drawer,
     to: number,
-    { pointerType = 'touch', steps = [to] }: { pointerType?: string; steps?: number[] } = {},
+    {
+      pointerType = 'touch',
+      steps = [to],
+      every = 1000,
+    }: { every?: number; pointerType?: string; steps?: number[] } = {},
   ): Promise<HTMLElement> => {
     const panel = part(drawer, 'panel') as HTMLElement
     panel.getBoundingClientRect = () => ({ height: 600, width: 320 }) as DOMRect
@@ -386,7 +392,7 @@ describe('swiping it away', () => {
     }
     at('pointerdown', 0, 0, panel)
     for (const [index, x] of steps.entries()) {
-      at('pointermove', x, 1000 + index * 1000)
+      at('pointermove', x, (index + 1) * every)
     }
     return panel
   }
@@ -401,61 +407,126 @@ describe('swiping it away', () => {
     Object.defineProperty(event, 'timeStamp', { value: time })
     window.dispatchEvent(event)
   }
-
-  test('follows the finger toward the edge it came from', async () => {
-    const drawer = (await mount(markup)) as Drawer
-    drawer.show()
-    await drawer.updateComplete
-    const panel = await swipe(drawer, 60)
-    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('60px')
-    release(60, 3000)
-    await drawer.updateComplete
-    expect(drawer.open).toBe(true)
-    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('')
-  })
-
-  test('closes it past halfway, through the request', async () => {
-    const drawer = (await mount(markup)) as Drawer
-    drawer.show()
-    await drawer.updateComplete
-    let asked = 0
-    drawer.addEventListener('helix-before-close', () => {
-      asked += 1
-    })
-    await swipe(drawer, 200)
-    release(200, 3000)
-    await drawer.updateComplete
-    expect(asked).toBe(1)
-    expect(drawer.open).toBe(false)
-  })
-
-  test('comes to rest at a snap point', async () => {
+  const open = async (attributes = ''): Promise<Drawer> => {
     const drawer = (await mount(
-      markup.replace('<helix-headless-drawer', '<helix-headless-drawer snap-points="0.5 1"'),
+      markup.replace('<helix-headless-drawer', `<helix-headless-drawer ${attributes}`),
     )) as Drawer
     drawer.show()
     await drawer.updateComplete
+    return drawer
+  }
+
+  test('follows the finger toward the edge it came from, and says it is dragging', async () => {
+    const drawer = await open()
+    const panel = await swipe(drawer, 60)
+    expect(panel.style.translate).toBe('60px 0px')
+    expect(hasState(drawer, 'dragging')).toBe(true)
+    expect(panel.style.getPropertyValue('--drawer-drag-progress')).toBe('0.188')
+    release(60, 3000)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    expect(panel.style.translate).toBe('')
+    expect(panel.style.getPropertyValue('--drawer-drag-progress')).toBe('')
+    expect(hasState(drawer, 'dragging')).toBe(false)
+  })
+
+  test('marks the panel with the axis it drags along, while it is open', async () => {
+    const drawer = (await mount(markup)) as Drawer
+    const panel = part(drawer, 'panel') as HTMLElement
+    expect(panel.hasAttribute('data-drags')).toBe(false)
+    drawer.show()
+    await drawer.updateComplete
+    expect(panel.getAttribute('data-drags')).toBe('x')
+    const sheet = await open('placement="bottom"')
+    expect((part(sheet, 'panel') as HTMLElement).getAttribute('data-drags')).toBe('y')
+  })
+
+  test('marks the content for the drag while it does not scroll along it', async () => {
+    const sheet = (await open('placement="bottom"')) as Drawer & { placement: string }
+    const content = part(sheet, 'content') as HTMLElement
+    expect(content.getAttribute('data-drags')).toBe('y')
+    Object.defineProperty(content, 'scrollHeight', { value: 900 })
+    Object.defineProperty(content, 'clientHeight', { value: 300 })
+    sheet.placement = 'top'
+    await sheet.updateComplete
+    expect(content.hasAttribute('data-drags')).toBe(false)
+  })
+
+  test('closes it past halfway, through the request', async () => {
+    const drawer = await open()
+    const heard: string[] = []
+    drawer.addEventListener('helix-before-close', () => heard.push('helix-before-close'))
+    drawer.addEventListener('toggle', () => heard.push('toggle'))
+    const panel = await swipe(drawer, 200)
+    release(200, 3000)
+    await drawer.updateComplete
+    expect(heard).toEqual(['helix-before-close', 'toggle'])
+    expect(drawer.open).toBe(false)
+    expect((panel as HTMLDialogElement).open).toBe(false)
+  })
+
+  test('a quick flick closes it from a short distance', async () => {
+    const drawer = await open()
+    await swipe(drawer, 50, { every: 10, steps: [15, 30, 50] })
+    release(50, 30)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(false)
+  })
+
+  test('a refused close springs back', async () => {
+    const drawer = await open()
+    drawer.addEventListener('helix-before-close', (event) => event.preventDefault())
+    const panel = await swipe(drawer, 200)
+    release(200, 3000)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+    expect(panel.style.translate).toBe('')
+  })
+
+  test('toward the left on a right-to-left page, where its end is', async () => {
+    document.documentElement.dir = 'rtl'
+    try {
+      const drawer = await open()
+      const panel = await swipe(drawer, -200)
+      expect(panel.style.translate).toBe('-200px 0px')
+      release(-200, 3000)
+      await drawer.updateComplete
+      expect(drawer.open).toBe(false)
+    } finally {
+      document.documentElement.removeAttribute('dir')
+    }
+  })
+
+  test('a persistent drawer gives, and stays', async () => {
+    const drawer = await open('persistent')
+    const panel = await swipe(drawer, 200)
+    const moved = Number.parseFloat(panel.style.translate)
+    expect(moved).toBeGreaterThan(0)
+    expect(moved).toBeLessThan(200)
+    release(200, 3000)
+    await drawer.updateComplete
+    expect(drawer.open).toBe(true)
+  })
+
+  test('comes to rest at a snap point', async () => {
+    const drawer = await open('snap-points="0.5 1"')
     const panel = await swipe(drawer, 150)
     release(150, 3000)
     await drawer.updateComplete
     expect(drawer.open).toBe(true)
     expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('160px')
+    expect(panel.style.translate).toBe('')
   })
 
   test('a mouse drags nothing, and swipe="false" turns it off', async () => {
-    const drawer = (await mount(markup)) as Drawer
-    drawer.show()
-    await drawer.updateComplete
+    const drawer = await open()
     const panel = await swipe(drawer, 200, { pointerType: 'mouse' })
-    expect(panel.style.getPropertyValue('--drawer-swipe-x')).toBe('')
+    expect(panel.style.translate).toBe('')
     release(200, 3000)
-    const off = (await mount(
-      markup.replace('<helix-headless-drawer', '<helix-headless-drawer swipe="false"'),
-    )) as Drawer
-    off.show()
-    await off.updateComplete
+    const off = await open('swipe="false"')
     const still = await swipe(off, 200)
-    expect(still.style.getPropertyValue('--drawer-swipe-x')).toBe('')
+    expect(still.style.translate).toBe('')
+    expect(still.hasAttribute('data-drags')).toBe(false)
     release(200, 3000)
   })
 })
