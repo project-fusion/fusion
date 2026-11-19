@@ -47,8 +47,11 @@ describe('the revealing example', () => {
       const moving = card.getBoundingClientRect().height
       await until(() => !hasState(profile, 'revealing'))
       const loaded = card.getBoundingClientRect().height
-      expect(moving).toBeGreaterThan(loading)
-      expect(moving).toBeLessThan(loaded)
+      /* Between, whichever is taller: the placeholder is drawn to the card's
+         shape, and the words it stands for wrap by the runner's fonts. */
+      expect(loaded).not.toBe(loading)
+      expect(moving).toBeGreaterThan(Math.min(loading, loaded))
+      expect(moving).toBeLessThan(Math.max(loading, loaded))
       expect((part(profile, 'placeholder') as HTMLElement | null)?.hidden).toBe(true)
 
       ;(document.getElementById('reload') as HTMLElement).click()

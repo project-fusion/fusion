@@ -51,6 +51,8 @@ export interface SpecResult {
 interface Case {
   body: () => unknown
   name: string
+  /** The blocks the test was declared in, outermost first. */
+  blocks: number[]
   suite: string[]
   /** This test's own limit, where it asked for one. */
   timeout?: number
@@ -64,9 +66,31 @@ type TestOptions = number | { timeout?: number }
 
 const cases: Case[] = []
 const hooks: { body: () => unknown; depth: number }[] = []
-const setups: { body: () => unknown; depth: number }[] = []
-const teardowns: { body: () => unknown; depth: number }[] = []
+/**
+ * A `beforeEach` or an `afterEach`, with the blocks it was declared in.
+ *
+ * **Scoped by block, as `bun:test` scopes it.** Every hook ran before every
+ * test of its family, wherever it was declared: on November 19, 2026 a
+ * headless Data Table spec's stand-in for `animate`, declared inside its own
+ * `describe`, stood in for it in the styled example spec sharing the page, and
+ * the example lit no rows. A block is a number, since two files can name a
+ * block alike. A hook declared outside any block still runs before every test
+ * of the family's page.
+ */
+interface EachHook {
+  blocks: number[]
+  body: () => unknown
+}
+
+const setups: EachHook[] = []
+const teardowns: EachHook[] = []
 let suite: string[] = []
+let blocks: number[] = []
+let lastBlock = 0
+
+/** Whether a hook was declared in a block that holds the test. */
+const holds = (hook: EachHook, entry: Case): boolean =>
+  hook.blocks.every((block, place) => entry.blocks[place] === block)
 
 /** How much of the above a previous bundle has already claimed. */
 let claimedCases = 0
@@ -77,8 +101,11 @@ let claimedTeardowns = 0
 /** Groups tests. Nests, and the names join for reporting. */
 export const describe = (name: string, body: () => void): void => {
   suite = [...suite, name]
+  lastBlock += 1
+  blocks = [...blocks, lastBlock]
   body()
   suite = suite.slice(0, -1)
+  blocks = blocks.slice(0, -1)
 }
 
 /**
@@ -90,7 +117,13 @@ export const describe = (name: string, body: () => void): void => {
  */
 const register = (name: string, body: () => unknown, options?: TestOptions): void => {
   const timeout = typeof options === 'number' ? options : options?.timeout
-  cases.push({ body, name, suite: [...suite], ...(timeout === undefined ? {} : { timeout }) })
+  cases.push({
+    blocks: [...blocks],
+    body,
+    name,
+    suite: [...suite],
+    ...(timeout === undefined ? {} : { timeout }),
+  })
 }
 
 /**
@@ -147,7 +180,7 @@ export const beforeAll = (body: () => unknown): void => {
  * fails that test, which then does not run.
  */
 export const beforeEach = (body: () => unknown): void => {
-  setups.push({ body, depth: suite.length })
+  setups.push({ blocks: [...blocks], body })
 }
 
 /**
@@ -165,7 +198,7 @@ export const beforeEach = (body: () => unknown): void => {
  * for every file that runs after it in the same page.
  */
 export const afterEach = (body: () => unknown): void => {
-  teardowns.push({ body, depth: suite.length })
+  teardowns.push({ blocks: [...blocks], body })
 }
 
 const show = (value: unknown): string => {
@@ -526,8 +559,8 @@ export const claim = (): (() => Promise<SpecResult[]>) => {
  */
 const runThese = async (
   ownHooks: { body: () => unknown; depth: number }[],
-  ownSetups: { body: () => unknown; depth: number }[],
-  ownTeardowns: { body: () => unknown; depth: number }[],
+  ownSetups: EachHook[],
+  ownTeardowns: EachHook[],
   ownCases: Case[],
 ): Promise<SpecResult[]> => {
   for (const hook of ownHooks) {
@@ -547,7 +580,7 @@ const runThese = async (
     let failure: string | undefined
     const limit = entry.timeout ?? TIMEOUT
     try {
-      for (const setup of ownSetups) {
+      for (const setup of ownSetups.filter((one) => holds(one, entry))) {
         await setup.body()
       }
       await Promise.race([
@@ -564,7 +597,7 @@ const runThese = async (
        teardown that throws fails the test it followed rather than being
        swallowed: a restore that did not happen is the fault that shows up three
        files later as somebody else's failure. */
-    for (const teardown of ownTeardowns) {
+    for (const teardown of ownTeardowns.filter((one) => holds(one, entry))) {
       try {
         await teardown.body()
       } catch (error) {
