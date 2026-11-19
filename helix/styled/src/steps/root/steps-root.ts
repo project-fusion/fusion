@@ -22,6 +22,8 @@ import { styles } from './steps-root.css.js'
  * @use Progress through a fixed sequence of stages, such as a checkout.
  * @instead tabs - Sections you visit in any order.
  * @instead number-input - A number you type, such as a quantity.
+ * @anatomy step
+ * @anatomy progress?
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @csspart progress - How far through the sequence is, drawn as a bar under the steps once a stylesheet gives the part a `display`, such as `helix-steps::part(progress) { display: block }`.

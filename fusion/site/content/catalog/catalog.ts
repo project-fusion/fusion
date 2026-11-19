@@ -18,6 +18,7 @@ import generated from './catalog.generated.json'
  * to trace.
  */
 export type {
+  AnatomyPart,
   ApiMember,
   Element,
   EventDoc,

@@ -57,6 +57,9 @@ import { property } from 'lit/decorators.js'
  * @aliases Placeholder, NoResults, Blank
  * @use A region with nothing in it, and the next step to take.
  * @instead skeleton - Content that has not arrived yet.
+ * @anatomy icon?
+ * @anatomy heading
+ * @anatomy actions?
  * @documentation https://fusion.dev/helix/components/empty
  *
  * @slot - The message: why the region is empty, and what to do about it.

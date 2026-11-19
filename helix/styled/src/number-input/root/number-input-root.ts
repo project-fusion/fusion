@@ -30,6 +30,10 @@ import { styles } from './number-input-root.css.js'
  * @use A number you type or nudge with step buttons, such as a quantity.
  * @instead slider - A value picked from a range by eye.
  * @instead steps - Progress through stages.
+ * @anatomy label
+ * @anatomy decrement
+ * @anatomy control
+ * @anatomy increment
  * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot decrement-icon - Replaces the icon on the step down button.

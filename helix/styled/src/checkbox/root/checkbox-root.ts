@@ -24,6 +24,9 @@ import { styles } from './checkbox-root.css.js'
  * @aliases Tickbox
  * @use A choice submitted with a form, or a set of independent choices.
  * @instead switch - A setting that applies at once.
+ * @anatomy box
+ * @anatomy label
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @cssproperty --checkbox-background-color - The fill of the box. It stays the same when the box is checked.

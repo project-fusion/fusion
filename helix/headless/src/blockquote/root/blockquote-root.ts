@@ -50,6 +50,8 @@ import { typedMarks } from '../../quote/marks.js'
  * @aliases Pullquote, Citation, Excerpt
  * @use A passage set apart from the prose, including a pull quote with `marks`.
  * @instead quote - A few words quoted inside a sentence.
+ * @anatomy blockquote
+ * @anatomy attribution?
  * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @slot - The quoted passage.

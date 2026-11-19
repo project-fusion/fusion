@@ -228,10 +228,27 @@ export interface Alternative {
   slug: string
 }
 
-/** One name in a family's anatomy, and whether the part is optional. */
+/**
+ * One name in a family's anatomy: whether the part is optional, what it is,
+ * and where a page finds it.
+ *
+ * **Found the way the guidance rule accepts it**, in the same order: a part
+ * folder is the element `helix-<family>-<name>`, and otherwise the name is a
+ * csspart or a slot of the root, then of any other element in the family.
+ */
 export interface AnatomyPart {
+  /** The part's own line: its element's summary, or its `@csspart` or `@slot` line. */
+  description: string
+  /**
+   * `element` where the name is a part folder, `part` where it is a csspart in
+   * `tag`'s shadow root, and `slot` where it is content written into `tag`'s
+   * slot of that name.
+   */
+  kind: 'element' | 'part' | 'slot'
   name: string
   optional: boolean
+  /** The styled element the part is, or the one it is inside. */
+  tag: string
 }
 
 export interface Family {
@@ -415,6 +432,85 @@ const methods = (rows: HelixMember[] | undefined): ApiMember[] =>
         type: `(${args}) => ${row.return?.type?.text ?? 'void'}`,
       }
     })
+
+/**
+ * Where one `@anatomy` name is found in a family, and the line that says what
+ * it is: a part folder's element first, then a csspart, then a slot, as the
+ * guidance rule accepts them. A name nothing publishes, which the rule
+ * reports, is kept as a slot of the root with no line, so the legend still
+ * numbers it.
+ */
+const anatomyOf = (
+  slug: string,
+  one: { name: string; optional?: boolean },
+  entries: HelixDeclaration[],
+): AnatomyPart => {
+  const { name } = one
+  const optional = one.optional === true
+  /* **Named by the styled tag**, since that is the tier a picture shows, and
+     read from either tier, since a styled root inherits most of its parts
+     and slots from the headless one and documents only the ones it adds. */
+  const styledTag = (tag: string): string => tag.replace(`helix-${HEADLESS}-`, 'helix-')
+  const isRoot = (entry: HelixDeclaration): boolean =>
+    styledTag(entry.tagName ?? '') === `helix-${slug}`
+  const styledFirst = (a: HelixDeclaration, b: HelixDeclaration): number =>
+    Number(tierOf(a.tagName ?? '') === HEADLESS) - Number(tierOf(b.tagName ?? '') === HEADLESS)
+  /* A part folder is an element whose role is the folder's name: `item` is
+     Menu's `helix-menu-item`, and `notification` is Notifications'
+     `helix-notification`. */
+  const plain = (text: string): string => text.toLowerCase().replace(/[^a-z0-9]/g, '')
+  const element = [...entries]
+    .sort(styledFirst)
+    .find((entry) => !isRoot(entry) && plain(entry.helix?.part ?? '') === plain(name))
+  if (element?.tagName) {
+    return {
+      description: element.summary ?? '',
+      kind: 'element',
+      name,
+      optional,
+      tag: styledTag(element.tagName),
+    }
+  }
+  /* The roots first, then the rest, so a name two elements share is the
+     root's. */
+  const ordered = [...entries].sort(
+    (a, b) => Number(!isRoot(a)) - Number(!isRoot(b)) || styledFirst(a, b),
+  )
+  /* **A csspart that is only the slot it passes through is read as the
+     slot.** Card's `header` part is "the slot the header arrives through",
+     which says how to style it, where the slot's own line says what goes
+     there, and that is what a legend is for. */
+  const found = (kind: 'part' | 'slot') =>
+    ordered.flatMap((entry) => {
+      const row = (kind === 'part' ? entry.cssParts : entry.slots)?.find((it) => it.name === name)
+      return row && entry.tagName ? [{ entry, row }] : []
+    })[0]
+  const slot = found('slot')
+  if (slot && /^The slot\b/.test(found('part')?.row.description ?? '')) {
+    return {
+      description: slot.row.description ?? '',
+      kind: 'slot',
+      name,
+      optional,
+      tag: styledTag(slot.entry.tagName ?? ''),
+    }
+  }
+  for (const kind of ['part', 'slot'] as const) {
+    for (const entry of ordered) {
+      const row = (kind === 'part' ? entry.cssParts : entry.slots)?.find((it) => it.name === name)
+      if (row && entry.tagName) {
+        return {
+          description: row.description ?? '',
+          kind,
+          name,
+          optional,
+          tag: styledTag(entry.tagName),
+        }
+      }
+    }
+  }
+  return { description: '', kind: 'slot', name, optional, tag: `helix-${slug}` }
+}
 
 const members = (
   rows: { description?: string; name?: string; type?: { text?: string } }[] | undefined,
@@ -657,10 +753,7 @@ export const catalog = (
 
       return {
         aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
-        anatomy: (guided?.anatomy ?? []).map((one) => ({
-          name: one.name,
-          optional: one.optional === true,
-        })),
+        anatomy: (guided?.anatomy ?? []).map((one) => anatomyOf(slug, one, entries)),
         category: root?.helix?.category ?? '',
         documentation: root?.helix?.documentation ?? '',
         elements: entries

@@ -28,6 +28,9 @@ import '../../voice-level/index.js'
  * @aliases Options, Select list
  * @use A list of options that stays open on the page.
  * @instead select - A list that opens only when you need it.
+ * @anatomy label
+ * @anatomy items
+ * @anatomy hint?
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.

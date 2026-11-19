@@ -132,9 +132,98 @@ describe('catalog', () => {
     expect(menu?.instead).toEqual([
       { description: 'A value a form submits.', label: 'Number Input', slug: 'number-input' },
     ])
-    expect(menu?.anatomy).toEqual([
+    expect(menu?.anatomy.map(({ name, optional }) => ({ name, optional }))).toEqual([
       { name: 'trigger', optional: false },
       { name: 'header', optional: true },
+    ])
+  })
+
+  test('an anatomy name is found as a part folder, then a csspart, then a slot', () => {
+    const [menu] = catalog([
+      {
+        modules: [
+          {
+            declarations: [
+              {
+                cssParts: [{ description: 'The floating box.', name: 'surface' }],
+                helix: {
+                  anatomy: [{ name: 'item' }, { name: 'surface' }, { name: 'trigger' }],
+                },
+                name: 'HelixMenu',
+                slots: [{ description: 'The button that opens the menu.', name: 'trigger' }],
+                tagName: 'helix-menu',
+              },
+            ],
+            path: 'src/menu/root/menu-root.ts',
+          },
+          {
+            declarations: [
+              {
+                helix: { part: 'Item' },
+                name: 'HelixMenuItem',
+                summary: 'One command in a menu.',
+                tagName: 'helix-menu-item',
+              },
+            ],
+            path: 'src/menu/item/menu-item.ts',
+          },
+        ],
+      },
+    ])
+    expect(menu?.anatomy).toEqual([
+      {
+        description: 'One command in a menu.',
+        kind: 'element',
+        name: 'item',
+        optional: false,
+        tag: 'helix-menu-item',
+      },
+      {
+        description: 'The floating box.',
+        kind: 'part',
+        name: 'surface',
+        optional: false,
+        tag: 'helix-menu',
+      },
+      {
+        description: 'The button that opens the menu.',
+        kind: 'slot',
+        name: 'trigger',
+        optional: false,
+        tag: 'helix-menu',
+      },
+    ])
+  })
+
+  test('a csspart that only passes a slot through is read as the slot', () => {
+    const [card] = catalog([
+      {
+        modules: [
+          {
+            declarations: [
+              {
+                cssParts: [{ description: 'The slot the header arrives through.', name: 'header' }],
+                helix: { anatomy: [{ name: 'header' }] },
+                name: 'HelixCard',
+                slots: [
+                  { description: 'Title and any actions for the whole card.', name: 'header' },
+                ],
+                tagName: 'helix-card',
+              },
+            ],
+            path: 'src/card/root/card-root.ts',
+          },
+        ],
+      },
+    ])
+    expect(card?.anatomy).toEqual([
+      {
+        description: 'Title and any actions for the whole card.',
+        kind: 'slot',
+        name: 'header',
+        optional: false,
+        tag: 'helix-card',
+      },
     ])
   })
 

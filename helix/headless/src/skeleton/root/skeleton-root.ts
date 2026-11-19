@@ -39,6 +39,7 @@ import { property } from 'lit/decorators.js'
  * @use The shape of content that is loading, where its layout is known.
  * @instead loader - Work of unknown length with no layout to hold.
  * @instead empty - A region that loaded and holds nothing.
+ * @anatomy skeleton
  * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @slot - The content the skeleton stands in for, which sizes it. Optional.

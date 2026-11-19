@@ -25,6 +25,8 @@ import { styles } from './megamenu-root.css.js'
  * @use A section of a site's main navigation that opens a panel of links.
  * @instead popover - Content other than navigation.
  * @instead navigation - Links that fit in one row.
+ * @anatomy trigger
+ * @anatomy surface
  * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - The filter behind the panel. Inside an App Header it is the

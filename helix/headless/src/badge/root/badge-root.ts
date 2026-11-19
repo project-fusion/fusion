@@ -58,6 +58,7 @@ import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
  * @use A count on an icon, a tab, or a button, or a dot that marks something new.
  * @instead tag - A word that describes the content.
  * @instead stat - A number that is the content itself.
+ * @anatomy indicator
  * @documentation https://fusion.dev/helix/components/badge
  *
  * @slot - The element being decorated.
