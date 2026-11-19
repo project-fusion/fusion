@@ -28,6 +28,7 @@ import { colorPickerArt } from './art/color-picker'
 import { columnManagerArt } from './art/column-manager'
 import { comboboxArt } from './art/combobox'
 import { commandArt } from './art/command'
+import { confettiArt } from './art/confetti'
 import { copyButtonArt } from './art/copy-button'
 import { cursorArt } from './art/cursor'
 import { dataTableArt } from './art/data-table'
@@ -213,6 +214,7 @@ const art: Record<string, ReactNode> = {
   'column-manager': columnManagerArt,
   combobox: comboboxArt,
   command: commandArt,
+  confetti: confettiArt,
   'copy-button': copyButtonArt,
   cursor: cursorArt,
   'data-table': dataTableArt,

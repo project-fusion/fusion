@@ -1,0 +1,15 @@
+/* **Laid out as a box**, so the burst has one to start from: the canvas it is
+   drawn on is the page's, outside this shadow root. */
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* **Nothing of its own on paper.** The burst is drawn on the page's canvas and
+   is gone a second and a half later, and the content inside prints as its own
+   family says, so the box asks for the economy the browser would choose. */
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}

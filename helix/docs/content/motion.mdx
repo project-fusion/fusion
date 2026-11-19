@@ -323,18 +323,20 @@ moves, give it a `view-transition-name` of its own on every page.
 
 ## Motion on your own elements
 
-Four functions in `@fusion.dev/helix-core` give elements you write yourself
+Five functions in `@fusion.dev/helix-core` give elements you write yourself
 the motion Helix's own families have, with no component around them:
 
 - `moveItems` slides the items of a list to their new places.
 - `trackIndicator` sends one mark from item to item.
 - `countTo` counts a figure to a new number.
 - `followPointer` writes where a mouse or pen is over an element.
+- `burstConfetti` bursts confetti out of an element once an action is done.
 
 Each one works on any element, in any framework, and needs no Helix
 stylesheet. Times and curves default to the tokens above, and to the values
 those tokens hold where the page does not load them. Under reduced motion
-nothing moves, the figure changes at once, and the pointer is not followed.
+nothing moves, the figure changes at once, the pointer is not followed, and no
+confetti is drawn.
 `moveItems`, `followPointer`, and `trackIndicator` return the way to stop.
 
 ### Items that move
