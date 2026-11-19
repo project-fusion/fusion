@@ -53,8 +53,8 @@ import {
  *
  * **Web only:** the grid's rows and cell roles under `selection-mode`, a
  * reading shown under a mouse, the hidden table drawn from `data`, the Listen
- * button `sonify` draws, and `gap` and `min-cell`, which the web's sheet
- * reads back.
+ * button `sonify` draws, `gap` and `min-cell`, which the web's sheet reads
+ * back, and the growth in under `grow` and `grow-again`.
  */
 export default headless('heatmap', {
   props: {
@@ -65,6 +65,8 @@ export default headless('heatmap', {
     errorText: '',
     for: '',
     gap: web(number()),
+    grow: web(false),
+    growAgain: web(false),
     label: '',
     loading: false,
     loadingText: 'Loading readings',

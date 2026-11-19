@@ -34,7 +34,8 @@ import {
  *
  * **Web only:** the renderer the default region holds, which `helix-plot`'s
  * three.js driver draws in, the hidden table drawn from `data`, the summary
- * sentence, and the Listen button `sonify` draws.
+ * sentence, the Listen button `sonify` draws, and the growth in under `grow`
+ * and `grow-again`.
  */
 export default headless('spatial-treemap', {
   props: {
@@ -44,6 +45,8 @@ export default headless('spatial-treemap', {
     errorText: '',
     for: '',
     groupBy: '',
+    grow: web(false),
+    growAgain: web(false),
     label: '',
     loading: false,
     loadingText: 'Loading readings',

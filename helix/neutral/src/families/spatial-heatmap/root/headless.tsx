@@ -39,7 +39,8 @@ import {
  *
  * **Web only:** the grid's row and cell roles under `selection-mode`, a
  * reading shown under a mouse, the renderer the `renderer` region holds, the
- * hidden table drawn from `data`, the Listen button, `gap`, and `min-cell`.
+ * hidden table drawn from `data`, the Listen button, `gap`, `min-cell`, and
+ * the growth in under `grow` and `grow-again`.
  */
 export default headless('spatial-heatmap', {
   props: {
@@ -51,6 +52,8 @@ export default headless('spatial-heatmap', {
     flat: false,
     for: '',
     gap: web(number()),
+    grow: web(false),
+    growAgain: web(false),
     label: '',
     loading: false,
     loadingText: 'Loading readings',
