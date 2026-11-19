@@ -571,14 +571,14 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     return svg`<path
         d=${wash}
         data-series=${index}
-        part=${hidden ? 'area area-hidden' : 'area'}
+        part="area${hidden ? ' area-hidden' : ''}"
         style="--chart-series: var(--chart-series-${index})"
         visibility=${hidden ? 'hidden' : nothing}
       /><path
         d=${path}
         data-series=${index}
         fill="none"
-        part=${hidden ? 'line line-hidden' : 'line'}
+        part="line${hidden ? ' line-hidden' : ''}"
         style="--chart-series: var(--chart-series-${index})"
         visibility=${hidden ? 'hidden' : nothing}
       />`
@@ -613,7 +613,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
           (one) => one.level,
           ({ leaving, level }) =>
             svg`<line
-              part=${leaving ? 'gridline gridline-leaving' : 'gridline'}
+              part="gridline${leaving ? ' gridline-leaving' : ''}"
               style=${`translate: 0 ${leaving ? heldInside(y(level)) : y(level)}px`}
               visibility=${leaving ? 'hidden' : nothing}
               x1="0"

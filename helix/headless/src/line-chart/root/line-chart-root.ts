@@ -801,7 +801,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
           (one) => one.level,
           ({ leaving, level }) =>
             svg`<line
-              part=${leaving ? 'gridline gridline-leaving' : 'gridline'}
+              part="gridline${leaving ? ' gridline-leaving' : ''}"
               style=${`translate: 0 ${leaving ? heldInside(y(level)) : y(level)}px`}
               visibility=${leaving ? 'hidden' : nothing}
               x1="0"
@@ -894,7 +894,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
           aria-hidden="true"
           ?data-jumped=${end.jumped}
           ?hidden=${end.hidden === true}
-          part=${end.hidden ? 'terminus terminus-hidden' : 'terminus'}
+          part="terminus${end.hidden ? ' terminus-hidden' : ''}"
           style=${`--chart-series: var(--chart-series-${end.index}); --chart-terminus-x: ${end.x}%; --chart-terminus-y: ${end.y}%`}
         ></span>`,
     )}`
@@ -941,7 +941,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         svg`<path
           d=${marks + lone}
           data-series=${index}
-          part=${hidden ? 'marker-ring marker-ring-hidden' : 'marker-ring'}
+          part="marker-ring${hidden ? ' marker-ring-hidden' : ''}"
           visibility=${hidden ? 'hidden' : nothing}
         />${
           marks === ''
@@ -949,7 +949,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
             : svg`<path
                 d=${marks}
                 data-series=${index}
-                part=${hidden ? 'marker marker-hidden' : 'marker'}
+                part="marker${hidden ? ' marker-hidden' : ''}"
                 style="--chart-series: var(--chart-series-${index})"
                 visibility=${hidden ? 'hidden' : nothing}
               />`
@@ -959,7 +959,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
             : svg`<path
                 d=${lone}
                 data-series=${index}
-                part=${hidden ? 'marker marker-lone marker-hidden' : 'marker marker-lone'}
+                part="marker marker-lone${hidden ? ' marker-hidden' : ''}"
                 style="--chart-series: var(--chart-series-${index})"
                 visibility=${hidden ? 'hidden' : nothing}
               />`
@@ -1053,7 +1053,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         ? svg`<path
             d=${wash}
             data-series=${index}
-            part=${hidden ? 'area area-hidden' : 'area'}
+            part="area${hidden ? ' area-hidden' : ''}"
             style="--chart-series: var(--chart-series-${index})"
             visibility=${hidden ? 'hidden' : nothing}
           />`

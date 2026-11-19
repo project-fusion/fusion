@@ -806,7 +806,7 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
           key: `${depth} ${deep}`,
           mark: svg`<g
             data-series=${index}
-            part=${hidden ? 'points points-hidden' : 'points'}
+            part="points${hidden ? ' points-hidden' : ''}"
             style="--chart-series: var(--chart-series-${index})"
           >${paths.map(
             ({ d, style }) =>
