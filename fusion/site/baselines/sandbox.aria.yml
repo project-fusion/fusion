@@ -72,6 +72,11 @@
       - text: Blockquote
       - link "Blockquote documentation":
         - /url: /helix/components/blockquote
+    - treeitem "Border Beam Border Beam documentation Experimental" [level=1]:
+      - text: Border Beam
+      - link "Border Beam documentation":
+        - /url: /helix/components/border-beam
+      - img "Experimental"
     - treeitem "Breadcrumbs Breadcrumbs documentation" [level=1]:
       - text: Breadcrumbs
       - link "Breadcrumbs documentation":
@@ -151,6 +156,11 @@
       - text: Command
       - link "Command documentation":
         - /url: /helix/components/command
+    - treeitem "Confetti Confetti documentation Experimental" [level=1]:
+      - text: Confetti
+      - link "Confetti documentation":
+        - /url: /helix/components/confetti
+      - img "Experimental"
     - treeitem "Copy Button Copy Button documentation" [level=1]:
       - text: Copy Button
       - link "Copy Button documentation":
@@ -518,6 +528,11 @@
       - text: Splitter
       - link "Splitter documentation":
         - /url: /helix/components/splitter
+    - treeitem "Spotlight Spotlight documentation Experimental" [level=1]:
+      - text: Spotlight
+      - link "Spotlight documentation":
+        - /url: /helix/components/spotlight
+      - img "Experimental"
     - treeitem "Stat Stat documentation" [level=1]:
       - text: Stat
       - link "Stat documentation":
