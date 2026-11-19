@@ -158,6 +158,15 @@ export default styles(
       on('ring', [web([rule({ forcedColors: true }, { stroke: 'Highlight' })])]),
       /* The axis names' plate is the canvas, as the ground is. */
       on('axis-name', [web([rule({ forcedColors: true }, { stroke: 'Canvas' })])]),
+      /* The ribbons move to new readings on `decelerate`, which no frame overshoots. */
+      on('host', [
+        web([
+          rule({
+            '--spatial-ribbon-chart-move-duration': token('duration-normal'),
+            '--spatial-ribbon-chart-move-easing': token('easing-decelerate'),
+          }),
+        ]),
+      ]),
     ]
   },
 )

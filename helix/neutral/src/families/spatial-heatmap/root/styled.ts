@@ -105,7 +105,8 @@ export default styles(
     return [
       include(chartTooltip),
       /* A grid of one track, so the footer is as wide as the strip. The ramp's far
-         end, the strong primary, which dark holds under a lightness of 0.87. */
+         end, the strong primary, which dark holds under a lightness of 0.87. The
+         prisms move to new readings on `decelerate`, which no frame overshoots. */
       on('host', [
         web([
           rule({
@@ -115,6 +116,8 @@ export default styles(
                 fn('oklch', ['from', token('color-primary-strong'), 'min(l, 0.87)', 'c', 'h']),
               ),
             },
+            '--spatial-heatmap-move-duration': token('duration-normal'),
+            '--spatial-heatmap-move-easing': token('easing-decelerate'),
             display: 'grid',
             gridTemplateColumns: fn('minmax', 0, 'max-content'),
           }),

@@ -327,6 +327,15 @@ export default styles(
       on('glow', [web([rule({ forcedColors: true }, { display: 'none' })])]),
       /* The axis names' plate is the canvas, as the ground is. */
       on('axis-name', [web([rule({ forcedColors: true }, { stroke: 'Canvas' })])]),
+      /* The bars move to new readings on `decelerate`, which no frame overshoots. */
+      on('host', [
+        web([
+          rule({
+            '--spatial-bar-chart-move-duration': token('duration-normal'),
+            '--spatial-bar-chart-move-easing': token('easing-decelerate'),
+          }),
+        ]),
+      ]),
     ]
   },
 )

@@ -172,6 +172,15 @@ export default styles(
       on(['ring', 'ring-behind'], [web([rule({ forcedColors: true }, { stroke: 'Highlight' })])]),
       /* The axis names' plate is the canvas, as the ground is. */
       on('axis-name', [web([rule({ forcedColors: true }, { stroke: 'Canvas' })])]),
+      /* The blocks move to new readings on `decelerate`, which no frame overshoots. */
+      on('host', [
+        web([
+          rule({
+            '--spatial-treemap-move-duration': token('duration-normal'),
+            '--spatial-treemap-move-easing': token('easing-decelerate'),
+          }),
+        ]),
+      ]),
     ]
   },
 )
