@@ -167,6 +167,17 @@ describe('an editor with an engine', () => {
     expect(told.updates.at(-1)).toMatchObject({ language: 'json', value: 'ab' })
   })
 
+  test('tells the engine whether changed lines light up', async () => {
+    const element = await editor('flash-changes')
+    const { engine, told } = fakeEngine()
+    element.engine = engine
+    await element.updateComplete
+    expect(told.mounted.at(-1)?.flashChanges).toBe(true)
+    element.flashChanges = false
+    await element.updateComplete
+    expect(told.updates.at(-1)?.flashChanges).toBe(false)
+  })
+
   test('mounts the engine again when it is moved in the page', async () => {
     const element = await editor()
     const { engine, told } = fakeEngine()
