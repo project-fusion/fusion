@@ -1,0 +1,8 @@
+/* A color for two of the states. The orb crosses to it with the shape. */
+.changing:state(listening) {
+  --orb-color: var(--helix-color-accent);
+}
+
+.changing:state(done) {
+  --orb-color: var(--helix-color-success);
+}
