@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { fits, monthPage, overviewOf, toneOf } from './buckets.js'
+import {
+  fits,
+  type HeatField,
+  heatBetween,
+  heatItems,
+  monthPage,
+  overviewOf,
+  toneOf,
+} from './buckets.js'
 
 /**
  * The two calculations a picture cannot check.
@@ -148,5 +156,44 @@ describe('a page of a calendar', () => {
     const whens: (string | undefined)[] = ['2026-01-10', undefined, '2026-02-12']
     expect(monthPage(whens, 0, true)).toBe(2)
     expect(monthPage(['Mon', 'Tue'], 0, true)).toBeUndefined()
+  })
+})
+
+describe('moving between two tables', () => {
+  const at = (share: number, floor = false) => ({
+    axes: share,
+    floor: () => floor,
+    share: () => share,
+  })
+  const strip = (...cells: Array<[string, number | undefined, string?]>): HeatField => ({
+    cells: cells.map(([key, value, tone]) => ({ key, value, ...(tone ? { tone } : {}) })),
+    highest: Math.max(0, ...cells.map(([, value]) => value ?? 0)),
+    rows: 2,
+  })
+
+  test('grows a column at a time, each cell empty until it starts and then climbing to its reading', () => {
+    const field = strip(['a', 8], ['b', 6, 'danger'], ['c', 4])
+    expect(heatItems(field).map((item) => item.step)).toEqual([0, 0, 1])
+    const waiting = heatBetween(undefined, field, at(0, true))
+    expect(waiting.cells.map((cell) => [cell.value, cell.tone])).toEqual([
+      [undefined, undefined],
+      [undefined, undefined],
+      [undefined, undefined],
+    ])
+    const half = heatBetween(undefined, field, at(0.5, true))
+    expect(half.cells.map((cell) => cell.value)).toEqual([4, 3, 2])
+    expect(half.cells[1]?.tone).toBe('danger')
+    expect(toneOf(half.cells[0] as HeatField['cells'][number], BOUNDS, TONES)).toBe('accent')
+  })
+
+  test('a cell both hold moves to its new reading, and a cell that left is gone at once', () => {
+    const from = strip(['a', 8], ['b', 2])
+    const to = strip(['b', 6], ['c', 4])
+    const half = heatBetween(from, to, at(0.5))
+    expect(half.cells.map((cell) => [cell.key, cell.value])).toEqual([
+      ['b', 4],
+      ['c', 2],
+    ])
+    expect(half.highest).toBe(7)
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { FieldRow } from '../spatial-scatter-chart/field.js'
-import { levelOf, surfaceOf } from './grid.js'
+import { levelOf, surfaceBetween, surfaceItems, surfaceOf } from './grid.js'
 
 const row = (label: string, hour: number, day: number, load?: number): FieldRow => ({
   cells: [
@@ -66,5 +66,46 @@ describe('a level', () => {
     expect(levelOf(field, field.cells[0] as never)).toBe(0)
     expect(levelOf(field, field.cells[4] as never)).toBe(1)
     expect(levelOf(field, field.cells[3] as never)).toBeUndefined()
+  })
+})
+
+describe('moving between two tables', () => {
+  const at = (share: number, floor = false) => ({
+    axes: share,
+    floor: () => floor,
+    share: () => share,
+  })
+
+  test('with no table before, the surface rises from a sheet at its lowest reading, a row across at a time', () => {
+    const field = surfaceOf(rows, [0, 1, 2])
+    expect(surfaceItems(field).map((item) => item.step)).toEqual([0, 0, 1, 1, 2, 2])
+    const flat = surfaceBetween(undefined, field, at(0, true))
+    expect(flat.cells.flatMap((cell) => (cell.value === undefined ? [] : [cell.value]))).toEqual([
+      10, 10, 10, 10,
+    ])
+  })
+
+  test('each place moves from its old height to its new one, and the contours follow', () => {
+    const from = surfaceOf(rows, [0, 1, 2])
+    const to = surfaceOf(
+      rows.map((one) => {
+        const load = one.cells[2]?.value
+        return load === undefined
+          ? one
+          : row(one.label, one.cells[0]?.value as number, one.cells[1]?.value as number, load * 2)
+      }),
+      [0, 1, 2],
+    )
+    const half = surfaceBetween(from, to, at(0.5))
+    expect(half.cells[0]?.value).toBe(15)
+    expect(half.lowest).toBe(15)
+    expect(half.highest).toBe(75)
+    expect(half.contours.length).toBe(to.contours.length)
+  })
+
+  test('a grid whose places changed is drawn at once', () => {
+    const from = surfaceOf(rows, [0, 1, 2])
+    const to = surfaceOf([...rows, row('f', 3, 1, 40)], [0, 1, 2])
+    expect(surfaceBetween(from, to, at(0.5))).toBe(to)
   })
 })

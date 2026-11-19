@@ -13,6 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
+  ReadingsMotionController,
   shortNumber,
   spokenReading,
   words,
@@ -21,7 +22,7 @@ import {
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fieldOf, type PlotField, type PlotPoint } from '../field.js'
+import { fieldOf, type PlotField, type PlotPoint, pointItems, pointsBetween } from '../field.js'
 import {
   type BoxPoint,
   boundsOf,
@@ -150,6 +151,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --spatial-scatter-chart-move-duration - How long the points take to move to a new table's readings: a point the table keeps moves to its new place, a point it adds rises from the floor, and a point it drops sinks to the floor. Unset, a new table is drawn at once. The growth under `grow` keeps its own timing.
+ * @cssproperty --spatial-scatter-chart-move-easing - The curve the points move to new readings along.
+ *
  * @cssstate active - While a point is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the points, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the points.
@@ -173,6 +177,33 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    */
   @property({ attribute: 'drop-lines', reflect: true, type: Boolean })
   dropLines = false
+
+  /**
+   * Grows the points in from the floor the first time the chart comes
+   * into view with readings, one after another in the order of the table, so the drawing arrives the way a
+   * page's own picture does. The growth is fast at first, slows to rest,
+   * and never passes a reading.
+   *
+   * Under `prefers-reduced-motion`, or where the page has paused its motion
+   * through `pauseMotion` or `Motion Toggle`, the points stand at their
+   * readings from the start. A later table grows the points it adds, each
+   * from the floor, so a reading that arrives while the chart is in view
+   * arrives the same way. The points it keeps move to their new places on `--spatial-scatter-chart-move-duration`, and stand there at once where it is unset.
+   */
+  @property({ reflect: true, type: Boolean })
+  grow = false
+
+  /**
+   * Grows the points in again each time the chart comes back into view
+   * after it left it, as a pane does when it is opened again, where `grow`
+   * alone grows them the first time only. Only a chart that grows takes it.
+   *
+   * While it is out of view the points stand at the floor, so the first
+   * frame after it returns is the start of the growth and never a flash of
+   * the whole drawing.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
 
   /** The column of text that puts each point in a group, by its heading. None by default. */
   @property({ attribute: 'group-by' })
@@ -232,6 +263,28 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   /** The point the keys rested on last, so a change of it can be told. */
   private told = -1
 
+  /**
+   * Moves the points from one table to the next, and grows them in under
+   * `grow`, timed by `--spatial-scatter-chart-move-duration` and
+   * `--spatial-scatter-chart-move-easing`.
+   */
+  protected readonly motion = new ReadingsMotionController<PlotField>(this, {
+    between: pointsBetween,
+    grow: () => this.grow,
+    growAgain: () => this.growAgain,
+    items: pointItems,
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--spatial-scatter-chart-move-duration'),
+        easing: style.getPropertyValue('--spatial-scatter-chart-move-easing'),
+      }
+    },
+  })
+
+  /** The points drawn last, kept so a frame of their move can be told. */
+  private lastShown: PlotField | undefined
+
   /** Carries a host `aria-labelledby` and `aria-describedby` to the plot. */
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('plot'),
@@ -259,6 +312,16 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   /** The field last read, and what it was read from. */
   private memo: { field: PlotField; groupBy: string; rows: unknown } | undefined
 
+  /**
+   * The points as drawn this frame, which a renderer draws: `field` at rest,
+   * and while the readings move, every point between its last place and its
+   * new one, in `field`'s order, then each point the last table had and the
+   * new one does not, sinking to the floor.
+   */
+  get shown(): PlotField {
+    return this.motion.drawn ?? this.field
+  }
+
   /** The point the keys or the pointer rest on, as its place in `field.points`, or `-1`. */
   get active(): number {
     return this.pointer.at
@@ -284,7 +347,9 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
    * reading the keys moved to leaves it. Called by the connector.
    */
-  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+  requestActive(at: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    /* A point sinking away is not a reading. */
+    const index = at < this.field.points.length ? at : -1
     if (kind === 'touch') {
       this.pointer.tapTo(index)
     } else if (index >= 0 || !this.pointer.keyed) {
@@ -299,6 +364,13 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    */
   placeReading(at: { x: number; y: number } | undefined): void {
     this.place = at
+  }
+
+  /** Decided before the table is drawn, so a point that rises never shows at its place first. */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    const field = this.field
+    this.motion.follow(field, field.points.length > 0)
   }
 
   override connectedCallback(): void {
@@ -328,9 +400,14 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
        the field is read once for each table and grouping, so a new one is a
        change. */
     const field = this.field
+    const shown = this.shown
     if (field !== this.last) {
       this.last = field
+      this.lastShown = shown
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (shown !== this.lastShown) {
+      this.lastShown = shown
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told) {
       this.told = this.pointer.at
@@ -435,16 +512,24 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * each point painted back to front, as the camera sees them. The chart's
    * own drawing, until a renderer has drawn and where none is connected.
    */
-  private renderFallback(field: PlotField, at: number): TemplateResult {
+  private renderFallback(read: PlotField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
+      boxView(read.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
+    /* Between two tables, the box and the points are drawn from the readings
+       on their way, in the frame of the new ones, so the drawing holds still. */
+    const field = this.motion.moving ? this.shown : read
+    const moving =
+      field === read
+        ? view
+        : boxView(field.axes, this.camera, [], this.noBox, view.words, wordsLocale(this))
+    const placeOf = (axes: PlotField['axes'], point: PlotPoint): BoxPoint => [
+      inBox(axes.x, point.x),
+      inBox(axes.y, point.y),
+      inBox(axes.z, point.z),
+    ]
     const places = field.points.map((point, index) => {
-      const box: BoxPoint = [
-        inBox(field.axes.x, point.x),
-        inBox(field.axes.y, point.y),
-        inBox(field.axes.z, point.z),
-      ]
+      const box = placeOf(field.axes, point)
       return {
         depth: view.depth(box),
         foot: view.on([box[0], -1, box[2]]),
@@ -453,11 +538,17 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         ...view.on(box),
       }
     })
-    this.placed = places
+    /* A point sinking away is not found by the pointer. */
+    this.placed = places.slice(0, read.points.length)
     const painted = [...places].sort((one, other) => one.depth - other.depth)
     const active = places[at]
     const bounds = this.drag.frame(
-      this.noBox ? boundsOf(places, 0.1) : view.bounds,
+      this.noBox
+        ? boundsOf(
+            read.points.map((point) => view.on(placeOf(read.axes, point))),
+            0.1,
+          )
+        : view.bounds,
       view.on([0, 0, 0]),
     )
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
@@ -472,7 +563,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${painted.map(
+      >${this.noBox ? nothing : drawBox(moving)}${painted.map(
         (place) =>
           svg`${this.dropLines ? svg`<path d="M${shortNumber(place.x)} ${shortNumber(place.y)}L${shortNumber(place.foot.x)} ${shortNumber(place.foot.y)}" part="drop-line" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></path>` : nothing}<circle cx=${place.x} cy=${place.y} part="point${place.index === at ? ' point-active' : ''}" r="0.045" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></circle>`,
       )}${

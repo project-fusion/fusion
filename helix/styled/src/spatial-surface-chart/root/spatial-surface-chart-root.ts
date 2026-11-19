@@ -27,6 +27,8 @@ import '../../tooltip/index.js'
  * @cssproperty --spatial-surface-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  * @cssproperty --spatial-surface-chart-high - The color of the highest reading, which the renderer reads too.
  * @cssproperty --spatial-surface-chart-low - The color of the lowest reading, which the renderer reads too.
+ * @cssproperty --spatial-surface-chart-move-duration - How long the surface takes to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-surface-chart-move-easing - The curve the surface moves to new readings along. Defaults to `--helix-easing-decelerate`, so the surface slows as it arrives and never passes its reading.
  */
 @customElement('helix-spatial-surface-chart')
 export class HelixSpatialSurfaceChart extends HelixHeadlessSpatialSurfaceChart {

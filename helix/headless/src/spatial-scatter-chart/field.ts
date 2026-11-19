@@ -6,7 +6,14 @@
  * the edge of the box, and a row read into the wrong axis looks like data.
  */
 
-import { ticks } from '@fusion.dev/helix-core'
+import {
+  keysOf,
+  type MotionItem,
+  type MotionShares,
+  mix,
+  mixAxis,
+  ticks,
+} from '@fusion.dev/helix-core'
 
 /** What the field reads of a row: its label and its cells, with their headings and numbers. */
 export interface FieldRow {
@@ -20,6 +27,11 @@ export interface PlotPoint {
   group: string
   /** The point's place among the groups, which its color is read by. */
   groupIndex: number
+  /**
+   * What the point is known by from one table to the next, on a field drawn
+   * between two while the readings move. A table's own field has none.
+   */
+  key?: string | undefined
   /** The row's own label. */
   label: string
   /** The row it was read from, counting from zero. */
@@ -132,4 +144,73 @@ export const fieldOf = (
 export const along = (axis: PlotAxis, value: number): number => {
   const [low, high] = axis.range
   return high === low ? 0.5 : (value - low) / (high - low)
+}
+
+/**
+ * The key of each point of `field`, in its order: its label, numbered where
+ * a label comes again. A field drawn between two tables carries each point's
+ * key with it.
+ */
+export const pointKeys = (field: PlotField): string[] => {
+  const keys = keysOf(field.points.map((point) => point.label))
+  return field.points.map((point, index) => point.key ?? (keys[index] as string))
+}
+
+/** Each point as the chart's motion knows it: by its key, growing in in the table's order. */
+export const pointItems = (field: PlotField): MotionItem[] =>
+  pointKeys(field).map((key, step) => ({ key, step }))
+
+/**
+ * The points `at` the shares between `from` and `to`, which the chart draws
+ * while its readings move. **A point both tables hold moves** from its old
+ * place to its new one, **a point only `to` holds rises** from the floor of
+ * the box where it stands across and in depth, and **a point only `from`
+ * held sinks** to the floor, after `to`'s points, and goes. The axes move
+ * with `at.axes`. With no `from`, every point rises from the floor.
+ */
+export const pointsBetween = (
+  from: PlotField | undefined,
+  to: PlotField,
+  at: MotionShares,
+): PlotField => {
+  const axes =
+    from && at.axes < 1
+      ? {
+          x: mixAxis(from.axes.x, to.axes.x, at.axes),
+          y: mixAxis(from.axes.y, to.axes.y, at.axes),
+          z: mixAxis(from.axes.z, to.axes.z, at.axes),
+        }
+      : to.axes
+  const floor = axes.y.range[0]
+  const before = new Map<string, PlotPoint>()
+  if (from) {
+    const had = pointKeys(from)
+    from.points.forEach((point, index) => {
+      before.set(had[index] as string, point)
+    })
+  }
+  const keys = pointKeys(to)
+  const points: PlotPoint[] = to.points.map((point, index) => {
+    const key = keys[index] as string
+    const share = at.share(key)
+    const old = before.get(key)
+    if (!old || at.floor(key)) {
+      return { ...point, key, y: mix(floor, point.y, share) }
+    }
+    return {
+      ...point,
+      key,
+      x: mix(old.x, point.x, share),
+      y: mix(old.y, point.y, share),
+      z: mix(old.z, point.z, share),
+    }
+  })
+  const kept = new Set(keys)
+  for (const [key, old] of before) {
+    const share = at.share(key)
+    if (!kept.has(key) && share < 1) {
+      points.push({ ...old, key, y: mix(old.y, floor, share) })
+    }
+  }
+  return { ...to, axes, points }
 }

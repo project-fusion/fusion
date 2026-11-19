@@ -26,6 +26,8 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/spatial-ribbon-chart
  *
  * @cssproperty --spatial-ribbon-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
+ * @cssproperty --spatial-ribbon-chart-move-duration - How long the ribbons take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-ribbon-chart-move-easing - The curve the ribbons move to new readings along. Defaults to `--helix-easing-decelerate`, so a ribbon slows as it arrives and never passes its reading.
  */
 @customElement('helix-spatial-ribbon-chart')
 export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {

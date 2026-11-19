@@ -11,6 +11,8 @@ export interface TreemapBlock {
   area: { x0: number; x1: number; z0: number; z1: number }
   group: string
   groupIndex: number
+  /** How much of its height it stands at, from 0 to 1, while it grows in or shrinks away. Whole where absent. */
+  grown?: number | undefined
   height?: number | undefined
   label: string
   row: number

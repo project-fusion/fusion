@@ -1,0 +1,90 @@
+<!-- @summary Ribbons that grow in from zero the first time they are seen, and follow their new numbers when the table changes. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="latency"
+  >
+    <caption>Response time by region</caption>
+    <thead>
+      <tr>
+        <th scope="col">Day</th>
+        <th scope="col">Frankfurt (ms)</th>
+        <th scope="col">Virginia (ms)</th>
+        <th scope="col">Singapore (ms)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Mon</th>
+        <td data-value="92">92</td>
+        <td data-value="120">120</td>
+        <td data-value="180">180</td>
+      </tr>
+      <tr>
+        <th scope="row">Tue</th>
+        <td data-value="88">88</td>
+        <td data-value="126">126</td>
+        <td data-value="176">176</td>
+      </tr>
+      <tr>
+        <th scope="row">Wed</th>
+        <td data-value="95">95</td>
+        <td data-value="118">118</td>
+        <td data-value="190">190</td>
+      </tr>
+      <tr>
+        <th scope="row">Thu</th>
+        <td data-value="110">110</td>
+        <td data-value="131">131</td>
+        <td data-value="205">205</td>
+      </tr>
+      <tr>
+        <th scope="row">Fri</th>
+        <td data-value="104">104</td>
+        <td data-value="140">140</td>
+        <td data-value="198">198</td>
+      </tr>
+      <tr>
+        <th scope="row">Sat</th>
+        <td data-value="86">86</td>
+        <td data-value="112">112</td>
+        <td data-value="172">172</td>
+      </tr>
+      <tr>
+        <th scope="row">Sun</th>
+        <td data-value="84">84</td>
+        <td data-value="108">108</td>
+        <td data-value="168">168</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-spatial-ribbon-chart
+    for="latency"
+    grow
+    label="Response time by region"
+  ></helix-spatial-ribbon-chart>
+
+  <helix-button id="refresh">Refresh data</helix-button>
+</helix-flex>
+
+<!-- The script rewrites the numbers in the table. The chart reads the table
+     and moves to the new numbers. -->
+<script type="module">
+  document.getElementById('refresh').addEventListener('click', () => {
+    const ranges = [[70, 140], [90, 170], [150, 240]]
+    for (const row of document.querySelectorAll('#latency tbody tr')) {
+      const cells = [...row.querySelectorAll('td')].slice(0)
+      cells.forEach((cell, index) => {
+        const [low, high] = ranges[index]
+        const value = low + Math.round(Math.random() * (high - low))
+        cell.dataset.value = String(value)
+        cell.textContent = String(value)
+      })
+    }
+  })
+</script>

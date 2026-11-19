@@ -1,0 +1,72 @@
+<!-- @summary Bars that grow in the first time they are seen, and rise or fall to their new numbers when the table changes. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="signups"
+  >
+    <caption>Signups by region and quarter</caption>
+    <thead>
+      <tr>
+        <th scope="col">Region</th>
+        <th scope="col">Q1</th>
+        <th scope="col">Q2</th>
+        <th scope="col">Q3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">North</th>
+        <td data-value="420">420</td>
+        <td data-value="465">465</td>
+        <td data-value="510">510</td>
+      </tr>
+      <tr>
+        <th scope="row">South</th>
+        <td data-value="310">310</td>
+        <td data-value="355">355</td>
+        <td data-value="340">340</td>
+      </tr>
+      <tr>
+        <th scope="row">East</th>
+        <td data-value="520">520</td>
+        <td data-value="560">560</td>
+        <td data-value="615">615</td>
+      </tr>
+      <tr>
+        <th scope="row">West</th>
+        <td data-value="260">260</td>
+        <td data-value="300">300</td>
+        <td data-value="345">345</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-spatial-bar-chart
+    for="signups"
+    grow
+    label="Signups by region and quarter"
+  ></helix-spatial-bar-chart>
+
+  <helix-button id="refresh">Refresh data</helix-button>
+</helix-flex>
+
+<!-- The script rewrites the numbers in the table. The chart reads the table
+     and moves to the new numbers. -->
+<script type="module">
+  document.getElementById('refresh').addEventListener('click', () => {
+    const ranges = [[200, 700], [200, 700], [200, 700]]
+    for (const row of document.querySelectorAll('#signups tbody tr')) {
+      const cells = [...row.querySelectorAll('td')].slice(0)
+      cells.forEach((cell, index) => {
+        const [low, high] = ranges[index]
+        const value = low + Math.round(Math.random() * (high - low))
+        cell.dataset.value = String(value)
+        cell.textContent = String(value)
+      })
+    }
+  })
+</script>

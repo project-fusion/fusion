@@ -25,6 +25,8 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/spatial-scatter-chart
  *
  * @cssproperty --spatial-scatter-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
+ * @cssproperty --spatial-scatter-chart-move-duration - How long the points take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-scatter-chart-move-easing - The curve the points move to new readings along. Defaults to `--helix-easing-decelerate`, so a point slows as it arrives and never passes its reading.
  */
 @customElement('helix-spatial-scatter-chart')
 export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {

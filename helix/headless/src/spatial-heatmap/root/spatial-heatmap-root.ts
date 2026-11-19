@@ -24,14 +24,13 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, toneOf } from '../../heatmap/root/buckets.js'
+import { fits, type HeatField, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
 import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 import {
   ACROSS,
   type Base,
   heightsOf,
-  highestOf,
   type LabelSize,
   labelPlaces,
   type Point,
@@ -159,6 +158,8 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @cssproperty --spatial-heatmap-label-x - Where the `start` or the `end` label stands clear of the drawing, from the footer's inline start, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
  * @cssproperty --spatial-heatmap-label-y - Where the `start` or the `end` label stands clear of the drawing, from the footer's top, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
+ * @cssproperty --spatial-heatmap-move-duration - How long the prisms take to move to a new table's readings: a cell the table keeps rises or falls to its new height, its tone following it through the tones between, and the heights of all of them follow the table's new highest reading. Unset, a new table is drawn at once. The growth under `grow` keeps its own timing.
+ * @cssproperty --spatial-heatmap-move-easing - The curve the prisms move to new readings along.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
  *
  * @cssstate drawn - While a renderer has drawn the relief, and the chart's own drawing stays unseen under it.
@@ -187,7 +188,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   relief = 2
 
   /** The prisms drawn on the last render, which the tooltip is placed against. */
-  private shown: Relief | undefined = undefined
+  private drawnPrisms: Relief | undefined = undefined
 
   /** Where the chart's own drawing is seen from, which a drag or Shift with an arrow turns. */
   @state()
@@ -272,8 +273,12 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   @state()
   private corners: DrawnCorners | undefined
 
-  /** The field last told, and the reading, so a renderer is told of a change only. */
-  private told = { at: -1, field: '' }
+  /** The field last told, the frame of a move, and the reading, so a renderer is told of a change only. */
+  private told: { at: number; field: string; frame: unknown } = {
+    at: -1,
+    field: '',
+    frame: undefined,
+  }
 
   /**
    * What a renderer draws: every reading drawn, down each column and then
@@ -290,14 +295,28 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     columns: number
     rows: number
   } {
-    const cells = this.drawn
+    return this.plotOf(this.heatField)
+  }
+
+  /**
+   * The relief as drawn this frame, which a renderer draws: `field` at rest,
+   * and while the readings grow or move, each prism at its height on the way,
+   * in the tone of its reading on the way.
+   */
+  get shown(): HelixHeadlessSpatialHeatmap['field'] {
+    return this.motion.moving ? this.plotOf(this.movingField) : this.field
+  }
+
+  /** The readings as a renderer draws them: each with its place on the grid, its height in cells, and its tone. */
+  private plotOf(heat: HeatField): HelixHeadlessSpatialHeatmap['field'] {
+    const cells = heat.cells
     const rows = this.rowCount
     const bounds = writtenNumbers(this.thresholds)
     const palette = writtenList(this.tones)
     const tallest = this.flat ? 0 : Math.max(0, this.relief || 0)
     const heights = heightsOf(
       cells.map((point) => point.value),
-      highestOf(this.points.map((point) => point.value)),
+      heat.highest,
       tallest,
     )
     const first = this.points.length - cells.length
@@ -369,9 +388,14 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     this.placeLabels()
     /* Told only on a change, so a renderer draws again only when it must. */
     const field = JSON.stringify(this.field)
+    const frame = this.motion.drawn
     if (field !== this.told.field) {
       this.told.field = field
+      this.told.frame = frame
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    } else if (frame !== this.told.frame) {
+      this.told.frame = frame
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
     }
     if (this.pointer.at !== this.told.at) {
       this.told.at = this.pointer.at
@@ -438,13 +462,28 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     )
   }
 
-  /** The drawn readings as prisms, standing against the highest reading in the table. */
+  /**
+   * How long a prism takes to rise or fall to a new reading, and its curve:
+   * `--spatial-heatmap-move-duration` and `--spatial-heatmap-move-easing`.
+   */
+  protected override moveTiming(): { duration: string; easing: string } {
+    const style = getComputedStyle(this)
+    return {
+      duration: style.getPropertyValue('--spatial-heatmap-move-duration'),
+      easing: style.getPropertyValue('--spatial-heatmap-move-easing'),
+    }
+  }
+
+  /**
+   * The drawn readings as prisms, standing against the highest reading in the
+   * table, each at its height on the way while the readings grow or move.
+   */
   private drawnRelief(): Relief {
     const tallest = this.flat ? 0 : Math.max(0, this.relief || 0)
-    const highest = highestOf(this.points.map((point) => point.value))
+    const moving = this.movingField
     const heights = heightsOf(
-      this.drawn.map((point) => point.value),
-      highest,
+      moving.cells.map((point) => point.value),
+      moving.highest,
       tallest,
     )
     return reliefOf(heights, this.rowCount, this.cellPx / (this.cellPx + this.gapPx), this.camera)
@@ -461,8 +500,10 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     /* Held at its size through a drag, so it turns in place. */
     const fits = this.drawnRelief()
     const relief = { ...fits, box: this.drag.frame(fits.box, fits.middle) }
-    this.shown = relief
+    this.drawnPrisms = relief
     const at = this.pointer.at
+    /* Each prism's tone as its reading stands this frame. */
+    const moving = this.movingField.cells
     /* Painted back to front for the view, whatever the order of the readings. */
     const prisms = relief.order.map((index) =>
       this.renderPrism(
@@ -470,7 +511,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         at === index,
         chosen.has(keys[index] ?? ''),
         grid,
-        toneOf(cells[index] ?? { value: undefined }, bounds, palette),
+        toneOf(moving[index] ?? cells[index] ?? { value: undefined }, bounds, palette),
       ),
     )
     const { box } = relief
@@ -561,7 +602,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   private placeLabels(): void {
     const footer = this.partNamed('footer')
     const [end, start] = [this.partNamed('end'), this.partNamed('start')]
-    const relief = this.shown
+    const relief = this.drawnPrisms
     if (!footer || !end || !start || !relief?.corners) {
       return
     }
@@ -655,8 +696,8 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
    */
   protected override renderTooltip(grid = false): TemplateResult | typeof nothing {
     const at = this.pointer.at
-    const prism = this.shown?.prisms[at]
-    const box = this.shown?.box
+    const prism = this.drawnPrisms?.prisms[at]
+    const box = this.drawnPrisms?.box
     const reading = grid ? undefined : this.pointer
     /* Over the renderer's drawing, at the reading's place there. */
     if (this.rendered) {

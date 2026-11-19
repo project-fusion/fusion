@@ -15,6 +15,7 @@ import {
   Vector3,
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import type { PlotColors } from '../connect-plot/connect-plot.js'
 import type {
   BarField,
   SpatialBarChartDriver,
@@ -51,8 +52,11 @@ const FOOTPRINT = 0.6
  * the blocks below it, on a grid of categories across and series in depth, in a box with a grid on its floor and two of
  * its walls, lit from above. Each series takes a series color from the theme,
  * and a bar whose cell names a tone takes that tone's. Under the chart's
- * `emphasis="muted"`, every other bar is the neutral ink. The chart's own
- * drawing alone draws a row, the glow, a toned bar's value, and the growth.
+ * `emphasis="muted"`, every other bar is the neutral ink. **The bars grow
+ * in and move to new readings as the chart's own drawing does**: the chart
+ * works out each frame, and the driver draws it with the view held still.
+ * The chart's own drawing alone draws a row, the glow, and a toned bar's
+ * value.
  *
  * **Dragging turns the box, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.
@@ -109,78 +113,89 @@ export const threeBarDriver = (
     return geometry
   }
 
-  return {
-    draw: (next, colors, font) => {
-      field = next
-      const [ex, ey, ez] = next.axes.extent ?? [1, 1, 1]
-      const spacing = Math.min(
-        (2 * HALF * ex) / Math.max(next.categories.length, 1),
-        (2 * HALF * ez) / Math.max(next.lanes, 1),
-      )
-      const width = spacing * FOOTPRINT
-      const page = new Color(colors.page)
-      const { emphasis, muted, through } = colors.look
-      const solids: BufferGeometry[] = []
-      const lines: BufferGeometry[] = []
-      drawnCells = []
-      tops = new Map()
-      next.cells.forEach((cell, index) => {
-        if (cell.value === undefined || (next.stacked && cell.value === 0)) {
-          return
-        }
-        const toned = cell.tone ? colors.extra[`tone-${cell.tone}`] : undefined
-        /* Muted, a bar is the neutral ink a third of the way from the
+  /** Builds the bars of `next`, and frames the view around them where `framed`, as a new table is. */
+  const build = (next: BarField, colors: PlotColors, font: string, framed: boolean): void => {
+    field = next
+    const [ex, ey, ez] = next.axes.extent ?? [1, 1, 1]
+    const spacing = Math.min(
+      (2 * HALF * ex) / Math.max(next.categories.length, 1),
+      (2 * HALF * ez) / Math.max(next.lanes, 1),
+    )
+    const width = spacing * FOOTPRINT
+    const page = new Color(colors.page)
+    const { emphasis, muted, through } = colors.look
+    const solids: BufferGeometry[] = []
+    const lines: BufferGeometry[] = []
+    drawnCells = []
+    tops = new Map()
+    next.cells.forEach((cell, index) => {
+      if (cell.value === undefined || (next.stacked && cell.value === 0)) {
+        return
+      }
+      const toned = cell.tone ? colors.extra[`tone-${cell.tone}`] : undefined
+      /* Muted, a bar is the neutral ink a third of the way from the
            ground, as the top of one in the chart's own drawing is, unless
            its cell names a tone. */
-        const tone = toned
-          ? new Color(toned)
-          : muted
-            ? new Color(colors.ground).lerp(new Color(colors.ink), 0.3)
-            : new Color(colors.groups[cell.depth % colors.groups.length] ?? colors.ink)
-        /* As the chart's own drawing paints them: `outlined` fades the faces
+      const tone = toned
+        ? new Color(toned)
+        : muted
+          ? new Color(colors.ground).lerp(new Color(colors.ink), 0.3)
+          : new Color(colors.groups[cell.depth % colors.groups.length] ?? colors.ink)
+      /* As the chart's own drawing paints them: `outlined` fades the faces
            toward the page and draws the edges in the series' color, and
            `subtle` is a faint wash under the same edges. */
-        const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
-        /* From where the block starts: zero, or the blocks below it in a
+      const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
+      /* From where the block starts: zero, or the blocks below it in a
            stacked column. */
-        const start = inBox(next.axes.y, cell.from) * ey
-        const top = inBox(next.axes.y, cell.from + cell.value) * ey
-        const tall = Math.max(Math.abs(top - start), 1e-3)
-        const x = inBox(next.axes.x, cell.across) * ex
-        const z = inBox(next.axes.z, cell.lane) * ez
-        const box = new BoxGeometry(width, tall, width)
-        box.translate(x, Math.min(top, start) + tall / 2, z)
-        solids.push(painted(box, color))
-        lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
-        drawnCells.push(index)
-        tops.set(index, new Vector3(x, Math.max(top, start), z))
-      })
-      lookThrough(barMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
-      lookThrough(edgeMaterial, through)
-      bars.geometry.dispose()
-      edges.geometry.dispose()
-      bars.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
-      edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
-      for (const one of [...solids, ...lines]) {
-        one.dispose()
-      }
-      stage.setAxes(next.axes, colors, font)
-      /* Framed around the box, whose proportions are the grid's, or with no
+      const start = inBox(next.axes.y, cell.from) * ey
+      const top = inBox(next.axes.y, cell.from + cell.value) * ey
+      const tall = Math.max(Math.abs(top - start), 1e-3)
+      const x = inBox(next.axes.x, cell.across) * ex
+      const z = inBox(next.axes.z, cell.lane) * ez
+      const box = new BoxGeometry(width, tall, width)
+      box.translate(x, Math.min(top, start) + tall / 2, z)
+      solids.push(painted(box, color))
+      lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
+      drawnCells.push(index)
+      tops.set(index, new Vector3(x, Math.max(top, start), z))
+    })
+    lookThrough(barMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
+    lookThrough(edgeMaterial, through)
+    bars.geometry.dispose()
+    edges.geometry.dispose()
+    bars.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
+    edges.geometry = (lines.length > 0 && mergeGeometries(lines)) || new BufferGeometry()
+    for (const one of [...solids, ...lines]) {
+      one.dispose()
+    }
+    stage.setAxes(next.axes, colors, font)
+    if (!framed) {
+      return
+    }
+    /* Framed around the box, whose proportions are the grid's, or with no
          box around the bars alone, so they fill the view. */
-      if (colors.look.box || tops.size === 0) {
-        stage.frame(
-          new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
-          new Vector3(HALF * ex, HALF * ey, HALF * ez),
-        )
-      } else {
-        const around = new Box3().setFromBufferAttribute(
-          bars.geometry.getAttribute('position') as BufferAttribute,
-        )
-        stage.frame(around.min, around.max)
-      }
+    if (colors.look.box || tops.size === 0) {
+      stage.frame(
+        new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
+        new Vector3(HALF * ex, HALF * ey, HALF * ez),
+      )
+    } else {
+      const around = new Box3().setFromBufferAttribute(
+        bars.geometry.getAttribute('position') as BufferAttribute,
+      )
+      stage.frame(around.min, around.max)
+    }
+  }
+
+  return {
+    draw: (next, colors, font) => {
+      build(next, colors, font, true)
     },
     focus: (index) => {
       stage.setMarker(field ? tops.get(index) : undefined)
+    },
+    move: (next, colors, font) => {
+      build(next, colors, font, false)
     },
     onHover: (listener) => stage.onHover(listener),
     onPlace: (listener) => stage.onPlace(listener),

@@ -109,6 +109,14 @@ export interface PlotDriver<F> {
   /** Marks the reading at `index` as the one the keys rest on, or none with `-1`. */
   focus(index: number): void
   /**
+   * Draws one frame of the readings moving to new ones: the chart's `shown`
+   * field, between its readings before and after a change, in the colors and
+   * the font the last `draw` was given. **The view holds still**, framed as
+   * `draw` framed the new readings, so nothing but the readings moves. A
+   * driver with none is drawn each frame by `draw`.
+   */
+  move?(field: F, colors: PlotColors, font: string): void
+  /**
    * Calls `hover` with the index of the reading a mouse or a pen rests on in
    * the drawing, and with `-1` when it rests on none. Returns what stops
    * listening.
@@ -157,6 +165,8 @@ interface Chart<F> extends HTMLElement {
   active?: number
   rendererDrawn?(on?: boolean): void
   field?: F
+  /** The field as drawn this frame, between two tables while the readings move. */
+  shown?: F
   placeCorners?(at: Corners | undefined): void
   placeReading?(at: Place | undefined): void
   requestActive?(index: number, kind?: PointerKind): void
@@ -300,7 +310,26 @@ export const connectPlot = <F extends object>(
     })
   }
   let connected = true
+  /** The colors and font the last full drawing read, which a frame of a move is drawn in. */
+  let look: { colors: PlotColors; font: string } | undefined
 
+  /** Draws the frame the chart shows while its readings move, where it is not its readings. */
+  const moveTo = (field: F): void => {
+    const shown = chart.shown
+    if (!look || shown === undefined || shown === field) {
+      return
+    }
+    if (driver.move) {
+      driver.move(shown, look.colors, look.font)
+    } else {
+      driver.draw(shown, look.colors, look.font)
+    }
+  }
+
+  /**
+   * Reads the page's colors and draws the chart's readings, which frames the
+   * view, then the frame it shows, where its readings are moving.
+   */
   const draw = (): void => {
     const field = chart.field
     if (!connected || !field) {
@@ -308,6 +337,7 @@ export const connectPlot = <F extends object>(
     }
     const colors = plotColorsFrom(frame, options.groupsOf(field), options.extraOf?.(field))
     if (!colors || options.readings(field) === 0) {
+      look = undefined
       chart.rendererDrawn?.(false)
       return
     }
@@ -316,15 +346,32 @@ export const connectPlot = <F extends object>(
         .fontFamily.split(',')[0]
         ?.trim()
         .replace(/^["']|["']$/g, '') ?? ''
-    driver.draw(field, colors, font || 'sans-serif')
+    look = { colors, font: font || 'sans-serif' }
+    driver.draw(field, look.colors, look.font)
+    moveTo(field)
     driver.focus(chart.active ?? -1)
     chart.rendererDrawn?.(true)
   }
 
   const handleChange = (event: Event): void => {
     const { kind } = (event as HelixPlotChangeEvent).detail
+    const field = chart.field
     if (kind === 'data') {
       draw()
+    } else if (kind === 'move') {
+      /* **A frame of a move is drawn in the colors last read**: reading them
+         settles the page's styles, which every frame would pay for. */
+      if (!look || !field) {
+        draw()
+        return
+      }
+      const shown = chart.shown ?? field
+      if (driver.move) {
+        driver.move(shown, look.colors, look.font)
+      } else {
+        driver.draw(shown, look.colors, look.font)
+      }
+      driver.focus(chart.active ?? -1)
     } else {
       driver.focus(chart.active ?? -1)
     }

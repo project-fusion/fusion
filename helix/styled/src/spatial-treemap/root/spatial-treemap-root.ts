@@ -26,6 +26,8 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/spatial-treemap
  *
  * @cssproperty --spatial-treemap-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
+ * @cssproperty --spatial-treemap-move-duration - How long the blocks take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.
+ * @cssproperty --spatial-treemap-move-easing - The curve the blocks move to new readings along. Defaults to `--helix-easing-decelerate`, so a block slows as it arrives and never passes its reading.
  */
 @customElement('helix-spatial-treemap')
 export class HelixSpatialTreemap extends HelixHeadlessSpatialTreemap {

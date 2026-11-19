@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { HelixPlotChangeEvent } from '@fusion.dev/helix-core'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { PlotColors, PointerKind } from '../connect-plot/connect-plot.js'
 import type { BarField, SpatialBarChartDriver } from './connect-spatial-bar-chart.js'
@@ -109,5 +110,34 @@ describe('connectSpatialBarChart', () => {
     told.press?.(3, 'mouse')
     await settle(element)
     expect(element.active).toBe(3)
+  })
+
+  test('a frame of a move is drawn by `move`, in the colors the last drawing read, with the view held', async () => {
+    const element = await chart()
+    const { driver, told } = recording()
+    const moved: Array<{ colors: PlotColors; field: BarField }> = []
+    driver.move = (field, colors) => {
+      moved.push({ colors, field })
+    }
+    connectSpatialBarChart(element, driver)
+    await settle(element)
+    const drawn = told.drawn.length
+    const frame = { ...(told.drawn.at(-1) as BarField), readings: 1 }
+    Object.defineProperty(element, 'shown', { configurable: true, get: () => frame })
+    element.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
+    expect(told.drawn.length).toBe(drawn)
+    expect(moved.at(-1)?.field).toBe(frame)
+    expect(moved.at(-1)?.colors).toBe(told.colors as PlotColors)
+  })
+
+  test('a driver with no `move` draws each frame of a move with `draw`', async () => {
+    const element = await chart()
+    const { driver, told } = recording()
+    connectSpatialBarChart(element, driver)
+    await settle(element)
+    const frame = { ...(told.drawn.at(-1) as BarField), readings: 1 }
+    Object.defineProperty(element, 'shown', { configurable: true, get: () => frame })
+    element.dispatchEvent(new HelixPlotChangeEvent({ kind: 'move' }))
+    expect(told.drawn.at(-1)).toBe(frame)
   })
 })

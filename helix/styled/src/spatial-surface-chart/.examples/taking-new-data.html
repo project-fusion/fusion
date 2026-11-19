@@ -1,0 +1,188 @@
+<!-- @summary A surface that rises from a flat sheet the first time it is seen, and takes its new shape when the table changes. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="load"
+  >
+    <caption>Requests a minute by hour and day</caption>
+    <thead>
+      <tr>
+        <th scope="col">Reading</th>
+        <th scope="col">Hour</th>
+        <th scope="col">Day</th>
+        <th scope="col">Requests a minute</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Day 1, 0h</th>
+        <td data-value="0">0</td>
+        <td data-value="1">1</td>
+        <td data-value="246">246</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 1, 4h</th>
+        <td data-value="4">4</td>
+        <td data-value="1">1</td>
+        <td data-value="246">246</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 1, 8h</th>
+        <td data-value="8">8</td>
+        <td data-value="1">1</td>
+        <td data-value="750">750</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 1, 12h</th>
+        <td data-value="12">12</td>
+        <td data-value="1">1</td>
+        <td data-value="750">750</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 1, 16h</th>
+        <td data-value="16">16</td>
+        <td data-value="1">1</td>
+        <td data-value="750">750</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 1, 20h</th>
+        <td data-value="20">20</td>
+        <td data-value="1">1</td>
+        <td data-value="246">246</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 0h</th>
+        <td data-value="0">0</td>
+        <td data-value="2">2</td>
+        <td data-value="264">264</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 4h</th>
+        <td data-value="4">4</td>
+        <td data-value="2">2</td>
+        <td data-value="264">264</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 8h</th>
+        <td data-value="8">8</td>
+        <td data-value="2">2</td>
+        <td data-value="840">840</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 12h</th>
+        <td data-value="12">12</td>
+        <td data-value="2">2</td>
+        <td data-value="840">840</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 16h</th>
+        <td data-value="16">16</td>
+        <td data-value="2">2</td>
+        <td data-value="840">840</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 2, 20h</th>
+        <td data-value="20">20</td>
+        <td data-value="2">2</td>
+        <td data-value="264">264</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 0h</th>
+        <td data-value="0">0</td>
+        <td data-value="3">3</td>
+        <td data-value="282">282</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 4h</th>
+        <td data-value="4">4</td>
+        <td data-value="3">3</td>
+        <td data-value="282">282</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 8h</th>
+        <td data-value="8">8</td>
+        <td data-value="3">3</td>
+        <td data-value="930">930</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 12h</th>
+        <td data-value="12">12</td>
+        <td data-value="3">3</td>
+        <td data-value="930">930</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 16h</th>
+        <td data-value="16">16</td>
+        <td data-value="3">3</td>
+        <td data-value="930">930</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 3, 20h</th>
+        <td data-value="20">20</td>
+        <td data-value="3">3</td>
+        <td data-value="282">282</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 0h</th>
+        <td data-value="0">0</td>
+        <td data-value="4">4</td>
+        <td data-value="300">300</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 4h</th>
+        <td data-value="4">4</td>
+        <td data-value="4">4</td>
+        <td data-value="300">300</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 8h</th>
+        <td data-value="8">8</td>
+        <td data-value="4">4</td>
+        <td data-value="1020">1020</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 12h</th>
+        <td data-value="12">12</td>
+        <td data-value="4">4</td>
+        <td data-value="1020">1020</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 16h</th>
+        <td data-value="16">16</td>
+        <td data-value="4">4</td>
+        <td data-value="1020">1020</td>
+      </tr>
+      <tr>
+        <th scope="row">Day 4, 20h</th>
+        <td data-value="20">20</td>
+        <td data-value="4">4</td>
+        <td data-value="300">300</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-spatial-surface-chart
+    for="load"
+    grow
+    label="Requests a minute by hour and day"
+  ></helix-spatial-surface-chart>
+
+  <helix-button id="refresh">Refresh data</helix-button>
+</helix-flex>
+
+<!-- The script rewrites the numbers in the table. The chart reads the table
+     and moves to the new numbers. -->
+<script type="module">
+  document.getElementById('refresh').addEventListener('click', () => {
+    for (const row of document.querySelectorAll('#load tbody tr')) {
+      const cell = row.querySelectorAll('td')[2]
+      const value = 40 + Math.round(Math.random() * 1360)
+      cell.dataset.value = String(value)
+      cell.textContent = String(value)
+    }
+  })
+</script>

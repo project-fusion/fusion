@@ -8,8 +8,20 @@
  * data never did.
  */
 
-import { type PagePoint, type Projection, pathData } from '@fusion.dev/helix-core'
-import { type BarCell, type BarField, barsOf } from '../spatial-bar-chart/bars.js'
+import {
+  keysOf,
+  type MotionShares,
+  type PagePoint,
+  type Projection,
+  pathData,
+} from '@fusion.dev/helix-core'
+import {
+  type BarCell,
+  type BarField,
+  barKeys,
+  barsBetween,
+  barsOf,
+} from '../spatial-bar-chart/bars.js'
 import type { FieldRow } from '../spatial-scatter-chart/field.js'
 import { inBox } from '../spatial-scatter-chart/view.js'
 
@@ -60,6 +72,35 @@ export const ribbonsOf = (rows: readonly FieldRow[], columns: readonly number[])
   }
 }
 
+/**
+ * The ribbons `at` the shares between `from` and `to`, which the chart draws
+ * while its readings move, as a bar chart's bars move: **a reading both
+ * tables hold rises or falls** to its new value and slides to its new place,
+ * **a reading only `to` holds grows** from zero, and **a reading only `from`
+ * held sinks** to zero, then goes. A series the new table drops goes at once,
+ * since its ribbon would stand in another's depth.
+ */
+export const ribbonsBetween = (
+  from: RibbonField | undefined,
+  to: RibbonField,
+  at: MotionShares,
+): RibbonField => {
+  const field = barsBetween(from, to, at)
+  const own = to.cells.length
+  const series = keysOf(to.series)
+  const keys = barKeys(field)
+  const cells = field.cells.flatMap((cell, index): RibbonCell[] => {
+    if (index < own) {
+      return [cell]
+    }
+    /* A reading going away sinks in its series' ribbon, wherever that series
+       now stands in depth. */
+    const depth = series.indexOf(keys[index]?.split('\u0001')[1] ?? '')
+    return depth < 0 ? [] : [{ ...cell, depth, lane: depth }]
+  })
+  return { ...field, cells }
+}
+
 /** One face of a ribbon, as path data, and how far it turns from the light. */
 export interface RibbonFace {
   d: string
@@ -90,7 +131,6 @@ export interface DrawnRibbon {
 export const ribbonsDrawn = (field: RibbonField, projection: Projection): DrawnRibbon[] => {
   const [ex, ey, ez] = field.axes.extent
   const on = (x: number, y: number, z: number): PagePoint => projection.at(x * ex, -z * ez, y * ey)
-  const across = field.categories.length
   const count = Math.max(field.series.length, 1)
   const half = (THICKNESS * 2) / count / 2
   const zero = inBox(field.axes.y, Math.max(field.axes.y.range[0], 0))
@@ -100,14 +140,19 @@ export const ribbonsDrawn = (field: RibbonField, projection: Projection): DrawnR
   return field.series.map((_, series): DrawnRibbon => {
     const z = inBox(field.axes.z, series)
     const [near, far] = [z + half, z - half]
+    /* Each reading of the series where it stands across, which between two
+       tables is where it is sliding to, and in order across. */
     const points: Array<{ index: number; value: number; x: number }> = []
-    for (let at = 0; at < across; at++) {
-      const index = at * field.series.length + series
-      const value = field.cells[index]?.value
-      if (value !== undefined) {
-        points.push({ index, value: inBox(field.axes.y, value), x: inBox(field.axes.x, at) })
+    field.cells.forEach((cell, index) => {
+      if (cell.depth === series && cell.value !== undefined) {
+        points.push({
+          index,
+          value: inBox(field.axes.y, cell.value),
+          x: inBox(field.axes.x, cell.across),
+        })
       }
-    }
+    })
+    points.sort((one, other) => one.x - other.x)
     const faces: RibbonFace[] = []
     /* The side facing the reader, front or back, drawn last, and the other left out. */
     const front = toward.z >= 0 ? near : far

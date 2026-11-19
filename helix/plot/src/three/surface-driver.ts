@@ -48,7 +48,8 @@ export interface ThreeSurfaceDriverOptions {
  * two of its walls. The surface is shaded along the ramp from
  * `--spatial-surface-chart-low` to `--spatial-surface-chart-high`, lit from above, and ruled along
  * the grid. A place the table has no reading for leaves a hole rather than a
- * pit.
+ * pit. **The surface rises in and moves to new readings as the chart's own
+ * drawing does**: the chart works out each frame, and the driver draws it.
  *
  * **Dragging turns the box, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.

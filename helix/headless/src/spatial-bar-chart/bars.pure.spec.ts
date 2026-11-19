@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
 import {
+  barItems,
+  barKeys,
+  barsBetween,
   barsDrawn,
   barsOf,
   climbing,
   type DrawnBar,
   floorOf,
-  grownAt,
-  growTime,
   heightened,
   namesOf,
   paintOrder,
@@ -303,24 +304,71 @@ describe('a lit bar, and a row with its floor', () => {
   })
 })
 
-describe('growing in', () => {
-  test('each category starts a little after the one before, and every bar ends at its height', () => {
-    expect(grownAt(0, 7, 0)).toBe(0)
-    expect(grownAt(0, 7, 500)).toBeGreaterThan(grownAt(3, 7, 500))
-    expect(grownAt(6, 7, growTime(7))).toBe(1)
-    /* Fast at first, slow to rest, and never past the value. */
-    let last = 0
-    for (let at = 0; at <= growTime(7); at += 50) {
-      const now = grownAt(2, 7, at)
-      expect(now).toBeGreaterThanOrEqual(last)
-      expect(now).toBeLessThanOrEqual(1)
-      last = now
-    }
+describe('moving between two tables', () => {
+  const at = (share: number, floor = false) => ({
+    axes: share,
+    floor: () => floor,
+    share: () => share,
   })
 
-  test('many categories share the same spread, so a long row takes no longer than a short one', () => {
-    expect(growTime(60)).toBe(growTime(7))
-    expect(growTime(1)).toBeLessThan(growTime(7))
+  test('keys each bar by its category and its series, and grows a category in with its step', () => {
+    const field = barsOf([row('Mon', 4, 6), row('Tue', 2, 3)], [0, 1])
+    expect(new Set(barKeys(field)).size).toBe(4)
+    expect(barItems(field).map((item) => item.step)).toEqual([0, 0, 1, 1])
+  })
+
+  test('with no table before, every bar grows from the floor, a stack as a whole', () => {
+    const field = barsOf([row('Mon', 4, 6)], [0, 1], true)
+    const half = barsBetween(undefined, field, at(0.5, true))
+    expect(half.cells.map((cell) => [cell.from, cell.value])).toEqual([
+      [0, 2],
+      [2, 3],
+    ])
+    expect(half.axes).toBe(field.axes)
+  })
+
+  test('a bar both tables hold moves from its old value to its new one, and slides to its new place', () => {
+    const from = barsOf([row('Mon', 4), row('Tue', 8)], [0])
+    const to = barsOf([row('Sun', 1), row('Mon', 6), row('Tue', 8)], [0])
+    const half = barsBetween(from, to, at(0.5))
+    const monday = half.cells[1]
+    expect(monday?.value).toBe(5)
+    expect(monday?.across).toBe(0.5)
+    /* Sunday is new, and grows from the floor where it stands. */
+    expect(half.cells[0]?.value).toBe(0.5)
+    expect(half.cells[0]?.across).toBe(0)
+  })
+
+  test('a bar the new table drops shrinks to the floor after the others, and then goes', () => {
+    const from = barsOf([row('Mon', 4), row('Tue', 8)], [0])
+    const to = barsOf([row('Mon', 4)], [0])
+    const half = barsBetween(from, to, at(0.5))
+    expect(half.cells).toHaveLength(2)
+    expect(half.cells[1]?.label).toBe('Tue')
+    expect(half.cells[1]?.value).toBe(4)
+    expect(barsBetween(from, to, at(1)).cells).toHaveLength(1)
+  })
+
+  test('the value axis eases to its new range, and writes only the ticks inside it', () => {
+    const from = barsOf([row('Mon', 4)], [0])
+    const to = barsOf([row('Mon', 40)], [0])
+    const half = barsBetween(from, to, at(0.5))
+    const [low, high] = half.axes.y.range
+    expect(low).toBe(0)
+    expect(high).toBeCloseTo((from.axes.y.range[1] + to.axes.y.range[1]) / 2, 9)
+    expect(half.axes.y.ticks.every((tick) => tick <= high)).toBe(true)
+  })
+
+  test('a field drawn between two moves on from where it is, keeping its cells known', () => {
+    const one = barsOf([row('Mon', 4)], [0])
+    const two = barsOf([row('Mon', 8), row('Tue', 2)], [0])
+    const three = barsOf([row('Mon', 0)], [0])
+    const half = barsBetween(one, two, at(0.5))
+    const next = barsBetween(half, three, at(0.5))
+    expect(next.cells[0]?.value).toBe(3)
+    /* Tuesday was growing, and shrinks from where it had got to. */
+    expect(next.cells[1]?.label).toBe('Tue')
+    expect(next.cells[1]?.value).toBeCloseTo(0.5, 9)
   })
 
   test('a growing bar stands from the floor at its share of its height', () => {

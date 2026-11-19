@@ -146,6 +146,12 @@ export {
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
 export {
+  type MotionItem,
+  type MotionShares,
+  ReadingsMotionController,
+  type ReadingsMotionOptions,
+} from './controllers/readings-motion-controller/readings-motion-controller.js'
+export {
   RelativeClockController,
   type RelativeClockOptions,
 } from './controllers/relative-clock-controller/relative-clock-controller.js'
@@ -651,6 +657,14 @@ export {
   seriesKey,
   unbroken,
 } from './utils/read-series/read-series.js'
+export {
+  grownAt,
+  growTime,
+  keysOf,
+  type MovingAxis,
+  mix,
+  mixAxis,
+} from './utils/readings-motion/readings-motion.js'
 export {
   type ElementsProperty,
   linkDescription,
