@@ -203,17 +203,17 @@
         - /url: "#guidelines"
     - heading "When to use" [level=3]
     - list:
-      - listitem: An action on the page or a form's submit, such as Save, Delete, or Open settings.
-    - heading "When to use something else" [level=3]
-    - list:
       - listitem:
-        - link "Icon Button":
+        - paragraph: An action on the page or a form's submit, such as Save, Delete, or Open settings.
+        - text: Button This page
+      - listitem:
+        - 'link "Icon Button: an action shown as an icon alone, such as Settings in a toolbar."':
           - /url: /helix/components/icon-button
-        - text: ": an action shown as an icon alone, such as Settings in a toolbar."
+          - text: An action shown as an icon alone, such as Settings in a toolbar. Icon Button
       - listitem:
-        - link "Copy Button":
+        - 'link "Copy Button: a value you copy to the clipboard, such as an install command."':
           - /url: /helix/components/copy-button
-        - text: ": a value you copy to the clipboard, such as an install command."
+          - text: A value you copy to the clipboard, such as an install command. Copy Button
     - heading "Using Button" [level=3]
     - list:
       - listitem:
