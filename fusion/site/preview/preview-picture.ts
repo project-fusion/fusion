@@ -4,19 +4,25 @@
  *
  * **The running example, never a stored image.** The page sends a family's
  * headline example with one `<template data-preview-picture>` after it. The
- * example is drawn at one scale, centered on the boxes it draws, so a picture
+ * example is drawn at one scale, placed by the boxes it draws, so a picture
  * changes the day the component does.
  *
  * **One scale in every tile**, so a control is pictured at the same size in
  * every row. Scaled to fit, an Icon Button shrank to an 8 pixel glyph beside a
  * Button near its real size, and a field's label to 4 pixel type. At three
- * quarters, a 12 pixel label is 9 pixels and 14 pixel body text 10.5. An
- * example taller or wider than the tile is cropped at its edges. It is laid
+ * quarters, a 12 pixel label is 9 pixels and 14 pixel body text 10.5. It is laid
  * out at one width in every tile, the width the larger tile shows at that
  * scale, so a field that fills its line fills that tile. The phone's smaller
  * tile crops the same layout, where a width of its own had squeezed a
- * button's words to an ellipsis. A box that is `fixed` or visually hidden is left out of
- * the centering, as the frame's own measurement leaves it out.
+ * button's words to an ellipsis.
+ *
+ * **Centered where it fits, and held at the start where it does not.** On
+ * each axis an example that fits the tile is centered, so a Button sits in
+ * the middle. One that overflows starts at the tile's top or inline-start
+ * edge, inside its margin, and fades out at the far edge. Centered, the crop
+ * cut a field's label through its top and its help text through its bottom,
+ * as half glyphs. A box that is `fixed` or visually hidden is left out, as the
+ * frame's own measurement leaves it out.
  *
  * **Fitted again whenever a box can change size**: after the elements
  * upgrade, when a font lands, when the frame is resized, and when the page
@@ -27,6 +33,12 @@ import { RESTYLED } from './preview-events'
 
 /** The template the page sends after the example. */
 const SELECTOR = 'template[data-preview-picture]'
+
+/** The space kept between an example and the tile's start edges, in pixels. */
+const MARGIN = 8
+
+/** How far the far edge of an example that overflows fades, in pixels. */
+const FADE = 16
 
 /** The scale every picture is drawn at. */
 const SCALE = 0.75
@@ -74,7 +86,7 @@ const drawn = (child: Element): DOMRect[] => {
     .filter((box) => box.width > 0 || box.height > 0)
 }
 
-/** The example scaled and centered in the frame, measured unscaled. */
+/** The example scaled and placed in the frame, measured unscaled. */
 const fit = (): void => {
   if (!scope) {
     return
@@ -88,9 +100,17 @@ const fit = (): void => {
   const top = Math.min(...boxes.map((box) => box.top))
   const right = Math.max(...boxes.map((box) => box.right))
   const bottom = Math.max(...boxes.map((box) => box.bottom))
-  const x = innerWidth / 2 - SCALE * ((left + right) / 2)
-  const y = innerHeight / 2 - SCALE * ((top + bottom) / 2)
+  const wide = SCALE * (right - left) > innerWidth - 2 * MARGIN
+  const tall = SCALE * (bottom - top) > innerHeight - 2 * MARGIN
+  const rtl = document.documentElement.dir === 'rtl'
+  const x = !wide
+    ? innerWidth / 2 - SCALE * ((left + right) / 2)
+    : rtl
+      ? innerWidth - MARGIN - SCALE * right
+      : MARGIN - SCALE * left
+  const y = tall ? MARGIN - SCALE * top : innerHeight / 2 - SCALE * ((top + bottom) / 2)
   scope.style.transform = `translate(${x}px, ${y}px) scale(${SCALE})`
+  document.body.dataset.pictureCrop = [wide && 'inline', tall && 'block'].filter(Boolean).join(' ')
 }
 
 /**
@@ -102,6 +122,7 @@ export const drawPicture = async (root: HTMLElement): Promise<void> => {
   if (!root.querySelector(SELECTOR)) {
     scope = undefined
     root.style.removeProperty('transform')
+    delete document.body.dataset.pictureCrop
     return
   }
   scope = root
@@ -127,6 +148,24 @@ body:has(${SELECTOR}) { margin: 0; overflow: hidden; }
 body:has(${SELECTOR}) #preview-root {
   inline-size: ${CANVAS}px; inset: 0 auto auto 0; margin: 0; min-block-size: 0;
   padding: 0; pointer-events: none; position: absolute; transform-origin: 0 0;
+}
+/* The far edge of an example that overflows, faded into the tile's
+   background, so a line it cuts ends in a fade and not a half glyph. */
+body[data-picture-crop~="block"]::after,
+body[data-picture-crop~="inline"]::before {
+  content: ""; pointer-events: none; position: fixed; z-index: 1;
+}
+body[data-picture-crop~="block"]::after {
+  background: linear-gradient(to bottom, transparent, var(--helix-color-background));
+  block-size: ${FADE}px; inset: auto 0 0 0;
+}
+body[data-picture-crop~="inline"]::before {
+  background: linear-gradient(to right, transparent, var(--helix-color-background));
+  inline-size: ${FADE}px; inset: 0 0 0 auto;
+}
+[dir="rtl"] body[data-picture-crop~="inline"]::before {
+  background: linear-gradient(to left, transparent, var(--helix-color-background));
+  inset: 0 auto 0 0;
 }
 `
 document.head.append(sheet)
