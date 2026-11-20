@@ -197,6 +197,45 @@
     - link "Open in the sandbox":
       - /url: /helix/sandbox?e=button.preview
     - textbox "Example source"
+    - heading "Guidelines Link to Guidelines" [level=2]:
+      - text: Guidelines
+      - link "Link to Guidelines":
+        - /url: "#guidelines"
+    - heading "When to use" [level=3]
+    - list:
+      - listitem:
+        - paragraph: An action on the page or a form's submit, such as Save, Delete, or Open settings.
+        - text: Button This page
+      - listitem:
+        - 'link "Icon Button: an action shown as an icon alone, such as Settings in a toolbar."':
+          - /url: /helix/components/icon-button
+          - text: An action shown as an icon alone, such as Settings in a toolbar. Icon Button
+      - listitem:
+        - 'link "Copy Button: a value you copy to the clipboard, such as an install command."':
+          - /url: /helix/components/copy-button
+          - text: A value you copy to the clipboard, such as an install command. Copy Button
+    - heading "Using Button" [level=3]
+    - list:
+      - listitem:
+        - text: Draw a link that looks like a button on your own anchor, with the base layer's recipe. Button never renders an anchor, because a router renders its own to intercept a click.
+        - code: <a data-button="solid" data-button-tone="primary" href="https://example.test" rel="noreferrer" target="_blank" > Visit website </a>
+        - button "Copy code"
+      - listitem:
+        - text: Set
+        - code: pending
+        - text: while the action a press started is still running. The button keeps focus and refuses presses, and a screen reader on it hears
+        - code: pending-label
+        - text: .
+        - code: "<helix-button emphasis=\"solid\" id=\"save\" pending-label=\"Saving\" tone=\"primary\" >Save changes</helix-button> <script type=\"module\"> const save = document.getElementById('save') // The time the pretend request takes. const WAIT = 2000 save.addEventListener('click', () => { save.pending = true setTimeout(() => { save.pending = false }, WAIT) }) </script>"
+        - button "Copy code"
+    - heading "Anatomy" [level=3]
+    - list:
+      - listitem:
+        - code: ::part(button)
+        - text: The inner control.
+      - listitem:
+        - code: ::part(text)
+        - text: The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
     - heading "Anatomy Link to Anatomy" [level=2]:
       - text: Anatomy
       - link "Link to Anatomy":
@@ -399,6 +438,9 @@
         - listitem:
           - link "Preview":
             - /url: "#preview"
+        - listitem:
+          - link "Guidelines":
+            - /url: "#guidelines"
         - listitem:
           - link "Anatomy":
             - /url: "#anatomy"
