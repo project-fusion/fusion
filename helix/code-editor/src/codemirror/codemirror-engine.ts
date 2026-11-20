@@ -548,6 +548,14 @@ const helixTheme = EditorView.theme({
   [`.cm-activeLine, ${drawn('.cm-activeLine')}`]: {
     backgroundColor: 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
   },
+  /* The number's box is placed from the line's edge in `ch`, and the band is
+     sized from text, so in a face whose digits are not `1ch` wide the box can
+     start a few pixels into the band. The wash reaches back to the band's
+     start as a shadow, which the scroller cuts off at its edge. */
+  '.cm-activeLine[data-line]::before': {
+    boxShadow:
+      'calc(-1 * var(--_code-editor-numbers)) 0 0 0 color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
+  },
   '.cm-content': {
     caretColor: 'var(--helix-color-primary)',
     paddingBlock: 'var(--helix-space-xs)',
@@ -689,6 +697,7 @@ const helixTheme = EditorView.theme({
   '&': { blockSize: '100%', color: 'var(--helix-color-foreground)', fontSize: 'inherit' },
   [`&:not(.cm-focused) .cm-activeLine, ${drawn('&:not(.cm-focused) .cm-activeLine')}`]: {
     backgroundColor: 'transparent',
+    boxShadow: 'none',
   },
   '&.cm-focused': { outline: 'none' },
 })
