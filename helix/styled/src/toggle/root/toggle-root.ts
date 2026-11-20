@@ -17,6 +17,7 @@ import { styles } from './toggle-root.generated.css.js'
  * @use A compact choice of view or mode, such as list or grid, that shows at once.
  * @instead radio - Options that each need a sentence.
  * @instead switch - One setting, on or off.
+ * @instead navigation - Links to other pages, with the current one marked.
  * @anatomy group
  * @anatomy item
  * @anatomy label
