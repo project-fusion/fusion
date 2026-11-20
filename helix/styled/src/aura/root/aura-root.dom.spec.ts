@@ -183,8 +183,7 @@ describe('aura', () => {
   /* **Declared once for the file, and deliberately never put back.** The
      browser lane gives this family a page of its own, so the stub outlives
      nothing, and the three specs that want another answer install their own and
-     restore to this one. The harness has no `afterAll` to undo it in, which is
-     the smaller reason. */
+     restore to this one. */
   beforeAll(() => {
     reportRenderer(HARDWARE)
   })

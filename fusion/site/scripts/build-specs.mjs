@@ -42,6 +42,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { specFileBlocks } from '@fusion.dev/scripts/spec-file-blocks'
 import { CONNECTORS, root, SOURCE, TIERS } from '@fusion.dev/scripts/workspace'
 
 /**
@@ -288,7 +289,7 @@ const result = await Bun.build({
   // is not something the served URL should carry.
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
   outdir: out,
-  plugins: [shareRuntime, useBrowserHarness, headlessFromSource],
+  plugins: [shareRuntime, useBrowserHarness, headlessFromSource, specFileBlocks(harness)],
   /* Off, for the reason the header gives: an entry holding both tiers of a
      family puts a subclass and its base in different chunks and the cycle is
      unresolvable. `RUNTIME` above fixes the same fault for one pair of Lit
