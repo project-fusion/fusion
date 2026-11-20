@@ -4,13 +4,19 @@
  *
  * **The running example, never a stored image.** The page sends a family's
  * headline example with one `<template data-preview-picture>` after it. The
- * example is laid out at the width of a narrow column, then scaled to fit the
- * frame and centered in it, so a picture changes the day the component does.
+ * example is drawn at one scale, centered on the boxes it draws, so a picture
+ * changes the day the component does.
  *
- * Scaled by the boxes the example draws, to fit the tile, and to four fifths
- * of its size at most. A Button is pictured near its real size in the middle
- * of the tile, and a Card is pictured whole at a fraction of its size. A box that is `fixed` or visually
- * hidden is left out, as the frame's own measurement leaves it out.
+ * **One scale in every tile**, so a control is pictured at the same size in
+ * every row. Scaled to fit, an Icon Button shrank to an 8 pixel glyph beside a
+ * Button near its real size, and a field's label to 4 pixel type. At three
+ * quarters, a 12 pixel label is 9 pixels and 14 pixel body text 10.5. An
+ * example taller or wider than the tile is cropped at its edges. It is laid
+ * out at one width in every tile, the width the larger tile shows at that
+ * scale, so a field that fills its line fills that tile. The phone's smaller
+ * tile crops the same layout, where a width of its own had squeezed a
+ * button's words to an ellipsis. A box that is `fixed` or visually hidden is left out of
+ * the centering, as the frame's own measurement leaves it out.
  *
  * **Fitted again whenever a box can change size**: after the elements
  * upgrade, when a font lands, when the frame is resized, and when the page
@@ -22,21 +28,14 @@ import { RESTYLED } from './preview-events'
 /** The template the page sends after the example. */
 const SELECTOR = 'template[data-preview-picture]'
 
-/**
- * The width the example is laid out at before it is scaled, in pixels: a
- * narrow column, so a field that fills its line is pictured large enough to
- * read as a field.
- */
-const CANVAS = 240
+/** The scale every picture is drawn at. */
+const SCALE = 0.75
 
 /**
- * The largest scale, so every family reads as one drawn small, a Button
- * among them.
+ * The width the example is laid out at, in pixels: the larger tile's 112, less
+ * 8 at each side, at `SCALE`.
  */
-const LARGEST = 0.8
-
-/** The space kept between the example and the edge of the frame, in pixels. */
-const MARGIN = 8
+const CANVAS = 128
 
 /** What is pictured, and what watches it. */
 let scope: HTMLElement | undefined
@@ -75,7 +74,7 @@ const drawn = (child: Element): DOMRect[] => {
     .filter((box) => box.width > 0 || box.height > 0)
 }
 
-/** The example scaled to the frame and centered in it, measured unscaled. */
+/** The example scaled and centered in the frame, measured unscaled. */
 const fit = (): void => {
   if (!scope) {
     return
@@ -89,14 +88,9 @@ const fit = (): void => {
   const top = Math.min(...boxes.map((box) => box.top))
   const right = Math.max(...boxes.map((box) => box.right))
   const bottom = Math.max(...boxes.map((box) => box.bottom))
-  const scale = Math.min(
-    LARGEST,
-    (innerWidth - 2 * MARGIN) / Math.max(right - left, 1),
-    (innerHeight - 2 * MARGIN) / Math.max(bottom - top, 1),
-  )
-  const x = innerWidth / 2 - scale * ((left + right) / 2)
-  const y = innerHeight / 2 - scale * ((top + bottom) / 2)
-  scope.style.transform = `translate(${x}px, ${y}px) scale(${scale})`
+  const x = innerWidth / 2 - SCALE * ((left + right) / 2)
+  const y = innerHeight / 2 - SCALE * ((top + bottom) / 2)
+  scope.style.transform = `translate(${x}px, ${y}px) scale(${SCALE})`
 }
 
 /**
