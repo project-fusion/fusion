@@ -95,6 +95,8 @@ export type TagSelectionMode = SelectionMode
  *
  * @cssproperty --tag-group-move-duration - How long a tag takes to slide to its new place, or to fade in. Unset, nothing moves.
  * @cssproperty --tag-group-move-easing - The curve a tag slides and fades in along.
+ *
+ * @cssstate empty - The group holds no tags, and draws its `empty` part.
  */
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
@@ -169,8 +171,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
   private last: HelixHeadlessTag | undefined
 
   /**
-   * Where a range chosen with Shift and an arrow starts, and where it reached,
-   * in `multiple`: the tag last pressed or moved to without Shift.
+   * Where a range chosen with Shift starts, and where it reached, in
+   * `multiple`: the tag last pressed, or moved to under `replace`, without
+   * Shift.
    */
   private anchor: HelixHeadlessTag | undefined
   private reached: HelixHeadlessTag | undefined
@@ -301,9 +304,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
       return
     }
     /* Shift extends from the tag last pressed, in either behavior, as React
-       Aria's selection does. */
-    if (mode === 'multiple' && cause?.shiftKey && this.anchor?.isConnected) {
-      this.extend(this.anchor, tag)
+       Aria's selection does, and from the tag itself where none was. */
+    if (mode === 'multiple' && cause?.shiftKey) {
+      this.extend(tag, tag)
       return
     }
     this.anchor = tag
@@ -341,21 +344,30 @@ export class HelixHeadlessTagGroup extends HelixElement {
     })
   }
 
-  /** The reachable tags from one to the other, either way round. */
-  private span(from: HelixHeadlessTag, to: HelixHeadlessTag): HelixHeadlessTag[] {
-    const tags = this.reachable
+  /** The reachable tags, or `tags`, from one to the other, either way round. */
+  private span(
+    from: HelixHeadlessTag,
+    to: HelixHeadlessTag,
+    tags = this.reachable,
+  ): HelixHeadlessTag[] {
     const [start, end] = [tags.indexOf(from), tags.indexOf(to)].sort((a, b) => a - b)
     return start === undefined || end === undefined || start < 0 ? [] : tags.slice(start, end + 1)
   }
 
   /**
-   * Shift and an arrow, Home or End, in `multiple`: the range from the anchor
-   * to the tag focus moved to is selected, in place of the range the last such
-   * key selected, as React Aria's selection extends.
+   * Shift with an arrow, Home, End, a press or Space, in `multiple`: the range
+   * from the anchor to `to` is selected, in place of the range the last such
+   * action selected, as React Aria's `extendSelection` does. Every tag from
+   * the anchor to where that range reached is let go, a disabled one too, and
+   * then every tag that is not disabled from the anchor to `to` is taken in.
+   * Where no tag has the anchor, the range runs from `from`.
    */
   private extend(from: HelixHeadlessTag, to: HelixHeadlessTag): void {
-    const anchor = this.anchor?.isConnected ? this.anchor : from
-    const before = new Set(this.span(anchor, this.reached?.isConnected ? this.reached : from))
+    const known = this.anchor?.isConnected === true
+    const anchor = known && this.anchor ? this.anchor : from
+    /* A range that reached a tag since removed lets go of nothing. */
+    const last = !known || this.reached === undefined ? to : this.reached
+    const before = new Set(last.isConnected ? this.span(anchor, last, this.tags) : [])
     const after = this.span(anchor, to)
     this.anchor = anchor
     this.reached = to
@@ -413,13 +425,19 @@ export class HelixHeadlessTagGroup extends HelixElement {
       const to = this.last
       if (multiple && event.shiftKey && to && to !== tag) {
         this.extend(tag, to)
-      } else if (!event.shiftKey) {
+      } else if (
+        /* Under `replace` the selection moves with focus, and the next range
+           runs from where it went. Under `toggle` focus moves alone, and the
+           anchor stays, as React Aria's selection keeps it. */
+        !(multiple && event.shiftKey) &&
+        this.replaces &&
+        to &&
+        !to.disabled &&
+        commaList(this.written).join(',') !== this.valueFor(to)
+      ) {
         this.anchor = to
         this.reached = to
-        /* Under `replace` the selection moves with focus. */
-        if (this.replaces && to && !to.disabled) {
-          this.ask(this.valueFor(to))
-        }
+        this.ask(this.valueFor(to))
       }
       return
     }
@@ -554,6 +572,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
     hostAria(internalsOf(this), { label: this.label, role: empty ? 'group' : 'grid' })
     internalsOf(this).ariaMultiSelectable =
       this.selectionMode === 'multiple' && !empty ? 'true' : null
+    this.toggleState('empty', empty)
   }
 
   protected override updated(changed: PropertyValues<this>): void {

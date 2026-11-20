@@ -38,23 +38,22 @@ const MODES = join(ROOT, 'helix/styles/src/_modes.css')
 
 const { TOKENS, TOKEN_GROUPS } = await import('../src/tokens.ts')
 
-/* Read back out of the module's own source, because a comment is not a value
-   and TypeScript does not hand one to a caller. The file is the source of both
-   halves and this is the half the language throws away. */
+/* The comments are read back out of the module's own source, because a
+   comment is not a value and TypeScript does not hand one to a caller. The
+   values come from the module itself: each builder returns the CSS it
+   declares, and a bare number is its own CSS. */
 const source = readFileSync(join(ROOT, 'helix/styles/src/tokens.ts'), 'utf8')
 const body = source.slice(source.indexOf('export const TOKENS: Token[] = ['))
+const values = new Map(TOKENS.map(([name, value]) => [name, String(value)]))
 
 const declarations = []
-/* The pattern has to survive both the formatter and the shape of an entry: the
-   formatter breaks a pair across lines whenever it does not fit, and a third
-   element, the description, may follow the value. A reader that misses either
-   silently drops tokens out of the stylesheet, and `--helix-font-sans` going
-   with them takes the whole site back to Times.
-   
-   The regular expression is not the lesson. The assertion below is, because a
-   reader that skips an entry cannot report that it did. */
-const pattern =
-  /\/\*([\s\S]*?)\*\/|\[\s*'((?:[^'\\]|\\.)*)',\s*'((?:[^'\\]|\\.)*)'\s*(?:,\s*'(?:[^'\\]|\\.)*')?\s*,?\s*\]/g
+const order = []
+/* A comment, or the opening of an entry: `[` and the quoted name. A value
+   never holds a quoted string straight after a `[`, since the one array a
+   builder takes, a shadow's lengths, holds lengths. The order the names are
+   met in is held to the module's own below, so a reader that skips an entry
+   says so. */
+const pattern = /\/\*([\s\S]*?)\*\/|\[\s*'((?:[^'\\]|\\.)*)',/g
 for (const match of body.matchAll(pattern)) {
   if (match[1] !== undefined) {
     const lines = match[1]
@@ -72,8 +71,15 @@ for (const match of body.matchAll(pattern)) {
     continue
   }
   const name = match[2].replace(/\\'/g, "'")
-  const value = match[3].replace(/\\'/g, "'").replace(/\\\\/g, '\\')
-  declarations.push(`  --helix-${name}: ${value};`)
+  order.push(name)
+  declarations.push(`  --helix-${name}: ${values.get(name)};`)
+}
+if (order.join('\n') !== TOKENS.map(([name]) => name).join('\n')) {
+  console.error(
+    'token layer: the entries read from tokens.ts are not the entries it exports, in order.\n' +
+      '  The reader in this script did not understand an entry it was handed.',
+  )
+  process.exit(1)
 }
 
 /* Every token in the registry has to reach the stylesheet.
@@ -123,7 +129,7 @@ const entries = TOKENS.map(([name, value, description]) => ({
   category: name.split('-')[0],
   ...(description ? { description } : {}),
   name: `--helix-${name}`,
-  value,
+  value: String(value),
 }))
 const categories = [...new Set(entries.map((entry) => entry.category))]
 /* Through the formatter like everything else generated here. `JSON.stringify`

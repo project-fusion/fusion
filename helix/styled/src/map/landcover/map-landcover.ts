@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapLandcover } from '@fusion.dev/helix-headless/map/landcover'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './map-landcover.css.js'
+import { styles } from './map-landcover.generated.css.js'
 
 /**
  * @summary What covers the ground on a map: forest, grass, farmland, wetland, sand, rock, and ice.

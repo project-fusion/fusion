@@ -37,8 +37,6 @@ import {
 } from '../events/index.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
-import { repeat } from 'lit/directives/repeat.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
   type Adjacency,
   adjacencyOf,
@@ -53,7 +51,9 @@ import {
   sortedOf,
   within,
   withoutGroups,
-} from './graph-model.js'
+} from '@fusion.dev/helix-core/graph'
+import { repeat } from 'lit/directives/repeat.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /** How long a layout runs before the frame offers to stop it, in milliseconds: WCAG 2.2.2's five seconds. */
 const LONG_LAYOUT = 5000

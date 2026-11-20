@@ -1,0 +1,272 @@
+import { describe, expect, test } from 'bun:test'
+import { hullOf } from '../projection/projection.js'
+import {
+  ACROSS,
+  heightsOf,
+  highestOf,
+  labelPlaces,
+  MARGIN,
+  type Point,
+  reliefOf,
+  THICKNESS,
+} from './relief.js'
+
+/** The corners of path data written `Mx yLx y…Z`, as numbers. */
+const corners = (data: string): Array<[number, number]> =>
+  data
+    .replace(/^M|Z$/g, '')
+    .split('L')
+    .map((pair) => pair.split(' ').map(Number) as [number, number])
+
+describe('heights', () => {
+  test('stand from zero, as a share of the highest reading', () => {
+    expect(heightsOf([2, 4, 1], 4, 3)).toEqual([1.5, 3, 0.75])
+  })
+
+  test('a blank, a zero, and a negative reading stand at zero', () => {
+    expect(heightsOf([undefined, 0, -3, 6], 6, 2)).toEqual([0, 0, 0, 2])
+  })
+
+  /* The highest is taken over the whole table, so a narrow strip that draws
+     the newest readings keeps the heights a wide one draws. */
+  test('a reading drawn against a higher one it does not draw keeps its share', () => {
+    expect(heightsOf([5], 10, 4)).toEqual([2])
+  })
+
+  test('with nothing above zero, everything is flat', () => {
+    expect(heightsOf([0, undefined], highestOf([0, undefined]), 3)).toEqual([0, 0])
+  })
+
+  test('the highest is the largest positive reading', () => {
+    expect(highestOf([3, undefined, 9, -12])).toBe(9)
+    expect(highestOf([])).toBe(0)
+  })
+})
+
+describe('the relief', () => {
+  test('fills down a column of rows, then across', () => {
+    const { prisms } = reliefOf([0, 0, 0, 0], 2, 1)
+    /* The third reading starts the second column, one step down to the right
+       of the first. */
+    expect(prisms[2]?.peak.x).toBeCloseTo((prisms[0]?.peak.x ?? 0) + ACROSS)
+    expect(prisms[2]?.peak.y).toBeCloseTo((prisms[0]?.peak.y ?? 0) + 0.5)
+    /* The second reading is the next row, one step down to the left. */
+    expect(prisms[1]?.peak.x).toBeCloseTo((prisms[0]?.peak.x ?? 0) - ACROSS)
+    expect(prisms[1]?.peak.y).toBeCloseTo((prisms[0]?.peak.y ?? 0) + 0.5)
+  })
+
+  test('a prism is raised by its height, and its sides span it', () => {
+    const { prisms } = reliefOf([2], 1, 1)
+    const top = corners(prisms[0]?.top ?? '')
+    const right = corners(prisms[0]?.right ?? '')
+    expect(prisms[0]?.peak.y).toBeCloseTo(0.5 - 2)
+    /* The darker side runs from two of the top's corners down to the floor
+       beneath them, two cells lower. */
+    const onTop = (x: number, y: number) =>
+      top.some(([tx, ty]) => Math.abs(tx - x) < 1e-3 && Math.abs(ty - y) < 1e-3)
+    expect(right.filter(([x, y]) => onTop(x, y))).toHaveLength(2)
+    expect(right.filter(([x, y]) => onTop(x, y - 2))).toHaveLength(2)
+  })
+
+  /**
+   * **Each prism is painted after the neighbors it can cover.** The one before
+   * it in its column and the one in the same row of the column before stand
+   * behind it, so their tops are higher on the page; the next in each
+   * direction stands in front, lower.
+   */
+  test('the order of the readings is back to front', () => {
+    const { prisms } = reliefOf(Array(14).fill(1), 7, 1)
+    const depth = (index: number) => prisms[index]?.peak.y ?? Number.NaN
+    expect(depth(8)).toBeGreaterThan(depth(7))
+    expect(depth(8)).toBeGreaterThan(depth(1))
+  })
+
+  test('the footprint leaves a gap between neighbors', () => {
+    const rightmost = (data: string) => Math.max(...corners(data).map(([x]) => x))
+    const whole = rightmost(reliefOf([0], 1, 1).prisms[0]?.top ?? '')
+    const most = rightmost(reliefOf([0], 1, 0.8).prisms[0]?.top ?? '')
+    /* The right corner, pulled in by a tenth of a cell at each end. */
+    expect(whole - most).toBeCloseTo(0.2 * ACROSS)
+  })
+
+  test('the box holds every corner, the tallest top included', () => {
+    const { box, prisms } = reliefOf([0, 3, 1, 0], 2, 1)
+    const all = prisms.flatMap((prism) =>
+      [prism.top, prism.left, prism.right].filter(Boolean).flatMap(corners),
+    )
+    for (const [x, y] of all) {
+      expect(x).toBeGreaterThanOrEqual(box.x - 1e-3)
+      expect(x).toBeLessThanOrEqual(box.x + box.width + 1e-3)
+      expect(y).toBeGreaterThanOrEqual(box.y - 1e-3)
+      expect(y).toBeLessThanOrEqual(box.y + box.height + 1e-3)
+    }
+    /* The second reading is the tallest, three cells above the floor. */
+    expect(box.y).toBeCloseTo(0.5 - 3)
+  })
+
+  test('the slab reaches past the grid, and the box holds it', () => {
+    const { box, base, corners } = reliefOf([1, 2, 3, 4, 5], 2, 1)
+    /* Three columns of two rows, the last still filling: the slab is the
+       whole grid, its left corner under the first column's last row. */
+    expect(corners?.start.x).toBeCloseTo((-MARGIN - (2 + MARGIN)) * ACROSS)
+    expect(corners?.start.y).toBeCloseTo((-MARGIN + 2 + MARGIN) / 2 + THICKNESS)
+    expect(corners?.end.x).toBeCloseTo((3 + MARGIN - (2 + MARGIN)) * ACROSS)
+    expect(corners?.end.y).toBeCloseTo((3 + MARGIN + 2 + MARGIN) / 2 + THICKNESS)
+    expect(box.x).toBeCloseTo(corners?.start.x ?? 0)
+    expect(box.y + box.height).toBeCloseTo(corners?.end.y ?? 0)
+    expect(base?.top.startsWith('M')).toBe(true)
+  })
+
+  test('no readings draw nothing in an empty box', () => {
+    expect(reliefOf([], 7, 1)).toEqual({
+      base: undefined,
+      box: { height: 0, width: 0, x: 0, y: 0 },
+      corners: undefined,
+      middle: { x: 0, y: 0 },
+      order: [],
+      outline: [],
+      prisms: [],
+    })
+  })
+
+  test('a number is written short, and never as minus zero', () => {
+    const { prisms } = reliefOf([0], 1, 1)
+    const top = prisms[0]?.top ?? ''
+    expect(top).not.toContain('-0 ')
+    expect(
+      corners(top)
+        .map(([x, y]) => `${x} ${y}`)
+        .sort(),
+    ).toEqual(['-0.866 0.5', '0 0', '0 1', '0.866 0.5'].sort())
+  })
+})
+
+describe('a turned relief', () => {
+  test('from the isometric camera, the order to paint in is the order of the readings', () => {
+    const { order } = reliefOf([1, 1, 1, 1, 1, 1], 2, 0.8)
+    /* Level readings on one diagonal may come in either order, since they do
+       not overlap; each column still comes after the one behind it. */
+    expect(order.indexOf(0)).toBeLessThan(order.indexOf(3))
+    expect(order.indexOf(1)).toBeLessThan(order.indexOf(5))
+  })
+
+  test('turned half round, the newest reading is painted first and the oldest last', () => {
+    const { order } = reliefOf([1, 1, 1, 1, 1, 1], 2, 0.8, { tilt: 35, turn: 225 })
+    expect(order[0]).toBe(5)
+    expect(order.at(-1)).toBe(0)
+  })
+
+  test('turned, the box still holds every face', () => {
+    const { box, prisms, base } = reliefOf([0, 3, 1, 2], 2, 0.8, { tilt: 50, turn: 100 })
+    const all = [
+      ...prisms.flatMap((prism) => [prism.top, prism.left, prism.right]),
+      base?.top ?? '',
+      base?.left ?? '',
+      base?.right ?? '',
+    ]
+      .filter(Boolean)
+      .flatMap(corners)
+    for (const [x, y] of all) {
+      expect(x).toBeGreaterThanOrEqual(box.x - 1e-3)
+      expect(x).toBeLessThanOrEqual(box.x + box.width + 1e-3)
+      expect(y).toBeGreaterThanOrEqual(box.y - 1e-3)
+      expect(y).toBeLessThanOrEqual(box.y + box.height + 1e-3)
+    }
+  })
+
+  test('seen from straight above, a prism shows its top alone', () => {
+    const { prisms } = reliefOf([2], 1, 1, { tilt: 90, turn: 45 })
+    expect([prisms[0]?.left, prisms[0]?.right]).toEqual(['', ''])
+  })
+})
+
+describe('the first and last labels', () => {
+  const SIZE = { height: 14, width: 48 }
+
+  /** A sixteen-week relief seen from `turn`, scaled to pixels with its box at the left, and where its labels stand. */
+  const placed = (turn: number, tilt = 35) => {
+    const heights = Array.from({ length: 112 }, (_, index) => (index % 5) + 1)
+    const relief = reliefOf(heights, 7, 0.8, { tilt, turn })
+    const scale = 400 / relief.box.width
+    const page = (point: Point): Point => ({
+      x: (point.x - relief.box.x) * scale,
+      y: (point.y - relief.box.y) * scale,
+    })
+    const outline = relief.outline.map(page)
+    const corners = relief.corners as { end: Point; start: Point }
+    const at = labelPlaces(
+      outline,
+      { end: page(corners.end), start: page(corners.start) },
+      { end: SIZE, start: SIZE },
+      400,
+      4,
+    )
+    return { at, corners: { end: page(corners.end), start: page(corners.start) }, outline }
+  }
+
+  test('from every side, each stands inside the span, under its corner, and clear of the drawing', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const { at, corners, outline } = placed(turn)
+      const hull = hullOf(outline)
+      for (const key of ['start', 'end'] as const) {
+        const label = at[key]
+        expect(label.x).toBeGreaterThanOrEqual(0)
+        expect(label.x + SIZE.width).toBeLessThanOrEqual(400 + 1e-6)
+        expect(label.y).toBeGreaterThan(corners[key].y)
+        /* No corner of the outline that stands over the label's span is below its top. */
+        for (const point of hull) {
+          if (point.x >= label.x && point.x <= label.x + SIZE.width) {
+            expect(point.y).toBeLessThan(label.y)
+          }
+        }
+      }
+    }
+  })
+
+  test('the two never stand on one another, even seen end on', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const { at } = placed(turn, 15)
+      const meet =
+        at.start.x < at.end.x + SIZE.width &&
+        at.end.x < at.start.x + SIZE.width &&
+        at.start.y < at.end.y + SIZE.height &&
+        at.end.y < at.start.y + SIZE.height
+      expect({ meet, turn }).toEqual({ meet: false, turn })
+    }
+  })
+
+  test('cut at the bottom, the two stand side by side', () => {
+    const outline = [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 60 },
+      { x: 0, y: 60 },
+    ]
+    const at = labelPlaces(
+      outline,
+      { end: { x: 52, y: 70 }, start: { x: 50, y: 70 } },
+      { end: SIZE, start: SIZE },
+      400,
+      4,
+      64,
+    )
+    expect(at.start.y).toBe(64)
+    expect(at.end.y).toBe(64)
+    expect(at.end.x).toBeGreaterThanOrEqual(at.start.x + SIZE.width)
+  })
+
+  test('they name the long edge nearer the reader, which stands lower than the middle of the slab', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const relief = reliefOf([1, 2, 3, 4], 2, 1, { tilt: 35, turn })
+      const corners = relief.corners as { end: Point; start: Point }
+      /* The outline's feet, every other corner, round the middle of the slab's
+         foot. Seen along the strip, the two long edges stand level. */
+      const feet = relief.outline.filter((_, index) => index % 2 === 0)
+      const foot = feet.reduce((sum, point) => sum + point.y, 0) / feet.length
+      expect({ lower: (corners.start.y + corners.end.y) / 2 >= foot - 1e-9, turn }).toEqual({
+        lower: true,
+        turn,
+      })
+    }
+  })
+})

@@ -1,0 +1,109 @@
+# Dialog, each example drawn alone: the preview and the alert open from the
+# start, and the persistent and the light-dismiss dialogs, the small, the
+# large and the full sizes, and the centered dialog open from their button.
+# One screenshot of each, named by the example, the dialog it opens, `MODE`,
+# and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Dialog"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://dialog/preview/preview
+      - extendedWaitUntil:
+          visible: .*This removes the project.*
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-preview-${MODE}-${SIZE}
+- openLink: helix://dialog/alert/preview
+- extendedWaitUntil:
+    visible: .*deleted for everyone on your team.*
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-alert-${MODE}-${SIZE}
+# The rest open from their buttons, one tap each, after the touch the iOS
+# simulator loses on a new screen. Each dialog closes by its own button
+# before the next opens.
+- openLink: helix://dialog/closedby/preview
+- extendedWaitUntil:
+    visible: Close editor
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Close editor
+- extendedWaitUntil:
+    visible: .*two unsaved changes.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-closedby-persistent-${MODE}-${SIZE}
+- tapOn: Discard changes
+- extendedWaitUntil:
+    notVisible: .*two unsaved changes.*
+    timeout: 5000
+- tapOn: Share folder
+- extendedWaitUntil:
+    visible: .*Anyone with the link.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-closedby-any-${MODE}-${SIZE}
+- openLink: helix://dialog/size/preview
+- extendedWaitUntil:
+    notVisible: .*Anyone with the link.*
+    timeout: 15000
+- extendedWaitUntil:
+    visible: Small
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Small
+- extendedWaitUntil:
+    visible: .*becomes read-only.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-size-small-${MODE}-${SIZE}
+- tapOn: Cancel
+- extendedWaitUntil:
+    notVisible: .*becomes read-only.*
+    timeout: 5000
+- tapOn: Large
+- extendedWaitUntil:
+    visible: .*Update your name.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-size-large-${MODE}-${SIZE}
+- tapOn: Cancel
+- extendedWaitUntil:
+    notVisible: .*Update your name.*
+    timeout: 5000
+- tapOn: Full
+- extendedWaitUntil:
+    visible: .*Update the project name.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-size-full-${MODE}-${SIZE}
+- openLink: helix://dialog/centered/preview
+- extendedWaitUntil:
+    notVisible: .*Update the project name.*
+    timeout: 15000
+- extendedWaitUntil:
+    visible: Discard changes
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Discard changes
+- extendedWaitUntil:
+    visible: .*nine unsaved changes.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: dialog-centered-${MODE}-${SIZE}

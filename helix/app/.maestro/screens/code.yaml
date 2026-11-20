@@ -1,0 +1,13 @@
+# Code, each example drawn alone: code inside a sentence. One screenshot of
+# each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Code"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://code/preview/preview
+- extendedWaitUntil:
+    visible: '.*data-density.*'
+    timeout: 30000
+- takeScreenshot: code-preview-${MODE}-${SIZE}

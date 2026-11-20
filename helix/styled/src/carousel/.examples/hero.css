@@ -5,17 +5,18 @@
    thing it was given. Three panels of flat color make the point the arrows and
    the indicators are here to make, and a photograph would make it no better. */
 .slide {
+  --card-radius: 0;
   aspect-ratio: 16 / 7;
 }
 
 .slide:nth-child(1) {
-  background-color: var(--helix-color-primary);
+  --card-background-color: var(--helix-color-primary);
 }
 
 .slide:nth-child(2) {
-  background-color: var(--helix-color-success);
+  --card-background-color: var(--helix-color-success);
 }
 
 .slide:nth-child(3) {
-  background-color: var(--helix-color-danger);
+  --card-background-color: var(--helix-color-danger);
 }

@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { contrast, MAP_LANDMARKS, mapLibreStyle, parseColor } from '@fusion.dev/helix-core/map'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
-import { MAP_LANDMARKS, mapLibreStyle } from './map-style.js'
-import { contrast, parseColor } from './oklab.js'
 
 const LIGHT = {
   foreground: '#111111',

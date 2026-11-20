@@ -1,0 +1,25 @@
+# Orb, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Orb"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://orb/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: orb-preview-${MODE}-${SIZE}
+- openLink: helix://orb/size/preview
+- extendedWaitUntil:
+    visible: 'Size'
+    timeout: 15000
+- takeScreenshot: orb-size-${MODE}-${SIZE}
+- openLink: helix://orb/states/preview
+- extendedWaitUntil:
+    visible: 'States'
+    timeout: 15000
+- takeScreenshot: orb-states-${MODE}-${SIZE}

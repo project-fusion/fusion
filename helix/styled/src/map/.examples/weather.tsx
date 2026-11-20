@@ -18,8 +18,8 @@ export function Example() {
       {/* Preview frame: data-preview-map has the frame connect MapLibre and data-preview-map-view sets the view; on your page, connectMap does, and you set the view on your map. */}
       <helix-map
         data-preview-map
-        data-preview-map-view="31,-99,5"
         label="Weather radar over Texas"
+        view="31,-99,5"
       >
         <div data-preview-map-canvas></div>
 

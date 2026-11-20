@@ -5,5 +5,5 @@ export {
   type PlotAxis,
   type PlotField,
   type PlotPoint,
-} from './field.js'
+} from '@fusion.dev/helix-core/spatial'
 export { HelixHeadlessSpatialScatterChart } from './root/spatial-scatter-chart-root.js'

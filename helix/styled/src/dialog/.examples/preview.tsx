@@ -1,10 +1,13 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(true)
+
   return (
     <>
       <helix-button
-        command="--show"
-        commandfor="confirm"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Delete project
@@ -12,9 +15,9 @@ export function Example() {
 
       {/* The dialog starts open, so the preview shows it. */}
       <helix-dialog
-        id="confirm"
         label="Delete project"
-        open
+        onClose={() => setOpen(false)}
+        open={open}
       >
         <helix-text
           as="h2"
@@ -30,15 +33,13 @@ export function Example() {
         >
           <helix-button
             autofocus
-            command="--close"
-            commandfor="confirm"
+            onClick={() => setOpen(false)}
           >
             Cancel
           </helix-button>
           <helix-button
-            command="--close"
-            commandfor="confirm"
             emphasis="solid"
+            onClick={() => setOpen(false)}
             tone="danger"
           >
             Delete project

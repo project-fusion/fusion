@@ -1,10 +1,9 @@
-import './vertical.css'
-
 export function Example() {
   return (
     <helix-splitter
       default-position="60"
       orientation="vertical"
+      style={{ blockSize: '14rem' }}
     >
       <helix-card
         separation="plain"

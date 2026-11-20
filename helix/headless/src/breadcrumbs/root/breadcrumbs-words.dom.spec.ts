@@ -37,6 +37,15 @@ const trail = async (around: string, crumbs: number): Promise<Trail> => {
   return host
 }
 
+/** The fold's button, which the trail's first crumb draws. */
+const fold = async (host: Trail): Promise<Element | null | undefined> => {
+  const first = host.shadowRoot?.querySelector('helix-headless-breadcrumb') as Updatable | null
+  if (first) {
+    await settle(first)
+  }
+  return first ? part(first, 'expand') : null
+}
+
 const POLISH = {
   'helix-breadcrumbs': {
     expandLabel:
@@ -55,7 +64,7 @@ describe('breadcrumbs on a page in another language', () => {
   test('count the folded crumbs with the language’s own forms', async () => {
     registerWords('pl', POLISH)
     const expand = async (crumbs: number): Promise<string | null | undefined> =>
-      part(await trail('lang="pl"', crumbs), 'expand')?.getAttribute('aria-label')
+      (await fold(await trail('lang="pl"', crumbs)))?.getAttribute('label')
     expect(await expand(5)).toBe('Pokaż 2 kolejne')
     expect(await expand(8)).toBe('Pokaż 5 kolejnych')
   })
@@ -64,6 +73,6 @@ describe('breadcrumbs on a page in another language', () => {
     /* Before, the count went in as raw digits whatever the language. */
     registerWords('ar', { 'helix-breadcrumbs': { expandLabel: 'Show {count} more' } })
     const host = await trail('lang="ar-EG"', 6)
-    expect(part(host, 'expand')?.getAttribute('aria-label')).toBe('Show ٣ more')
+    expect((await fold(host))?.getAttribute('label')).toBe('Show ٣ more')
   })
 })

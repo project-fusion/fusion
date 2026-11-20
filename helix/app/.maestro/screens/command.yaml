@@ -1,0 +1,43 @@
+# Command, its examples drawn alone, open, narrowed by typing, and run by a press
+# with the keyboard still up. One screenshot of each, named by the example, `MODE`,
+# and `SIZE`. A field is named by its placeholder, and a command by its words, so
+# each wait matches the words inside. No press lands on the scrim, which closes
+# the palette, so the first touch of a screen is on the filter itself.
+appId: dev.fusion.helix.app
+name: "Screens: Command"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://command/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Open folder.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: command-preview-${MODE}-${SIZE}
+- tapOn:
+    text: '.*Search commands.*'
+    retryTapIfNoChange: false
+- inputText: sav
+- extendedWaitUntil:
+    notVisible: '.*New file.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: command-preview-narrowed-${MODE}-${SIZE}
+# A press on a command with the keyboard up runs it and closes the palette.
+- tapOn:
+    text: '.*Save all.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    notVisible: '.*Save all.*'
+    timeout: 10000
+- takeScreenshot: command-preview-ran-${MODE}-${SIZE}
+- openLink: helix://command/two-destinations/preview
+- extendedWaitUntil:
+    visible: '.*Button.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: command-two-destinations-${MODE}-${SIZE}

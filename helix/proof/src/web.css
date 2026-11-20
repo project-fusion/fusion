@@ -1,0 +1,17 @@
+/* The web's frame around the app: the document in the theme's colors, and
+   each screen in the column App Header centers its row in, 72rem wide with
+   its inline padding, so the page's edges line up with the bar's. */
+html,
+body {
+  background: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+  margin: 0;
+}
+
+.proof-page {
+  box-sizing: border-box;
+  inline-size: 100%;
+  margin-inline: auto;
+  max-inline-size: 72rem;
+  padding: var(--helix-space-lg) var(--helix-space-lg) var(--helix-space-3xl);
+}

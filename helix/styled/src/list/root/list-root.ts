@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './list-root.css.js'
+import { styles } from './list-root.generated.css.js'
 
 /**
  * @summary A set of rows, announced as a list.

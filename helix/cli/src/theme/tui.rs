@@ -330,7 +330,7 @@ mod tests {
             order: Order::default(),
             rows: crate::theme::report::rows(&pairings, Filter::default(), Order::default()),
             selected: 0,
-            source: "helix.theme.json".to_owned(),
+            source: "helix.json".to_owned(),
         }
     }
 
@@ -360,7 +360,7 @@ mod tests {
     #[test]
     fn the_screen_names_its_source_and_says_what_it_is_showing() {
         let screen = drawn(&view(), 80, 12);
-        assert!(screen.contains("helix.theme.json"));
+        assert!(screen.contains("helix.json"));
         assert!(screen.contains("3 of 3 shown"));
         assert!(screen.contains("all"));
         assert!(screen.contains("in order"));

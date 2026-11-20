@@ -11,6 +11,7 @@ const RESTING: Arrival[] = [
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
+  const [open, setOpen] = useState(false)
   const refused = useRef(false)
 
   const say = (name: string, carried: string) => {
@@ -18,10 +19,6 @@ export function Example() {
       const kept = before === RESTING ? [] : before
       return [...kept, { carried, name }].slice(-KEEP)
     })
-  }
-
-  const opening = () => {
-    say('helix-before-open', 'About to open')
   }
 
   const closing = (event: Event) => {
@@ -39,6 +36,7 @@ export function Example() {
   }
 
   const shut = () => {
+    setOpen(false)
     say('close', 'Closed')
   }
 
@@ -48,30 +46,22 @@ export function Example() {
       gap="md"
     >
       <helix-button
-        command="--show"
-        commandfor="unsaved"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Open dialog
       </helix-button>
 
       <helix-dialog
-        id="unsaved"
+        dismissible
         label="Unsaved changes"
         onClose={shut}
         onhelix-before-close={closing}
-        onhelix-before-open={opening}
         onToggle={moved}
+        open={open}
       >
         <helix-text>You have changes that have not been saved.</helix-text>
-        <helix-button
-          command="--close"
-          commandfor="unsaved"
-          slot="footer"
-        >
-          Close
-        </helix-button>
       </helix-dialog>
 
       <helix-list

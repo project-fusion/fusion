@@ -7,9 +7,9 @@ export function Example() {
       <helix-map
         controls="zoom compass tilt layers fullscreen"
         data-preview-map
-        data-preview-map-view="30.2672,-97.7431,15.6,50,-17"
         label="Downtown Austin from above"
         map-type="hybrid"
+        view="30.2672,-97.7431,15.6,50,-17"
       >
         <div data-preview-map-canvas></div>
 

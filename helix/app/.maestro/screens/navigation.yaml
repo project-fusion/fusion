@@ -1,0 +1,66 @@
+# Navigation, its examples drawn alone, with the first destination current
+# and then with another, after the touch the iOS simulator loses on a new
+# screen. One screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Navigation"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://navigation/preview/preview
+      - extendedWaitUntil:
+          visible: Activity
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+# Settings runs off the bar at iOS's largest text size, and Activity shows.
+- tapOn: Activity
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-moved-${MODE}-${SIZE}
+# The marker example draws the plain, the underlined, and the segmented bar
+# one above the other, and the second and third Activity are the underlined
+# and the segmented bar's.
+- openLink: helix://navigation/marker/preview
+- extendedWaitUntil:
+    visible: Marker
+    timeout: 15000
+- extendedWaitUntil:
+    visible: Activity
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-marker-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Activity
+    index: 1
+- tapOn:
+    text: Activity
+    index: 2
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-marker-moved-${MODE}-${SIZE}
+- openLink: helix://navigation/vertical/preview
+- extendedWaitUntil:
+    visible: Who can see and change this workspace.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-vertical-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Security
+- extendedWaitUntil:
+    visible: Sign-in rules and the devices signed in.
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-vertical-moved-${MODE}-${SIZE}

@@ -1,0 +1,12 @@
+# Tabs' preview example, in its Preview tab, scrolled toward the middle of the
+# screen until a quarter of it shows.
+appId: dev.fusion.helix.app
+name: "Screens: Tabs"
+---
+- openLink: helix://tabs/preview
+- scrollUntilVisible:
+    centerElement: true
+    element: A summary of the project and the people on it.
+    timeout: 60000
+    visibilityPercentage: 25
+- takeScreenshot: tabs-${MODE}-${SIZE}

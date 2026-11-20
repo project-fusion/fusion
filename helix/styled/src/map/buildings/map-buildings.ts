@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapBuildings } from '@fusion.dev/helix-headless/map/buildings'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './map-buildings.css.js'
+import { styles } from './map-buildings.generated.css.js'
 
 /**
  * @summary The buildings on a map, raised to their real heights in 3D.

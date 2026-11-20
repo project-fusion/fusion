@@ -8,6 +8,7 @@ import {
   MixinControllerChecked,
   MixinField,
   slotFilled,
+  toggled,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -29,8 +30,10 @@ import { property } from 'lit/decorators.js'
  * A checked box submits its `value`, and an unchecked one submits nothing, as a
  * native checkbox does.
  *
- * Assistive technology reports `indeterminate` as neither checked nor
- * unchecked.
+ * `indeterminate` changes only the presentation. Assistive technology reports
+ * the box as neither checked nor unchecked, and the first click resolves it.
+ * The form still submits the state under the dash: a box that is checked
+ * under the dash submits its `value`, and an unchecked one submits nothing.
  *
  * **Keyboard.** The box is one tab stop.
  *
@@ -112,7 +115,8 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   /**
    * Shows the box as neither checked nor unchecked.
    *
-   * Presentation only. It never submits, and the first change resolves it.
+   * Presentation only. The form submits the checked state under the dash, and
+   * the first change resolves it.
    *
    * Not reflected, as no state is: the element resolves it itself, and a
    * reflected one removed the attribute the consumer wrote. A stylesheet
@@ -156,20 +160,31 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
 
   private readonly handleChange = (event: Event): void => {
     const input = event.target as HTMLInputElement
-    // The input has already flipped itself. Where the change is refused it is
-    // put back to whatever the element resolves to, so the box never shows a
-    // state the element does not hold.
-    const next = input.checked
+    // The input has already flipped itself, to the state `toggled` proposes,
+    // since the input holds what the element holds between presses. Where the
+    // change is refused it is put back to whatever the element resolves to,
+    // so the box never shows a state the element does not hold.
+    const next = toggled({
+      checked: this.checked,
+      disabled: this.isDisabled,
+      mixed: this.indeterminate,
+      readOnly: this.readOnly,
+    })
     /* The dash goes only where the change is taken. Clearing it
      * unconditionally leaves a refused change holding the checked state and
      * losing the third one: a box neither ticked nor dashed, which is a state
      * nobody asked for. Refusing leaves everything as it was, which is the
      * argument the line below already makes for `checked`. */
-    const taken = this.requestChecked(next)
+    const taken = next !== null && this.requestChecked(next.checked)
     if (taken) {
-      this.indeterminate = false
+      this.indeterminate = next.mixed
     }
     input.checked = this.checked
+    /* The click cleared the input's own `indeterminate` as well. A refused
+       press leaves the property where it was, so the template's binding has
+       no new value to write, and the input would tell assistive technology
+       "not checked" under a box that draws the dash. */
+    input.indeterminate = this.indeterminate
     // A refused change changed nothing, so there is no `change` to send.
     if (taken) {
       this.relayNativeEvent(event)

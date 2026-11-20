@@ -48,9 +48,9 @@ const CELLS: [(&str, &str, &str); 3] = [
         r#"^:host\(\[emphasis="([a-z]+)"\]\) \[part="button"\]$"#,
     ),
     (
-        "emphasis hover",
-        r#"^\[data-button="([a-z]+)"\]:not\(:disabled\):hover$"#,
-        r#"^:host\(:not\(:disabled\)\[emphasis="([a-z]+)"\]\) \[part="button"\]:hover$"#,
+        "emphasis hover and press",
+        r#"^\[data-button="([a-z]+)"\]:not\(:disabled\):is\(:hover, :active\)$"#,
+        r#"^:host\(:not\(:disabled\)\[emphasis="([a-z]+)"\]\) \[part="button"\]:is\(:hover, :active\)$"#,
     ),
 ];
 
@@ -60,9 +60,52 @@ static RULE: LazyLock<Regex> =
 static COMMENT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
-/// One space between tokens, so a wrapped `var()` reads as its own spelling.
+/// One space between tokens and none inside a parenthesis, so a wrapped
+/// `var()` reads as its own spelling: `var( --a, b )` written by hand is
+/// `var(--a, b)` as the compiler writes it.
 fn flatten(value: &str) -> String {
-    value.split_whitespace().collect::<Vec<&str>>().join(" ")
+    value
+        .split_whitespace()
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .replace("( ", "(")
+        .replace(" )", ")")
+}
+
+/// A selector with each `:where(...)` replaced by what it holds, so
+/// `:host(:where([emphasis="solid"])) [part="button"]`, as Helix's compiler
+/// writes a rule whose conditions add no weight, reads as the selector a
+/// hand-written sheet has.
+fn unwrapped(selector: &str) -> String {
+    let mut out = String::with_capacity(selector.len());
+    let mut rest = selector;
+    let mut closes: Vec<usize> = Vec::new();
+    let mut depth = 0usize;
+    while let Some(character) = rest.chars().next() {
+        if rest.starts_with(":where(") {
+            depth += 1;
+            closes.push(depth);
+            rest = &rest[":where(".len()..];
+            continue;
+        }
+        match character {
+            '(' => {
+                depth += 1;
+                out.push(character);
+            }
+            ')' => {
+                if closes.last() == Some(&depth) {
+                    closes.pop();
+                } else {
+                    out.push(character);
+                }
+                depth = depth.saturating_sub(1);
+            }
+            _ => out.push(character),
+        }
+        rest = &rest[character.len_utf8()..];
+    }
+    out
 }
 
 /// Every rule in a sheet as `selector` to its declarations, each `property:
@@ -104,9 +147,9 @@ fn matrix(css: &str, side: usize) -> BTreeMap<(String, String), Vec<String>> {
     for (selector, declarations) in rules(css) {
         /* Each selector of a list on its own, so `a, b { }` reaches both. */
         for one in selector.split(',') {
-            let one = one.trim();
+            let one = unwrapped(one.trim());
             for (cell, pattern) in &patterns {
-                if let Some(captured) = pattern.captures(one) {
+                if let Some(captured) = pattern.captures(&one) {
                     found
                         .entry(((*cell).to_owned(), captured[1].to_owned()))
                         .or_default()
@@ -159,10 +202,14 @@ pub fn run(context: &Context) -> Report {
         return empty;
     };
     let recipe_at = context.root.join(layer);
-    let element_at = context
-        .root
-        .join(&styled.source)
-        .join("button/root/button-root.css");
+    /* The stylesheet `helix system stylesheets` writes from Button's table,
+    or one written by hand where a styled layer has no table. */
+    let folder = context.root.join(&styled.source).join("button/root");
+    let element_at = ["button-root.generated.css", "button-root.css"]
+        .iter()
+        .map(|name| folder.join(name))
+        .find(|path| path.is_file())
+        .unwrap_or_else(|| folder.join("button-root.css"));
     let (Ok(recipe), Ok(element)) = (
         fs::read_to_string(&recipe_at),
         fs::read_to_string(&element_at),
@@ -225,5 +272,32 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes: Vec::new(),
         unit: "cells of the button matrix",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{flatten, unwrapped};
+
+    #[test]
+    fn a_selector_with_no_weight_reads_as_one_written_by_hand() {
+        assert_eq!(
+            unwrapped(
+                r#":host(:where(:not(:disabled)[emphasis="solid"])) [part="button"]:where(:is(:hover, :active))"#
+            ),
+            r#":host(:not(:disabled)[emphasis="solid"]) [part="button"]:is(:hover, :active)"#
+        );
+        assert_eq!(
+            unwrapped(r#":host(:where([tone="primary"]))"#),
+            r#":host([tone="primary"])"#
+        );
+    }
+
+    #[test]
+    fn a_wrapped_value_reads_as_the_compiler_writes_it() {
+        assert_eq!(
+            flatten("var(\n    --button-fill,\n    color-mix(in oklab, red 14%, transparent)\n  )"),
+            "var(--button-fill, color-mix(in oklab, red 14%, transparent))"
+        );
     }
 }

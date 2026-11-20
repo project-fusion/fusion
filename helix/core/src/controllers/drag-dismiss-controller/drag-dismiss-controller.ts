@@ -94,6 +94,14 @@ export interface DragDismissOptions {
   /** The element a drag starts on: a handle, or the whole surface. */
   surface: () => HTMLElement | null | undefined
 
+  /**
+   * Whether a drag `dx` and `dy` from the press moves the surface, asked
+   * until one does: a drawer's list keeps a drag it scrolls, and the surface
+   * stays where it rests for the rest of the press. Every drag moves it where
+   * this is not given.
+   */
+  takes?: (dx: number, dy: number) => boolean
+
   /** The element that moves, where it is not the surface. */
   target?: () => HTMLElement | null | undefined
 
@@ -286,6 +294,9 @@ export class DragDismissController implements ReactiveController {
   private drag(dx: number, dy: number): void {
     const edge = this.options.edge()
     if (!edge) {
+      return
+    }
+    if (!this.held && this.options.takes && !this.options.takes(dx, dy)) {
       return
     }
     if (!this.held) {

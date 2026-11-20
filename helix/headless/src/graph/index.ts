@@ -1,4 +1,3 @@
-export * from './events/index.js'
 export type {
   Adjacency,
   Entry,
@@ -9,6 +8,7 @@ export type {
   GraphNodeShape,
   GraphNodeTone,
   Relation,
-} from './root/graph-model.js'
-export { adjacencyOf, entriesOf, nameOf, sortedOf, within } from './root/graph-model.js'
+} from '@fusion.dev/helix-core/graph'
+export { adjacencyOf, entriesOf, nameOf, sortedOf, within } from '@fusion.dev/helix-core/graph'
+export * from './events/index.js'
 export { HelixHeadlessGraph } from './root/graph-root.js'

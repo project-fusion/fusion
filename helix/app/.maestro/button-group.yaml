@@ -1,0 +1,68 @@
+# Button Group: presses on a group that chooses several, where Bold starts
+# pressed, a press on Italic presses it too, and a press on Bold lets it go.
+# Recorded.
+#
+# A pressed button is a toggle button, and Android gives its checked state,
+# which the flow requires. On iOS React Native gives a pressed one the value
+# "checked", which Maestro reads as the element's text: that step is optional
+# until a night shows what iOS gives.
+appId: dev.fusion.helix.app
+name: Button Group
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://button-group/selection/preview
+      SHOWS: Italic
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: button-group
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Bold
+      - assertVisible:
+          checked: false
+          text: Italic
+- tapOn: Italic
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Italic
+      - assertVisible:
+          checked: true
+          text: Bold
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          leftOf: Underline
+          optional: true
+          rightOf: Bold
+          text: checked
+- takeScreenshot: button-group-italic
+- tapOn: Bold
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: Bold
+      - assertVisible:
+          checked: true
+          text: Italic
+- takeScreenshot: button-group-bold-released
+- stopRecording

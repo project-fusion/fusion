@@ -1,4 +1,4 @@
-import { type GraphPoint, neighborsOf, type SeedLink, TURN } from './seed.js'
+import { type GraphPoint, neighborsOf, type SeedLink, TURN } from '@fusion.dev/helix-core/graph'
 
 /** A note as the arrangement reads it: its group, if it has one. */
 export interface ArrangedNode {

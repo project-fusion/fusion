@@ -68,6 +68,9 @@ followTheme(map, frame, style)
 - The renderer's own keyboard handling and zoom buttons are turned off, so the
   frame's controls are the only ones.
 - The renderer's credit is shown in the frame's footer.
+- The map opens at the frame's `view`, written as `lat,lng,zoom` with the
+  tilt and the turn in degrees after them where you want them, such as
+  `view="55.95,-3.19,13"`.
 - `connection.fit()` frames every place on the map.
 - `connection.disconnect()` puts back everything `connectMap` changed.
 
@@ -470,8 +473,10 @@ readers announce its `description` when it changes, at most once every
 
 Use `helix-map-points` for more places than markers can handle. MapLibre draws
 all of them as one layer, loaded from a GeoJSON file in `src` or from data you
-set on `data`. With `cluster`, nearby points combine into counts, and pressing a
-count zooms in to it. Pressing a point sends `helix-activate` from the layer
+set on `data`. With `cluster`, nearby points combine into counts. Pressing a
+count sends `helix-map-cluster` from the layer and zooms in to the count. The
+event's detail has `count`, the number of places it holds, `place`, where it
+is, and `zoom`, the zoom it comes apart at. Pressing a point sends `helix-activate` from the layer
 with the point's id, or with the property named by `name-key`. Leaflet draws
 each point on its own, which works for hundreds of points.
 

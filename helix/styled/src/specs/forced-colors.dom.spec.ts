@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 /* Forced colors paint every background the page's Canvas color. A mark drawn
  * as a background, a heatmap cell, a scatter point, a meter's fill, a star, a
@@ -39,10 +39,12 @@ beforeAll(async () => {
 /** The rules a family's sheets write under forced colors, as text. */
 const forced = (tag: string): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
     .split('@media (forced-colors: active)')
     .slice(1)
     .map(block)
@@ -85,7 +87,7 @@ describe('under forced colors', () => {
   test('the end of a line and its markers keep the line’s color', () => {
     expect(rule('helix-line-chart', '[part~="terminus"]')).toContain('forced-color-adjust: none')
     expect(rule('helix-line-chart', '[part~="marker"]')).toContain('forced-color-adjust: none')
-    expect(rule('helix-sparkline', '[part~="terminus"]')).toContain('forced-color-adjust: none')
+    expect(rule('helix-sparkline', '[part="terminus"]')).toContain('forced-color-adjust: none')
     expect(forced('helix-sparkline')).toMatch(/\[part="low"\] \{\s*forced-color-adjust: none/u)
   })
 

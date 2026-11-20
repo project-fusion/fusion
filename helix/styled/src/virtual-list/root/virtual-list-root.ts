@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessVirtualList } from '@fusion.dev/helix-headless/virtual-list'
 import type { CSSResultGroup } from 'lit'
 
-import { styles } from './virtual-list-root.css.js'
+import { styles } from './virtual-list-root.generated.css.js'
 
 /**
  * @summary A list that renders only the rows of a long set that are on screen.

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapArea } from '@fusion.dev/helix-headless/map/area'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './map-area.css.js'
+import { styles } from './map-area.generated.css.js'
 
 /**
  * @summary A shape on a map, such as a delivery zone.

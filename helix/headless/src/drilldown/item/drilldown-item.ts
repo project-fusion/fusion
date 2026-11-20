@@ -68,7 +68,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Content before the label, usually an icon.
  *
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the row is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
- * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands.
+ * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands. A row that opens a page chooses nothing and sends none: its drilldown sends `helix-navigate`.
  *
  * @csspart item - The row itself, which is an `<a>` where `href` is set.
  * @csspart label - The row's label.
@@ -307,7 +307,12 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     if (!this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
       return false
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    /* A row that opens a page has chosen nothing, so nothing is said to
+       stand: the drilldown goes into the page and says `helix-navigate`. Read
+       from the children, since `page` waits for the next update. */
+    if (![...this.children].some((child) => child.slot === 'page')) {
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    }
     return true
   }
 

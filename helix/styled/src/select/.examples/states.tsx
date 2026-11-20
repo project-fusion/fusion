@@ -6,7 +6,8 @@ export function Example() {
 
   useEffect(() => {
     const select = choice.current
-    select?.updateComplete.then(() => select.focus())
+    /* On a phone the ref has no `updateComplete`, and the field is not focused. */
+    void select?.updateComplete?.then(() => select.focus())
   }, [])
 
   return (

@@ -3,7 +3,7 @@ import { HelixHeadlessGraph } from '@fusion.dev/helix-headless/graph'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
-import { styles } from './graph-root.css.js'
+import { styles } from './graph-root.generated.css.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
 

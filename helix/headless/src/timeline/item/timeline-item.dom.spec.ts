@@ -1,5 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { setTimers, timers } from '@fusion.dev/helix-core/capabilities/timers'
+import { type FakeTimers, fakeTimers } from '@fusion.dev/helix-core/capabilities/timers/fake'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -86,20 +88,30 @@ describe('one timeline entry', () => {
 /* A timeline of recent events had to write "3 hours ago" itself, and the words
    stayed as they were drawn for as long as the page was open. */
 describe('a relative time', () => {
-  interface Ticker {
-    waiting: Set<{ at: number; run: () => void }>
-  }
-  const ticker = () =>
-    (globalThis as unknown as Record<symbol, Ticker | undefined>)[Symbol.for('helix.ticker')]
+  /* A fake clock set as the timers capability, which the entry's clock runs
+     on, with `Date.now` following it. */
   const realNow = Date.now
+  const heldTimers = timers()
+  let clock: FakeTimers
   const reading = (element: HTMLElement): string =>
     part(element, 'time')?.querySelector('slot')?.textContent?.trim() ?? ''
 
+  /* Set by each test that reads it, and not in a `beforeEach`: the browser
+     harness runs a bundle's `beforeEach` before every test in the bundle,
+     and a fake clock left there stopped the composer's typing timeout. */
+  const stop = (): void => {
+    clock = fakeTimers(realNow())
+    setTimers(clock)
+    Date.now = () => clock.wall()
+  }
+
   afterEach(() => {
     Date.now = realNow
+    setTimers(heldTimers)
   })
 
   test('is written from datetime where nothing is slotted, and moves on as it goes stale', async () => {
+    stop()
     const said = Date.now() - 80_000
     const element = await entry(
       `lang="en" relative datetime="${new Date(said).toISOString()}"`,
@@ -107,12 +119,8 @@ describe('a relative time', () => {
     )
     expect(part(element, 'time')?.tagName).toBe('TIME')
     expect(reading(element)).toBe('1 minute ago')
-    const waiting = [...(ticker()?.waiting ?? [])]
-    expect(waiting.length).toBeGreaterThan(0)
-    Date.now = () => said + 125_000
-    for (const one of waiting) {
-      one.run()
-    }
+    expect(clock.pending().timeouts).toBeGreaterThan(0)
+    clock.advance(45_000)
     await (element as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(reading(element)).toBe('2 minutes ago')
   })
@@ -140,9 +148,10 @@ describe('a relative time', () => {
   })
 
   test('an entry taken off the page stops asking', async () => {
+    stop()
     const element = await entry(`relative datetime="${new Date().toISOString()}"`, 'Shipped')
-    const before = ticker()?.waiting.size ?? 0
+    const before = clock.pending().timeouts
     element.remove()
-    expect(ticker()?.waiting.size ?? 0).toBeLessThan(before)
+    expect(clock.pending().timeouts).toBeLessThan(before)
   })
 })

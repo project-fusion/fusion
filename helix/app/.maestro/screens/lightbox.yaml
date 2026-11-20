@@ -1,0 +1,16 @@
+# Lightbox, its preview drawn alone, one screenshot named by the example,
+# `MODE`, and `SIZE`.
+#
+# The preview opens over its own screen, so the flow waits for the words of its
+# first picture's line.
+appId: dev.fusion.helix.app
+name: "Screens: Lightbox"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://lightbox/preview/preview
+- extendedWaitUntil:
+    visible: '.*Shallow water at the beach.*'
+    timeout: 30000
+- takeScreenshot: lightbox-preview-${MODE}-${SIZE}

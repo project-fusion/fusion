@@ -1,5 +1,3 @@
-import './preview.css'
-
 export function Example() {
   return (
     <div className="page">

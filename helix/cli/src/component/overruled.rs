@@ -233,7 +233,7 @@ pub fn run(context: &Context) -> Report {
         for rule in rules(&css) {
             let into = if rule.selector.contains("::slotted(") {
                 &mut slotted
-            } else if rule.selector.contains(":host") {
+            } else if on_host(&rule.selector) {
                 &mut host
             } else {
                 continue;
@@ -282,9 +282,54 @@ pub fn run(context: &Context) -> Report {
     }
 }
 
+/// Whether a component's selector styles the host itself: `:host`, or
+/// `:host(...)` with nothing after it but a pseudo-class, in any of its list.
+///
+/// **A part of the shadow root is no host**, so a generated sheet's
+/// `:host [part="body"]` is a rule for a node a document rule cannot reach.
+fn on_host(selector: &str) -> bool {
+    selector.split(',').any(|one| {
+        let one = one.trim();
+        let Some(rest) = one.strip_prefix(":host") else {
+            return false;
+        };
+        let rest = if rest.starts_with('(') {
+            let mut depth = 0usize;
+            let mut end = rest.len();
+            for (at, character) in rest.char_indices() {
+                match character {
+                    '(' => depth += 1,
+                    ')' => {
+                        depth -= 1;
+                        if depth == 0 {
+                            end = at + 1;
+                            break;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            &rest[end..]
+        } else {
+            rest
+        };
+        rest.is_empty() || (rest.starts_with(':') && !rest.starts_with("::"))
+    })
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{before_upgrade, below_children, past_compound, reaches};
+    use super::{before_upgrade, below_children, on_host, past_compound, reaches};
+
+    #[test]
+    fn a_part_of_the_shadow_root_is_no_host() {
+        assert!(on_host(":host"));
+        assert!(on_host(":host(:where([controls]))"));
+        assert!(on_host("[part=\"x\"], :host:focus-within"));
+        assert!(!on_host(":host [part=\"body\"]"));
+        assert!(!on_host(":host slot[name=\"end\"]"));
+        assert!(!on_host("[part=\"x\"]"));
+    }
 
     #[test]
     fn a_document_rule_for_before_the_upgrade_overrules_nothing_after_it() {

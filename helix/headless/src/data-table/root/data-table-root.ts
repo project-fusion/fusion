@@ -71,6 +71,8 @@ import {
   wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
+import { csvOf, type Grown, grow, toggledOpen } from '@fusion.dev/helix-core/data-table'
+import { droppedAt, tracksOf } from '@fusion.dev/helix-core/table'
 import { caretDown, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -85,8 +87,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { ColumnMenuDrawer, HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import { edgeOf } from '../../table/edge.js'
-import { droppedAt } from '../../table/fit.js'
-import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
 import '../../date-input/index.js'
 import '../../divider/index.js'
@@ -114,8 +114,6 @@ import {
   HelixViewChangeEvent,
 } from '../events/index.js'
 import { EXPORT_TYPES, type ExportData, type ExportOptions, exportText } from '../export.js'
-import { toggledOpen } from '../keys.js'
-import { type Grown, grow } from '../tree.js'
 import {
   type ColumnType,
   type DataTableView,
@@ -2815,19 +2813,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   csv(): string {
     const columns = this.orderedColumns.filter((column) => column.shown && column.field !== '')
     const rows = this.mode === 'server' && !this.childField ? this.rows : this.flat().rows
-    const quote = (value: unknown): string => {
-      if (value === undefined || value === null) {
-        return ''
-      }
-      let text = String(value)
-      if (typeof value === 'string' && /^[=+\-@\t\r]/.test(text)) {
-        text = `'${text}`
-      }
-      return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
-    }
-    const head = columns.map((column) => quote(column.textContent?.trim() || column.field))
-    const body = rows.map((row) => columns.map((column) => quote(valueAt(row, column.field))))
-    return [head, ...body].map((line) => line.join(',')).join('\r\n')
+    return csvOf(
+      columns.map((column) => ({
+        field: column.field,
+        heading: column.textContent?.trim() || column.field,
+      })),
+      rows,
+    )
   }
 
   /** Asks for a different query. */

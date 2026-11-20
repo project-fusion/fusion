@@ -14,7 +14,7 @@ export function Example() {
         open={open}
         tone="neutral"
       >
-        <span slot="heading">Tip</span>
+        <helix-text slot="heading">Tip</helix-text>
         Press the slash key to search from anywhere.
       </helix-callout>
       <helix-flex gap="sm">

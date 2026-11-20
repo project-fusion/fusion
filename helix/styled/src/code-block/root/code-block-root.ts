@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCodeBlock } from '@fusion.dev/helix-headless/code-block'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './code-block-root.css.js'
+import { styles } from './code-block-root.generated.css.js'
 import '../../copy-button/index.js'
 
 /**

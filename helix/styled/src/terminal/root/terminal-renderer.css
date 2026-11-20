@@ -1,0 +1,24 @@
+/* **What only the web's renderer and find bar read**, which a phone, drawing
+   its screen as text, has no use for: the grid's scrollbar and selection,
+   which `connectTerminal` themes xterm.js from, and the colors the find bar,
+   a Find, takes from the frame. The rest of the frame's rules are generated
+   from helix/neutral. */
+:host {
+  --terminal-scrollbar-thumb-color: var(--helix-scrollbar-thumb-color);
+  --terminal-selection-background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary) 30%,
+    transparent
+  );
+}
+
+/* The find bar sits under the header on the header's fill, its field on the
+   grid's ground. */
+[part="find"] {
+  --find-background-color: var(
+    --terminal-header-background-color,
+    var(--helix-color-surface-raised)
+  );
+  --find-border-color: var(--terminal-border-color, var(--helix-color-border));
+  --find-field-background-color: var(--terminal-background-color);
+}

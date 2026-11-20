@@ -7,23 +7,21 @@ import {
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
+import { CONSOLE_HEARD, CONSOLE_LEVELS, CONSOLE_LIMIT } from '@fusion.dev/helix-core/sandbox'
 import { levelSaid } from '@fusion.dev/helix-headless/log'
+import type { ConsoleDetail } from '@fusion.dev/helix-headless/sandbox-events'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
-import type { ConsoleDetail } from '../events/index.js'
 import '../../button/index.js'
 import '../../log/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './sandbox-console.css.js'
+import { styles } from './sandbox-console.generated.css.js'
 
 /** A console level, from the quietest to the loudest. */
 type ConsoleLevel = ConsoleDetail['level']
-
-/** The four levels the filter offers, the quietest first. */
-const LEVELS: readonly ConsoleLevel[] = ['log', 'info', 'warn', 'error']
 
 /** The log the lines are drawn in, as far as the console drives it. */
 interface Output extends HTMLElement {
@@ -36,12 +34,6 @@ interface Heard {
   key: number
   words: string
 }
-
-/** How many lines are kept. Older ones fall off the top. */
-const LIMIT = 200
-
-/** How many of the newest lines the region a screen reader hears holds. */
-const HEARD = 5
 
 /** Keeps the filter's `input` inside the shadow root it started in. */
 const stop = (event: Event): void => event.stopPropagation()
@@ -89,6 +81,7 @@ const stop = (event: Event): void => event.stopPropagation()
  * @csspart output-before - The log's `before` part.
  * @csspart output-dropped - The log's `dropped` part.
  * @csspart output-empty - The log's `empty` part.
+ * @csspart output-group - The log's `group` part.
  * @csspart output-group-content - The log's `group-content` part.
  * @csspart output-group-duration - The log's `group-duration` part.
  * @csspart output-group-heading - The log's `group-heading` part.
@@ -272,7 +265,7 @@ export class HelixSandboxConsole extends HelixElement {
       this.heard = [
         ...this.heard,
         { key: this.said, words: before ? `${before} ${detail.text}` : detail.text },
-      ].slice(-HEARD)
+      ].slice(-CONSOLE_HEARD)
     }
   }
 
@@ -332,7 +325,7 @@ export class HelixSandboxConsole extends HelixElement {
     const button = this.tag('button')
     return html`<div part="controls">
       <select part="filter" aria-label=${this.levelLabel} @change=${this.handleLevel} @input=${stop}>
-        ${LEVELS.map(
+        ${CONSOLE_LEVELS.map(
           (one) =>
             html`<option value=${one} ?selected=${(this.level ?? 'log') === one}>
               ${this.levelWords[one]}
@@ -353,7 +346,7 @@ export class HelixSandboxConsole extends HelixElement {
     return html`${this.renderControls()}<${log}
         part="output"
         exportparts="after: output-after, before: output-before, dropped: output-dropped, empty: output-empty,
-        group-content: output-group-content, group-duration: output-group-duration,
+        group: output-group, group-content: output-group-content, group-duration: output-group-duration,
         group-heading: output-group-heading, group-mark: output-group-mark,
         group-status: output-group-status, group-summary: output-group-summary,
         group-summary-done: output-group-summary-done,
@@ -377,7 +370,7 @@ export class HelixSandboxConsole extends HelixElement {
         empty-text=${this.emptyLabel ?? this.emptyText}
         label=${this.label || this.fallbackLabel}
         level=${this.level ?? nothing}
-        limit=${LIMIT}
+        limit=${CONSOLE_LIMIT}
         quiet
         separation="plain"
         wrap

@@ -3,7 +3,7 @@ import { HelixHeadlessCarousel } from '@fusion.dev/helix-headless/carousel'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './carousel-root.css.js'
+import { styles } from './carousel-root.generated.css.js'
 
 /**
  * @summary Shows one slide of several, with controls to move between them.

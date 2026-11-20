@@ -1,0 +1,50 @@
+# Steps: a press on a stage, on the events example, whose log lists what the
+# press sent, then a press that moves the controlled example's active stage.
+# Recorded.
+#
+# React Native has no state for the current stage, so Helix gives it the
+# value "Current step", which iOS reads after its name and Maestro reads as
+# the element's text. Android keeps the value where Maestro does not read it.
+# The step that reads it is optional until a night shows what iOS gives.
+appId: dev.fusion.helix.app
+name: Steps
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://steps/preview/preview
+      SHOWS: .*Payment.*
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: Current step
+- openLink: helix://steps/events/preview
+- extendedWaitUntil:
+    visible: .*Press a step.*
+    timeout: 15000
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: steps
+- tapOn: .*Payment.*
+- assertVisible: '.*"payment" was pressed.*'
+- assertVisible: '.*about to change to "payment".*'
+- takeScreenshot: steps-events-payment
+- openLink: helix://steps/controlled/preview
+- extendedWaitUntil:
+    visible: .*Review.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- takeScreenshot: steps-controlled-details
+- tapOn: .*Review.*
+- takeScreenshot: steps-controlled-review
+- stopRecording

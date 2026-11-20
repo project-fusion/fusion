@@ -1,0 +1,79 @@
+# Sandbox, each example drawn alone, read only as a phone draws it: one
+# screenshot of each, named by the example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it
+# draws, then for the screen to stand still, so no picture catches the
+# screen before it sliding away. The first screen's title is every family's
+# first, so the flow waits for its toolbar's button too.
+appId: dev.fusion.helix.app
+name: "Screens: Sandbox"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://sandbox/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- extendedWaitUntil:
+    visible: 'Reset code'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-preview-${MODE}-${SIZE}
+- openLink: helix://sandbox/a-live-preview/preview
+- extendedWaitUntil:
+    visible: 'A live preview'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-a-live-preview-${MODE}-${SIZE}
+- openLink: helix://sandbox/editing-aids/preview
+- extendedWaitUntil:
+    visible: 'Editing aids'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-editing-aids-${MODE}-${SIZE}
+- openLink: helix://sandbox/events/preview
+- extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-events-${MODE}-${SIZE}
+- openLink: helix://sandbox/files/preview
+- extendedWaitUntil:
+    visible: 'Files'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-files-${MODE}-${SIZE}
+- openLink: helix://sandbox/highlighted-source/preview
+- extendedWaitUntil:
+    visible: 'Highlighted source'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-highlighted-source-${MODE}-${SIZE}
+- openLink: helix://sandbox/preview-leading/preview
+- extendedWaitUntil:
+    visible: 'Preview leading'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-preview-leading-${MODE}-${SIZE}
+- openLink: helix://sandbox/sized-panes/preview
+- extendedWaitUntil:
+    visible: 'Sized panes'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-sized-panes-${MODE}-${SIZE}
+- openLink: helix://sandbox/with-a-panel/preview
+- extendedWaitUntil:
+    visible: 'With a panel'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: sandbox-with-a-panel-${MODE}-${SIZE}

@@ -1,0 +1,68 @@
+# List: a row dragged by its grip to a new place, and rows selected and
+# cleared with a press, recorded.
+appId: dev.fusion.helix.app
+name: List
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://list/reordering
+      SHOWS: Freeze the branch.*
+# The first touch on a screen that has just opened is lost on the iOS
+# simulator, a drag's as well: three times in three on October 11, 2026. A tap
+# on the empty space below the example takes it.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: list
+# **The first row's grip, dragged low on the screen, past the last row.**
+# Android lists the grip by its name. iOS reads a row as one element, its label
+# ending with the grip's name, so there the drag starts where the grip sits in
+# the row. A drag that moved the row part of the way is made once more.
+- repeat:
+    times: 2
+    while:
+      notVisible:
+        text: Freeze the branch.*
+        below: Tag the release.*
+    commands:
+      - runFlow:
+          when:
+            visible: Move Freeze the branch
+          commands:
+            - swipe:
+                from: Move Freeze the branch
+                direction: DOWN
+                duration: 2000
+      - runFlow:
+          when:
+            notVisible: Move Freeze the branch
+          commands:
+            - swipe:
+                from:
+                  text: Freeze the branch.*
+                  point: 93%, 50%
+                direction: DOWN
+                duration: 2000
+- assertVisible:
+    text: Freeze the branch.*
+    below: Tag the release.*
+# The selectable example starts with its first row selected.
+- openLink: helix://list/selectable
+- extendedWaitUntil:
+    visible: Budget.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Budget.*
+- assertVisible:
+    text: Budget.*
+    selected: true
+- tapOn: Quarterly report.*
+- assertNotVisible:
+    text: Quarterly report.*
+    selected: true
+- stopRecording

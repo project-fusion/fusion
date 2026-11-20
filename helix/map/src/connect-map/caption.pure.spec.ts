@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { captionAt } from './caption.js'
+import { captionAt } from '@fusion.dev/helix-core/map'
 
 /** Whether a place is inside a ring of places, as the caption search asks it. */
 const within = (

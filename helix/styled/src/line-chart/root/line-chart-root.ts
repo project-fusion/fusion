@@ -8,9 +8,8 @@ import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
-import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
-import { styles } from './line-chart-root.css.js'
+import { styles } from './line-chart-root.generated.css.js'
 import '../../tooltip/index.js'
 
 /**
@@ -145,7 +144,6 @@ export class HelixLineChart extends HelixHeadlessLineChart {
     seriesStyles,
     statusStyles,
     tooltipStyles,
-    terminusStyles,
     styles,
     sonifyStyles,
     statusMarkStyles,

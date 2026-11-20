@@ -23,12 +23,13 @@ The same command works with `yarn create`, `pnpm create`, and `bun create`.
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
 | `react-nextjs` | React and TypeScript on the Next.js App Router, the three pages as real routes. |
+| `expo-router` | React and TypeScript on Expo Router: one app for the web, iOS, and Android. |
 | `vue-vite` | Vue and TypeScript on Vite. |
 | `angular` | Angular and TypeScript on the Angular CLI. |
 | `svelte-vite` | Svelte and TypeScript on Vite. |
 | `solid-vite` | Solid and TypeScript on Vite. |
 
-Every template lays down the same three pages:
+Every web template lays down the same three pages:
 
 - a landing page saying what you have and where the rest of it is documented;
 - an overview holding a sorted, paged, selectable data table;
@@ -38,6 +39,9 @@ What differs between them is what each framework requires. Each one starts Helix
 diagnostics in development. A production build never loads them. Every build
 but Angular's leaves them out, and Angular's writes them to a file of their own
 that the page never requests.
+
+`expo-router` writes an app that runs as a website and as an iOS and Android
+app from one set of pages. Its README says how to run it on each.
 
 This is `helix new` from
 [`@fusion.dev/helix-cli`](https://www.npmjs.com/package/@fusion.dev/helix-cli),

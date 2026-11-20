@@ -4,10 +4,9 @@ import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
-import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { HelixNotification } from '../notification/notification.js'
-import { styles } from './notifications-root.css.js'
+import { styles } from './notifications-root.generated.css.js'
 
 /**
  * @summary A feed of notifications, each marked read or unread.
@@ -73,7 +72,6 @@ export class HelixNotifications extends HelixHeadlessNotifications {
   separation?: 'filled' | 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = [
-    densityStyles,
     liveStyles,
     collectionStateStyles,
     collectionErrorStyles,

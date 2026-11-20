@@ -18,6 +18,7 @@ internal to the build.
 | `headless` | `helix-headless` | behavior, accessibility and form participation, no styling |
 | `icons` | `helix-icons` | the icon set |
 | `map` | `helix-map` | connects the Map frame to a map renderer, such as MapLibre or Leaflet |
+| `native` | `helix-native` | the React Native runtime the components draw with: the renderer, the machines, the theme, and a phone's capabilities |
 | `plot` | `helix-plot` | draws the spatial charts in three dimensions with three.js |
 | `sandbox` | `helix-sandbox` | the sandbox's source editor, and a code highlighter for Code Block |
 | `speech` | `helix-speech` | recognizes dictation in the page, on the device, with Moonshine |
@@ -27,8 +28,10 @@ internal to the build.
 | `theme` | `helix-theme` | the derivation engine, Rust compiled to WASM |
 | `plugin` | the `helix` Claude Code plugin | the agent guide as a skill, and the Helix MCP server |
 | `visual` | in `helix-cli` | the Rust crate behind `helix visual` |
+| `app` | none | the gallery on a phone: each family with a native version, and its examples, in Expo Go |
 | `cem` | none | writes the framework typings from a Helix manifest |
 | `gallery` | none | rendered component images for the documentation |
+| `neutral` | none | each family's platform-neutral source, which `helix system` compiles for the web and React Native |
 | `testing` | none | the spec harness the other packages share |
 | `workbench` | none | the spec runner and the JSX reader behind the sandbox page on fusion.dev |
 

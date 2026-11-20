@@ -5,9 +5,9 @@ import {
   PlacementController,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { descriptionOf } from '@fusion.dev/helix-core/canvas'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { descriptionOf } from '../describe.js'
 
 /**
  * What the board draws from a card, as distinct from what it writes onto one:

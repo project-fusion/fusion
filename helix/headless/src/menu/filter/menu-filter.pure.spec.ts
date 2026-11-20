@@ -63,7 +63,7 @@ describe('the menu filter, an entry of its own', () => {
   }
 
   test('the styled menu carries none of the field’s sheet', () => {
-    const css = readFileSync(join(helix, 'styled/src/menu/root/menu-root.css'), 'utf8')
+    const css = readFileSync(join(helix, 'styled/src/menu/root/menu-root.generated.css'), 'utf8')
     expect(css).not.toContain('search-field')
   })
 })

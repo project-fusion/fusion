@@ -33,8 +33,10 @@ describe('the row the keyboard is on', () => {
      the option's stylesheet and Time Picker's select. `data-active` is still
      written for older stylesheets, and none of the library's reads it. */
   test('is styled through `:state(active)` in the option’s sheet and in Time Picker’s', async () => {
-    const { styles: option } = await import('./option-root.css.js')
-    const { styles: picker } = await import('../../time-picker/root/time-picker-root.css.js')
+    const { styles: option } = await import('./option-root.generated.css.js')
+    const { styles: picker } = await import(
+      '../../time-picker/root/time-picker-root.generated.css.js'
+    )
     for (const sheet of [option, picker]) {
       expect(sheet.cssText).toContain(':state(active)')
       expect(sheet.cssText).not.toContain('[data-active]')

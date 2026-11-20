@@ -10,22 +10,11 @@ const CONFIG = {
 
 export function Example() {
   return (
-    <>
-      {/* The JSON is written into the page because React hydration drops object
-          properties on custom elements. The text survives server rendering. */}
-      <script
-        id="config"
-        type="application/json"
-      >
-        {JSON.stringify(CONFIG)}
-      </script>
-
-      <helix-object-inspector
-        filter="sfo1"
-        filterable
-        for="config"
-        label="config.json"
-      ></helix-object-inspector>
-    </>
+    <helix-object-inspector
+      filter="sfo1"
+      filterable
+      label="config.json"
+      value={CONFIG}
+    ></helix-object-inspector>
   )
 }

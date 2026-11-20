@@ -2,7 +2,7 @@ import { customElement, reducedMotion } from '@fusion.dev/helix-core'
 import { HelixHeadlessDialog } from '@fusion.dev/helix-headless/dialog'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './dialog-root.css.js'
+import { styles } from './dialog-root.generated.css.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -159,10 +159,10 @@ export class HelixDialog extends HelixHeadlessDialog {
   /**
    * **A new height while open moves from the old one**, measured after layout
    * and before the frame is painted, so the panel never shows at its new size
-   * first. The sizes heard while the move runs are the move's own, and pass.
-   * A new width lays out at once, since that is the window or the page
-   * changing rather than what the panel holds, and the panel scrolls nothing
-   * while it moves, so a growing panel shows no scroll bar on its way.
+   * first. A new width lays out at once, since that is the window or the page
+   * changing rather than what the panel holds, and neither the panel nor its
+   * body scrolls while it moves, so a growing panel shows no scroll bar on its
+   * way.
    */
   private resized(surface: HTMLDialogElement, size: { block: number; inline: number }): void {
     if (!surface.open) {
@@ -200,10 +200,24 @@ export class HelixDialog extends HelixHeadlessDialog {
         easing: style.getPropertyValue('--helix-easing-emphasized').trim() || 'ease-in-out',
       },
     )
+    /* The body gives up its height first, so it holds still for the move too. */
+    this.partNamed<HTMLElement>('body')?.animate(
+      [{ overflowY: 'hidden' }, { overflowY: 'hidden' }],
+      { duration },
+    )
     this.resizing = move
+    /* **Not watched while it moves.** The move sets the panel's height in the
+       frame this answer runs in, and a size the observer still watches that
+       changes there is one it cannot deliver until the next frame, which the
+       browser reports as a ResizeObserver loop. Watched again once the move
+       ends, when the observer reports the size it came to rest at. */
+    this.sizes?.unobserve(surface)
     const done = (): void => {
       if (this.resizing === move) {
         this.resizing = undefined
+        if (this.isConnected) {
+          this.sizes?.observe(surface)
+        }
       }
     }
     void move.finished.then(done, done)

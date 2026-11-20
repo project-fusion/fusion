@@ -1,8 +1,13 @@
 import { describe, expect, test } from 'bun:test'
+import {
+  cameraOf,
+  cssColor,
+  mapLibreStyle,
+  mix,
+  parseColor,
+  worldOf,
+} from '@fusion.dev/helix-core/map'
 import { PbfWriter } from 'pbf'
-import { mapLibreStyle } from '../style/map-style.js'
-import { cssColor, mix, parseColor } from '../style/oklab.js'
-import { cameraOf, worldOf } from './camera.js'
 import { mapSnapshot, SNAPSHOT_LAYERS, widthAt } from './snapshot.js'
 
 const COLORS = {

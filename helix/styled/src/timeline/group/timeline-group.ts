@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTimelineGroup } from '@fusion.dev/helix-headless/timeline'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './timeline-group.css.js'
+import { styles } from './timeline-group.generated.css.js'
 
 /**
  * @summary A run of timeline entries under a heading, such as a day.

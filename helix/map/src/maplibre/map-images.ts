@@ -1,4 +1,4 @@
-import type { MapImage } from '../style/map-style.js'
+import type { MapImage } from '@fusion.dev/helix-core/map'
 
 /** Drawn at twice their size, for sharp screens, and handed to MapLibre as such. */
 export const IMAGE_RATIO = 2

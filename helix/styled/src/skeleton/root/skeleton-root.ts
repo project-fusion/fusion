@@ -2,7 +2,7 @@ import { customElement, numberConverter, reducedMotion, resizeFrom } from '@fusi
 import { HelixHeadlessSkeleton } from '@fusion.dev/helix-headless/skeleton'
 import { type CSSResultGroup, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './skeleton-root.css.js'
+import { styles } from './skeleton-root.generated.css.js'
 
 /**
  * @summary A placeholder shown in place of content that is still loading.

@@ -1,5 +1,7 @@
-.metric {
-  --card-media-block-size: 3rem;
+helix-grid {
+  --grid-columns: minmax(0, 16rem);
+}
 
-  inline-size: 16rem;
+helix-card {
+  --card-media-block-size: 3rem;
 }

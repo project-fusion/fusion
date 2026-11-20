@@ -4,8 +4,8 @@ import type {
   readColor as ReadColor,
   readColorAlpha as ReadColorAlpha,
 } from '@fusion.dev/helix-core'
+import { ORB_PARAMS, type OrbClock } from '@fusion.dev/helix-core/orb'
 import {
-  at,
   framesBooked,
   hasLayout,
   hasState,
@@ -16,17 +16,6 @@ import {
   registerDom,
   role,
 } from '@fusion.dev/helix-testing/dom'
-import {
-  blendParams,
-  blendStaged,
-  evenSphere,
-  meshFor,
-  ORB_PARAMS,
-  orbPoint,
-  paramsFor,
-  project,
-  stateDistance,
-} from '../shapes.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
    exactly that reason: `@customElement` runs at evaluation, and a static import
@@ -98,10 +87,12 @@ describe('orb', () => {
   })
 
   test('a new state departs from the shape on the screen, and a first state is where it starts', async () => {
-    type Morphing = Upgraded & { paramsNow(): typeof ORB_PARAMS.thinking }
+    /* The shape drawn, as the element's core clock gives it now. */
+    type Morphing = Upgraded & { clock: OrbClock }
+    const drawn = (one: Morphing) => one.clock.params(performance.now())
     const first = (await mount('<helix-orb state="working"></helix-orb>')) as Morphing
     await first.updateComplete
-    expect(first.paramsNow()).toEqual(ORB_PARAMS.working)
+    expect(drawn(first)).toEqual(ORB_PARAMS.working)
 
     const host = (await mount('<helix-orb></helix-orb>')) as Morphing
     await host.updateComplete
@@ -109,7 +100,7 @@ describe('orb', () => {
     await host.updateComplete
     /* At the start of the change the cloud is still the sash it was. Read off
        `state`, the change began at `working` and jumped there. */
-    const now = host.paramsNow()
+    const now = drawn(host)
     expect(now.ring).toBeCloseTo(ORB_PARAMS.thinking.ring, 1)
     expect(now.ring).not.toBe(ORB_PARAMS.working.ring)
   })
@@ -121,26 +112,39 @@ describe('orb', () => {
     'a color that changes with the state crosses with the shape, and one drawn once snaps',
     async () => {
       type Color = [number, number, number, number]
+      /* The element's own two: core's crossing of the colors, and the clock
+         whose change of state it lands with. */
       type Crossing = Upgraded & {
-        crossColors(ink: Color, ground: Color, duration: string, snap: boolean): [Color, Color]
+        clock: { left(now: number): number }
+        inks: {
+          cross(
+            ink: Color,
+            ground: Color,
+            ask: { alone: number; left: number; now: number; snap: boolean },
+          ): [Color, Color]
+        }
       }
       const red: Color = [200, 0, 0, 1]
       const blue: Color = [0, 0, 200, 1]
       const ground: Color = [255, 255, 255, 1]
       const host = (await mount('<helix-orb></helix-orb>')) as Crossing
       await host.updateComplete
-      expect(host.crossColors(red, ground, '0.12s', false)[0]).toEqual(red)
+      const cross = (ink: Color, snap = false): [Color, Color] => {
+        const now = performance.now()
+        return host.inks.cross(ink, ground, { alone: 120, left: host.clock.left(now), now, snap })
+      }
+      expect(cross(red)[0]).toEqual(red)
       host.state = 'working'
       await host.updateComplete
       /* Far past the stylesheet's beat, and well inside the shape's span, the ink
        is still on its way. */
-      host.crossColors(blue, ground, '0.12s', false)
+      cross(blue)
       await new Promise((resolve) => setTimeout(resolve, 200))
-      const [ink] = host.crossColors(blue, ground, '0.12s', false)
+      const [ink] = cross(blue)
       expect(ink[0]).toBeGreaterThan(20)
       expect(ink[2]).toBeLessThan(180)
       /* A frame nothing follows takes the new color whole. */
-      expect(host.crossColors(red, ground, '0.12s', true)[0]).toEqual(red)
+      expect(cross(red, true)[0]).toEqual(red)
     },
   )
 
@@ -373,175 +377,6 @@ describe('orb', () => {
         expect(await framesBooked(4)).toBeGreaterThan(0)
       }))
   }
-})
-
-describe('orb shapes', () => {
-  test('an unknown state is drawn as thinking rather than as nothing', () => {
-    /* The set of things an agent can be doing grows faster than the list of
-       shapes, and a verb with no shape should cost a reader precision, not the
-       whole indicator. */
-    expect(paramsFor('summarising')).toBe(ORB_PARAMS.thinking)
-    expect(paramsFor(undefined)).toBe(ORB_PARAMS.thinking)
-  })
-
-  test('every state carries every number, so a blend cannot produce NaN', () => {
-    /* One missing key multiplies into the geometry as `undefined` and the whole
-       cloud disappears. It cost a render of `fetching` once. */
-    const keys = Object.keys(ORB_PARAMS.thinking).sort()
-    for (const params of Object.values(ORB_PARAMS)) {
-      expect(Object.keys(params).sort()).toEqual(keys)
-      for (const value of Object.values(params)) {
-        expect(Number.isFinite(value)).toBe(true)
-      }
-    }
-  })
-
-  test('a blend of two states lands between them, key by key', () => {
-    const mid = blendParams(ORB_PARAMS.thinking, ORB_PARAMS.fetching, 0.5)
-    expect(mid.belt).toBeCloseTo((ORB_PARAMS.thinking.belt + ORB_PARAMS.fetching.belt) / 2, 6)
-    expect(mid.orbit).toBeCloseTo(0.5, 6)
-  })
-
-  test('the silhouette leads and what it is doing follows', () => {
-    /* Structure at half way, character still held back by the trail: a light
-       must not be orbiting a shape that is still a sash. */
-    const shape = blendStaged(ORB_PARAMS.thinking, ORB_PARAMS.fetching, 0.5, 0)
-    expect(shape.belt).toBeCloseTo((ORB_PARAMS.thinking.belt + 1) / 2, 6)
-    expect(shape.orbit).toBe(ORB_PARAMS.thinking.orbit)
-  })
-
-  test('a near pair is given less time than a far one', () => {
-    const near = stateDistance(ORB_PARAMS.waiting, ORB_PARAMS.done)
-    const far = stateDistance(ORB_PARAMS.thinking, ORB_PARAMS.working)
-    expect(near).toBeLessThan(far)
-    expect(near).toBeGreaterThan(0)
-    expect(far).toBeLessThanOrEqual(1)
-  })
-
-  test('the ring is a hole, not a squashed ball', () => {
-    /* Every dot of a torus sits off the unit sphere: the ones through the hole
-       are nearer the axis than any point of a sphere can be. A `ring` that
-       normalized with the rest would read as a ball again. */
-    const even = evenSphere(6, 12)
-    let nearest = 1
-    for (let band = 0; band < 6; band++) {
-      for (let s = 0; s < 12; s++) {
-        const [x, , z] = orbPoint(band / 5, s / 12, 0, ORB_PARAMS.working, band * 12 + s, even)
-        nearest = Math.min(nearest, Math.hypot(x, z))
-      }
-    }
-    expect(nearest).toBeLessThan(0.4)
-  })
-
-  test('the even sphere is ordered by band and then by longitude', () => {
-    /* **The bug this guards is invisible in either end state.** The bands are
-       sorted by an azimuth measured from the same origin and in the same
-       direction as the generator's longitude. Left at `atan2`'s own range the
-       two orderings sit half a turn apart, every dot is handed a destination
-       across the ball, and the blend into `done` carries the whole cloud
-       through its own axis: a near-empty frame halfway through a transition
-       that both endpoints render perfectly. */
-    const lanes = 6
-    const segs = 12
-    const even = evenSphere(lanes, segs)
-    expect(even).toHaveLength(lanes * segs)
-    for (let band = 0; band < lanes; band++) {
-      let previous = -1
-      for (let s = 0; s < segs; s++) {
-        const point = at(even, band * segs + s)
-        const azimuth = (Math.atan2(point[2], point[0]) + Math.PI * 2) % (Math.PI * 2)
-        expect(azimuth).toBeGreaterThanOrEqual(previous)
-        previous = azimuth
-      }
-    }
-  })
-
-  test('bands rise with the lane index, so a blend is a short move', () => {
-    const lanes = 6
-    const segs = 12
-    const even = evenSphere(lanes, segs)
-    const height = (band: number): number => at(even, band * segs)[1]
-    for (let band = 1; band < lanes; band++) {
-      expect(height(band)).toBeGreaterThan(height(band - 1))
-    }
-  })
-
-  test('every dot of every state sits where the projection can use it', () => {
-    /* A point at the origin is one the projection sends somewhere arbitrary,
-       and a point outside the ball is one the depth ramp reads wrongly.
-       **The shell is an invariant only for the states that are spheres**: the
-       ring's inner edge is nearer the axis than any point of a sphere can be,
-       which is exactly what gives it a hole. */
-    const mesh = meshFor(64)
-    const even = evenSphere(mesh.lanes, mesh.segs)
-    for (const [name, params] of Object.entries(ORB_PARAMS)) {
-      const outer = 1 + params.pulse + 0.001
-      for (let i = 0; i < 200; i++) {
-        const u = (i % 13) / 12
-        const v = (i % 17) / 17
-        const [x, y, z] = orbPoint(u, v, 1.4, params, i, even)
-        const length = Math.hypot(x, y, z)
-        expect(Number.isFinite(length)).toBe(true)
-        expect(`${name}:${length > 0.2}`).toBe(`${name}:true`)
-        expect(`${name}:${length <= outer}`).toBe(`${name}:true`)
-        if (params.ring < 0.001) {
-          expect(`${name}:${length > 0.55 * (1 - params.pulse)}`).toBe(`${name}:true`)
-        }
-      }
-    }
-  })
-
-  test('a transition never passes through a collapse', () => {
-    /* **The failure this catches is the one every still frame hides**: both
-       ends render correctly and the middle falls into the axis.
-       
-       Measured as coverage (how many cells of a grid over the canvas hold at
-       least one dot), and not as the cloud's mean radius, which was the first
-       attempt and does not work. Dots piling onto a handful of points barely
-       move the mean, so that version passed with the fault deliberately put
-       back. Coverage halves. */
-    const mesh = meshFor(64)
-    const even = evenSphere(mesh.lanes, mesh.segs)
-    const coverage = (k: number): number => {
-      const params =
-        k <= 0
-          ? ORB_PARAMS.thinking
-          : k >= 1
-            ? ORB_PARAMS.done
-            : blendParams(ORB_PARAMS.thinking, ORB_PARAMS.done, k)
-      const cells = new Set<number>()
-      let index = 0
-      for (let band = 0; band < mesh.lanes; band++) {
-        const u = mesh.lanes < 2 ? 0.5 : band / (mesh.lanes - 1)
-        for (let s = 0; s < mesh.segs; s++, index++) {
-          const [x, y, z] = orbPoint(u, s / mesh.segs, 1.4, params, index, even)
-          const [px, py] = project(64, x, y, z)
-          cells.add(Math.round(px) * 128 + Math.round(py))
-        }
-      }
-      return cells.size
-    }
-    const ends = Math.min(coverage(0), coverage(1))
-    for (let step = 1; step < 10; step++) {
-      /* No frame in the middle may cover much less of the box than the tighter
-         of the two ends. A collapse shows up here as a fraction of it. */
-      expect(`${step}:${coverage(step / 10) > ends * 0.85}`).toBe(`${step}:true`)
-    }
-  })
-
-  test('the mesh thins with size but the orb keeps its middle', () => {
-    const large = meshFor(64)
-    const small = meshFor(20)
-    expect(small.lanes).toBeLessThan(large.lanes)
-    expect(small.segs).toBeLessThan(large.segs)
-    /* Dots get relatively fatter as the orb shrinks, or the mesh disappears
-       into the pixel grid. */
-    expect(small.radiusScale / 20).toBeGreaterThan(large.radiusScale / 64)
-    /* And the tonal range compresses, because depth drawn as a wide gray ramp
-       is invisible when the far side of the sphere is three pixels across. */
-    expect(small.shadeSpan).toBeLessThan(large.shadeSpan)
-    expect(small.aMin).toBeGreaterThan(large.aMin)
-  })
 })
 
 /**

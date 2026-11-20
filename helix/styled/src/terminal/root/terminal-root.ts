@@ -4,7 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './terminal-root.css.js'
+import { styles as rendererStyles } from './terminal-renderer.css.js'
+import { styles } from './terminal-root.generated.css.js'
 import '../../button/index.js'
 import '../../find/index.js'
 import '../../icon-button/index.js'
@@ -76,8 +77,9 @@ export class HelixTerminal extends HelixHeadlessTerminal {
   separation?: 'plain'
 
   /* The live region's clip first, as that sheet asks, and the glyphs'
-     size before this family's own rules. */
-  static override styles: CSSResultGroup = [liveStyles, glyphStyles, styles]
+     size before this family's own rules, the renderer's values before the
+     rules generated from helix/neutral. */
+  static override styles: CSSResultGroup = [liveStyles, glyphStyles, rendererStyles, styles]
 }
 
 declare global {

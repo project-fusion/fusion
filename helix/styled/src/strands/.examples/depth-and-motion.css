@@ -1,10 +1,13 @@
+/* Strands fills the box it is given, the way an image does, so an example has
+   to give it one. The TSX gives it in its style, which a phone reads too, and
+   the HTML twin, which takes no inline style, gives it here. */
+helix-strands {
+  block-size: 16rem;
+}
+
 /* Two ribbons side by side, so the difference reads at a glance. */
 .pair {
   display: grid;
   gap: var(--helix-space-md);
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-}
-
-.stage {
-  block-size: 16rem;
 }

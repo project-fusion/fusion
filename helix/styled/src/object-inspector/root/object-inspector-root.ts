@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessObjectInspector } from '@fusion.dev/helix-headless/object-inspector'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './object-inspector-root.css.js'
+import { styles } from './object-inspector-root.generated.css.js'
 import '../../copy-button/index.js'
 
 /**

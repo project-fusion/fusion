@@ -21,8 +21,12 @@ crate-type = ["cdylib", "rlib"]
 [features]
 # Default-off, so the library stays dependency-free for the browser consumer.
 serde = ["dep:serde"]
+# The reader at a JavaScript boundary, which names the field a refusal is
+# about. The WASM wrapper takes it, and so does the native module's crate,
+# `fusion-helix-native`, so an intent reads the same on a phone as in a browser.
+json = ["serde", "dep:serde_json"]
 # The boundary is JSON, so the wrapper needs a reader.
-wasm = ["serde", "dep:serde_json", "dep:wasm-bindgen"]
+wasm = ["json", "dep:wasm-bindgen"]
 
 [dependencies]
 serde = { workspace = true, optional = true }

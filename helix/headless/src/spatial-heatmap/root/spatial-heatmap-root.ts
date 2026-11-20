@@ -4,8 +4,11 @@ import {
   commaList,
   customElement,
   drawTooltip,
+  type HeatField,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
+  heatmapFits,
+  heatmapTone,
   ISOMETRIC,
   isRtl,
   MIRROR_RULE,
@@ -24,9 +27,6 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, type HeatField, toneOf } from '../../heatmap/root/buckets.js'
-import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
-import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 import {
   ACROSS,
   type Base,
@@ -37,7 +37,9 @@ import {
   type Prism,
   type Relief,
   reliefOf,
-} from '../projection.js'
+} from '@fusion.dev/helix-core/spatial'
+import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
+import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 
 /** How far a label stands below what it clears, in pixels. */
 const LABEL_GAP = 4
@@ -362,7 +364,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         height: heights[index] ?? 0,
         label: this.sourceRows[first + index]?.label ?? '',
         row: index % rows,
-        tone: toneOf(cell, bounds, palette),
+        tone: heatmapTone(cell, bounds, palette),
       })),
       columns: Math.ceil(cells.length / rows),
       rows: Math.min(rows, cells.length),
@@ -489,7 +491,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     }
     const pitch = this.cellPx + this.gapPx
     const across = width / ACROSS - this.rowCount * pitch - this.gapPx
-    return fits(
+    return heatmapFits(
       this.points.length,
       Math.max(across, Number.MIN_VALUE),
       this.cellPx,
@@ -547,7 +549,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         at === index,
         chosen.has(keys[index] ?? ''),
         grid,
-        toneOf(moving[index] ?? cells[index] ?? { value: undefined }, bounds, palette),
+        heatmapTone(moving[index] ?? cells[index] ?? { value: undefined }, bounds, palette),
       ),
     )
     const { box } = relief

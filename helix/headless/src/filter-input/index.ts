@@ -1,7 +1,11 @@
+export type {
+  FilterSource,
+  FilterSourceRequest,
+  FilterSuggestion,
+} from '@fusion.dev/helix-core/filter-text'
 export * from './chip/filter-chip.js'
 export * from './events/index.js'
 export * from './field/filter-field.js'
 export * from './grammar.js'
 export * from './operator/filter-operator.js'
 export * from './root/filter-input-root.js'
-export type { FilterSource, FilterSourceRequest, FilterSuggestion } from './suggest.js'

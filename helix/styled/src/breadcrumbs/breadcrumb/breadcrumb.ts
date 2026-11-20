@@ -1,7 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBreadcrumb } from '@fusion.dev/helix-headless/breadcrumbs'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './breadcrumb.css.js'
+import { styles } from './breadcrumb.generated.css.js'
+/* The fold's menu and its button, drawn in this tier's styles. */
+import '../../icon-button/index.js'
+import '../../menu/index.js'
 
 /**
  * @summary One step in a breadcrumb trail.
@@ -38,6 +41,9 @@ import { styles } from './breadcrumb.css.js'
  */
 @customElement('helix-breadcrumb')
 export class HelixBreadcrumb extends HelixHeadlessBreadcrumb {
+  /* The fold's menu, its rows, and its button are this tier's. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

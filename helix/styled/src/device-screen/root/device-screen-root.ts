@@ -6,7 +6,7 @@ import { property } from 'lit/decorators.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './device-screen-root.css.js'
+import { styles } from './device-screen-root.generated.css.js'
 
 /**
  * @summary A device's screen, drawn from a stream you supply, that sends taps, swipes, keys, and button presses back to the device.

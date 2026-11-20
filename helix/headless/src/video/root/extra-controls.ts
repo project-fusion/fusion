@@ -1,14 +1,22 @@
 /**
  * Which extra controls a player offers, and which of them go behind the button.
  *
- * Separable because every answer here is taken from two written lists and three
- * facts, before anything is drawn: what the consumer asked for, what this
- * platform can do, and what is already on the bar. Nothing in it reaches the
- * media element and nothing in it renders, which is what keeps the roster one
- * decision rather than a condition spread across two templates.
+ * The roster is core's (`@fusion.dev/helix-core/player`), which a phone's
+ * player reads too: what the consumer asked for, what this platform can do,
+ * and what is already on the bar. This module asks the document what the
+ * browser offers, and says whether a file is the player's to hand over.
  */
 
-import { writtenList } from '@fusion.dev/helix-core'
+import {
+  barControls as barOf,
+  controlNames,
+  FULL_CONTROLS,
+  menuControls as menuOf,
+  type PlayerConditions,
+  playerOffers,
+} from '@fusion.dev/helix-core/player'
+
+export { controlNames, FULL_CONTROLS }
 
 /** What the existence of a control depends on, which only the player can answer. */
 export interface Conditions {
@@ -22,92 +30,41 @@ export interface Conditions {
   source: boolean
 }
 
-/** Whether this platform can do a named control at all. */
-export const offers = (one: string, player: Conditions): boolean => {
-  /* As a server answers while hydrating what it sent: it has no document to
-     ask, so it offered none, and a render that differs is a template Lit
-     throws on. The update after hydration asks. */
-  if (one === 'pip') {
-    /* `disablePictureInPicture` is asked as well as the platform's own flag,
-       because the two refuse from opposite ends and only one of them was read.
-       A player carrying the attribute draws a button whose every press is
-       rejected: the platform says no, the control is there anyway, and nothing
-       tells the reader. */
-    return (
-      !player.hydrating &&
-      !player.refusedPip &&
-      typeof document !== 'undefined' &&
-      document.pictureInPictureEnabled
-    )
-  }
-  /* Availability, not support. A device that can play this has to exist for
-     the button to mean anything: an AirPlay control with nothing to send to
-     is a control that opens an empty list, which is worse than no control.
-     `watchAvailability` is what answers that, and it answers late, so this
-     reads a flag the watch keeps rather than asking. */
-  if (one === 'remote') {
-    return player.remote
-  }
-  /* A download needs something to download. `src` and not a slotted
-     `<source>`: the element chose one of those and which one is the
-     browser's business, so offering a specific file would be a guess about a
-     decision already made. */
-  if (one === 'download') {
-    return player.source
-  }
-  /* Always offered, because there is nothing to check. Neither of these does
-     anything to the video: they say the reader asked, and whatever holds the
-     set answers. A player that hid them until it could prove a set existed
-     would be a player that cannot know. */
-  if (one === 'next' || one === 'previous') {
-    return true
-  }
-  /* A skip needs only a timeline, and a video that has none cannot be played
-     at all, so there is nothing here to check either. */
-  if (one === 'forward' || one === 'rewind') {
-    return true
-  }
-  return one === 'speed'
-}
-
 /**
- * What `full` stands for in a list of controls: every control that does
- * something to the video by itself, as Web Awesome's `full` preset adds speed
- * and picture in picture to its standard bar.
+ * The conditions core's roster reads, with picture in picture asked of the
+ * document.
  *
- * `download`, `previous` and `next` are left out. Offering the file is a
- * decision about the content, and the other two move a set the player cannot
- * see, so each is named where it is wanted.
+ * As a server answers while hydrating what it sent: it has no document to
+ * ask, so it offered none, and a render that differs is a template Lit throws
+ * on. The update after hydration asks. `disablePictureInPicture` is asked as
+ * well as the platform's own flag, because the two refuse from opposite ends:
+ * a player carrying the attribute would draw a button whose every press is
+ * rejected.
  */
-export const FULL_CONTROLS = ['rewind', 'forward', 'speed', 'pip', 'remote'] as const
+const conditionsOf = (player: Conditions): PlayerConditions => ({
+  pip:
+    !player.hydrating &&
+    !player.refusedPip &&
+    typeof document !== 'undefined' &&
+    document.pictureInPictureEnabled,
+  remote: player.remote,
+  source: player.source,
+})
 
-/** The names in a written list, with `full` read as the controls it stands for, each once. */
-export const controlNames = (written: string): string[] => [
-  ...new Set(
-    writtenList(written).flatMap((one): readonly string[] =>
-      one === 'full' ? FULL_CONTROLS : [one],
-    ),
-  ),
-]
+/** Whether this platform can do a named control at all. */
+export const offers = (one: string, player: Conditions): boolean =>
+  playerOffers(one, conditionsOf(player))
 
 /** The extras asked for, in order, and only the ones this platform can do. */
 export const barControls = (written: string, player: Conditions): string[] =>
-  controlNames(written).filter((one) => offers(one, player))
+  barOf(written, conditionsOf(player))
 
-/**
- * The controls asked for behind the overflow button, in order.
- *
- * A name in both lists is on the bar and not here. Drawing it twice is worse
- * than either placement, and the bar is the one a reader can see.
- */
+/** The controls asked for behind the overflow button, in order, none of them on the bar. */
 export const menuControls = (
   written: string,
   onBar: readonly string[],
   player: Conditions,
-): string[] => {
-  const bar = new Set(onBar)
-  return controlNames(written).filter((one) => !bar.has(one) && offers(one, player))
-}
+): string[] => menuOf(written, onBar, conditionsOf(player))
 
 /**
  * Whether the file a `src` points at is the player's to hand over.

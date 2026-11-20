@@ -20,6 +20,7 @@ export function Example() {
     <helix-code-block
       expandable
       label="tokens.css"
+      style={{ '--code-block-max-block-size': '8rem' }}
     >
       {code}
     </helix-code-block>

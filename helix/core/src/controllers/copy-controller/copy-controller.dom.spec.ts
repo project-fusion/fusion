@@ -1,6 +1,8 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { setClipboard } from '../../capabilities/clipboard/index.js'
+import { serverClipboard } from '../../capabilities/clipboard/server.js'
 
 /**
  * Putting text on the clipboard, and holding a confirmation for a moment.
@@ -68,6 +70,8 @@ const routes = ({ legacy, modern }: Routes): { carriers: string[] } => {
 afterEach(() => {
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: realClipboard })
   delete (document as unknown as Record<string, unknown>).execCommand
+  /* A copy installs the browser's clipboard, and a run shares that module across files. */
+  setClipboard(serverClipboard)
 })
 
 interface Host extends HTMLElement {

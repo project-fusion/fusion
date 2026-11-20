@@ -3,7 +3,7 @@ import { HelixHeadlessCopyButton } from '@fusion.dev/helix-headless/copy-button'
 import type { CSSResultGroup } from 'lit'
 import { HelixIconButton } from '../../icon-button/root/icon-button-root.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
-import { styles } from './copy-button-root.css.js'
+import { styles } from './copy-button-root.generated.css.js'
 import '../../tooltip/index.js'
 
 /**

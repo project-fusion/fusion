@@ -40,13 +40,25 @@ export interface MapPartChangeDetail {
   kind: 'cluster' | 'gestures' | 'layer' | 'menu' | 'place'
 }
 
-/** What a cluster a reader pressed holds. */
+/** What a cluster a reader pressed holds, and where it comes apart. */
 export interface MapClusterDetail {
+  /** How many places it stands for. */
+  count: number
   /**
    * A points layer's count, as the connector keyed it, where the cluster is
-   * one the renderer drew rather than one of markers.
+   * one the renderer drew: `c:` and the renderer's own id for it. Web only.
    */
   key?: string | undefined
-  /** The names of the places it stands for, the one it is drawn as first, where they are known. */
+  /**
+   * The names of the places it stands for, the one it is drawn as first,
+   * where they are known: a cluster of markers. Web only.
+   */
   labels: string[]
+  /** Where it is drawn, in degrees. */
+  place: { lat: number; lng: number }
+  /**
+   * The zoom it comes apart at, which pressing it zooms in to, where it is a
+   * points layer's count and the renderer has said.
+   */
+  zoom?: number | undefined
 }

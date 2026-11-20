@@ -1,6 +1,10 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { clipboard } from '../../capabilities/clipboard/index.js'
+import { installWebClipboard } from '../../capabilities/clipboard/web.js'
+import { timers } from '../../capabilities/timers/index.js'
+import { installWebTimers } from '../../capabilities/timers/web.js'
+import type { Stop } from '../../capabilities/types.generated.js'
 import { HelixCopyEvent } from '../../events/events.js'
-import { deepActiveElement } from '../../utils/focusable-elements/focusable-elements.js'
 
 /** What a copy needs to know, asked for rather than assumed. */
 export interface CopyOptions {
@@ -22,60 +26,6 @@ const read = (option: number | (() => number) | undefined): number | undefined =
   typeof option === 'function' ? option() : option
 
 /**
- * Writes to the clipboard, by whichever of the two routes this context allows.
- *
- * The async API first, because it is the one with a future and the only one that
- * reports failure. It is gated in more places than it looks: an insecure origin,
- * a document that is not focused, and a Permissions Policy that defaults to
- * `self`, which a sandboxed iframe without `allow-same-origin` is not.
- *
- * `execCommand` second, deprecated and still the more widely permitted of the
- * two: it is synchronous and rides the user gesture that called it rather than
- * asking for a permission, so it works in a sandboxed frame where the modern one
- * is refused. A textarea rather than the selection, because the text being
- * copied is not on the page: it is a value.
- *
- * `fixed` and `opacity: 0` rather than off-screen, because scrolling to a
- * focused element is what a negative offset causes, and a copy that jumps the
- * page is worse than one that does not happen.
- */
-const write = async (text: string): Promise<boolean> => {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    /* Fall through. There is nothing to report yet. */
-  }
-
-  /* Focus goes back where it was. The carrier takes it to be copied from and
-     then leaves the page, which dropped a keyboard reader on the body and kept
-     a screen reader from hearing the button's name change to "Copied". */
-  const had = deepActiveElement()
-  const carrier = document.createElement('textarea')
-  carrier.value = text
-  carrier.setAttribute('readonly', '')
-  carrier.setAttribute('aria-hidden', 'true')
-  carrier.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none'
-  document.body.append(carrier)
-  /* Focused as well as selected. `select()` focuses in a browser and does not
-     everywhere, and `execCommand('copy')` copies the *document's* selection, so
-     an unfocused textarea copies whatever was selected on the page instead. */
-  carrier.focus()
-  carrier.select()
-  let wrote = false
-  try {
-    wrote = document.execCommand('copy')
-  } catch {
-    wrote = false
-  }
-  carrier.remove()
-  if (had instanceof HTMLElement || had instanceof SVGElement) {
-    had.focus({ preventScroll: true })
-  }
-  return wrote
-}
-
-/**
  * Puts text on the clipboard and holds a confirmation for a moment.
  *
  * A controller rather than a component, because copying is a behavior and not a
@@ -87,7 +37,13 @@ const write = async (text: string): Promise<boolean> => {
  *
  * **There are two routes and both are tried**, because the modern one is gated
  * in more places than it looks and a control that does nothing is
- * indistinguishable from a broken one. See `write` above.
+ * indistinguishable from a broken one. The clipboard capability's web
+ * implementation, `webClipboard`, holds both, and it is set as the capability
+ * as the first copy starts where nothing has set another, so a fake clipboard
+ * takes a page's copies, as a conformance scenario's does. On a phone, the
+ * native runtime's clipboard writes through expo-clipboard. **The
+ * confirmation ends on the timers capability**, so a fake clock ends it on
+ * both platforms alike.
  *
  * **Where neither route is allowed, the copy has failed**, and `failed` holds
  * for the moment a confirmation would. A component decides whether to say so:
@@ -109,7 +65,7 @@ export class CopyController implements ReactiveController {
   /** Whether the last copy put nothing on the clipboard, and is still being said. */
   failed = false
 
-  private timer: ReturnType<typeof setTimeout> | undefined
+  private timer: Stop | undefined
 
   constructor(
     private readonly host: ReactiveControllerHost & EventTarget,
@@ -128,7 +84,9 @@ export class CopyController implements ReactiveController {
    * `copied`, for a component that says so.
    */
   async copy(text: string): Promise<boolean> {
-    const wrote = text !== '' && (await write(text))
+    installWebClipboard()
+    installWebTimers()
+    const wrote = text !== '' && (await clipboard().write(text))
     /* **The host may have gone while the clipboard was being written.** Writing
        is asynchronous, `hostDisconnected` runs the moment the element leaves,
        and it clears a timer that does not exist yet, so without this the
@@ -146,11 +104,12 @@ export class CopyController implements ReactiveController {
       this.host.dispatchEvent(new HelixCopyEvent({ value: text }))
     }
     this.reset()
-    this.timer = setTimeout(() => {
+    this.timer = timers().timeout(read(this.options.after) ?? 1200, () => {
+      this.timer = undefined
       this.copied = false
       this.failed = false
       this.host.requestUpdate()
-    }, read(this.options.after) ?? 1200)
+    })
     return wrote
   }
 
@@ -161,9 +120,7 @@ export class CopyController implements ReactiveController {
   }
 
   private reset(): void {
-    if (this.timer !== undefined) {
-      clearTimeout(this.timer)
-      this.timer = undefined
-    }
+    this.timer?.()
+    this.timer = undefined
   }
 }

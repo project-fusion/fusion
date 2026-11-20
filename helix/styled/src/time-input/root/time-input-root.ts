@@ -6,15 +6,7 @@ import { property } from 'lit/decorators.js'
    it to remind anyone. */
 import '../../tag/root/index.js'
 import '../../time-picker/index.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldGhostStyles } from '../../shared/field/field-ghost.css.js'
-import { styles as fieldSegmentsStyles } from '../../shared/field/field-segments.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
-import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
-import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
-import { styles } from './time-input-root.css.js'
+import { styles } from './time-input-root.generated.css.js'
 
 /**
  * @summary A field for a time, typed or picked from a list.
@@ -75,17 +67,7 @@ export class HelixTimeInput extends HelixHeadlessTimeInput {
   emphasis?: 'ghost'
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    fieldStyles,
-    fieldFrameStyles,
-    fieldGhostStyles,
-    fieldStackedStyles,
-    fieldSegmentsStyles,
-    tagRowStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

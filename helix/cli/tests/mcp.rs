@@ -92,6 +92,7 @@ fn it_negotiates_and_lists_its_tools() {
         [
             "helix_find",
             "helix_family",
+            "helix_anatomy",
             "helix_example",
             "helix_imports",
             "helix_tokens",
@@ -276,7 +277,11 @@ fn the_audit_has_the_keys_the_command_line_prints() {
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).expect("a temp directory");
     std::fs::write(dir.join(".git"), "").expect("a root marker");
-    std::fs::write(dir.join("helix.theme.json"), r##"{ "brand": "#3b82f6" }"##).expect("an intent");
+    std::fs::write(
+        dir.join("helix.json"),
+        r##"{ "theme": { "brand": "#3b82f6" } }"##,
+    )
+    .expect("an intent");
     let printed = Command::new(binary())
         .args(["--json", "theme", "audit"])
         .current_dir(&dir)

@@ -7,8 +7,8 @@ export function Example() {
       <helix-map
         controls="zoom compass tilt layers fullscreen"
         data-preview-map
-        data-preview-map-view="37.7300,-119.6100,12.4,60,70"
         label="Yosemite Valley in 3D"
+        view="37.7300,-119.6100,12.4,60,70"
       >
         <div data-preview-map-canvas></div>
 

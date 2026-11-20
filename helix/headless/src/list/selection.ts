@@ -1,4 +1,4 @@
-import { commaList, pressedValue, rangeAdd, type SelectionMode } from '@fusion.dev/helix-core'
+import { commaList, pressedValue, rangeExtend, type SelectionMode } from '@fusion.dev/helix-core'
 
 /*
  * What an interactive list's selection and its arrow keys come to, as
@@ -30,6 +30,16 @@ export interface ListChoice {
   shown: readonly string[]
   /** The value of the row a range runs from, where there is one. */
   anchor?: string | undefined
+  /**
+   * The value of the row the last Shift range reached, which the next one
+   * lets go of the rows up to. The anchor where it was set since.
+   */
+  reached?: string | undefined
+  /**
+   * Every row's value, in order, disabled rows too, which a range lets go of
+   * as React Aria's does. `shown` where it is left out.
+   */
+  rows?: readonly string[]
   /** Whether Shift was held, which takes in the rows from the anchor. */
   extend?: boolean
   /** Whether Control or Command was held, which toggles under `replace` and moves without choosing. */
@@ -42,7 +52,10 @@ export interface ListChoice {
  * The `value` a press or an arrival leaves, or `null` where it changes nothing.
  *
  * - With Shift, in a list that selects many, every row from the anchor to this
- *   one is added, as Data Table and Listbox add a range.
+ *   one is selected in place of the range the last Shift selected, as React
+ *   Aria's `extendSelection` does: the rows from the anchor to where that
+ *   range reached are let go, so moving back toward the anchor lets go of
+ *   what the range passed, and what was selected outside it stays.
  * - Under `replace`, the row is selected alone, by a press or by a key moving
  *   onto it. Control or Command toggles it under a press, and moves without
  *   choosing under a key.
@@ -55,6 +68,8 @@ export const choiceValue = ({
   extend = false,
   mode,
   pressed,
+  reached,
+  rows,
   shown,
   toggle = false,
   value,
@@ -64,8 +79,8 @@ export const choiceValue = ({
   }
   const now = commaList(value)
   if (extend && mode === 'multiple') {
-    const from = anchor === undefined ? -1 : shown.indexOf(anchor)
-    const range = rangeAdd(now, shown, from, shown.indexOf(pressed))
+    const items = rows ?? shown
+    const range = rangeExtend(now, { anchor, choosable: shown, items, reached, to: pressed })
     return range ? range.join(',') : null
   }
   if (behavior === 'replace' && !toggle) {

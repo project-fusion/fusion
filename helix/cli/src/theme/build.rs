@@ -6,7 +6,8 @@ use fusion_helix_theme::css::{to_css, to_css_modes};
 use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 
-use crate::args::Build;
+use crate::args::{Build, ThemeFormat};
+use crate::theme::native::to_native;
 use crate::theme::{load, violations};
 
 /// # Errors
@@ -61,17 +62,40 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
     }
 
     /* **Both modes as one block of `light-dark()` pairs**, the way the
-    stylesheet writes its own tokens, unless the intent named one mode. */
-    let css = match themes.as_slice() {
-        [light, dark] => to_css_modes(light, dark, &args.selector),
-        [one, ..] => to_css(one, &args.selector),
-        [] => unreachable!("an intent derives in at least one mode"),
+    stylesheet writes its own tokens, unless the intent named one mode. A
+    module for React Native gives one mode's colors to both, as a block with
+    one mode applies in either. */
+    let artifact = match (args.format, themes.as_slice()) {
+        (ThemeFormat::Css, [light, dark]) => to_css_modes(light, dark, &args.selector),
+        (ThemeFormat::Css, [one, ..]) => to_css(one, &args.selector),
+        (ThemeFormat::Native, [light, dark]) => to_native(light, dark),
+        (ThemeFormat::Native, [one, ..]) => to_native(one, one),
+        (_, []) => unreachable!("an intent derives in at least one mode"),
     };
     let tokens = themes.first().map_or(0, |theme| theme.tokens.len());
+
+    /* **A check writes nothing**, and fails where the file is not what the
+    intent builds, so a project that commits its theme finds out when the two
+    part. */
+    if args.check {
+        let Some(path) = &args.out else {
+            unreachable!("clap requires `--out` with `--check`")
+        };
+        if std::fs::read_to_string(path).ok().as_deref() != Some(artifact.as_str()) {
+            return Err(Failure::new(
+                Code::Failed,
+                format!("{} is missing or out of date", path.display()),
+                format!("it is not what {source} builds"),
+            )
+            .hint("run the same `helix theme build` without `--check`"));
+        }
+        return Ok(Code::Ok);
+    }
+
     let written = match &args.out {
         None => None,
         Some(path) => {
-            std::fs::write(path, &css).map_err(|failure| {
+            std::fs::write(path, &artifact).map_err(|failure| {
                 Failure::input(
                     format!("cannot write {}", path.display()),
                     failure.to_string(),
@@ -84,18 +108,23 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
     if json {
         /* The CSS is a field rather than the whole document, so a caller reading
         the JSON gets the violations beside it and does not have to run the
-        command twice to learn whether `--force` was carrying anything. */
+        command twice to learn whether `--force` was carrying anything. A
+        module for React Native is `module`. */
+        let field = match args.format {
+            ThemeFormat::Css => "css",
+            ThemeFormat::Native => "module",
+        };
         fusion_rules::say!(
             "{}",
             serde_json::json!({
-                "css": css,
+                field: artifact,
                 "tokens": tokens,
                 "violations": violations,
                 "written": written,
             })
         );
     } else if written.is_none() {
-        fusion_rules::put!("{css}");
+        fusion_rules::put!("{artifact}");
     } else {
         /* **To stderr, because stdout is the artifact even when it went to a
         file.** A caller redirecting stdout and passing `--out` gets an empty

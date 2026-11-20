@@ -1,0 +1,63 @@
+# Combobox, its examples drawn alone, closed, narrowed by typing, and chosen from
+# with the keyboard still up, after the touch the iOS simulator loses on a new
+# screen. One screenshot of each, named by the example, `MODE`, and `SIZE`.
+# A field is named by its label or its placeholder, and an option by its words,
+# so each wait matches the words inside.
+appId: dev.fusion.helix.app
+name: "Screens: Combobox"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://combobox/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Language.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: combobox-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn:
+    text: '.*Search languages.*'
+    retryTapIfNoChange: false
+- inputText: script
+- extendedWaitUntil:
+    visible: '.*JavaScript.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: combobox-preview-narrowed-${MODE}-${SIZE}
+# A press on an option with the keyboard up chooses it and closes the list.
+- tapOn:
+    text: '.*TypeScript.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    notVisible: '.*JavaScript.*'
+    timeout: 10000
+- takeScreenshot: combobox-preview-chosen-${MODE}-${SIZE}
+- openLink: helix://combobox/multiple/preview
+- extendedWaitUntil:
+    visible: '.*Rust.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: combobox-multiple-${MODE}-${SIZE}
+- openLink: helix://combobox/creatable/preview
+- extendedWaitUntil:
+    visible: '.*Search or add.*'
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn:
+    text: '.*Search or add.*'
+    retryTapIfNoChange: false
+- inputText: zig
+- extendedWaitUntil:
+    visible: '.*Add.*zig.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: combobox-creatable-${MODE}-${SIZE}

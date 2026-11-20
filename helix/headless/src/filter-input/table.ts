@@ -8,9 +8,9 @@
  * columns are read the same way.
  */
 
+import type { FilterSource, FilterSuggestion } from '@fusion.dev/helix-core/filter-text'
 import type { FacetDetail } from './events/index.js'
 import type { FilterGrammarField, FilterGrammarOperator } from './grammar.js'
-import type { FilterSource, FilterSuggestion } from './suggest.js'
 
 /** One filter in a table's view. */
 export interface BoundFilter {

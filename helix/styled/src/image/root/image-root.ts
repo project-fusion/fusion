@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessImage } from '@fusion.dev/helix-headless/image'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './image-root.css.js'
+import { styles } from './image-root.generated.css.js'
 
 /**
  * @summary An image that shows a placeholder while it loads and a fallback if it fails.

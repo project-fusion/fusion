@@ -38,8 +38,9 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../../dialog/description.js'
 import { closeOnDialogSubmit, commandValue } from '../../dialog/form-method.js'
+import { DrawerHandOff } from '../hand-off.js'
 import { beyondWindow } from '../reveal.js'
-import { startsSwipe } from '../swipe-start.js'
+import { onScrim, startsSwipe } from '../swipe-start.js'
 
 /**
  * @summary A panel that slides in from an edge.
@@ -83,6 +84,15 @@ import { startsSwipe } from '../swipe-start.js'
  * and a drag settles at the nearest, or at the next one along for a flick.
  * The offset of the snap point it rests at is written on the panel as
  * `--drawer-swipe-x` and `--drawer-swipe-y`.
+ *
+ * **A list inside the panel hands its drag to the panel** once the list can
+ * scroll no further that way, its top for a drawer at the bottom, and has
+ * stood still for half a second, as iOS's sheets and Vaul's drawer do: the
+ * momentum of a list flung to its top then carries no drawer with it. While
+ * the panel rests short of the whole, a drag away from its edge opens it
+ * further before the list scrolls. The browser owns a touch once it has
+ * started to scroll the list, so a list that reaches its top during a drag
+ * hands over on the next touch.
  *
  * `snap` is the snap point the panel rests at, and `:state(snapped)` is on the
  * host while that is less than the whole panel. `snapTo()` moves it to
@@ -366,9 +376,18 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     return snapTravel(size, parseSnapPoints(this.snapPoints)[0] ?? 1)
   }
 
+  /* A list inside the panel, whose drag the panel takes once it hands it over. */
+  protected readonly handOff = new DrawerHandOff(this, {
+    edge: () => this.edge,
+    rest: () => this.rest,
+    scroller: () => this.partNamed('content'),
+    surface: () => this.panel,
+  })
+
   /* Dragged closed. The controller moves the panel and carries the release;
      what a release means here, a snap point or a close, is settled by
-     `settleSwipe`, and the close is the same request as every other way out. */
+     `settleSwipe`, and the close is the same request as every other way out.
+     A drag a list keeps leaves the panel where it rests. */
   protected readonly drags = new DragDismissController(this, {
     /* A drawer that refuses to close gives past its smallest snap point. */
     bounds: (size) => ({
@@ -406,9 +425,16 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       )
     },
     rest: () => this.rest,
-    start: (target, event) =>
-      startsSwipe(target, event.pointerType, swipeAxis(this.edge), this.partNamed('content')),
+    /* Never on the scrim, which a press dismisses the drawer from. */
+    start: (target, event) => {
+      if (onScrim(target, this.panel, event)) {
+        return false
+      }
+      this.handOff.begin(event)
+      return startsSwipe(target, event.pointerType)
+    },
     surface: () => this.panel,
+    takes: (dx, dy) => this.handOff.takes(dx, dy),
     timing: () => {
       const style = getComputedStyle(this)
       return {
@@ -837,11 +863,14 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
            do not count a host that delegates focus, where Chromium's do.
            Measured on a modal drawer with no `dismissible` and nothing marked,
            Chromium focused the first control and WebKit the panel, so the
-           first control is focused here when the browser chose none. */
+           first control is focused here when the browser chose none. **A
+           drawer that is not modal too**: `show()` runs the same focusing
+           steps, and the conformance record had Chromium on the drawer's
+           action and WebKit on its host. */
         const chose =
           this.matches(':focus-within') &&
           !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === panel)
-        const fallback = this.modal && !chose ? focusableElements(this)[0] : undefined
+        const fallback = chose ? undefined : focusableElements(this)[0]
         if (fallback) {
           focusAs(fallback, focusing)
         } else {

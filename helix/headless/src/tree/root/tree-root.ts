@@ -1,6 +1,9 @@
 import {
   AriaForwardController,
   auditName,
+  type CheckableRow,
+  checkedState,
+  checkRows,
   closestInstance,
   commaList,
   customElement,
@@ -12,6 +15,7 @@ import {
   LayoutMotionController,
   MixinCollection,
   MixinControllerActive,
+  pressRow,
   ReorderController,
   requestReorder,
   scrollItemIntoView,
@@ -28,7 +32,6 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { fromGrip } from '../grip.js'
 import { HelixHeadlessTreeItem } from '../item/tree-item.js'
-import { type CheckableRow, checkedState, checkRows, pressRow } from '../selection.js'
 
 /** Keys the tree handles, per the APG tree pattern. */
 const KEYS = new Set([

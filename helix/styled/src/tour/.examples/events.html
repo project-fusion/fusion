@@ -1,16 +1,15 @@
 <!-- @summary A stop asks to move, the tour decides, and finishing fires a different event from leaving. -->
-<link
-  href="styles.css"
-  rel="stylesheet"
->
 <!-- @min 420 -->
 <helix-flex
   direction="column"
   gap="md"
 >
-  <div class="stage">
+  <helix-flex
+    align-items="center"
+    justify-content="center"
+  >
     <helix-button id="anchor">Create project</helix-button>
-  </div>
+  </helix-flex>
 
   <helix-tour
     id="run"
@@ -32,7 +31,7 @@
   >
     <helix-list-item>
       No events yet
-      <span slot="description">Go through the tour, then skip it</span>
+      <helix-text slot="description">Go through the tour, then skip it</helix-text>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -52,7 +51,7 @@
     }
     const row = document.createElement('helix-list-item')
     row.textContent = name
-    const under = document.createElement('span')
+    const under = document.createElement('helix-text')
     under.slot = 'description'
     under.textContent = carried
     row.append(under)

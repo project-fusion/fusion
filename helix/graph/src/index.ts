@@ -1,4 +1,10 @@
 export {
+  type GraphPoint,
+  type SeedLink,
+  type SeedNode,
+  seedPositions,
+} from '@fusion.dev/helix-core/graph'
+export {
   communitiesOf,
   type GroupByCommunityOptions,
   groupByCommunity,
@@ -23,12 +29,6 @@ export {
   type LinkLook,
   type NodeLook,
 } from './connect-graph/looks.js'
-export {
-  type GraphPoint,
-  type SeedLink,
-  type SeedNode,
-  seedPositions,
-} from './connect-graph/seed.js'
 export {
   fitToStencil,
   type GraphStencil,

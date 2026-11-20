@@ -1,0 +1,53 @@
+# Drilldown: a press on a row with a page goes into it, the header names the
+# page, and the way back comes out to the top page. The events example logs
+# the row chosen on a page below the top. Recorded.
+appId: dev.fusion.helix.app
+name: Drilldown
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://drilldown/preview/preview
+      SHOWS: Appearance
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: drilldown
+- tapOn: Appearance
+- extendedWaitUntil:
+    visible: Density
+    timeout: 5000
+- assertNotVisible: About
+- tapOn: Back
+- extendedWaitUntil:
+    visible: About
+    timeout: 5000
+- tapOn: Editor
+- extendedWaitUntil:
+    visible: Word wrap
+    timeout: 5000
+- tapOn: Back
+- openLink: helix://drilldown/events/preview
+# The screen before it draws the same words and stays in the tree through the
+# move, so a step waits for the new screen's title and the move's end.
+- extendedWaitUntil:
+    visible: Events
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
+- extendedWaitUntil:
+    visible: Appearance
+    timeout: 15000
+- tapOn: Appearance
+- extendedWaitUntil:
+    visible: Theme
+    timeout: 5000
+- tapOn: Theme
+- extendedWaitUntil:
+    visible: .*Chose "theme".*
+    timeout: 5000
+- stopRecording

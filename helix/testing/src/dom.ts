@@ -557,6 +557,8 @@ export const hasLayout = (): boolean => false
  * being asserted: a spec that cannot find its second row has not got as far as
  * having an opinion.
  */
+export { unweighted } from './sheets.js'
+
 export const at = <T>(list: ArrayLike<T>, index: number): T => {
   const item = list[index]
   if (item === undefined) {

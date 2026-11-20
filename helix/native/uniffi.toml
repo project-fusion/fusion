@@ -1,0 +1,12 @@
+# How UniFFI writes the Swift and the Kotlin over `fusion-helix-native`.
+# `scripts/engine.mjs` generates both, and neither is committed.
+
+[bindings.kotlin]
+cdylib_name = "fusion_helix_native"
+package_name = "dev.fusion.helix.theme.engine"
+
+[bindings.swift]
+# The C module the XCFramework carries, which the Swift imports. The Swift is
+# compiled into the `HelixTheme` pod, so its own module name names nothing.
+ffi_module_name = "HelixThemeFFI"
+module_name = "HelixTheme"

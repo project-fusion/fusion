@@ -1,0 +1,297 @@
+/**
+ * The shape of each state, as numbers: blending two states, the distance
+ * between them, and the generator that turns one set of numbers into the
+ * dots of a whole shape, then the projection that draws them.
+ */
+import { ORB_PARAMS, type OrbParams, type OrbState } from './states.js'
+
+const KEYS = Object.keys(ORB_PARAMS.thinking) as (keyof OrbParams)[]
+
+/** Halfway between two states, key by key. */
+export const blendParams = (a: OrbParams, b: OrbParams, k: number): OrbParams => {
+  const out = {} as OrbParams
+  for (const key of KEYS) {
+    out[key] = a[key] + (b[key] - a[key]) * k
+  }
+  return out
+}
+
+/** Each key's own range, so a distance can be measured across all of them. */
+const SPANS: Record<keyof OrbParams, number> = {
+  belt: 1,
+  breathe: 0.08,
+  edge: 1,
+  jitter: 1,
+  orbit: 1,
+  pulse: 0.09,
+  rate: 2.5,
+  ring: 1,
+  rot: 1.6,
+  shear: 1.3,
+  squash: 1,
+  waveA: 0.2,
+  waveB: 0.1,
+}
+
+/** What the shape is. */
+const STRUCTURE = [
+  'belt',
+  'edge',
+  'jitter',
+  'ring',
+  'rot',
+  'shear',
+  'squash',
+  'waveA',
+  'waveB',
+] as const
+
+/** What it is doing. */
+const CHARACTER = ['breathe', 'orbit', 'pulse', 'rate'] as const
+
+/**
+ * How far apart two states are, `0` to `1`, each key against its own range.
+ *
+ * Two states differing in one small number should not be given the time
+ * `thinking` to `done` needs. One length for every pair reads as rushed at one
+ * end of the set and slack at the other.
+ */
+export const stateDistance = (a: OrbParams, b: OrbParams): number => {
+  let sum = 0
+  for (const key of KEYS) {
+    sum += Math.abs(b[key] - a[key]) / SPANS[key]
+  }
+  return Math.min(1, sum / 3.2)
+}
+
+/**
+ * Two states blended on two clocks: the silhouette, and then what it is doing.
+ *
+ * **The other order shows a light orbiting a sash.** Every number moving on one
+ * curve makes a change of state read as a cross-fade between two pictures; the
+ * shape arriving first makes it read as one thing becoming another.
+ */
+export const blendStaged = (
+  a: OrbParams,
+  b: OrbParams,
+  shape: number,
+  character: number,
+): OrbParams => {
+  const out = {} as OrbParams
+  for (const key of STRUCTURE) {
+    out[key] = a[key] + (b[key] - a[key]) * shape
+  }
+  for (const key of CHARACTER) {
+    out[key] = a[key] + (b[key] - a[key]) * character
+  }
+  return out
+}
+
+/** How far the character trails the silhouette, as a share of the run. */
+export const TRAIL = 0.2
+
+/** The state's numbers, or `thinking`'s where the name is not one we draw. */
+export const paramsFor = (state: string | undefined): OrbParams =>
+  ORB_PARAMS[state as OrbState] ?? ORB_PARAMS.thinking
+
+const TAU = Math.PI * 2
+
+/** Smootherstep: zero slope and zero acceleration at both ends. */
+export const smoother = (t: number): number => t * t * t * (t * (t * 6 - 15) + 10)
+
+/** A point of the Fibonacci sphere, which is the evenest cheap one. */
+export const fibonacci = (i: number, n: number): [number, number, number] => {
+  const k = Math.PI * (3 - Math.sqrt(5))
+  const y = 1 - (2 * (i + 0.5)) / n
+  const r = Math.sqrt(Math.max(0, 1 - y * y))
+  return [r * Math.cos(i * k), y, r * Math.sin(i * k)]
+}
+
+const evenCache = new Map<string, [number, number, number][]>()
+
+/**
+ * The even sphere `done` settles into, ordered so the band grid can address it.
+ *
+ * **The azimuth is measured from the same origin and in the same direction as
+ * the generator's longitude**, and that is not a detail. With `atan2`'s own
+ * range the two orderings sit half a turn apart: every dot is handed a
+ * destination across the ball, and the blend carries the whole cloud through its
+ * own axis. It showed as a near-empty frame midway through every transition
+ * into `done`, and nowhere else, because no single state reads this ordering.
+ */
+export const evenSphere = (lanes: number, segs: number): [number, number, number][] => {
+  const key = `${lanes}x${segs}`
+  const hit = evenCache.get(key)
+  if (hit) {
+    return hit
+  }
+  const total = lanes * segs
+  const points: [number, number, number][] = []
+  for (let i = 0; i < total; i++) {
+    points.push(fibonacci(i, total))
+  }
+  points.sort((a, b) => a[1] - b[1])
+  const azimuth = (q: [number, number, number]): number => (Math.atan2(q[2], q[0]) + TAU) % TAU
+  const out: [number, number, number][] = new Array(total)
+  for (let b = 0; b < lanes; b++) {
+    const band = points.slice(b * segs, (b + 1) * segs)
+    band.sort((a, c) => azimuth(a) - azimuth(c))
+    for (let s = 0; s < segs; s++) {
+      out[b * segs + s] = band[s] as [number, number, number]
+    }
+  }
+  evenCache.set(key, out)
+  return out
+}
+
+/** How far the bands reach when `belt` is 1, in units of the sphere's radius. */
+const SPAN = 1.86
+
+/** The ring's hole and tube, which together come to the sphere's own radius. */
+const RING_HOLE = 0.64
+const RING_TUBE = 0.36
+
+/**
+ * One dot, from its place in the grid and the state's numbers.
+ *
+ * `u` runs across the bands and `v` around them, both `0` to `1`, and `phase`
+ * is the state's own accumulated clock.
+ */
+export const orbPoint = (
+  u: number,
+  v: number,
+  phase: number,
+  p: OrbParams,
+  index: number,
+  even: [number, number, number][],
+): [number, number, number] => {
+  const th = v * TAU + p.shear * phase * 0.55 * (u - 0.5) * 2
+  const wave =
+    p.waveA * Math.sin(th * 3 - phase * 1.7 + u * 3.1) + p.waveB * Math.sin(th * 5 + phase * 1.1)
+  const y = Math.max(-0.995, Math.min(0.995, (u - 0.5) * SPAN * p.belt + wave))
+  const r = Math.sqrt(Math.max(0, 1 - y * y))
+  let point: [number, number, number] = [r * Math.cos(th), y * p.squash, r * Math.sin(th)]
+  /* **A ring, opened out before the lean is applied**, so it tips rather than
+     lying flat. Tube plus hole comes to the radius the sphere had, so the
+     silhouette changes and the footprint does not. */
+  if (p.ring > 0.001) {
+    const ph = u * TAU
+    const rr = RING_HOLE + RING_TUBE * Math.cos(ph)
+    const torus: [number, number, number] = [
+      rr * Math.cos(th),
+      RING_TUBE * Math.sin(ph),
+      rr * Math.sin(th),
+    ]
+    point = [
+      point[0] + (torus[0] - point[0]) * p.ring,
+      point[1] + (torus[1] - point[1]) * p.ring,
+      point[2] + (torus[2] - point[2]) * p.ring,
+    ]
+  }
+  if (p.rot) {
+    const c = Math.cos(p.rot)
+    const s = Math.sin(p.rot)
+    point = [point[0], point[1] * c - point[2] * s, point[1] * s + point[2] * c]
+  }
+  if (p.jitter > 0.001) {
+    const e = even[index] as [number, number, number]
+    point = [
+      point[0] + (e[0] - point[0]) * p.jitter,
+      point[1] + (e[1] - point[1]) * p.jitter,
+      point[2] + (e[2] - point[2]) * p.jitter,
+    ]
+    /* **Held off the unit sphere in proportion to the ring.** Normalizing a
+       half-formed torus rounds it back into the ball it is leaving, so the
+       morph collapses in the middle and reappears at the end. */
+    const len = Math.hypot(point[0], point[1], point[2]) || 1
+    const k = 1 + (1 / len - 1) * (1 - p.ring)
+    point = [point[0] * k, point[1] * k, point[2] * k]
+  }
+  /* **The ripple rides on the closed sphere.** `waveA` and `waveB` are applied
+     to the latitude before `jitter` blends them away, so a fully relaxed state
+     had nothing left that could move; this survives it. */
+  if (p.pulse > 0.001) {
+    const ripple = 1 + p.pulse * Math.sin(phase * 1.5 - point[1] * 3.2)
+    point = [point[0] * ripple, point[1] * ripple, point[2] * ripple]
+  }
+  return point
+}
+
+/** The mesh and ink of an orb at one size. */
+export interface OrbMesh {
+  aMin: number
+  ghostAlpha: number
+  ghostAlphaSpan: number
+  ghostCount: number
+  ghostRadius: number
+  ghostShade: number
+  lanes: number
+  radiusBase: number
+  radiusDepth: number
+  radiusScale: number
+  segs: number
+  shadeFar: number
+  shadeSpan: number
+}
+
+/**
+ * The mesh for a given diameter.
+ *
+ * **The dot budget falls as `size^1.37`** and the two axes of the grid each take
+ * its square root, which is the relationship the reference libraries land on
+ * across their own three tunings. Dots are drawn sub-pixel and their radius
+ * scales as `size^0.6`; small orbs get relatively fatter dots, or the mesh
+ * disappears into the pixel grid.
+ *
+ * **The tonal range is compressed as the orb shrinks.** Depth drawn as a
+ * 0.6-wide gray ramp is legible at 64px and invisible at 20, where the far side
+ * of the sphere is three pixels across: below 64 the ramp narrows and the alpha
+ * floor lifts, trading depth for a mark that is actually on the screen.
+ */
+export const meshFor = (size: number): OrbMesh => {
+  const budget = (size / 64) ** 1.366
+  const axis = Math.sqrt(budget)
+  const small = Math.min(1, Math.max(0, (64 - size) / 44))
+  return {
+    aMin: 0.4 + 0.2 * small,
+    ghostAlpha: 0.14,
+    ghostAlphaSpan: 0.3,
+    ghostCount: Math.max(30, Math.round(80 * budget)),
+    ghostRadius: 0.8,
+    ghostShade: 0.66,
+    lanes: Math.max(4, Math.round(14 * axis)),
+    radiusBase: 0.8,
+    radiusDepth: 1.35,
+    radiusScale: (size / 300) ** 0.6 * 0.85 * (64 / size) ** 0.26,
+    segs: Math.max(10, Math.round(78 * axis)),
+    shadeFar: 0.6 - 0.16 * small,
+    shadeSpan: 0.56 - 0.14 * small,
+  }
+}
+
+/**
+ * How the cloud is turned before it is flattened onto the canvas.
+ *
+ * Fixed: the orb never spins. Everything that moves is moving inside the shape,
+ * which is what makes it read as thought rather than as a thing being rotated.
+ */
+const TILT = 0.55
+const ROLL = 0.3
+
+/** Projects a point on the unit sphere to canvas pixels, with its depth. */
+export const project = (
+  size: number,
+  x: number,
+  y: number,
+  z: number,
+): [number, number, number] => {
+  const c = size / 2
+  const radius = (size / 2) * 0.78
+  const st = Math.sin(TILT)
+  const ct = Math.cos(TILT)
+  const sr = Math.sin(ROLL)
+  const cr = Math.cos(ROLL)
+  const dx = x * cr + z * sr
+  const dz = -x * sr + z * cr
+  return [c + dx * radius, c - (y * ct - dz * st) * radius, y * st + dz * ct]
+}

@@ -2,7 +2,7 @@ import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './flex-root.css.js'
+import { styles } from './flex-root.generated.css.js'
 
 /**
  * Reads `wrap` as a switch with one named value: present is `true`,

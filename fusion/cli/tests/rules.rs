@@ -432,13 +432,52 @@ fn order_with_a_condition_it_does_not_know() {
             ("fusion.json", EMPTY),
             (
                 "package.json",
-                &manifest("\"types\": \"./a.d.ts\", \"development\": \"./src/a.ts\", \"default\": \"./a.js\""),
+                &manifest(
+                    "\"types\": \"./a.d.ts\", \"development\": \"./src/a.ts\", \"default\": \"./a.js\"",
+                ),
             ),
         ],
         |tree| {
             tree.write(
                 "package.json",
                 &manifest("\"types\": \"./a.d.ts\", \"default\": \"./a.js\", \"development\": \"./src/a.ts\""),
+            );
+        },
+        "keys are out of order",
+        "package.json",
+    );
+}
+
+/// **A set of its own ahead of `types` keeps its place**, as a family's
+/// `react-native` set does, while `types` and `default` are still put right
+/// around it.
+#[test]
+fn order_keeps_a_condition_set_ahead_of_types() {
+    let manifest = |exports: &str| {
+        format!(
+            "{{\n  \"name\": \"sandbox\",\n  \"exports\": {{\n    \"./tabs\": {{\n      {exports}\n    }}\n  }},\n  \"files\": [\"dist\"]\n}}\n"
+        )
+    };
+    let native = "\"react-native\": { \"types\": \"./n.d.ts\", \"default\": \"./n.js\" }";
+    plant_in(
+        "workspace-order-nested",
+        "workspace",
+        "order",
+        &[
+            ("fusion.json", EMPTY),
+            (
+                "package.json",
+                &manifest(&format!(
+                    "{native}, \"types\": \"./a.d.ts\", \"default\": \"./a.js\""
+                )),
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "package.json",
+                &manifest(&format!(
+                    "{native}, \"default\": \"./a.js\", \"types\": \"./a.d.ts\""
+                )),
             );
         },
         "keys are out of order",
@@ -515,7 +554,10 @@ fn publishable() {
                 "fusion.json",
                 r#"{ "scope": "@acme/", "domains": ["kit"] }"#,
             ),
-            ("packages/kit/package.json", &kit("\n  \"license\": \"MIT\",")),
+            (
+                "packages/kit/package.json",
+                &kit("\n  \"license\": \"MIT\","),
+            ),
             (
                 "Cargo.toml",
                 "[workspace]\nmembers = [\"crates/thing\"]\n\n[workspace.package]\npublish = false\n",
@@ -596,6 +638,86 @@ fn publishable_imports() {
         },
         "`@acme/kit` is published and imports `@acme/kit-tools`, which is not",
         "packages/kit/dist/index.js",
+    );
+}
+
+/// **A condition ahead of `types` is a set of its own that starts with
+/// `types`, or a finding.** The set is what a family's `react-native` entry
+/// is; a path there, or a set leading with `default`, is read in place of the
+/// web's `types` by whoever asserts it.
+#[test]
+fn publishable_conditions() {
+    let kit = |native: &str| {
+        format!(
+            r#"{{
+  "name": "@acme/kit",
+  "description": "A kit.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {{
+    "type": "git",
+    "url": "https://example.com/acme.git",
+    "directory": "packages/kit"
+  }},
+  "exports": {{
+    "./tabs": {{
+      "react-native": {native},
+      "types": "./dist/tabs/index.d.ts",
+      "default": "./dist/tabs/index.js"
+    }}
+  }},
+  "files": ["dist"],
+  "publishConfig": {{ "access": "public" }}
+}}"#
+        )
+    };
+    let clean = [
+        (
+            "package.json",
+            r#"{ "name": "@acme/root", "private": true, "workspaces": ["packages/*"] }"#.to_owned(),
+        ),
+        (
+            "fusion.json",
+            r#"{ "scope": "@acme/", "domains": ["kit"] }"#.to_owned(),
+        ),
+        (
+            "packages/kit/package.json",
+            kit(
+                r#"{ "types": "./dist/tabs/index.native.d.ts", "default": "./dist/tabs/index.native.js" }"#,
+            ),
+        ),
+    ];
+    let clean: Vec<(&str, &str)> = clean
+        .iter()
+        .map(|(at, text)| (*at, text.as_str()))
+        .collect();
+    plant_in(
+        "workspace-publishable-conditions",
+        "workspace",
+        "publishable",
+        &clean,
+        |tree| {
+            tree.write(
+                "packages/kit/package.json",
+                &kit(r#""./dist/tabs/index.native.js""#),
+            );
+        },
+        "`@acme/kit` orders `exports[./tabs]` as react-native, types, default",
+        "packages/kit",
+    );
+    plant_in(
+        "workspace-publishable-conditions-led",
+        "workspace",
+        "publishable",
+        &clean,
+        |tree| {
+            tree.write(
+                "packages/kit/package.json",
+                &kit(r#"{ "default": "./dist/tabs/index.native.js", "types": "./dist/tabs/index.native.d.ts" }"#),
+            );
+        },
+        "`@acme/kit` orders `exports[./tabs]` as react-native, types, default",
+        "packages/kit",
     );
 }
 
@@ -867,7 +989,10 @@ fn registration_past_a_glob() {
             ("package.json", ROOT),
             ("fusion.json", r#"{ "hydrates": ["app"] }"#),
             ("packages/util/package.json", r#"{ "name": "@acme/util" }"#),
-            ("packages/util/src/index.ts", "export const helper = () => 1\n"),
+            (
+                "packages/util/src/index.ts",
+                "export const helper = () => 1\n",
+            ),
             (
                 "packages/elements/package.json",
                 r#"{ "name": "@acme/elements" }"#,
@@ -891,7 +1016,9 @@ fn registration_past_a_glob() {
 #[test]
 fn scoped() {
     let panel = |class: &str| {
-        format!("import styles from './panel.module.css'\n\nexport const Panel = () => <div className={class} />\n")
+        format!(
+            "import styles from './panel.module.css'\n\nexport const Panel = () => <div className={class} />\n"
+        )
     };
     plant(
         "workspace",
@@ -998,6 +1125,43 @@ fn shipped() {
         },
         "no source at packages/lib/src/gone.ts",
         "packages/lib/dist/gone.js",
+    );
+}
+
+/// A module compiled from `native`, beside `src`, as the styled package's
+/// React Native components are, has its source there.
+#[test]
+fn shipped_from_native() {
+    plant_in(
+        "workspace-shipped-native",
+        "workspace",
+        "shipped",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", EMPTY),
+            (
+                "packages/lib/package.json",
+                r#"{ "name": "@acme/lib", "scripts": { "build": "tsc -b" } }"#,
+            ),
+            ("packages/lib/src/tabs/index.ts", "export const web = 1\n"),
+            (
+                "packages/lib/native/tabs/index.native.ts",
+                "export const native = 1\n",
+            ),
+            ("packages/lib/dist/tabs/index.js", "export const web = 1;\n"),
+            (
+                "packages/lib/dist/tabs/index.native.js",
+                "export const native = 1;\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/lib/dist/list/index.native.js",
+                "export const native = 1;\n",
+            );
+        },
+        "no source at packages/lib/src/list/index.native.ts",
+        "packages/lib/dist/list/index.native.js",
     );
 }
 

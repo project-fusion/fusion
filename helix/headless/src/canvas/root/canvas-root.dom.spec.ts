@@ -2579,7 +2579,7 @@ describe('canvas beyond the properties', () => {
   })
 
   test('a group is read where it sits on the board, and what it holds straight after it', async () => {
-    const { reading } = await import('./canvas-document.js')
+    const { reading } = await import('@fusion.dev/helix-core/canvas')
     const order = reading(
       [
         { height: 300, id: 'later', type: 'group', width: 400, x: 0, y: 600 },
@@ -2594,7 +2594,7 @@ describe('canvas beyond the properties', () => {
   })
 
   test('two groups drawn as the same box are both still read', async () => {
-    const { reading } = await import('./canvas-document.js')
+    const { reading } = await import('@fusion.dev/helix-core/canvas')
     const box = { height: 100, type: 'group' as const, width: 100, x: 0, y: 0 }
     const order = reading(
       [
@@ -2608,7 +2608,7 @@ describe('canvas beyond the properties', () => {
   })
 
   test('a step that turns back on itself keeps the stub out of each side', async () => {
-    const { connector } = await import('./canvas-document.js')
+    const { connector } = await import('@fusion.dev/helix-core/canvas')
     const { d } = connector(
       { fromNode: 'a', fromSide: 'right', id: 'e', toNode: 'b', toSide: 'left' },
       { height: 50, id: 'a', type: 'text', width: 100, x: 300, y: 0 },

@@ -1,0 +1,41 @@
+# Announcement, each example drawn alone: the preview, each tone, each
+# separation, and a band with actions. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it
+# draws, then for the screen to stand still, so no picture catches the
+# screen before it sliding away.
+appId: dev.fusion.helix.app
+name: "Screens: Announcement"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://announcement/preview/preview
+- extendedWaitUntil:
+    visible: '.*maintenance.*'
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: announcement-preview-${MODE}-${SIZE}
+- openLink: helix://announcement/tone/preview
+- extendedWaitUntil:
+    visible: 'Tone'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: announcement-tone-${MODE}-${SIZE}
+- openLink: helix://announcement/separation/preview
+- extendedWaitUntil:
+    visible: 'Separation'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: announcement-separation-${MODE}-${SIZE}
+- openLink: helix://announcement/with-actions/preview
+- extendedWaitUntil:
+    visible: 'With actions'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: announcement-with-actions-${MODE}-${SIZE}

@@ -1,0 +1,14 @@
+# Motion Toggle, each example drawn alone: the pause as an icon alone and
+# with words. One screenshot of each, named by the example, `MODE`, and
+# `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Motion Toggle"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://motion-toggle/preview/preview
+- extendedWaitUntil:
+    visible: '.*Pause motion.*'
+    timeout: 30000
+- takeScreenshot: motion-toggle-preview-${MODE}-${SIZE}

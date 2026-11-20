@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCallout } from '@fusion.dev/helix-headless/callout'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './callout-root.css.js'
+import { styles } from './callout-root.generated.css.js'
 
 /**
  * @summary A passage set apart as a note, information, a warning, or an error.

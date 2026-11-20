@@ -1,8 +1,7 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
-import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
-import { styles } from './sandbox-toolbar.css.js'
+import { styles } from './sandbox-toolbar.generated.css.js'
 
 /**
  * @summary The bar across the top of a sandbox.
@@ -38,7 +37,7 @@ export class HelixSandboxToolbar extends HelixElement {
       <slot name="end"></slot>`
   }
 
-  static override styles: CSSResultGroup = [densityStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

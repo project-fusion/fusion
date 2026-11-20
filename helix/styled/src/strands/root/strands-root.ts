@@ -8,11 +8,6 @@ import {
   PaintGateController,
   readColor,
 } from '@fusion.dev/helix-core'
-import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
-import { property } from 'lit/decorators.js'
-import { HelixStrandsFallbackEvent } from '../events/index.js'
-import { paletteOf, RESTING_PALETTE, type StrandsPalette } from '../palette.js'
 import {
   arcLengths,
   boxPath,
@@ -21,9 +16,16 @@ import {
   type PathPoint,
   type PlacedStop,
   pagePath,
+  paletteOf,
+  RESTING_PALETTE,
+  type StrandsPalette,
   type StrandsPattern,
   visibleRange,
-} from '../path.js'
+} from '@fusion.dev/helix-core/strands'
+import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
+import { html } from 'lit'
+import { property } from 'lit/decorators.js'
+import { HelixStrandsFallbackEvent } from '../events/index.js'
 import {
   DUST,
   MAX_DUST,
@@ -32,7 +34,7 @@ import {
   MIN_STRANDS,
   StrandsRenderer,
 } from '../renderer.js'
-import { styles } from './strands-root.css.js'
+import { styles } from './strands-root.generated.css.js'
 
 /** The widest either edge of the drawing buffer may get, in device pixels. Aura's ceiling, for Aura's reason. */
 const MAX_CANVAS_EDGE = 4096

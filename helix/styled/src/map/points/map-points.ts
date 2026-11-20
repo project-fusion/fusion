@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapPoints } from '@fusion.dev/helix-headless/map/points'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './map-points.css.js'
+import { styles } from './map-points.generated.css.js'
 
 /**
  * @summary Thousands of places on a map, loaded from data.

@@ -24,6 +24,7 @@
     "./join-lines": "./lib/join-lines.mjs",
     "./known-in-webkit": "./lib/known-in-webkit.mjs",
     "./leave": "./lib/leave.mjs",
+    "./lengths": "./lib/lengths.mjs",
     "./literal": "./lib/literal.mjs",
     "./minify-json": "./lib/minify-json.mjs",
     "./models": "./lib/models.mjs",

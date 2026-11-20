@@ -2,80 +2,60 @@
 <!-- @min 480 -->
 
 <helix-navigation label="Main">
-  <a href="#overview">Overview</a>
+  <helix-navigation-item href="#overview">Overview</helix-navigation-item>
   <helix-megamenu label="Products">
-    <div data-megamenu-group>
-      <helix-text
-        as="h3"
-        data-megamenu-heading
-        scale="title"
-      >Build</helix-text>
-      <a
-        data-megamenu-item
-        href="#helix"
-      >
-        <helix-icon name="cube"></helix-icon>
-        <strong>Projects</strong>
-        <span>Plan and track work across teams.</span>
-      </a>
-    </div>
-    <div data-megamenu-group>
-      <helix-text
-        as="h3"
-        data-megamenu-heading
-        scale="title"
-      >Run</helix-text>
-      <a
-        data-megamenu-item
-        href="#trace"
-      >
-        <helix-icon name="pulse"></helix-icon>
-        <strong>Reports</strong>
-        <span>See how your projects are doing.</span>
-      </a>
-    </div>
+    <helix-megamenu-group label="Build">
+      <helix-megamenu-item href="#helix">
+        <helix-icon
+          name="cube"
+          slot="icon"
+        ></helix-icon>
+        Projects
+        <helix-text slot="description">Plan and track work across teams.</helix-text>
+      </helix-megamenu-item>
+    </helix-megamenu-group>
+    <helix-megamenu-group label="Run">
+      <helix-megamenu-item href="#trace">
+        <helix-icon
+          name="pulse"
+          slot="icon"
+        ></helix-icon>
+        Reports
+        <helix-text slot="description">See how your projects are doing.</helix-text>
+      </helix-megamenu-item>
+    </helix-megamenu-group>
   </helix-megamenu>
   <helix-megamenu label="Solutions">
-    <div data-megamenu-group>
-      <helix-text
-        as="h3"
-        data-megamenu-heading
-        scale="title"
-      >By team</helix-text>
-      <a
-        data-megamenu-item
-        href="#engineering"
-      >
-        <helix-icon name="gear"></helix-icon>
-        <strong>Engineering</strong>
-        <span>Plan releases and track bugs.</span>
-      </a>
-      <a
-        data-megamenu-item
-        href="#design"
-      >
-        <helix-icon name="palette"></helix-icon>
-        <strong>Design</strong>
-        <span>Share files and collect feedback.</span>
-      </a>
-    </div>
+    <helix-megamenu-group label="By team">
+      <helix-megamenu-item href="#engineering">
+        <helix-icon
+          name="gear"
+          slot="icon"
+        ></helix-icon>
+        Engineering
+        <helix-text slot="description">Plan releases and track bugs.</helix-text>
+      </helix-megamenu-item>
+      <helix-megamenu-item href="#design">
+        <helix-icon
+          name="palette"
+          slot="icon"
+        ></helix-icon>
+        Design
+        <helix-text slot="description">Share files and collect feedback.</helix-text>
+      </helix-megamenu-item>
+    </helix-megamenu-group>
   </helix-megamenu>
   <helix-megamenu label="Company">
-    <div data-megamenu-group>
-      <helix-text
-        as="h3"
-        data-megamenu-heading
-        scale="title"
-      >About</helix-text>
-      <a
-        data-megamenu-item
-        href="#story"
-      >
-        <helix-icon name="building"></helix-icon>
-        <strong>About us</strong>
-        <span>Our team and our history.</span>
-      </a>
-    </div>
+    <helix-megamenu-group label="About">
+      <helix-megamenu-item href="#story">
+        <helix-icon
+          name="building"
+          slot="icon"
+        ></helix-icon>
+        About us
+        <helix-text slot="description">Our team and our history.</helix-text>
+      </helix-megamenu-item>
+    </helix-megamenu-group>
   </helix-megamenu>
-  <a href="#pricing">Pricing</a>
+  <helix-navigation-item href="#pricing">Pricing</helix-navigation-item>
 </helix-navigation>

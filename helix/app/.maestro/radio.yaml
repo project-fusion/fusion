@@ -1,0 +1,58 @@
+# Radio Group: a press chooses a radio and clears the one chosen before, on
+# the events example, whose log lists what each press sent, recorded.
+#
+# Android gives each radio's checked state, which the flow requires. iOS
+# gives React Native's value, such as "radio button, checked", which Maestro
+# reads as the element's text, so the step that reads it finds the element by
+# that value between the radios above and below it. It is optional until a
+# night shows what iOS gives. `keys/radio.yaml` moves through the group with
+# the arrow keys on Android.
+appId: dev.fusion.helix.app
+name: Radio
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://radio/events/preview
+      SHOWS: Team
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: radio
+- tapOn: Team
+- assertVisible: '.*Chose "team".*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Team
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          above: Scale
+          below: Free
+          optional: true
+          text: (.*, )?checked
+- takeScreenshot: radio-events-team
+- tapOn: Scale
+- assertVisible: '.*Chose "scale".*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Scale
+      - assertVisible:
+          checked: false
+          text: Team
+- takeScreenshot: radio-events-scale
+- stopRecording

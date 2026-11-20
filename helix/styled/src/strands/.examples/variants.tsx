@@ -3,15 +3,18 @@ import './variants.css'
 export function Example() {
   return (
     <div className="forms">
-      <div className="stage">
-        <helix-strands pattern="bend"></helix-strands>
-      </div>
-      <div className="stage">
-        <helix-strands pattern="ribbon"></helix-strands>
-      </div>
-      <div className="stage">
-        <helix-strands pattern="waves"></helix-strands>
-      </div>
+      <helix-strands
+        pattern="bend"
+        style={{ blockSize: '16rem' }}
+      ></helix-strands>
+      <helix-strands
+        pattern="ribbon"
+        style={{ blockSize: '16rem' }}
+      ></helix-strands>
+      <helix-strands
+        pattern="waves"
+        style={{ blockSize: '16rem' }}
+      ></helix-strands>
     </div>
   )
 }

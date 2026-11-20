@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessRadio } from '@fusion.dev/helix-headless/radio'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './radio-root.css.js'
+import { styles } from './radio-root.generated.css.js'
 
 /**
  * @summary One choice in a radio group.

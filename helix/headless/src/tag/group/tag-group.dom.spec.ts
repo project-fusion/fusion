@@ -303,6 +303,27 @@ describe('selection behavior and an empty selection', () => {
     expect(one.group.value).toBe('Apple,Pear,Plum')
   })
 
+  /* React Aria's `extendSelection`: a range takes the place of the last one,
+     and an arrow without Shift under `toggle` keeps the anchor. */
+  test('a Shift range takes the place of the last one, and an arrow alone keeps the anchor', async () => {
+    const one = await group('selection-mode="multiple"', PLAIN)
+    const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]
+    click(plum)
+    click(apple)
+    cell(apple).focus()
+    key(apple, { key: 'ArrowRight', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple,Pear,Plum')
+    key(pear, { key: 'ArrowLeft', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple,Plum')
+    // Pear is not where the next range runs from, so it stays let go of.
+    key(apple, { key: 'ArrowRight' })
+    key(pear, { key: 'ArrowLeft', shiftKey: true })
+    await settle(one)
+    expect(one.group.value).toBe('Apple,Plum')
+  })
+
   test('under replace, the arrow keys carry the selection, and Control moves without it', async () => {
     const one = await group('selection-mode="multiple" selection-behavior="replace"', PLAIN)
     const [apple, pear, , plum] = one.tags as [Tag, Tag, Tag, Tag]

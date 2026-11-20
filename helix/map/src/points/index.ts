@@ -1,2 +1,2 @@
-export type { MapPoints } from './points.js'
-export { pointsFrom } from './points.js'
+export type { MapPoints } from '@fusion.dev/helix-core/map'
+export { pointsFrom } from '@fusion.dev/helix-core/map'

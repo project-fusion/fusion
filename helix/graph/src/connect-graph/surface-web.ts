@@ -1,4 +1,4 @@
-import type { GraphPoint } from './seed.js'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 
 /**
  * Places on a surface, joined to their near neighbors, and split in halves

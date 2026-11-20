@@ -19,7 +19,7 @@ describe('dialog server output', () => {
        read off one with no children of its own. */
     const bare = ssr(html`<helix-headless-dialog label="Delete"></helix-headless-dialog>`)
     expect(rendered(bare, 'helix-headless-dialog')).toMatch(
-      /<dialog[\s\S]*<slot\s+part="body"\s*><\/slot>[\s\S]*<\/dialog>/,
+      /<dialog[\s\S]*<div\s+part="body">(<!--[^>]*-->)?<slot\s*><\/slot><\/div>[\s\S]*<\/dialog>/,
     )
   })
 

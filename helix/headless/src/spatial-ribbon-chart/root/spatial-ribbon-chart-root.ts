@@ -28,7 +28,14 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { barItems } from '../../spatial-bar-chart/bars.js'
+import {
+  barItems,
+  type DrawnRibbon,
+  type RibbonField,
+  ribbonsBetween,
+  ribbonsDrawn,
+  ribbonsOf,
+} from '@fusion.dev/helix-core/spatial'
 import {
   boundsOf,
   boxView,
@@ -41,13 +48,6 @@ import {
   turned,
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
-import {
-  type DrawnRibbon,
-  type RibbonField,
-  ribbonsBetween,
-  ribbonsDrawn,
-  ribbonsOf,
-} from '../ribbons.js'
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {

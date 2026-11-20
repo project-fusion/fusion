@@ -1,0 +1,22 @@
+# Loader: a loader standing in for a button is read by its label while the
+# button it holds keeps its place unseen, and the idle loader beside it shows
+# its button. Recorded.
+#
+# A loader is a busy progress bar, so iOS reads its label as its text. The
+# button it stands in for is hidden from a screen reader, so Maestro finds
+# only the idle loader's button. Android adds the busy state to the label,
+# as in "Saving, busy", so the label is matched with the words around it.
+appId: dev.fusion.helix.app
+name: Loader
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://loader/content/preview
+      SHOWS: .*Saving.*
+- assertVisible:
+    text: Save changes
+- assertVisible:
+    text: .*Saving.*

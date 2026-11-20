@@ -1,0 +1,25 @@
+/* A screen on a phone: a scroll view, since a phone has no document that
+   scrolls, with the same margins as the web's column. It clears the home
+   indicator with the system's own inset. */
+import { ScrollArea, useTokens } from '@fusion.dev/helix-native'
+import type { ReactNode } from 'react'
+
+export function Page({ children }: { readonly children?: ReactNode }) {
+  const tokens = useTokens()
+  const space = (name: string): number => {
+    const value = tokens[name]
+    return typeof value === 'number' ? value : 0
+  }
+  return (
+    <ScrollArea
+      contentContainerStyle={{
+        paddingBottom: space('space-3xl'),
+        paddingHorizontal: space('space-lg'),
+        paddingTop: space('space-xl'),
+      }}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      {children}
+    </ScrollArea>
+  )
+}

@@ -13,7 +13,9 @@
 //! statements about itself and one of them is out of date.
 //!
 //! **A condition order.** Conditions match top to bottom, so a `types` after
-//! anything else is never read and the package reports as untyped.
+//! anything else is never read and the package reports as untyped. The one
+//! thing allowed ahead of it is a set of its own that starts with `types`, as
+//! a family's `react-native` set does.
 //!
 //! **A published package taking an unpublished dependency**, which is the one
 //! that cannot be seen from inside the package: it resolves here because the
@@ -113,14 +115,44 @@ fn publishes(manifest: &Manifest) -> bool {
     manifest.value.get("private").and_then(Value::as_bool) != Some(true)
 }
 
+/// One `types`-bearing condition set in an exports tree.
+struct Ordered {
+    keys: Vec<String>,
+    /// The first condition ahead of `types` that a resolver reads in its place.
+    shadow: Option<String>,
+    /// The keys leading to the set.
+    trail: Vec<String>,
+}
+
+/// Whether a condition's value is a set of its own that starts with `types`.
+fn led_by_types(value: &Value) -> bool {
+    value
+        .as_object()
+        .and_then(|nested| nested.keys().next())
+        .is_some_and(|first| first == "types")
+}
+
 /// Every `types`-bearing condition set in an exports tree, in written order.
-fn conditions(node: &Value, trail: &[String], found: &mut Vec<(Vec<String>, Vec<String>)>) {
+///
+/// **A condition ahead of `types` is allowed where it is a set of its own that
+/// starts with `types`**, as `react-native` is on `@fusion.dev/helix/tabs`: a
+/// resolver asserting it reads that set's `types`, and one that does not reads
+/// past it to the outer `types`. A path ahead of `types`, or a set that does not
+/// start with one, is read in its place by whoever asserts the condition.
+fn conditions(node: &Value, trail: &[String], found: &mut Vec<Ordered>) {
     let Some(object) = node.as_object() else {
         return;
     };
     let keys: Vec<String> = object.keys().cloned().collect();
-    if keys.iter().any(|one| one == "types") {
-        found.push((keys.clone(), trail.to_vec()));
+    if let Some(at) = keys.iter().position(|one| one == "types") {
+        found.push(Ordered {
+            keys: keys.clone(),
+            shadow: keys[..at]
+                .iter()
+                .find(|key| !led_by_types(&object[key.as_str()]))
+                .cloned(),
+            trail: trail.to_vec(),
+        });
     }
     for key in keys {
         let mut deeper = trail.to_vec();
@@ -419,15 +451,20 @@ fn judge(
     if let Some(exports) = manifest.value.get("exports") {
         conditions(exports, &[], &mut found);
     }
-    for (keys, trail) in found {
-        if keys.first().map(String::as_str) == Some("types") {
+    for Ordered {
+        keys,
+        shadow,
+        trail,
+    } in found
+    {
+        let Some(shadow) = shadow else {
             continue;
-        }
+        };
         findings.push(Finding {
             detail: format!(
-                "Conditions match top to bottom, so `types` after `{}` is never read and the \
-                 package reports as untyped.",
-                keys.first().cloned().unwrap_or_default()
+                "Conditions match top to bottom, so `types` after `{shadow}` is never read and \
+                 the package reports as untyped. A condition ahead of `types` has to be a set \
+                 of its own that starts with `types`."
             ),
             file: at.clone(),
             message: format!(

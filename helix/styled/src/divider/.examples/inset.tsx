@@ -1,5 +1,3 @@
-import './inset.css'
-
 export function Example() {
   return (
     <helix-flex
@@ -13,7 +11,7 @@ export function Example() {
         ></helix-icon>
         Documents
       </helix-list-item>
-      <helix-divider className="row-rule"></helix-divider>
+      <helix-divider style={{ '--divider-padding-start': '3.25rem' }}></helix-divider>
       <helix-list-item>
         <helix-icon
           name="cube"

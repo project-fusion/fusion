@@ -45,9 +45,17 @@ export const clockLocale = (locale: string, hourCycle?: HourCycle): string => {
  * exactly the question `resolvedOptions` answers and the list is long and
  * changes. `en-US` is true, `en-GB`, `fr-FR` and `ja-JP` are false, measured.
  */
-export const isTwelveHour = (locale?: string): boolean =>
-  new Intl.DateTimeFormat(locale || undefined, { timeStyle: 'short' }).resolvedOptions().hour12 ===
-  true
+export const isTwelveHour = (locale?: string): boolean => {
+  const format = new Intl.DateTimeFormat(locale || undefined, { timeStyle: 'short' })
+  const { hour12 } = format.resolvedOptions()
+  /* Hermes leaves `hour12` out, so a phone reads the half of the day off a time
+     written at one in the afternoon. */
+  return typeof hour12 === 'boolean'
+    ? hour12
+    : format
+        .formatToParts(new Date(Date.UTC(2000, 0, 1, 13)))
+        .some((part) => part.type === 'dayPeriod')
+}
 
 /**
  * What a locale calls the half of the day before or after noon, such as `AM`,

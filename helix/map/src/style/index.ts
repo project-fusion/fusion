@@ -1,3 +1,10 @@
+export type {
+  MapImage,
+  MapLandmark,
+  MapLibreStyle,
+  MapStyleOptions,
+} from '@fusion.dev/helix-core/map'
+export { MAP_LANDMARKS, mapLibreStyle } from '@fusion.dev/helix-core/map'
 export type { MapColors } from './map-colors.js'
 export {
   colorsNow,
@@ -8,5 +15,3 @@ export {
   PATIENCE,
   settledColor,
 } from './map-colors.js'
-export type { MapImage, MapLandmark, MapLibreStyle, MapStyleOptions } from './map-style.js'
-export { MAP_LANDMARKS, mapLibreStyle } from './map-style.js'

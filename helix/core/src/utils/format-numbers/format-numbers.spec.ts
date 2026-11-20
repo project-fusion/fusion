@@ -41,6 +41,18 @@ describe('a formatter for a locale', () => {
     expect(formatNumbers('en-US')(8000)).toBe('8,000')
   })
 
+  /* Hermes in Expo Go has no `formatToParts`, and a chart with a negative
+     number threw while it drew there. */
+  test('writes the minus sign on a runtime without formatToParts', () => {
+    const parts = Intl.NumberFormat.prototype.formatToParts
+    try {
+      ;(Intl.NumberFormat.prototype as { formatToParts?: unknown }).formatToParts = undefined
+      expect(formatNumbers('en-GB')(-8000)).toBe('\u22128,000')
+    } finally {
+      Intl.NumberFormat.prototype.formatToParts = parts
+    }
+  })
+
   test('two locales do not share one formatter', () => {
     expect(formatNumbers('en-US')(1234)).not.toBe(formatNumbers('de-DE')(1234))
   })

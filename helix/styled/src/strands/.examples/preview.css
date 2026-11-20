@@ -1,5 +1,6 @@
 /* Strands fills the box it is given, the way an image does, so an example has
-   to give it one. */
-.stage {
+   to give it one. The TSX gives it in its style, which a phone reads too, and
+   the HTML twin, which takes no inline style, gives it here. */
+helix-strands {
   block-size: 20rem;
 }

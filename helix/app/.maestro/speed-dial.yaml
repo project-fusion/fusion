@@ -1,0 +1,61 @@
+# Speed Dial: a press on the trigger opens the actions, choosing one closes
+# the dial, and a press outside closes it too. The events example logs what
+# the dial sends as it opens, as an action is chosen, and as it closes.
+# Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
+appId: dev.fusion.helix.app
+name: Speed Dial
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://speed-dial/preview/preview
+      SHOWS: Actions
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: speed-dial
+- tapOn: Actions
+- extendedWaitUntil:
+    visible: Duplicate
+    timeout: 5000
+- tapOn: Duplicate
+- extendedWaitUntil:
+    notVisible: Duplicate
+    timeout: 5000
+- tapOn: Actions
+- extendedWaitUntil:
+    visible: Share
+    timeout: 5000
+# Outside the actions and the trigger, on the page.
+- tapOn:
+    point: 20%, 90%
+- extendedWaitUntil:
+    notVisible: Share
+    timeout: 5000
+- openLink: helix://speed-dial/events/preview
+# The screen before it draws the same words and stays in the tree through the
+# move, so a step waits for the new screen's title and the move's end.
+- extendedWaitUntil:
+    visible: Events
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
+- extendedWaitUntil:
+    visible: Actions
+    timeout: 15000
+- tapOn: Actions
+- extendedWaitUntil:
+    visible: Upload file
+    timeout: 5000
+- tapOn: Upload file
+- extendedWaitUntil:
+    visible: .*"upload" was chosen.*
+    timeout: 5000
+- assertVisible: .*helix-before-close.*
+- stopRecording

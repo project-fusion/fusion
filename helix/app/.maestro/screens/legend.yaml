@@ -1,0 +1,30 @@
+# Legend, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Legend"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://legend/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: legend-preview-${MODE}-${SIZE}
+- openLink: helix://legend/categories/preview
+- extendedWaitUntil:
+    visible: 'Categories'
+    timeout: 15000
+- takeScreenshot: legend-categories-${MODE}-${SIZE}
+- openLink: helix://legend/emphasis/preview
+- extendedWaitUntil:
+    visible: 'Emphasis'
+    timeout: 15000
+- takeScreenshot: legend-emphasis-${MODE}-${SIZE}
+- openLink: helix://legend/placement/preview
+- extendedWaitUntil:
+    visible: 'Placement'
+    timeout: 15000
+- takeScreenshot: legend-placement-${MODE}-${SIZE}

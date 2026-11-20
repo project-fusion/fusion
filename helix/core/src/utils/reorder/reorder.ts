@@ -230,6 +230,9 @@ export const placeKey = (
   return rest
 }
 
+/** How far in from each edge of a box a held item scrolls it, in pixels, where the box is long enough. */
+export const EDGE_ZONE = 40
+
 /**
  * How far to scroll a box in one frame while a held item is near one of its
  * edges, in pixels: negative toward the start, positive toward the end, and 0
@@ -243,7 +246,7 @@ export const edgeSpeed = (
   at: number,
   start: number,
   end: number,
-  { most = 12, zone = 40 }: { most?: number; zone?: number } = {},
+  { most = 12, zone = EDGE_ZONE }: { most?: number; zone?: number } = {},
 ): number => {
   const reach = Math.min(zone, (end - start) / 2)
   if (reach <= 0) {

@@ -32,10 +32,14 @@ export interface MapPointsInView {
   key: string
   /** Its name, where it is a point that has one. */
   label?: string | undefined
+  /** Where it is, in degrees. */
+  place: { lat: number; lng: number }
   /** What pressing it reports, where it is a point. */
   value?: string | undefined
   x: number
   y: number
+  /** The zoom a count comes apart at, once the renderer has said. */
+  zoom?: number | undefined
 }
 
 /** A GeoJSON collection of points, longitude first as GeoJSON writes it. */
@@ -64,7 +68,8 @@ export interface MapPointsCollection {
  *
  * The points and counts in view share one tab stop. The arrow keys, Home, and
  * End move between them from top to bottom and along each line. Enter on a
- * count zooms in to it.
+ * count, or a click on it, sends `helix-map-cluster` from this element, and
+ * `connectMap` zooms in to it.
  *
  * @since 0.105.0
  * @status stable
@@ -73,7 +78,7 @@ export interface MapPointsCollection {
  * @documentation https://fusion.dev/helix/components/map
  *
  * @event {HelixActivateEvent} helix-activate - A point in view was pressed. The value is its id, or its name if it has no id.
- * @event {HelixMapClusterEvent} helix-map-cluster - A count in view was pressed from the keyboard. `connectMap` zooms in to it.
+ * @event {HelixMapClusterEvent} helix-map-cluster - A count was pressed, from the keyboard or by a click on the map. The detail has how many places it holds, where it is, and the zoom it comes apart at. `connectMap` zooms in to it.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The points, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  *
  * @csspart count - The button on a count, which is also a `place`.
@@ -192,7 +197,15 @@ export class HelixHeadlessMapPoints extends HelixElement {
   /** Presses one: a point is the page's, a count the connector's to zoom in to. */
   private press(one: MapPointsInView): void {
     if (one.count !== undefined) {
-      this.dispatchEvent(new HelixMapClusterEvent({ key: one.key, labels: [] }))
+      this.dispatchEvent(
+        new HelixMapClusterEvent({
+          count: one.count,
+          key: one.key,
+          labels: [],
+          place: one.place,
+          zoom: one.zoom,
+        }),
+      )
     } else {
       this.dispatchEvent(new HelixActivateEvent({ value: one.value || one.label || '' }))
     }
