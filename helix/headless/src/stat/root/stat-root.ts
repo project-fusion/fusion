@@ -243,7 +243,7 @@ export class HelixHeadlessStat extends HelixElement {
     this.widths = new ResizeObserver(() => this.fit())
     this.widths.observe(this)
     if (typeof MutationObserver !== 'undefined') {
-      this.edits = new MutationObserver(this.readFigure)
+      this.edits = new MutationObserver(this.figureEdited)
       this.edits.observe(this, { characterData: true, subtree: true })
     }
     /* **Measured again once a face arrives.** The figure is set in the display
@@ -263,6 +263,23 @@ export class HelixHeadlessStat extends HelixElement {
   }
 
   private readonly refit = (): void => this.fit()
+
+  /**
+   * Reads a slotted figure that changed, and measures it again.
+   *
+   * **A figure edited in place kept its old step.** A render measures, but an
+   * edit that leaves the runs as they were asks for none, and the stat's own
+   * width does not move, so nothing measured: "123456789012" stepped twice in a
+   * 120 pixel stat, edited to "12", stayed two steps down with room to spare.
+   * Measured here only when no update is coming, since the update measures, and
+   * not while a count runs, which is fitted to the number it rests on.
+   */
+  private readonly figureEdited = (): void => {
+    this.readFigure()
+    if (this.hasUpdated && !this.isUpdatePending && this.count.counting === undefined) {
+      this.fit()
+    }
+  }
 
   /**
    * Sets the figure a step or two smaller where it does not fit on one line.
@@ -490,7 +507,7 @@ export class HelixHeadlessStat extends HelixElement {
        text changed. */
     const written = figure !== '' || slotted.length > 0
     return html`<slot name="label" part="label" @slotchange=${() => this.requestUpdate()}></slot>
-      ${figure === '' ? html`${written ? html`<span part="value">${pieces}</span>` : nothing}<slot part=${written ? nothing : 'value'} ?hidden=${written} @slotchange=${this.readFigure}></slot>` : this.drawFigure(pieces)}
+      ${figure === '' ? html`${written ? html`<span part="value">${pieces}</span>` : nothing}<slot part=${written ? nothing : 'value'} ?hidden=${written} @slotchange=${this.figureEdited}></slot>` : this.drawFigure(pieces)}
       <slot name="unit" part="unit" @slotchange=${this.readPieces}></slot>
       <slot name="trend" part="trend" @slotchange=${this.readPieces}></slot>`
   }
