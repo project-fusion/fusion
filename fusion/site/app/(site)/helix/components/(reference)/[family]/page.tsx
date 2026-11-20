@@ -25,6 +25,7 @@ import { sourceUrl } from '../../../../../../utils/source/source'
 import { AnatomyPreview } from './anatomy'
 import { DocumentActions } from './document-actions'
 import api from './page.module.css'
+import { FamilyPicture } from './picture'
 import { ComponentPreview, type PreviewLayout } from './preview'
 import { TierAddress } from './tier-address'
 
@@ -59,10 +60,32 @@ const listed = (words: readonly string[]): string =>
 /**
  * A situation as it reads after a family's name and a colon: "Select: a value a
  * form submits." The guidance writes each one as a sentence, so its first
- * letter is lowered, unless the first word is a name such as "HTML".
+ * letter is lowered, unless the first word is a name such as "HTML". A row
+ * that opens another family is named this way, the family first.
  */
 const after = (text: string): string =>
   /^[A-Z](?![A-Z])/.test(text) ? text[0]?.toLowerCase() + text.slice(1) : text
+
+/**
+ * A family's headline example as the choosing table pictures it: at rest, with
+ * the template that tells the frame to draw it small. A root that the example
+ * opens is closed again, so a Dialog is pictured as the page shows it before
+ * you press anything.
+ */
+const withPicture = (html: string, slug: string): string => {
+  const resting = html.replace(
+    new RegExp(`<(helix-(?:headless-)?${slug})(?=[\\s>])([^>]*)>`, 'g'),
+    (_tag, name: string, attributes: string) =>
+      `<${name}${attributes.replace(/\sopen(?:=(?:""|''|"open"|'open'))?(?=[\s>]|$)/, '')}>`,
+  )
+  return `${resting.trimEnd()}\n<template data-preview-picture></template>\n`
+}
+
+/** The example a family is pictured by: its styled headline, where it has one. */
+const picturedBy = (slug: string): Example | undefined => {
+  const examples = findFamily(slug)?.examples ?? []
+  return examples.find((example) => example.tier === 'styled') ?? examples[0]
+}
 
 /**
  * How a reader reaches a part from their own code: the element's tag, the
@@ -570,6 +593,25 @@ export async function generateMetadata({
   })
 }
 
+/**
+ * A family's picture in the choosing table, or an empty tile of the same size
+ * for a family with no example, so the rows still line up.
+ */
+function Picture({ slug }: { slug: string }) {
+  const example = picturedBy(slug)
+  if (!example) {
+    return <span aria-hidden="true" className={api.picture} />
+  }
+  return (
+    <FamilyPicture
+      className={api.picture}
+      css={example.css}
+      html={withPicture(example.html, slug)}
+      {...(example.layout ? { layout: example.layout as PreviewLayout } : {})}
+    />
+  )
+}
+
 export default async function FamilyDocs({
   params,
   searchParams,
@@ -780,50 +822,58 @@ export default async function FamilyDocs({
               <SectionHeading as="h2" label="Guidelines" target="guidelines">
                 Guidelines
               </SectionHeading>
-              {/* **Two columns where there is room**, the case for the family
-                  beside the cases for another, so the two lists are read as
-                  one choice. Each alternative opens with the other family's
-                  name as a link, because the answer to "use something else"
-                  is a family you can open. The lists are the docs' own prose
-                  lists, since each line is a sentence to read. */}
+              {/* **One table for choosing**, a row for each situation: a
+                  picture of the family, the situation, and the family. This
+                  family's rows come first, as one row with its situations
+                  stacked, so its picture is drawn once. Each alternative
+                  follows, and its whole row opens that family. */}
               {(family.use.length > 0 || family.instead.length > 0) && (
-                <div className={api.guidelines}>
-                  {family.use.length > 0 && (
-                    <helix-flex direction="column" gap="xs">
-                      <helix-text as="h3" scale="body-strong">
-                        When to use
-                      </helix-text>
-                      <div data-prose>
-                        <ul>
-                          {family.use.map((line) => (
-                            <li key={line}>
-                              <CodeText>{line}</CodeText>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </helix-flex>
-                  )}
-                  {family.instead.length > 0 && (
-                    <helix-flex direction="column" gap="xs">
-                      <helix-text as="h3" scale="body-strong">
-                        When to use something else
-                      </helix-text>
-                      <div data-prose>
-                        <ul>
-                          {family.instead.map((one) => (
-                            <li key={one.slug}>
-                              <Link data-link="" href={`/helix/components/${one.slug}`}>
-                                {one.label}
-                              </Link>
-                              : <CodeText>{after(one.description)}</CodeText>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </helix-flex>
-                  )}
-                </div>
+                <helix-flex direction="column" gap="sm">
+                  <helix-text as="h3" scale="body-strong">
+                    When to use
+                  </helix-text>
+                  <ul className={api.choices}>
+                    {family.use.length > 0 && (
+                      <li>
+                        <div className={api.choice}>
+                          <Picture slug={family.slug} />
+                          <helix-flex class={api.choiceSituation} direction="column" gap="2xs">
+                            {family.use.map((line) => (
+                              <helix-text as="p" key={line} scale="body">
+                                <CodeText>{line}</CodeText>
+                              </helix-text>
+                            ))}
+                          </helix-flex>
+                          <span className={api.choiceFamily}>
+                            <helix-text scale="body-strong">{family.label}</helix-text>
+                            <helix-text emphasis="muted" scale="caption">
+                              This page
+                            </helix-text>
+                          </span>
+                        </div>
+                      </li>
+                    )}
+                    {family.instead.map((one) => (
+                      <li key={one.slug}>
+                        <Link
+                          aria-label={`${one.label}: ${plainText(after(one.description))}`}
+                          className={`${api.choice} ${api.choiceLink}`}
+                          href={`/helix/components/${one.slug}`}
+                        >
+                          <Picture slug={one.slug} />
+                          <helix-text as="span" class={api.choiceSituation} scale="body">
+                            <CodeText>{one.description}</CodeText>
+                          </helix-text>
+                          <span className={api.choiceFamily}>
+                            <helix-text class={api.choiceName} scale="body-strong">
+                              {one.label}
+                            </helix-text>
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </helix-flex>
               )}
               {/* **How to use the family once it is chosen**, each rule in
                   bold with its reason under it, and the example it names

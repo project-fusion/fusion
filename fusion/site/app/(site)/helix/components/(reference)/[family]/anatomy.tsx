@@ -4,6 +4,7 @@ import type { HelixResizeEvent, HelixSandboxPreview } from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import { PREVIEW_RELAY } from '@/preview/preview-relay'
 import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
+import { useInertFrame } from './inert-frame'
 import type { PreviewLayout } from './preview'
 import sheet from './preview.module.css'
 
@@ -43,31 +44,7 @@ export function AnatomyPreview({ css, html, layout = 'centered', min = ANATOMY_M
     frame.styles = css
   }, [html, css])
 
-  /* **Focus that arrives is handed back.** `inert` keeps a reader from moving
-     into the frame, and a modal the example opens still moves the page's focus
-     into it as it loads: measured on Dialog and Drawer in Chromium. The page
-     hears that only as its window losing focus, with this element active, so
-     the frame inside it is blurred then, and once on mount for a frame that
-     took focus before the page hydrated. */
-  useEffect(() => {
-    const host = preview.current
-    if (!host) {
-      return
-    }
-    /* **Inert, because it is a picture.** A press could close the part the
-       legend numbers, and the legend under it is the same list in words. Set
-       here, since the element's typings take no `inert`. */
-    host.inert = true
-    const release = () => {
-      const frame = document.activeElement === host ? host.shadowRoot?.activeElement : undefined
-      if (frame instanceof HTMLElement) {
-        frame.blur()
-      }
-    }
-    release()
-    addEventListener('blur', release)
-    return () => removeEventListener('blur', release)
-  }, [])
+  useInertFrame(preview)
 
   /* Eight pixels, for the Preview section's reason: the frame reports through
      every step of an upgrade. */

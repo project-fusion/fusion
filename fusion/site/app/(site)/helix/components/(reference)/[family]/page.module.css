@@ -284,13 +284,97 @@
   white-space: pre-line;
 }
 
-/* **The two guidance lists side by side where each has 18rem**, and one under
-   the other on a phone. Each column holds at most three short lines, so two
-   columns at the article's width read as one choice between them. */
-.guidelines {
+/* **The choosing table**: a row for each situation, with a rule between two
+   rows and above and below the table, as the docs' tables have. A picture,
+   the situation, and the family, which gives the situation the width it
+   needs and keeps every family name in one column. */
+.choices {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  container-type: inline-size;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.choices > li {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.choice {
+  align-items: center;
+  color: inherit;
   display: grid;
-  gap: var(--helix-space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--helix-space-xs) var(--helix-space-md);
+  grid-template-columns: auto minmax(0, 1fr) 10rem;
+  padding: var(--helix-space-sm);
+  text-decoration: none;
+}
+
+/* A row that opens another family: the name in the link color, and the row
+   shaded under the pointer, since all of it is the link. */
+.choiceLink {
+  border-radius: var(--helix-radii-sm);
+}
+
+.choiceLink:hover {
+  background: var(--helix-color-surface-sunken);
+}
+
+.choiceLink:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+}
+
+.choiceName {
+  color: var(--helix-color-accent);
+}
+
+.choiceLink:hover .choiceName {
+  color: var(--helix-color-accent-hover);
+}
+
+.choiceSituation {
+  min-inline-size: 0;
+}
+
+.choiceFamily {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The family drawn small, or an empty tile of the same size. The frame under
+   it takes no press, so a press on the picture is a press on the row. */
+.picture {
+  background: var(--helix-color-background);
+  block-size: 4.5rem;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: block;
+  inline-size: 7rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* **Under 32rem the family's name moves under its situation**, and the
+   picture stays at the start of the row, a step smaller, beside both. */
+@container (width < 32rem) {
+  .choice {
+    align-items: start;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .picture {
+    block-size: 3.5rem;
+    grid-row: span 2;
+    inline-size: 5.5rem;
+  }
+
+  .choiceFamily {
+    flex-direction: row;
+    gap: var(--helix-space-xs);
+    align-items: baseline;
+  }
 }
 
 /* The rules for using a family, numbered by the list itself, with the space
