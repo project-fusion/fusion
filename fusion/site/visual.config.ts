@@ -122,13 +122,16 @@ export default defineConfig({
      Button page. Chromium paints a cross-origin frame only once it is in
      view, so a whole-page picture held it empty, measured on November 19,
      2026, in CI and locally, while the same frame drew for a reader who
-     scrolled to it. The legend under it is still pictured. */
+     scrolled to it. The legend under it is still pictured. The pictures in
+     the choosing table above it are frames of the same kind, so they are
+     masked for the same reason. */
   mask: [
     '[data-site-footer] helix-tag',
     '[data-site-measure]',
     '[data-site-count]',
     '[data-site-points-canvas]',
     '[data-site-anatomy]',
+    '[data-site-picture]',
   ],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',

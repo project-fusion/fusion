@@ -23,6 +23,7 @@
 import '@fusion.dev/helix'
 import { drawAnatomy } from './preview-anatomy'
 import { RESTYLED } from './preview-events'
+import { drawPicture } from './preview-picture'
 
 /** Where the map chunk, MapLibre, the graph chunks, and the terminal chunk are, stamped at build time. */
 declare const __PREVIEW_GRAPH_COSMOS_URL__: string
@@ -341,8 +342,10 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountCodeEditors(host, generation)
     mountEditors(host, generation)
     highlightCode(host)
-    /* The family page's numbered parts, where it sent any. */
+    /* The family page's numbered parts, where it sent any, and its pictures
+       of a family drawn small. */
     void drawAnatomy(host)
+    void drawPicture(host)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()
