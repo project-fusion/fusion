@@ -213,16 +213,21 @@ describe('the line numbers', () => {
         element.style.fontFamily = 'serif'
         element.style.fontSize = '23px'
         element.style.setProperty('--helix-leading-normal', '2')
-        const start = view.scrollDOM.getBoundingClientRect().left + 2
         const lines = linesOf(view)
         expect(lines.map((line) => line.dataset.line)).toEqual(['1', '2', '3', '4'])
         for (const line of lines) {
-          const { bottom, top } = line.getBoundingClientRect()
+          const { bottom, left, top } = line.getBoundingClientRect()
           const number = getComputedStyle(line, '::before')
           expect(number.fontSize).toBe('23px')
           expect(number.lineHeight).toBe(getComputedStyle(line).lineHeight)
-          expect(element.shadowRoot?.elementFromPoint(start, top + 1)).toBe(line)
-          expect(element.shadowRoot?.elementFromPoint(start, bottom - 1)).toBe(line)
+          /* The middle of the number's box, which ends where the marker's
+             begins, and the marker's ends where the line starts. */
+          const middle =
+            left -
+            parseFloat(getComputedStyle(line, '::after').width) -
+            parseFloat(number.width) / 2
+          expect(element.shadowRoot?.elementFromPoint(middle, top + 1)).toBe(line)
+          expect(element.shadowRoot?.elementFromPoint(middle, bottom - 1)).toBe(line)
         }
       },
     )
