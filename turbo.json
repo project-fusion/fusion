@@ -547,6 +547,7 @@
         "@fusion.dev/helix-terminal#build"
       ],
       "inputs": [
+        "preview/preview-anatomy.ts",
         "preview/preview-code-editor-entry.ts",
         "preview/preview-editor-entry.ts",
         "preview/preview-events.ts",
@@ -558,6 +559,7 @@
         "preview/preview-highlight-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
+        "preview/preview-picture.ts",
         "preview/preview-plot-three-entry.ts",
         "preview/preview-terminal-entry.ts",
         "utils/map-view/map-view.ts",
