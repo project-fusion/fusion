@@ -32,6 +32,7 @@
     "./scope": "./lib/scope.mjs",
     "./settle": "./lib/settle.mjs",
     "./shard": "./lib/shard.mjs",
+    "./spec-file-blocks": "./lib/spec-file-blocks.mjs",
     "./strip-map-comment": "./lib/strip-map-comment.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
