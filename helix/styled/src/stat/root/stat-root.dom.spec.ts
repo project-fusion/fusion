@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  registerDom,
+  slotted,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -85,6 +92,24 @@ describe('stat', () => {
     expect(divided).toContain('margin-inline-start: calc(var(--_stat-group-gap) * -1')
     expect(divided).toContain('padding-inline-start: var(--_stat-group-gap)')
   })
+
+  /* "123456789012" stepped twice in a 120 pixel stat, edited in place to "12"
+     as a framework edits a text node, stayed two steps down with room to
+     spare: the edit asked for no render and the width did not move. */
+  if (hasLayout()) {
+    test('a figure edited in place is measured again', async () => {
+      const host = (await mount(
+        '<div style="inline-size: 120px"><helix-stat>123456789012<span slot="label">People</span></helix-stat></div>',
+      )) as HTMLElement
+      const stat = host.querySelector('helix-stat') as Updatable & { stepNeeded: number }
+      await stat.updateComplete
+      expect(stat.stepNeeded).toBe(2)
+      ;(stat.firstChild as Text).data = '12'
+      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+      expect(stat.stepNeeded).toBe(0)
+      expect(hasState(stat, 'stepped')).toBe(false)
+    })
+  }
 
   test('the hooks the docs name are what the sheets read', () => {
     expect(sheet('helix-stat')).toMatch(/var\(\s*--stat-value-size,/)
