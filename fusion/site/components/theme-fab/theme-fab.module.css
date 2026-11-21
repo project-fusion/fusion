@@ -32,9 +32,9 @@
   display: flex;
   inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
   inset-inline: 0;
-  /* In the corner, clear of the actions a page centers at its close. */
-  justify-content: flex-end;
-  padding-inline: var(--helix-space-lg);
+  /* Centered, on the page's own axis. */
+  justify-content: center;
+  padding-inline: var(--helix-space-md);
   pointer-events: none;
   position: fixed;
   z-index: var(--helix-layer-sticky);
@@ -217,7 +217,6 @@
 
   .fab:not([data-open]) {
     margin-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
-    margin-inline-end: var(--helix-space-lg);
   }
 
   /**
