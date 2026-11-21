@@ -1,0 +1,215 @@
+//! A declaration as the GPUI style calls that draw it.
+//!
+//! **Each call is written after a receiver**, `.bg(..)`, so the same call
+//! styles an element and the style refinement a `.hover()` closure builds,
+//! since both are `Styled`.
+//!
+//! **A declaration GPUI cannot draw yet is dropped with why**, as a phone's
+//! `dropped` list names one, and one the spike does not map is a fault.
+
+use std::collections::BTreeMap;
+
+use super::field;
+use super::theme::{float, Kind, Tokens};
+use crate::family::ir::Value;
+
+/// What a declaration becomes.
+pub enum Lowered {
+    /// The calls, in order.
+    Calls(Vec<String>),
+    /// Nothing, with why.
+    Dropped(String),
+}
+
+/// What a value is read as.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Wanted {
+    Color,
+    Length,
+    Number,
+}
+
+/// What lowering reads: the theme's tokens, and the hooks the element takes,
+/// which each lowering adds to.
+pub struct Reads<'a> {
+    pub tokens: &'a Tokens,
+    pub hooks: &'a mut BTreeMap<String, &'static str>,
+}
+
+/// `property: value` as calls.
+///
+/// # Errors
+///
+/// Why the spike cannot write it.
+pub fn lower(property: &str, value: &Value, reads: &mut Reads) -> Result<Lowered, String> {
+    let calls = |calls: &[String]| Ok(Lowered::Calls(calls.to_vec()));
+    match property {
+        "display" => match keyword(value)? {
+            /* GPUI has no inline layout, so an inline flex box is a flex box. */
+            "flex" | "inline-flex" => calls(&[".flex()".to_owned()]),
+            "block" | "inline-block" => calls(&[".block()".to_owned()]),
+            "none" => calls(&[".hidden()".to_owned()]),
+            other => Err(format!("`display: {other}` has no GPUI form in the spike")),
+        },
+        "align-items" => {
+            let call = match keyword(value)? {
+                "center" => ".items_center()",
+                "start" | "flex-start" => ".items_start()",
+                "end" | "flex-end" => ".items_end()",
+                "baseline" => ".items_baseline()",
+                other => return Err(format!("`align-items: {other}` has no GPUI form in the spike")),
+            };
+            calls(&[call.to_owned()])
+        }
+        "justify-content" => {
+            let call = match keyword(value)? {
+                "center" => ".justify_center()",
+                "start" | "flex-start" => ".justify_start()",
+                "end" | "flex-end" => ".justify_end()",
+                "space-between" => ".justify_between()",
+                "space-around" => ".justify_around()",
+                other => {
+                    return Err(format!(
+                        "`justify-content: {other}` has no GPUI form in the spike"
+                    ))
+                }
+            };
+            calls(&[call.to_owned()])
+        }
+        "background-color" => calls(&[format!(".bg({})", read(Wanted::Color, value, reads)?)]),
+        "color" => calls(&[format!(".text_color({})", read(Wanted::Color, value, reads)?)]),
+        "border-color" => calls(&[format!(
+            ".border_color({})",
+            read(Wanted::Color, value, reads)?
+        )]),
+        "border-radius" => calls(&[format!(".rounded({})", read(Wanted::Length, value, reads)?)]),
+        "font-size" => calls(&[format!(".text_size({})", read(Wanted::Length, value, reads)?)]),
+        "font-weight" => calls(&[format!(
+            ".font_weight(gpui::FontWeight({}))",
+            read(Wanted::Number, value, reads)?
+        )]),
+        "font-family" => match value {
+            Value::Token(name) if reads.tokens.kind(name) == Some(Kind::Family) => {
+                calls(&[format!(".font_family(theme.{}.clone())", field(name))])
+            }
+            _ => Err("a font family is read from a token in the spike".to_owned()),
+        },
+        "gap" => calls(&[format!(".gap({})", read(Wanted::Length, value, reads)?)]),
+        "padding-inline" => calls(&[format!(".px({})", read(Wanted::Length, value, reads)?)]),
+        "padding-block" => calls(&[format!(".py({})", read(Wanted::Length, value, reads)?)]),
+        "opacity" => calls(&[format!(".opacity({})", read(Wanted::Number, value, reads)?)]),
+        "outline" => outline(value, reads),
+        "transition" | "animation" => Ok(Lowered::Dropped(format!(
+            "`{property}`: GPUI animates only what `with_animation` names, and the runtime's transition driver is a later phase"
+        ))),
+        other => Err(format!("`{other}` has no GPUI form in the spike")),
+    }
+}
+
+/// An outline, as a ring: GPUI draws no outline.
+fn outline(value: &Value, reads: &mut Reads) -> Result<Lowered, String> {
+    let Value::Space(parts) = value else {
+        return Err("an outline is written as its width, its style, and its color".to_owned());
+    };
+    let [width, Value::Text(style), color] = parts.as_slice() else {
+        return Err("an outline is written as its width, its style, and its color".to_owned());
+    };
+    if style != "solid" {
+        return Err(format!("an outline drawn `{style}` has no GPUI form"));
+    }
+    let width = match width {
+        Value::Text(text) => text
+            .strip_suffix("px")
+            .and_then(|number| number.parse::<f64>().ok())
+            .map(|number| format!("gpui::px({})", float(number)))
+            .ok_or_else(|| format!("an outline `{text}` wide is written in pixels in the spike"))?,
+        _ => return Err("an outline's width is written in pixels in the spike".to_owned()),
+    };
+    let color = read(Wanted::Color, color, reads)?;
+    Ok(Lowered::Calls(vec![format!(
+        ".shadow(vec![super::theme::ring({width}, {color})])"
+    )]))
+}
+
+/// A keyword value.
+fn keyword(value: &Value) -> Result<&str, String> {
+    match value {
+        Value::Text(text) => Ok(text),
+        _ => Err("the value is no keyword".to_owned()),
+    }
+}
+
+/// `value` read as `wanted`, as a Rust expression.
+fn read(wanted: Wanted, value: &Value, reads: &mut Reads) -> Result<String, String> {
+    match value {
+        Value::Token(name) => {
+            let kind = reads
+                .tokens
+                .kind(name)
+                .ok_or_else(|| format!("the theme holds no `{name}`"))?;
+            let fits = matches!(
+                (wanted, kind),
+                (Wanted::Color, Kind::Color)
+                    | (Wanted::Length, Kind::Length)
+                    | (Wanted::Number, Kind::Number)
+            );
+            if fits {
+                Ok(format!("theme.{}", field(name)))
+            } else {
+                Err(format!(
+                    "`{name}` is a {kind:?} token, read here as a {wanted:?}"
+                ))
+            }
+        }
+        Value::Hook {
+            fallback: Some(fallback),
+            name,
+            of: None,
+        } => {
+            let fallback = read(wanted, fallback, reads)?;
+            reads.hooks.insert(
+                name.clone(),
+                match wanted {
+                    Wanted::Color => "gpui::Hsla",
+                    Wanted::Length => "gpui::AbsoluteLength",
+                    Wanted::Number => "f32",
+                },
+            );
+            Ok(format!("hooks.{}.unwrap_or({fallback})", field(name)))
+        }
+        Value::Hook { .. } => {
+            Err("a hook with no default, or another family's, is a later phase".to_owned())
+        }
+        Value::Number(number) => match wanted {
+            Wanted::Number => Ok(format!("{}_f32", float(*number))),
+            Wanted::Length if *number == 0.0 => Ok("gpui::px(0.)".to_owned()),
+            _ => Err(format!("`{number}` is no {wanted:?}")),
+        },
+        Value::Text(text) => literal(wanted, text),
+        _ => {
+            Err("the value is a later phase's: arithmetic, a mix, or a measured length".to_owned())
+        }
+    }
+}
+
+/// Words written in the source, read as `wanted`.
+fn literal(wanted: Wanted, text: &str) -> Result<String, String> {
+    match wanted {
+        Wanted::Color if text == "transparent" => Ok("gpui::transparent_black()".to_owned()),
+        Wanted::Color => {
+            let hex = super::theme::color(text)?;
+            Ok(format!(
+                "gpui::Hsla::from({})",
+                hex.trim_end_matches(".into()")
+            ))
+        }
+        Wanted::Length => {
+            let length = super::theme::length(text)?;
+            Ok(length.replace("AbsoluteLength::", "gpui::AbsoluteLength::"))
+        }
+        Wanted::Number => text
+            .parse::<f64>()
+            .map(|number| format!("{}_f32", float(number)))
+            .map_err(|_| format!("`{text}` is no number")),
+    }
+}

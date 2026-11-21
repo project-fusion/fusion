@@ -1,0 +1,22 @@
+# Acme's Button and Badge, written as Rust by `helix system gpui` and drawn in
+# a GPUI window. A spike for `helix/neutral/RUST.md`.
+#
+# **Outside the Cargo workspace**, with a workspace of its own and its own
+# lockfile, so no workspace build compiles GPUI. Build it from this folder.
+#
+# **GPUI is pinned to one snapshot**, the `gpui-pre` crates Zed's main branch
+# is published as each week. 0.3.12 is the snapshot gpui-component 0.10 builds
+# with. Every snapshot may change GPUI's API, so a bump moves both crates
+# together and runs `helix system gpui` again.
+[package]
+name = "helix-gpui-spike"
+edition = "2021"
+license = "MIT"
+publish = false
+version = "0.0.0"
+
+[workspace]
+
+[dependencies]
+gpui = { package = "gpui-pre", version = "=0.3.12" }
+gpui_platform = { package = "gpui-pre-platform", version = "=0.3.12", features = ["font-kit", "runtime_shaders"] }

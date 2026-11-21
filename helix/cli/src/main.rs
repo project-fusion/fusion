@@ -141,6 +141,8 @@ fn main() {
                 #[cfg(feature = "internal")]
                 System::DesignTokens(args) => family::design_tokens(args, config, &from, cli.json),
                 #[cfg(feature = "internal")]
+                System::Gpui(args) => family::gpui(args, config, &from, cli.json),
+                #[cfg(feature = "internal")]
                 System::Machines(args) => family::machines(args, config, &from, cli.json),
                 System::Parts(args) => family::parts(args, config, &from, cli.json),
                 System::Platforms(args) => family::platforms(args, config, &from),

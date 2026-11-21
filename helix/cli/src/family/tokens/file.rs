@@ -37,6 +37,14 @@ struct Written {
     value: Json,
 }
 
+/// Each token's kind, by its name, and each mode's values, as the native
+/// theme takes them.
+#[derive(Debug, Default)]
+pub struct Values {
+    pub kinds: Vec<(String, &'static str)>,
+    pub modes: Vec<(&'static str, Vec<(String, Native)>)>,
+}
+
 /// The tokens of one file, in the order the file writes them.
 #[derive(Debug)]
 pub struct Read {
@@ -97,6 +105,34 @@ impl Read {
         system: &System,
         header: &str,
     ) -> Result<Vec<(String, String)>, Failure> {
+        let values = self.values(modes)?;
+        let mut written: Vec<(String, String)> = values
+            .modes
+            .iter()
+            .map(|(name, values)| {
+                (
+                    format!("{name}.generated.ts"),
+                    module(system, header, name, values),
+                )
+            })
+            .collect();
+        written.push((
+            "kinds.generated.ts".to_owned(),
+            kinds_module(system, header, &values.kinds),
+        ));
+        Ok(written)
+    }
+
+    /// Each token's kind, and its value in each mode, as the native theme
+    /// takes them. `modes` lays a file over this one for each mode it names:
+    /// `light`, `dark`, or both.
+    ///
+    /// # Errors
+    ///
+    /// [`Failure`] naming each token whose value cannot be written, each mode
+    /// the native theme does not draw, and each token a mode's file sets that
+    /// this file does not hold.
+    pub fn values(&self, modes: &BTreeMap<String, PathBuf>) -> Result<Values, Failure> {
         let mut faults = Vec::new();
         for mode in modes.keys() {
             if mode != "light" && mode != "dark" {
@@ -105,8 +141,7 @@ impl Read {
                 ));
             }
         }
-        let mut written = Vec::new();
-        let mut kinds: Vec<(String, &str)> = Vec::new();
+        let mut read = Values::default();
         for name in ["light", "dark"] {
             let laid = match modes.get(name) {
                 Some(path) => self.laid_under(&Self::file(path)?, &mut faults),
@@ -117,24 +152,17 @@ impl Read {
                 match native(&laid, token, 0) {
                     Ok((kind, value)) => {
                         if name == "light" {
-                            kinds.push((token.name.clone(), kind));
+                            read.kinds.push((token.name.clone(), kind));
                         }
                         values.push((token.name.clone(), value));
                     }
                     Err(why) => faults.push(format!("`{}` in {name} mode: {why}", token.name)),
                 }
             }
-            written.push((
-                format!("{name}.generated.ts"),
-                module(system, header, name, &values),
-            ));
+            read.modes.push((name, values));
         }
-        written.push((
-            "kinds.generated.ts".to_owned(),
-            kinds_module(system, header, &kinds),
-        ));
         if faults.is_empty() {
-            Ok(written)
+            Ok(read)
         } else {
             Err(Failure::input(
                 format!(

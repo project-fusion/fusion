@@ -299,3 +299,46 @@ fn nothing_it_writes_names_helix_but_the_runtime_it_draws_with() {
     }
     assert!(named.is_empty(), "{}", named.join("\n"));
 }
+
+#[test]
+fn the_gpui_spike_writes_the_badge_and_the_button_and_names_the_tab_set_it_leaves_out() {
+    let acme = Acme::new("gpui");
+    let output = Command::new(binary())
+        .args(["system", "gpui", "--out", "out/gpui", "--config"])
+        .arg(acme.root.join("helix.json"))
+        .current_dir(&acme.root)
+        .env("NO_COLOR", "1")
+        .output()
+        .expect("the binary runs");
+    let said = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{said}");
+    assert!(said.contains("left out tabs/root"), "{said}");
+    let button = acme.read("out/gpui/button.rs");
+    for written in [
+        "pub struct Button {",
+        "pub enum ButtonEmphasis {",
+        ".role(Role::Button)",
+        ".track_focus(&focus)",
+        "radius: Option<gpui::AbsoluteLength>",
+        ".rounded(hooks.radius.unwrap_or(theme.radius_control))",
+        ".when(emphasis == Some(ButtonEmphasis::Outlined), |el| el.bg(gpui::transparent_black())",
+        ".focus_visible(|style| {",
+        "super::theme::ring(gpui::px(2.0), theme.color_focus)",
+        ".when(disabled, |el| el.opacity(0.5_f32))",
+    ] {
+        assert!(button.contains(written), "{written}\n{button}");
+    }
+    assert!(
+        button.contains("`transition`"),
+        "the transition it drops is named:\n{button}"
+    );
+    let badge = acme.read("out/gpui/badge.rs");
+    assert!(badge.contains(".role(Role::Status)"), "{badge}");
+    assert!(badge.contains(".child(value.clone())"), "{badge}");
+    let theme = acme.read("out/gpui/theme.rs");
+    assert!(
+        theme.contains("color_accent: gpui::rgba(0x1a4de6ff).into(),"),
+        "{theme}"
+    );
+    assert!(theme.contains("pub fn dark(cx: &App) -> Self"), "{theme}");
+}

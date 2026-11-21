@@ -41,6 +41,7 @@ use crate::args::{SystemDesignTokens, SystemTokens};
 use crate::PRODUCT;
 
 pub use dtcg::{design_tokens, Layer};
+pub use file::{Read, Values};
 
 /// The design system a token layer is written for: its name, the names it
 /// gives its tokens, and the key its own data is kept under in each

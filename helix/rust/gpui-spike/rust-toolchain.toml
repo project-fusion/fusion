@@ -1,0 +1,4 @@
+# GPUI needs the latest stable Rust, which is newer than the workspace's.
+[toolchain]
+channel = "1.100.0"
+profile = "minimal"
