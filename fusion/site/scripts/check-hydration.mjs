@@ -19,7 +19,7 @@
  * hands React the handler again and React binds it itself, which hides the
  * bug, and nothing here presses a control that commits first:
  *
- * - `/` at 1440: Down Arrow on the Helix product opens its megamenu. The link's
+ * - `/` at 1440: Down Arrow on Design opens its megamenu. The link's
  *   `aria-expanded` is React state that `onhelix-before-open` sets.
  * - `/insights`: with focus off the search the page put it in, `/` is the
  *   shortcut `helix-kbd` sends as `helix-shortcut`, and `onhelix-shortcut`
@@ -65,14 +65,14 @@ const PAGES = [
     needs: ['helix-megamenu'],
     path: '/',
     run: async (page) => {
-      const trigger = page.locator('helix-megamenu[label="Helix"] a[slot="trigger"]')
+      const trigger = page.locator('helix-megamenu[label="Design"] a[slot="trigger"]')
       await trigger.focus()
       await page.keyboard.press('ArrowDown')
       return page
         .waitForFunction(
           () =>
             document
-              .querySelector('helix-megamenu[label="Helix"] a[slot="trigger"]')
+              .querySelector('helix-megamenu[label="Design"] a[slot="trigger"]')
               ?.getAttribute('aria-expanded') === 'true',
           undefined,
           { timeout: 2000 },
@@ -80,8 +80,8 @@ const PAGES = [
         .then(() => true)
         .catch(() => false)
     },
-    said: '`onhelix-before-open` set the open panel, so the Helix link says it is expanded',
-    waitFor: 'helix-megamenu[label="Helix"]',
+    said: '`onhelix-before-open` set the open panel, so the Design link says it is expanded',
+    waitFor: 'helix-megamenu[label="Design"]',
     width: 1440,
   },
   {
