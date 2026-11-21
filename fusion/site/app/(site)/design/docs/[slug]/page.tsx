@@ -29,7 +29,7 @@ export async function generateMetadata({
   return page
     ? pageMetadata({
         description: page.description,
-        path: `/helix/docs/${page.slug}`,
+        path: `/design/docs/${page.slug}`,
         title: page.title,
       })
     : {}

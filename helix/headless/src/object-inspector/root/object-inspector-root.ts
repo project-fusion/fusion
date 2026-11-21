@@ -167,7 +167,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @anatomy count
  * @practice Name a JSON script with `for` on a page a server renders or React hydrates. - JSON text works with server rendering and with React hydration, which skips object properties.
  * @practice {windowed} Give a `windowed` inspector a height on the headless tier. - Windowing works only in a box with a height, and the styled tier sets one.
- * @documentation https://fusion.dev/helix/components/object-inspector
+ * @documentation https://fusion.dev/design/components/object-inspector
  *
  * @slot empty - Shown in the tree while it has no entries to show. Defaults to `empty-text`, or `no-matches-label` while a filter matched none.
  *

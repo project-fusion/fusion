@@ -9,17 +9,17 @@ import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
 import { SORTS } from './sorts'
 
-const vertical = findVertical('/helix')
-const product = PRODUCTS.find((entry) => entry.href === '/helix')
+const vertical = findVertical('/design')
+const product = PRODUCTS.find((entry) => entry.href === '/design')
 
-/* `Components`, because this is the index and not the product page. `/helix`
-   is the product page; `/helix/components` is the URL a reader guesses for the
+/* `Components`, because this is the index and not the product page. `/design`
+   is the product page; `/design/components` is the URL a reader guesses for the
    list, so it needs an index of its own above the `[family]` segment.
  */
 export const metadata = pageMetadata({
   description:
     'Every family Helix ships, with its status, its category and the tier it is documented at.',
-  path: '/helix/components',
+  path: '/design/components',
   title: 'Components',
 })
 
@@ -88,7 +88,7 @@ export default async function Page({
             className={styles.familyCard}
             data-card
             data-slug={family.slug}
-            href={`/helix/components/${family.slug}`}
+            href={`/design/components/${family.slug}`}
             key={family.slug}
           >
             <helix-card separation="outlined">

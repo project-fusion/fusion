@@ -130,7 +130,7 @@ const isInsertion = (event: Event): boolean =>
  * @anatomy surface
  * @practice Import Option beside Combobox. - An option belongs to the Option family, which Combobox does not register.
  * @practice Add the option yourself when `creatable` sends its create event. - The options are your light DOM, and your framework would render over an option the combobox inserted.
- * @documentation https://fusion.dev/helix/components/combobox
+ * @documentation https://fusion.dev/design/components/combobox
  *
  * @slot - The options.
  * @slot empty - What the list shows when it has no options, for content richer than `empty-text`.

@@ -177,7 +177,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @anatomy screen
  * @practice Set `screen-width` and `screen-height` to the screen's size in the units your device takes input in. - Every point an event carries is in those units: points for the iOS Simulator, and pixels for an Android device.
  * @practice Set `readonly` while an agent drives the device. - The screen then shows the stream and sends nothing back.
- * @documentation https://fusion.dev/helix/components/device-screen
+ * @documentation https://fusion.dev/design/components/device-screen
  *
  * @slot - The element that draws the stream: a `<video>`, an `<img>`, or a `<canvas>`.
  * @slot back-icon - Replaces the glyph inside the Back button.

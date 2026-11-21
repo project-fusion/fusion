@@ -16,15 +16,15 @@ import { CORTEX_MODULES } from './modules'
 import styles from './page.module.css'
 import { TraceGraph } from './trace-graph'
 
-const vertical = findVertical('/cortex')
-const product = PRODUCTS.find((entry) => entry.href === '/cortex')
+const vertical = findVertical('/agents')
+const product = PRODUCTS.find((entry) => entry.href === '/agents')
 
 /**
  * Cortex, which is what this route is now named for.
  */
 export const metadata = pageMetadata({
   description: product?.body ?? vertical?.summary ?? '',
-  path: '/cortex',
+  path: '/agents',
   title: product?.name ?? vertical?.name ?? 'Cortex',
 })
 

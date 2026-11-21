@@ -27,7 +27,7 @@ export type MapTerrainEncoding = 'mapbox' | 'terrarium'
  * @status stable
  * @category media
  * @aliases Terrain, Hillshade, Elevation, Relief
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The tiles, how the ground is raised, or the layer's name or colors changed. Used by `connectMap`; pages do not need to listen for it.
  */

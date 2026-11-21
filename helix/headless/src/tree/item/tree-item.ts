@@ -70,7 +70,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
- * @documentation https://fusion.dev/helix/components/tree
+ * @documentation https://fusion.dev/design/components/tree
  *
  * @slot - The item's label. A nested item does not go here: give it `slot="children"`. In a development build, an item nested here is reported.
  * @slot actions - Controls for the row, after `end`, such as a button that opens a menu. Shown while the row is hovered or focused.

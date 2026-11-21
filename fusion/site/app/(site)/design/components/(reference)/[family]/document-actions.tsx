@@ -53,7 +53,7 @@ export function DocumentActions({
          accordion and every component page would ship its own copy of one to
          serve a menu row almost nobody opens. It is a static file on this
          origin, so the request is a cache hit in every case that matters. */
-      void fetch(`/helix/components/${family}.md`)
+      void fetch(`/design/components/${family}.md`)
         .then((response) => response.text())
         .then((markdown) => navigator.clipboard.writeText(markdown))
         .then(() => setCopied(true))
@@ -74,7 +74,7 @@ export function DocumentActions({
   /* The prompt both agents are handed. It points at the document rather than
      pasting it, because the document is a stable public URL and a pasted copy
      is a snapshot that starts going stale immediately. */
-  const document = absolute(`/helix/components/${family}.md`)
+  const document = absolute(`/design/components/${family}.md`)
   const prompt = `Read ${document} and help me use the Helix ${family} component.`
 
   return (
@@ -84,7 +84,7 @@ export function DocumentActions({
       </helix-icon-button>
 
       {headline && (
-        <helix-menu-item href={`/helix/sandbox?e=${family}.${headline}`} value="edit-sandbox">
+        <helix-menu-item href={`/design/sandbox?e=${family}.${headline}`} value="edit-sandbox">
           Edit in Sandbox
         </helix-menu-item>
       )}
@@ -94,7 +94,7 @@ export function DocumentActions({
           rather than assumed: `text/markdown` renders as text there instead of
           downloading, which is the open question here. */}
       <helix-menu-item
-        href={`/helix/components/${family}.md`}
+        href={`/design/components/${family}.md`}
         rel="noreferrer"
         target="_blank"
         value="view-markdown"

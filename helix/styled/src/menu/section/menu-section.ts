@@ -13,7 +13,7 @@ import { styles } from './menu-section.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Menu group, Menu heading
- * @documentation https://fusion.dev/helix/components/menu
+ * @documentation https://fusion.dev/design/components/menu
  *
  * @cssproperty --menu-section-heading-color - Color of the heading.
  */

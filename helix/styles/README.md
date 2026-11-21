@@ -26,6 +26,6 @@ Or take the pieces, in the order of the first four rows:
 The tokens are the contract every Helix component reads, so overriding one here
 moves every component that answers it.
 
-[Documentation](https://fusion.dev/helix) · [Token reference](https://fusion.dev/helix/docs/tokens)
+[Documentation](https://fusion.dev/design) · [Token reference](https://fusion.dev/design/docs/tokens)
 
 MIT

@@ -44,7 +44,7 @@ import { styles } from './color-picker-root.css.js'
  * @anatomy sample
  * @anatomy channels
  * @anatomy value
- * @documentation https://fusion.dev/helix/components/color-picker
+ * @documentation https://fusion.dev/design/components/color-picker
  *
  * @cssproperty --color-picker-feedback-color - The color of the message under the picker, while `feedback` is set.
  * @cssproperty --color-picker-field-label-color - The color of the names above the channel number fields, in `channel-fields`.

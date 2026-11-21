@@ -28,7 +28,7 @@ import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-ma
 export const metadata = pageMetadata({
   description:
     'Describe a brand and get a palette. Helix measures the contrast of each pair it solves.',
-  path: '/helix/theme',
+  path: '/design/theme',
   title: 'Theme builder',
 })
 
@@ -119,9 +119,9 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
         {
           group: 'Components',
           items: families.map((family) => ({
-            alternate: `/helix/sandbox?family=${family.slug}`,
+            alternate: `/design/sandbox?family=${family.slug}`,
             alternateLabel: 'Open in the sandbox',
-            href: `/helix/components/${family.slug}`,
+            href: `/design/components/${family.slug}`,
             label: family.label,
           })),
         },

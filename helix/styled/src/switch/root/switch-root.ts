@@ -37,7 +37,7 @@ import { styles } from './switch-root.css.js'
  * @anatomy label
  * @anatomy hint?
  * @practice Apply the setting the moment the switch changes, with no Save button after it. - People expect a switch to take effect at once.
- * @documentation https://fusion.dev/helix/components/switch
+ * @documentation https://fusion.dev/design/components/switch
  *
  * @slot - The label that names what the switch turns on.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.

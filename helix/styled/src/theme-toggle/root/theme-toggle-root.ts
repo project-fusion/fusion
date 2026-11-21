@@ -21,7 +21,7 @@ import { styles } from './theme-toggle-root.css.js'
  * @anatomy button
  * @anatomy icon
  * @practice Listen for the change event, and write the mode into the next page you serve. - The button sets the mode on the page in front of you, and the next page starts from its own markup.
- * @documentation https://fusion.dev/helix/components/theme-toggle
+ * @documentation https://fusion.dev/design/components/theme-toggle
  *
  * @cssproperty --theme-toggle-background-color - The button's fill. Defaults to the floating overlay surface.
  */

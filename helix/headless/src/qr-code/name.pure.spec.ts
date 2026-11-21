@@ -11,8 +11,8 @@ describe('the name of a code', () => {
   })
 
   test('is the word and the address for a web address with no label', () => {
-    expect(qrName('', 'https://fusion.dev/helix', 'QR code')).toBe(
-      'QR code, https://fusion.dev/helix',
+    expect(qrName('', 'https://fusion.dev/design', 'QR code')).toBe(
+      'QR code, https://fusion.dev/design',
     )
     expect(qrName('  ', ' HTTP://example.com ', 'Code QR')).toBe('Code QR, HTTP://example.com')
   })

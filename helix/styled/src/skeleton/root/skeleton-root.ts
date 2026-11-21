@@ -44,7 +44,7 @@ import { styles } from './skeleton-root.css.js'
  * @anatomy skeleton
  * @practice {loading} Put the real content inside the skeleton and set `loading`. - The skeleton takes the content's size, so nothing moves when the content arrives.
  * @practice {revealing} Draw your own placeholder in the `placeholder` slot for content that is not there until it loads. - The placeholder shows while `loading` is set, laid out as the content will be, such as a circle and three lines for a profile.
- * @documentation https://fusion.dev/helix/components/skeleton
+ * @documentation https://fusion.dev/design/components/skeleton
  *
  * @csspart content - The box around the content, hidden while `loading`.
  * @csspart line - Each line of a `lines` paragraph, which is also a `skeleton` part.

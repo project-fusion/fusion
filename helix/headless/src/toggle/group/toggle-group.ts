@@ -68,7 +68,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @since 0.1.0
  * @status stable
  * @aliases SegmentedControl, Segmented, Navigation, Switcher
- * @documentation https://fusion.dev/helix/components/toggle
+ * @documentation https://fusion.dev/design/components/toggle
  *
  * @slot - The group's items.
  * @slot end - Content after the track, on the same line, such as a count or a reset.

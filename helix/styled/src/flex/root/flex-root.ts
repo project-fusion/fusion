@@ -53,7 +53,7 @@ const wrapConverter = {
  * @use Children in one row or one column with a gap, such as an avatar beside a name.
  * @instead grid - Children in columns that line up across rows.
  * @practice {layouts} Put several actions in a flex of their own inside a flex whose `layout` is split. - They then stay together at the end, where split would space them evenly.
- * @documentation https://fusion.dev/helix/components/flex
+ * @documentation https://fusion.dev/design/components/flex
  *
  * @slot - The items to lay out.
  *

@@ -84,7 +84,7 @@ const ink = (value: string, alpha = 1): string => {
  * @instead meter - A measurement in a known range, such as disk used.
  * @instead orb - What an agent is doing, such as thinking or listening.
  * @practice Set `level` and `bands` from your audio as often as you have readings, about 30 times a second. - Each bar and wave eases toward its reading, up fast and down slower.
- * @documentation https://fusion.dev/helix/components/voice-level
+ * @documentation https://fusion.dev/design/components/voice-level
  *
  * @csspart canvas - The canvas the level is drawn on.
  *

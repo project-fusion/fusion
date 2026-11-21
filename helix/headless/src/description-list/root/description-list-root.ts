@@ -32,7 +32,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy item
  * @anatomy label
  * @anatomy value
- * @documentation https://fusion.dev/helix/components/description-list
+ * @documentation https://fusion.dev/design/components/description-list
  *
  * @slot - The items.
  *

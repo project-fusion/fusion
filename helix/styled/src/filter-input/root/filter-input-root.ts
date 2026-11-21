@@ -48,7 +48,7 @@ import '../../voice-level/index.js'
  * @practice {suggesting} Import Option beside Filter Input for anything in `suggestions`. - A suggestion is an option, the Option family's, which the field does not register.
  * @practice {picking} Import the Filter Input `menu` entry to write a `FilterMenu`. - `FilterMenu` draws its pages with Menu, which the family's own entry leaves out.
  * @practice {dismissing} Remove a token in `tags` from your markup when it asks to go. - The field only sends the request, from the remove button or from Backspace.
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  *
  * @cssproperty --filter-input-action-padding-inline - The space on either side of a slotted control's label. It follows `--helix-space-xs`, the space a token uses.
  * @cssproperty --filter-input-action-size - The height of a control slotted at either end. It follows `--helix-size-tag`, so it matches the height of the tokens beside it.

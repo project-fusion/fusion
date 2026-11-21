@@ -89,7 +89,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @anatomy icon
  * @anatomy label?
  * @practice Set `good` to the direction that is good for the metric. - Up is bad for churn, latency, error rate, cost, and bounce rate, and the color follows from `movement`.
- * @documentation https://fusion.dev/helix/components/trend
+ * @documentation https://fusion.dev/design/components/trend
  *
  * @slot - The metric that moved. Not needed with `value`, which writes it.
  * @slot down-icon - Replaces the arrow while `movement` is `down`. Hidden from screen readers.

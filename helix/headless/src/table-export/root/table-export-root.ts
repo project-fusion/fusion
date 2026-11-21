@@ -68,7 +68,7 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @anatomy format
  * @anatomy actions
  * @practice Put Table Export in a Popover or a Dialog opened by an Export button. - The panel is the content, and it draws no trigger of its own.
- * @documentation https://fusion.dev/helix/components/table-export
+ * @documentation https://fusion.dev/design/components/table-export
  *
  * @csspart actions - The row that holds Copy and Export.
  * @csspart choice - One choice, a `Radio`.

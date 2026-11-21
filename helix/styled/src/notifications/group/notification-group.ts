@@ -21,7 +21,7 @@ import { styles } from './notification-group.css.js'
  * @status stable
  * @category feedback
  * @aliases NotificationSection, FeedGroup
- * @documentation https://fusion.dev/helix/components/notifications
+ * @documentation https://fusion.dev/design/components/notifications
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group collapses. Cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group expands. Cancelable: cancel it to keep the group collapsed.

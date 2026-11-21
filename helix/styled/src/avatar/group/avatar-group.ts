@@ -24,7 +24,7 @@ import { styles } from './avatar-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Avatar stack, Facepile
- * @documentation https://fusion.dev/helix/components/avatar
+ * @documentation https://fusion.dev/design/components/avatar
  *
  * @cssproperty --avatar-group-overflow-background-color - The fill of the count of avatars past `max`.
  * @cssproperty --avatar-group-overflow-border-color - The edge of the count of avatars past `max`, which keeps it a circle on a surface the color of its fill.

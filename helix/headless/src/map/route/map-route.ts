@@ -42,7 +42,7 @@ export const pointsConverter = { fromAttribute: pointsOf }
  * @status stable
  * @category media
  * @aliases Map line, Path, Polyline
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The route's points, progress, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  */

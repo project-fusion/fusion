@@ -69,7 +69,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @anatomy field
  * @anatomy hint?
  * @practice Set `type` and `required` before you write `validate`. - The browser checks those first, and `validate` runs on each change only once it finds nothing wrong.
- * @documentation https://fusion.dev/helix/components/input
+ * @documentation https://fusion.dev/design/components/input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot conceal-icon - Replaces the crossed-out eye on the reveal button while the password shows, under `reveal`.

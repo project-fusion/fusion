@@ -406,7 +406,7 @@ export function MapsHero({
           <Link data-button="solid" data-button-tone="primary" href="#get-started">
             Get started
           </Link>
-          <Link data-button="subtle" href="/helix/theme?layout=map">
+          <Link data-button="subtle" href="/design/theme?layout=map">
             Build your theme
           </Link>
         </helix-flex>
@@ -415,7 +415,7 @@ export function MapsHero({
         {sent ? (
           <helix-text scale="caption">
             Showing your theme from the theme builder.{' '}
-            <a data-link="true" href={`/helix/theme?${sent.query}`}>
+            <a data-link="true" href={`/design/theme?${sent.query}`}>
               Back to the theme builder
             </a>
           </helix-text>

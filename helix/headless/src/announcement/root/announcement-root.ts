@@ -83,7 +83,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @anatomy dismiss?
  * @practice Remove a dismissed announcement in your listener. - The dismiss button and `duration` send the dismiss event, and the announcement stays in the document.
  * @practice Set `queued` to show several announcements one at a time. - A queued announcement waits while one queued before it in the same parent is still there, and shows when that one is removed.
- * @documentation https://fusion.dev/helix/components/announcement
+ * @documentation https://fusion.dev/design/components/announcement
  *
  * @slot - The message.
  * @slot actions - Actions for the message, usually a link or a button.

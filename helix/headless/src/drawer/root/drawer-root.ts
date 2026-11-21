@@ -137,7 +137,7 @@ import { startsSwipe } from '../swipe-start.js'
  * @anatomy dismiss?
  * @anatomy content
  * @practice {unsaved} Open the drawer from a button with `commandfor="<id>"` naming the drawer and `command="--show"`. - The platform's invoker attributes open it with no script.
- * @documentation https://fusion.dev/helix/components/drawer
+ * @documentation https://fusion.dev/design/components/drawer
  *
  * @slot - The drawer's content.
  * @slot dismiss-icon - Replaces the glyph inside the close control.

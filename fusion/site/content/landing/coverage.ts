@@ -27,7 +27,7 @@ export {
 } from './claims.generated'
 
 /** The table with every element named, and the size comparison beside it. */
-export const METRICS_HREF = '/helix/docs/metrics#what-each-system-ships'
+export const METRICS_HREF = '/design/docs/metrics#what-each-system-ships'
 
 /** The day the peers were read, written the way the site writes dates. */
 export const measuredOn = (iso: string): string =>

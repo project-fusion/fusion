@@ -16,7 +16,7 @@ import { styles } from './tab-panel.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/tabs
+ * @documentation https://fusion.dev/design/components/tabs
  *
  * @slot - The panel's content.
  *

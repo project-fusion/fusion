@@ -52,7 +52,7 @@ import '../../button/index.js'
  * @since 0.1.0
  * @status stable
  * @aliases Stage
- * @documentation https://fusion.dev/helix/components/steps
+ * @documentation https://fusion.dev/design/components/steps
  *
  * @slot - The step's name.
  * @slot content - The stage's content. The headless tier always renders it, because it has no stylesheet to collapse it with. Your stylesheet decides whether it is collapsed.

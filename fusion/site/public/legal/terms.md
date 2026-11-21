@@ -21,7 +21,7 @@ agree terms for paid work separately, in writing.
 
 ## The sandbox runs your code in your browser
 
-`/helix/sandbox` and `/helix/theme` run the code you type into them.
+`/design/sandbox` and `/design/theme` run the code you type into them.
 
 Your code runs inside an iframe with `sandbox="allow-scripts allow-forms"`. The
 iframe does not have `allow-same-origin`, so the document runs with an opaque

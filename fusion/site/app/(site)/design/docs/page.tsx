@@ -11,7 +11,7 @@ import styles from './page.module.css'
  */
 export const metadata = pageMetadata({
   description: 'Install it, theme it, and the ideas underneath.',
-  path: '/helix/docs',
+  path: '/design/docs',
   title: 'Docs',
 })
 
@@ -19,7 +19,7 @@ export default function DocsIndex() {
   return (
     /* **`docsMain`, not the vertical product shell.**
        `vertical-page.module.css` carries `padding-block: var(--site-band)`, the
-       marketing band inset that `/helix` and `/cortex` need because they have no
+       marketing band inset that `/design` and `/agents` need because they have no
        chrome above them. Inside the docs layout, which already pads 48px below
        the header, the two stack: the index's title sits at 249 where every page
        it links to starts at 134, and 108px below its own sidebar. An index that
@@ -51,7 +51,7 @@ export default function DocsIndex() {
           </helix-text>
           <div className={styles.pages}>
             {section.pages.map((page) => (
-              <Link className={styles.page} href={`/helix/docs/${page.slug}`} key={page.slug}>
+              <Link className={styles.page} href={`/design/docs/${page.slug}`} key={page.slug}>
                 <helix-text class={styles.title} scale="body-strong">
                   {page.title}
                 </helix-text>

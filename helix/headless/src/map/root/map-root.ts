@@ -210,7 +210,7 @@ const SETTLES = 400
  * @practice Import the entry of each layer you write beside `map/root`, such as `map/marker`. - A map draws the layers it is given, so `map/root` registers the frame alone.
  * @practice Add pan and rotate to `controls` where the map has to be usable without dragging. - Dragging is otherwise the only way a pointer moves the map, and WCAG 2.2 asks for another way at level AA.
  * @practice {behind-content} Set `fill` to lay the map behind a page's own content, and give its container a position, such as relative. - The frame covers its container.
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @slot - The element your renderer draws the map in, and the map's markers, routes, areas, positions, and points layers.
  * @slot attribution - The map credit, which most tile licenses require.

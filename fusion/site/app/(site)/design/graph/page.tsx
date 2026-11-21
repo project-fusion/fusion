@@ -114,7 +114,7 @@ function Showcase({
 
 export const metadata = pageMetadata({
   description: GRAPH.lede,
-  path: '/helix/graph',
+  path: '/design/graph',
   title: GRAPH.title,
 })
 
@@ -123,7 +123,7 @@ export const metadata = pageMetadata({
  *
  * **A page beside the component's reference**, because what is shown is more
  * than a component: a frame, a connector, three renderers, and shapes.
- * `/helix/components/graph` stays the frame's reference.
+ * `/design/components/graph` stays the frame's reference.
  *
  * **Sold, then shown, then handed over**, in Maps' order: a mind on a model
  * of a brain at the top, then what a graph gets from Helix, a live graph,
@@ -218,7 +218,7 @@ export default function Page() {
               <Snippet code={GRAPH_INSTALL} label="Install" language="sh" />
             </div>
             <helix-flex class="siteActions" data-density="lg">
-              <Link data-button="solid" data-button-tone="primary" href="/helix/docs/graphs">
+              <Link data-button="solid" data-button-tone="primary" href="/design/docs/graphs">
                 Read the Graphs guide
               </Link>
             </helix-flex>

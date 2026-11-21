@@ -146,7 +146,7 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * @anatomy nav
  * @anatomy indicator
  * @practice Mark the current link with `aria-current`. - The marker reads it, so the attribute a screen reader announces also places the marker.
- * @documentation https://fusion.dev/helix/components/navigation
+ * @documentation https://fusion.dev/design/components/navigation
  *
  * @slot - The destinations, as your own links.
  * @slot indicator - A marker of your own, drawn inside the `indicator` part, where the current destination's place and size reach it.

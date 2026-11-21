@@ -5,8 +5,8 @@ path: /legal/acceptable-use
 title: Acceptable use
 ---
 
-Last updated September 26, 2026. This policy covers `/helix/sandbox` and
-`/helix/theme`, the two pages that run code you write. The policy is short,
+Last updated September 26, 2026. This policy covers `/design/sandbox` and
+`/design/theme`, the two pages that run code you write. The policy is short,
 because the way the sandbox is built prevents most misuse.
 
 ## Your code runs in your browser

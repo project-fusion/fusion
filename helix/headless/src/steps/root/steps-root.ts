@@ -112,7 +112,7 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  * @anatomy progress?
  * @practice Give every step a `value`, or none. - A step with no value is named by its place, so a value of 2 and the second place are one name.
  * @practice Set `--button-background-color` to change the hover color of a step's name. - The name is a Button, and Steps has no `--steps-hover-color`.
- * @documentation https://fusion.dev/helix/components/steps
+ * @documentation https://fusion.dev/design/components/steps
  *
  * @slot - The steps.
  *

@@ -45,11 +45,11 @@ import { fileURLToPath } from 'node:url'
 import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { CONTEXTS } from '../app/(tool)/helix/theme/themed-contexts.tsx'
-import { LAYOUTS } from '../app/(tool)/helix/theme/themed-page.tsx'
+import { CONTEXTS } from '../app/(tool)/design/theme/themed-contexts.tsx'
+import { LAYOUTS } from '../app/(tool)/design/theme/themed-page.tsx'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const OUT = join(ROOT, 'fusion/site/app/(tool)/helix/theme/themed-page-markup.generated.ts')
+const OUT = join(ROOT, 'fusion/site/app/(tool)/design/theme/themed-page-markup.generated.ts')
 
 /* Keyed by the pair, because the two axes are independent and the builder holds
    one piece of state for each. A nested record would make the lookup two steps

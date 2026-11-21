@@ -139,7 +139,7 @@ const CONTROL = 'helix-control:'
  * @anatomy footer?
  * @practice Import Command alone for commands written as options. - The palette registers Option itself, since it draws the controls on screen as options.
  * @practice {controls} Set `controls` to find any control on screen. - Every labeled Helix control puts itself on the page's list, and the palette lists the ones you can reach once you type.
- * @documentation https://fusion.dev/helix/components/command
+ * @documentation https://fusion.dev/design/components/command
  *
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.

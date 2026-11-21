@@ -70,7 +70,7 @@ export interface MapPointsCollection {
  * @status stable
  * @category media
  * @aliases Data layer, GeoJSON layer, Point layer
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixActivateEvent} helix-activate - A point in view was pressed. The value is its id, or its name if it has no id.
  * @event {HelixMapClusterEvent} helix-map-cluster - A count in view was pressed from the keyboard. `connectMap` zooms in to it.

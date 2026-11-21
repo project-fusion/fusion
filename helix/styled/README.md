@@ -35,6 +35,6 @@ Built on [`@fusion.dev/helix-headless`](https://www.npmjs.com/package/@fusion.de
 which is the same behavior with no styling at all if you would rather bring your
 own.
 
-[Documentation](https://fusion.dev/helix) · [Components](https://fusion.dev/helix/components)
+[Documentation](https://fusion.dev/design) · [Components](https://fusion.dev/design/components)
 
 MIT

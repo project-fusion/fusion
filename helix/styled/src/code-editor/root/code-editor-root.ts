@@ -37,7 +37,7 @@ import '../../toolbar/index.js'
  * @anatomy status
  * @practice Connect CodeMirror for highlighting, line numbers, and folding. - On its own the code is a plain textarea in the code face.
  * @practice {fill} Set `fill` for an editor that fills a pane, such as one side of a split view. - Without it, the editor is 24rem tall.
- * @documentation https://fusion.dev/helix/components/code-editor
+ * @documentation https://fusion.dev/design/components/code-editor
  *
  * @cssproperty --code-editor-background-color - The ground the code is drawn on. Defaults to the page's background.
  * @cssproperty --code-editor-block-size - The frame's height, as a length: 24rem unless set. Ignored with `fill`, where the container decides it.

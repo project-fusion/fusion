@@ -151,7 +151,7 @@ export const auditReactMissing = (host: Node, window: number, mark: string): voi
       `within ${window} ms. Helix reads them under a key starting \`__reactProps$\`, and this ` +
       'React no longer writes one. `onhelix-*` handlers on a server-rendered page will not run, and ' +
       'object properties the server could not write will not arrive. Pin React to a version in the ' +
-      'range https://fusion.dev/helix/docs/using-the-elements states, and report the one installed.',
+      'range https://fusion.dev/design/docs/using-the-elements states, and report the one installed.',
     tag: host instanceof Element ? host.localName : undefined,
   })
 }

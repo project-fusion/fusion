@@ -115,7 +115,7 @@ import { joinSaid, messageWords } from '../words.js'
  * @practice {undo} Do an action that can be undone, then call `undoable()`. - The message holds an Undo button and shows for 8 seconds, which replaces a confirmation dialog.
  * @practice Call `add()` to show a message from a page with no framework state. - It appends a message and removes it once it is dismissed, and the messages you render stay yours.
  * @practice Render a second region inside a modal dialog for a message with an action. - While a modal is open, a message outside it stays visible, and its actions cannot be pressed.
- * @documentation https://fusion.dev/helix/components/toast
+ * @documentation https://fusion.dev/design/components/toast
  *
  * @slot - The messages.
  *

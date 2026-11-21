@@ -13,6 +13,7 @@ export { COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 import { type ColorMode, COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 
 import { MOTION_KEY, type Motion } from '@/utils/motion/motion'
+import styles from './preferences.module.css'
 
 const TIER_KEY = 'fusion-api-tier'
 
@@ -142,8 +143,10 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
   return (
     <helix-drawer
+      class={styles.preferences}
       dismissible
       label="Preferences"
+      material="glass"
       onhelix-before-close={() => onOpenChange(false)}
       onhelix-before-open={() => onOpenChange(true)}
       open={open}

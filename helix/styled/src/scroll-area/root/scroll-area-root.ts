@@ -69,7 +69,7 @@ function registerDepths(): void {
  * @use A box of fixed height whose content scrolls, such as release notes in a panel.
  * @instead virtual-list - Thousands of rows, of which only those in view are drawn.
  * @instead log - Output that arrives while you watch, with the newest line kept in view.
- * @documentation https://fusion.dev/helix/components/scroll-area
+ * @documentation https://fusion.dev/design/components/scroll-area
  *
  * @cssproperty --scroll-area-fade - The depth of the fade at each edge.
  * @cssproperty --scroll-area-fade-block-end - The depth of the bottom fade, or `0` to remove it.

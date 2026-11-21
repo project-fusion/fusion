@@ -117,7 +117,7 @@ const PROSE: Route[] = [
   {
     description: 'A design system of web components, themed from your brand color.',
     kind: 'page',
-    path: '/helix',
+    path: '/design',
     priority: 0.9,
     section: 'Helix',
     title: 'Helix',
@@ -125,7 +125,7 @@ const PROSE: Route[] = [
   {
     description: 'Install Helix, build a theme, and learn how it works.',
     kind: 'page',
-    path: '/helix/docs',
+    path: '/design/docs',
     priority: 0.9,
     section: 'Helix',
     title: 'Docs',
@@ -133,7 +133,7 @@ const PROSE: Route[] = [
   {
     description: 'Every Helix component, with its API and a live example.',
     kind: 'page',
-    path: '/helix/components',
+    path: '/design/components',
     priority: 0.9,
     section: 'Helix',
     title: 'Components',
@@ -141,7 +141,7 @@ const PROSE: Route[] = [
   {
     description: 'Memory, provenance, and context for AI systems.',
     kind: 'page',
-    path: '/cortex',
+    path: '/agents',
     priority: 0.9,
     section: 'Cortex',
     title: 'Cortex',
@@ -150,7 +150,7 @@ const PROSE: Route[] = [
     description:
       'Twelve animated backgrounds colored by your tokens, with controls for every parameter.',
     kind: 'page',
-    path: '/helix/aura',
+    path: '/design/aura',
     priority: 0.4,
     section: 'Helix',
     title: 'Aura',
@@ -158,7 +158,7 @@ const PROSE: Route[] = [
   {
     description: 'Interactive maps in your brand’s colors, drawn by MapLibre or Leaflet.',
     kind: 'page',
-    path: '/helix/maps',
+    path: '/design/maps',
     priority: 0.5,
     section: 'Helix',
     title: 'Maps',
@@ -167,7 +167,7 @@ const PROSE: Route[] = [
     description:
       'Interactive graphs in your brand’s colors, drawn by Sigma.js, cosmos.gl, or three.js.',
     kind: 'page',
-    path: '/helix/graph',
+    path: '/design/graph',
     priority: 0.5,
     section: 'Helix',
     title: 'Graph',
@@ -176,7 +176,7 @@ const PROSE: Route[] = [
     description:
       'Edit the source of any Helix component example and see the result beside it. Link to an example with `?e=<family>.<example>`.',
     kind: 'page',
-    path: '/helix/sandbox',
+    path: '/design/sandbox',
     priority: 0.5,
     section: 'Helix',
     title: 'Sandbox',
@@ -185,7 +185,7 @@ const PROSE: Route[] = [
     description:
       'Enter your brand color and get a full palette. Helix measures the contrast of each pair it solves.',
     kind: 'page',
-    path: '/helix/theme',
+    path: '/design/theme',
     priority: 0.6,
     section: 'Helix',
     title: 'Theme builder',
@@ -197,7 +197,7 @@ const components = (): Route[] =>
   getFamilies().map((family) => ({
     description: family.summary,
     kind: 'component' as const,
-    path: `/helix/components/${family.slug}`,
+    path: `/design/components/${family.slug}`,
     priority: 0.7,
     section: 'Helix components',
     title: family.label,
@@ -216,7 +216,7 @@ const docs = (): Route[] => {
   return docPages.map((page) => ({
     description: page.description,
     kind: 'doc' as const,
-    path: `/helix/docs/${page.slug}`,
+    path: `/design/docs/${page.slug}`,
     priority: order.get(page.slug) === 0 ? 0.8 : 0.6,
     section: `Helix docs: ${page.section}`,
     title: page.title,

@@ -219,7 +219,7 @@ export function ComponentBrowser({
               of custom elements, since Tabs is one card and two elements. The
               library says "family" wherever it has to tell a family from its
               parts, which is an authoring concern; a reader browsing meets the
-              word nowhere else on the site, the route being `/helix/components`
+              word nowhere else on the site, the route being `/design/components`
               and the label above saying the same. */}
         <helix-input
           className={pageHero.heroSearch}
@@ -256,11 +256,11 @@ export function ComponentBrowser({
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is
                   decoration that happens to point right. */}
-            <Link data-button href="/helix/components/button">
+            <Link data-button href="/design/components/button">
               <helix-icon name="flag-banner-fold"></helix-icon>
               Start
             </Link>
-            <Link data-button href="/helix/sandbox">
+            <Link data-button href="/design/sandbox">
               <helix-icon name="microscope"></helix-icon>
               Sandbox
             </Link>

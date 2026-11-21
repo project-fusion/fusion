@@ -26,7 +26,7 @@ import { styles } from './trend-root.css.js'
  * `--helix-color-fall`, which are success and danger until your page sets
  * them. Mainland China, Taiwan, and Japan draw a rise in red, so a page for
  * those markets swaps the two, as
- * [Rise and fall colors](https://fusion.dev/helix/docs/localization#rise-and-fall-colors)
+ * [Rise and fall colors](https://fusion.dev/design/docs/localization#rise-and-fall-colors)
  * shows. `good` still decides the word and the `better` and `worse` states.
  *
  * @since 0.1.0
@@ -41,7 +41,7 @@ import { styles } from './trend-root.css.js'
  * @anatomy icon
  * @anatomy label?
  * @practice Set `good` to the direction that is good for the metric. - Up is bad for churn, latency, error rate, cost, and bounce rate, and the color follows from `movement`.
- * @documentation https://fusion.dev/helix/components/trend
+ * @documentation https://fusion.dev/design/components/trend
  *
  * @cssproperty --trend-better-color - Color of a move that `good` says is an improvement.
  * @cssproperty --trend-color - Color of the arrow and the metric. Setting it overrides the color that `good` or `color-by` sets.

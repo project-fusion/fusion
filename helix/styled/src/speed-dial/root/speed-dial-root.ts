@@ -25,7 +25,7 @@ import { styles } from './speed-dial-root.css.js'
  * @anatomy icon
  * @practice Import Icon beside Speed Dial where your trigger or your actions use one. - Speed Dial draws no icon of its own, so it does not register one.
  * @practice Set `open-on="long-press"` for a trigger with an action of its own, such as composing a message. - A press then runs the trigger's action, and holding it for half a second opens the dial.
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @cssproperty --speed-dial-background-color - Fill of the trigger the dial draws when none is slotted.
  * @cssproperty --speed-dial-color - Color of that trigger's icon.

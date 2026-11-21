@@ -8,8 +8,8 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Picture } from '@/components/site-nav/tiles'
 import { Wordmark } from '@/components/wordmark/wordmark'
-import { PRODUCTS } from '@/content/products/products'
-import { stageAppearance } from '@/content/verticals/verticals'
+import { PRODUCTS, type Product } from '@/content/products/products'
+import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { MAILTO } from '@/utils/site/site'
 import styles from './site-nav.module.css'
 
@@ -25,10 +25,17 @@ const SECTIONS = [
 ]
 
 /**
+ * The word a product goes by in the bar and the menu: its vertical's, which says
+ * what kind of thing is there. The product's own name is in the panel, on its
+ * page and in the footer.
+ */
+const barLabel = (product: Product) => findVertical(product.href)?.label ?? product.name
+
+/**
  * The top level, with every destination in it exactly once.
  */
 export const DESTINATIONS = [
-  ...PRODUCTS.map((product) => ({ href: product.href, label: product.name })),
+  ...PRODUCTS.map((product) => ({ href: product.href, label: barLabel(product) })),
   ...SECTIONS,
 ]
 
@@ -82,7 +89,7 @@ export function SiteMenu({
          *  A tree, because the depth is real. A flat list of four destinations
          *             leaves everything a reader actually goes to inside Helix, the docs,
          *             the component reference, the sandbox, the theme builder, reachable
-         *             only by landing on `/helix` first and looking for it.
+         *             only by landing on `/design` first and looking for it.
          *
          *             **Every row at one size, the product rows included.** Under
          *             `subordinate` Docs and Sandbox came out smaller than Services and
@@ -107,7 +114,7 @@ export function SiteMenu({
               default-open={pathname.startsWith(product.href)}
               key={product.href}
             >
-              {product.name}
+              {barLabel(product)}
               {/*
                *  The product's own page as a row of its own, because the row
                *                   above it is not a link.
@@ -300,13 +307,13 @@ export function SiteNav({
 
   /* Gallery heroes and the scale candidate run up behind the masthead, so the
      bar has nothing to separate itself from until the page moves. Component
-     pages under `/helix` keep a white top. */
+     pages under `/design` keep a white top. */
   /* The landing page joins these because its hero draws an aura, and a bar with
      a fill of its own would cut a strip of flat background across the top of
      the light. `transparent` takes the fill back once anything scrolls under
      it, which is the state a hero is guaranteed not to still be in. */
   const onHero =
-    pathname === '/' || pathname === '/helix' || pathname === '/cortex' || pathname === '/insights'
+    pathname === '/' || pathname === '/design' || pathname === '/agents' || pathname === '/insights'
 
   return (
     <>
@@ -359,7 +366,7 @@ export function SiteNav({
                   href={product.href}
                   key={product.href}
                 >
-                  {product.name}
+                  {barLabel(product)}
                 </Link>
               )
             }
@@ -385,7 +392,7 @@ export function SiteNav({
               <helix-megamenu
                 class={styles.navPanel}
                 key={product.href}
-                label={product.name}
+                label={barLabel(product)}
                 layout="band"
                 onhelix-before-close={() => setOpenPanel(null)}
                 /* Both fire before the panel moves and both are cancelable, so
@@ -409,13 +416,13 @@ export function SiteNav({
                     panel's own state, heard from its events. */}
                 <Link
                   aria-current={within(product.href) ? 'page' : undefined}
-                  aria-expanded={openPanel?.getAttribute('label') === product.name}
+                  aria-expanded={openPanel?.getAttribute('label') === barLabel(product)}
                   data-navigation-item
                   href={product.href}
                   slot="trigger"
                   suppressHydrationWarning
                 >
-                  {product.name}
+                  {barLabel(product)}
                 </Link>
 
                 {/* The tiles: the things you open and use, each with a picture

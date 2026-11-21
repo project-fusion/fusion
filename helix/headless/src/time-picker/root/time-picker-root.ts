@@ -106,7 +106,7 @@ import '../../option/root/index.js'
  * @anatomy option
  * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
  * @practice Keep `step` at 15 minutes or more where the list spans a day. - At 15 minutes a day is 96 rows, which people can scroll or type into, and at 1 minute it is 1,440.
- * @documentation https://fusion.dev/helix/components/time-picker
+ * @documentation https://fusion.dev/design/components/time-picker
  *
  * @slot empty - What the list shows when no time falls between `min` and `max`, for content richer than `empty-text`.
  * @slot hint - Help under the times, for content richer than the `hint` text.

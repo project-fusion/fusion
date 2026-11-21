@@ -53,7 +53,7 @@ import { typedMarks } from '../../quote/marks.js'
  * @anatomy attribution?
  * @practice Write the source's URL in `cite`, and who said it in `attribution`. - The browser keeps `cite` and does not show it, so a name written there is never seen.
  * @practice {pull-quote} Leave typed quotation marks out of a passage under `marks`. - The mark is drawn for the element's language, so a typed one makes a second mark.
- * @documentation https://fusion.dev/helix/components/blockquote
+ * @documentation https://fusion.dev/design/components/blockquote
  *
  * @slot - The quoted passage.
  * @slot attribution - Who said it, and where. Replaces the words of `attribution`.

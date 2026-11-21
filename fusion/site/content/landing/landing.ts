@@ -82,7 +82,7 @@ export const LANDING: PageCopy = {
     {
       body: [
         'Charts, data tables, chat, and date pickers use the same tokens as your buttons.',
-        'Compare the systems: /helix/docs/metrics#what-each-system-ships',
+        'Compare the systems: /design/docs/metrics#what-each-system-ships',
       ],
       kicker: 'Coverage',
       title: 'Every component in one package',

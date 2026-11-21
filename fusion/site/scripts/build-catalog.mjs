@@ -141,7 +141,7 @@ for (const source of EXAMPLES) {
 }
 
 /* Whether each event bubbles, read from the event classes as `analyze` reads
-   them, so a family's `.json` and `/helix/api.json` say what each package's
+   them, so a family's `.json` and `/design/api.json` say what each package's
    `api.json` says. */
 const families = catalog(manifests, examples, bubblingOf(join(root, 'fusion/site')))
 mkdirSync(dirname(OUT), { recursive: true })
@@ -164,8 +164,8 @@ writeFileSync(OUT, `${JSON.stringify(families)}\n`)
  * The `.json` beside each family is the catalog entry verbatim rather than a
  * second shape of it. It is what the page renders from, so anything else would
  * be a third source for one component's API. */
-const COMPONENTS = join(PUBLIC, 'helix/components')
-const DOCS = join(PUBLIC, 'helix/docs')
+const COMPONENTS = join(PUBLIC, 'design/components')
+const DOCS = join(PUBLIC, 'design/docs')
 rmSync(COMPONENTS, { force: true, recursive: true })
 rmSync(DOCS, { force: true, recursive: true })
 mkdirSync(COMPONENTS, { recursive: true })
@@ -242,7 +242,7 @@ for (const family of families) {
           '',
           ...family.instead.map(
             (one) =>
-              `- [${one.label}](/helix/components/${one.slug}.md): ${lowered(one.description)}`,
+              `- [${one.label}](/design/components/${one.slug}.md): ${lowered(one.description)}`,
           ),
           '',
         ]
@@ -308,7 +308,7 @@ for (const family of families) {
       frontmatter: [
         ['title', family.label],
         ['description', family.summary || `The ${family.label} component family.`],
-        ['path', `/helix/components/${family.slug}`],
+        ['path', `/design/components/${family.slug}`],
         ['source', `${from.join(', ')}, and ${family.source}`],
       ],
       guidelines: { [family.slug]: guidance },

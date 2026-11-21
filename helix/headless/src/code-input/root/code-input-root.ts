@@ -80,7 +80,7 @@ const typeText = (control: HTMLTextAreaElement, text: string): void => {
  * @anatomy field
  * @anatomy hint?
  * @practice Import Code Block from Helix Sandbox once on the page. - Helix ships no grammar, and that import registers the highlighter that colors every Code Input.
- * @documentation https://fusion.dev/helix/components/code-input
+ * @documentation https://fusion.dev/design/components/code-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - After the code, for an icon or an action beside it.

@@ -57,7 +57,7 @@ holds an edit, and `reset()` puts back the source it was given.
 
 Tab indents by two spaces. Escape, then Tab, moves focus out of the editor.
 
-The [Sandbox reference](https://fusion.dev/helix/components/sandbox#helix-sandbox-editor)
+The [Sandbox reference](https://fusion.dev/design/components/sandbox#helix-sandbox-editor)
 lists every property, event, method, and state of the editor. The package
 ships its own `api.json` and `lint.json`, so `helix api family sandbox` lists
 the editor beside the shell, and `helix scan` checks the attributes you write
@@ -97,7 +97,7 @@ does not read is drawn plain. A block's own `highlight` wins.
 The sandbox shell, its preview, and `helix-sandbox-source` are in
 `@fusion.dev/helix/sandbox`, and they work without this package. The preview
 runs each example in a frame of its own. The
-[sandbox guide](https://fusion.dev/helix/docs/sandbox) says how to give it a
+[sandbox guide](https://fusion.dev/design/docs/sandbox) says how to give it a
 frame that loads your components.
 
 ## Working on it

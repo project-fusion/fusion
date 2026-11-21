@@ -46,7 +46,7 @@ const PRESSED = [
  * @instead toolbar - A mix of controls that share one tab stop.
  * @instead tabs - A row that shows one panel of content for each choice.
  * @practice {selection} Set `selection-mode`, and give each button a `value`, for buttons that stay pressed. - Each button with a `value` is then a toggle button, which a press presses or releases.
- * @documentation https://fusion.dev/helix/components/button-group
+ * @documentation https://fusion.dev/design/components/button-group
  *
  * @slot - The buttons in the group.
  *

@@ -13,7 +13,7 @@ import { styles } from './option-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases OptGroup, Section
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  */
 @customElement('helix-option-group')
 export class HelixOptionGroup extends HelixHeadlessOptionGroup {

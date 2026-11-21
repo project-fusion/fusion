@@ -15,7 +15,7 @@ import { styles } from './speed-dial-group.css.js'
  * @status stable
  * @category actions
  * @aliases Speed dial section, Action group
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @cssproperty --speed-dial-group-label-color - Color of the group's name.
  * @cssproperty --speed-dial-group-label-font-size - Size of the group's name.

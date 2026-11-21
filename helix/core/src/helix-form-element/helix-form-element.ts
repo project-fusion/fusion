@@ -112,7 +112,7 @@ const watchFormChecks = (form: HTMLFormElement | null): void => {
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://fusion.dev/helix/docs/tiers
+ * @documentation https://fusion.dev/design/docs/tiers
  */
 export class HelixFormElement extends HelixFormElementBase {
   protected override willUpdate(changed: PropertyValues): void {

@@ -59,7 +59,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @anatomy value?
  * @practice Write a `Meter.Segment` for each share of the whole. - The meter measures their sum.
  * @practice Set `low`, `high`, and `optimum` to mark bands of the range. - `low` and `high` divide the range into a low, a middle, and a high band, and `optimum` sets the preferred one.
- * @documentation https://fusion.dev/helix/components/meter
+ * @documentation https://fusion.dev/design/components/meter
  *
  * @slot - `Meter.Segment` elements, one for each share of the whole, drawn in the bar.
  * @slot label - A visible label. Its words name the meter in place of `label`.

@@ -127,7 +127,7 @@ const kind = (file: File): string => {
  * @anatomy field
  * @anatomy trigger
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/file-input
+ * @documentation https://fusion.dev/design/components/file-input
  *
  * @slot feedback - The message that says what is wrong with the chosen files.
  * @slot hint - Help under the field.

@@ -15,15 +15,15 @@ import { getFamilies } from '../../../content/catalog/catalog'
 import { HelixStrands } from './helix-strands'
 import styles from './page.module.css'
 
-const vertical = findVertical('/helix')
-const product = PRODUCTS.find((entry) => entry.href === '/helix')
+const vertical = findVertical('/design')
+const product = PRODUCTS.find((entry) => entry.href === '/design')
 
 /**
  * Helix, which is what this route is about rather than what it lists.
  */
 export const metadata = pageMetadata({
   description: product?.body ?? vertical?.summary ?? '',
-  path: '/helix',
+  path: '/design',
   title: product?.name ?? vertical?.name ?? 'Helix',
 })
 
@@ -83,10 +83,10 @@ export default function Page() {
                 justify-content="center"
                 wrap
               >
-                <Link data-button="solid" data-button-tone="primary" href="/helix/components">
+                <Link data-button="solid" data-button-tone="primary" href="/design/components">
                   Browse the components
                 </Link>
-                <Link data-button="subtle" href="/helix/docs">
+                <Link data-button="subtle" href="/design/docs">
                   Read the docs
                 </Link>
               </helix-flex>

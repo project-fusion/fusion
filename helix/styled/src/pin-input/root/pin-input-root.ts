@@ -28,7 +28,7 @@ import { styles } from './pin-input-root.css.js'
  * @anatomy label
  * @anatomy cell
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/pin-input
+ * @documentation https://fusion.dev/design/components/pin-input
  *
  * @csspart caret - The caret, drawn in the empty box it is in while the field has focus.
  * @csspart cell - One box.

@@ -142,7 +142,7 @@ export function exampleShown(example: string): number {
  * @status stable
  * @category forms
  * @aliases Message box, Prompt input
- * @documentation https://fusion.dev/helix/components/chat
+ * @documentation https://fusion.dev/design/components/chat
  *
  * @slot attachments - What the draft carries, such as images or files, inside the box and above the field.
  * @slot end - Content under the field, beside the send button.

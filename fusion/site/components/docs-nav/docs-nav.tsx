@@ -5,7 +5,7 @@ import { type MouseEvent as ReactMouseEvent, useCallback, useId, useRef, useStat
 import { docsShell } from '@/components/docs-shell/docs-shell'
 import type { NavEntry, NavSection } from '@/content/helix-nav/helix-nav'
 
-/* The sidebar for everything under `/helix`, from `helixNavigation()`.
+/* The sidebar for everything under `/design`, from `helixNavigation()`.
  *
  * **One component, not one per rail.** Two files rendering the same `helix-tree`
  * over different data is what let the docs and the component navigations drift

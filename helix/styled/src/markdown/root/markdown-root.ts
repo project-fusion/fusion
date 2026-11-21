@@ -30,7 +30,7 @@ import { styles } from './markdown-root.css.js'
  * @practice Set `text` to everything a reply has said so far, with `streaming` while more is coming. - Each time `text` grows, only what changed is drawn.
  * @practice Put `data-prose` on the element or on a container. - The page's prose recipe then sets the document's type, spacing, lists, and tables.
  * @practice On a server, render `markdownToHtml(text)` inside the element. - The element keeps markup that matches what it would draw, and draws nothing again.
- * @documentation https://fusion.dev/helix/components/markdown
+ * @documentation https://fusion.dev/design/components/markdown
  */
 @customElement('helix-markdown')
 export class HelixMarkdown extends HelixHeadlessMarkdown {

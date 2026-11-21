@@ -41,7 +41,7 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * @status stable
  * @category forms
  * @aliases Facet, Dimension
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  *
  * @slot - The field's comparisons, as `FilterOperator`s, and its values, as
  * `Option`s. The filter input reads them and does not render them.

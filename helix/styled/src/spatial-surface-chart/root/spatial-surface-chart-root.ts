@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * @anatomy grid
  * @anatomy face
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-surface-chart
+ * @documentation https://fusion.dev/design/components/spatial-surface-chart
  *
  * @cssproperty --spatial-surface-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  * @cssproperty --spatial-surface-chart-high - The color of the highest reading, which the renderer reads too.

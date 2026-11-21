@@ -15,8 +15,8 @@ export interface PageMeta {
    * fills the block in from the convention only when nothing else has. Naming
    * the file's own URL instead does not work and looks like it does. Next
    * appends a content hash to an image route, so the built path is
-   * `/helix/components/[family]/opengraph-image-1czn6t`, and a hand-written
-   * `/helix/components/accordion/opengraph-image` is a 404 that no page renders
+   * `/design/components/[family]/opengraph-image-1czn6t`, and a hand-written
+   * `/design/components/accordion/opengraph-image` is a 404 that no page renders
    * and no test visits.
    */
   image?: string | false

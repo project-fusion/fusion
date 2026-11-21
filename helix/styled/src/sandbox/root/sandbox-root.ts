@@ -170,7 +170,7 @@ const fileOf = (pane: Element): string => {
  * @anatomy separator
  * @anatomy status-bar
  * @practice {files} Give each source pane the `name` of what it sets in the preview, such as html, css, or js. - The sandbox ignores a pane with any other name.
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @slot panel - A panel under both panes, usually a console.
  * @slot preview - The live preview. It comes second unless `lead` is `preview`.

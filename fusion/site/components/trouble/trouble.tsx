@@ -32,7 +32,7 @@ export function NotFoundBody() {
         <Link data-link="quiet" href="/">
           Front page
         </Link>
-        <Link data-link="quiet" href="/helix">
+        <Link data-link="quiet" href="/design">
           Helix
         </Link>
         <Link data-link="quiet" href="/insights">

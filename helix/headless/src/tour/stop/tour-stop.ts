@@ -91,7 +91,7 @@ export type TourStopEffect = (
  * @since 0.1.0
  * @status stable
  * @category overlays
- * @documentation https://fusion.dev/helix/components/tour
+ * @documentation https://fusion.dev/design/components/tour
  *
  * @slot - The stop's content. Any content works, such as a card, or a heading and a line.
  * @slot actions - Replaces the controls, which are Back, Next, and Skip.

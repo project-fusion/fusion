@@ -13,7 +13,7 @@ import { styles } from './video-playlist-item.css.js'
  * @since 0.1.0
  * @status stable
  * @category media
- * @documentation https://fusion.dev/helix/components/video-playlist
+ * @documentation https://fusion.dev/design/components/video-playlist
  *
  * @cssproperty --video-playlist-item-background-color - The fill behind a row.
  * @cssproperty --video-playlist-item-color - The color of an entry's name.

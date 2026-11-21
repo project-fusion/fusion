@@ -54,7 +54,7 @@ export function GraphHero() {
           <Link data-button="solid" data-button-tone="primary" href="#get-started">
             Get started
           </Link>
-          <Link data-button="subtle" href="/helix/theme">
+          <Link data-button="subtle" href="/design/theme">
             Build your theme
           </Link>
         </helix-flex>

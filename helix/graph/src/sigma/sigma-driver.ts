@@ -307,7 +307,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
      is what a container taken off the page measures. A page that leaves
      while its graph is drawn removes the box first and disconnects after, so
      a draw made then threw out of the page's teardown: on fusion.dev, leaving
-     /cortex once its trace had drawn replaced the whole site with its error
+     /agents once its trace had drawn replaced the whole site with its error
      page. When the box is back, the observer below draws it again. */
   const boxed = (): boolean =>
     container.isConnected && container.offsetWidth > 0 && container.offsetHeight > 0

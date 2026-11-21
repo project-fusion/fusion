@@ -12,7 +12,7 @@ This guide follows the latest release of Helix. A project that installed Helix h
 This guide is what an agent reads before writing Helix code. It is also the
 `helix` skill: `skills/helix/SKILL.md` in `@fusion.dev/helix`, which matches the
 version installed, and the skill in Helix's plugin for coding agents. [Coding
-agents](https://fusion.dev/helix/docs/coding-agents) says how to install the plugin or link the skill.
+agents](https://fusion.dev/design/docs/coding-agents) says how to install the plugin or link the skill.
 
 ### Use a Helix family wherever one exists
 
@@ -49,7 +49,7 @@ Each family's API is in the packages you installed, and on this site:
 - `node_modules/@fusion.dev/helix/api.json`, and the `api.json` of each other
   Helix package you installed, which lists the elements it adds to a family,
   such as `helix-sandbox-editor` in `@fusion.dev/helix-sandbox`
-- `https://fusion.dev/helix/components/<family>.md` and `.json`
+- `https://fusion.dev/design/components/<family>.md` and `.json`
 
 Each lists the import lines, every tag, every property with its literal union,
 every event with its React prop, every slot, part, and custom property, and the
@@ -112,7 +112,7 @@ Set the state inside `flushSync` from `react-dom`. Without it, React renders the
 update in a later task, and keys typed faster than that are lost.
 
 A form reset returns the element to `default-value` and the matching attributes
-for the other states. See [State and control](https://fusion.dev/helix/docs/state-and-control).
+for the other states. See [State and control](https://fusion.dev/design/docs/state-and-control).
 
 #### 3. Using the exact event name
 
@@ -225,7 +225,7 @@ Run these after you write Helix code, and fix every finding at `error` and
 | `helix theme audit` | `helix_audit_theme` | Every foreground and background pair in your theme that misses its contrast target |
 
 `helix scan --file <path>` reports one file's findings and still reads the whole
-project, so an import in another file counts. [Diagnostics](https://fusion.dev/helix/docs/diagnostics)
+project, so an import in another file counts. [Diagnostics](https://fusion.dev/design/docs/diagnostics)
 lists every kind of finding, and what the checks do not cover.
 
 ### What this guide does not cover
@@ -240,4 +240,4 @@ of them here would be a second copy that goes stale. Fetch the family.
 
 **Whether a component fits your case.** Read the examples to decide. Every
 family's `.md` file includes them as text, and
-`https://fusion.dev/helix/sandbox?e=<family>.<slug>` opens one for editing.
+`https://fusion.dev/design/sandbox?e=<family>.<slug>` opens one for editing.

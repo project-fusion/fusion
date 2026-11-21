@@ -34,7 +34,7 @@ const SERIES = 20
  * @anatomy label
  * @practice Put one Cursor for each person in a positioned box, and set `x` and `y` in pixels from its top left. - The pointer is placed as a collaboration service reports it.
  * @practice Draw a person's other marks, such as a selection, in the color their `series` names. - Their pointer and their marks then read as one person's.
- * @documentation https://fusion.dev/helix/components/cursor
+ * @documentation https://fusion.dev/design/components/cursor
  *
  * @csspart arrow - The pointer's arrow.
  * @csspart label - The person's name, in their color, beside the arrow.

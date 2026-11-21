@@ -1,0 +1,25 @@
+/* **The command palette's glass: the same scrim, fill, blur and edge.** The
+   drawer and the palette are both chrome summoned from the masthead over the
+   same page, so they are one material. `site-find.module.css` carries the
+   reasons for each value.
+
+   **The scrim is the half that decides the rest.** `[part="panel"]::backdrop`
+   paints *behind* the panel, so the panel's `backdrop-filter` reads the page
+   with the scrim already over it. Under the full modal scrim a white page
+   went to L 0.66 and the blur had a flat gray field to sample. At 45 percent
+   of that scrim the page stays near white, and `--site-glass-dense` lands
+   where the palette does.
+
+   **On the host, scrim included.** A `var()` written inside `::backdrop`
+   cannot read a token, so the drawer reads `--drawer-scrim` from here.
+
+   **The attribute is in the selector to outrank `site.css`**, whose
+   `helix-drawer[material="glass"]` sets the fill for every other glass drawer
+   and would win over a bare class. */
+.preferences[material="glass"] {
+  --drawer-backdrop: var(--site-glass-backdrop);
+  --drawer-background-color: var(--site-glass-dense);
+  --drawer-border-color: var(--helix-material-border);
+  --drawer-border-width: var(--helix-border-thin);
+  --drawer-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
+}

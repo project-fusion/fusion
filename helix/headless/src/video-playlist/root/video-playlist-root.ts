@@ -120,7 +120,7 @@ type Player = HTMLElement & {
  * @anatomy meta
  * @practice Put a `Video` in the `player` slot. - A plain video has no previous and next controls, so its moves are the entries, the menu, and your own buttons calling `previous()` and `next()`.
  * @practice Under `reorderable`, move the entries yourself, in the order the reorder event's keys hold. - The playlist moves no element of yours, and the next entry is the one after the current entry in the order you leave.
- * @documentation https://fusion.dev/helix/components/video-playlist
+ * @documentation https://fusion.dev/design/components/video-playlist
  *
  * @slot - The entries.
  * @slot empty - Shown while the playlist has no entries. Defaults to `empty-text`.

@@ -62,7 +62,7 @@ import { HelixPreviewEvent } from '../events/index.js'
  * @anatomy track
  * @practice {halves} Set `step` to `0.5` for half marks. - Five marks at a half step give ten places to press.
  * @practice {review-summary} Set `readonly` to show a score. - A read-only rating is announced as a displayed value and does not look disabled.
- * @documentation https://fusion.dev/helix/components/rating
+ * @documentation https://fusion.dev/design/components/rating
  *
  * @slot empty-mark - The shape of an unfilled mark, copied into every position of the track, such as an outlined star beside a filled `mark`. Without it, the track copies `mark`.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.

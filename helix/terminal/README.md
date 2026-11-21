@@ -7,11 +7,11 @@ or a driver of your own, themed from your tokens.
 bun add @fusion.dev/helix @fusion.dev/helix-terminal @xterm/xterm @xterm/addon-fit @xterm/addon-search @xterm/addon-web-links
 ```
 
-**The guide is [Terminals](https://fusion.dev/helix/docs/terminals)**:
+**The guide is [Terminals](https://fusion.dev/design/docs/terminals)**:
 connecting a process, keeping up with a fast one, exits and restarts, the
 theme and its colors, read-only output, links, the keyboard and screen
 readers, and writing a driver. The element itself is on the
-[Terminal reference](https://fusion.dev/helix/components/terminal).
+[Terminal reference](https://fusion.dev/design/components/terminal).
 
 ```js
 import '@fusion.dev/helix/terminal'

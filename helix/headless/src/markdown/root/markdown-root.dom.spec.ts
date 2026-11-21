@@ -213,7 +213,7 @@ describe('markdown streamed one character at a time', () => {
   const REPLY = [
     '## Plan',
     '',
-    'We change **three things**, in order. See [the guide](https://fusion.dev/helix) first.',
+    'We change **three things**, in order. See [the guide](https://fusion.dev/design) first.',
     '',
     '1. Read the `config` file.',
     '2. Update the *schema*:',

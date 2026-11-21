@@ -49,7 +49,7 @@ import '../../tooltip/index.js'
  * @anatomy labels
  * @practice Set `zero` where the distance from zero is the point. - The scale covers the range of the data, since zero would flatten a series that moves between 980 and 1020.
  * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
- * @documentation https://fusion.dev/helix/components/line-chart
+ * @documentation https://fusion.dev/design/components/line-chart
  *
  * @cssproperty --chart-glide-duration - How long the guide, the band, and the tooltip take to glide from one reading to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places them at once, and under reduced motion they move at once, whatever it says. They are placed where their reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. The line drawing on and the wash fading in as the chart arrives take 1.6 times as long. A series a legend hides fades out over the same time, and the value axis and its rules move to the new scale with the marks. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.

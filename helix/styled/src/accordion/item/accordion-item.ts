@@ -16,7 +16,7 @@ import { styles } from './accordion-item.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Collapsible, Expander, Disclosure
- * @documentation https://fusion.dev/helix/components/accordion
+ * @documentation https://fusion.dev/design/components/accordion
  *
  * @slot - The content shown when the section is open.
  * @slot chevron - Replaces the open and close indicator. A slotted icon is sized, colored and

@@ -2,9 +2,9 @@
   - /url: /
 - navigation "Sections":
   - link "Helix":
-    - /url: /helix
+    - /url: /design
   - link "Cortex":
-    - /url: /cortex
+    - /url: /agents
   - link "Services":
     - /url: /company/services
   - link "Insights":
@@ -195,7 +195,7 @@
     - button "Copy index.html"
     - button "Centered layout"
     - link "Open in the sandbox":
-      - /url: /helix/sandbox?e=button.preview
+      - /url: /design/sandbox?e=button.preview
     - textbox "Example source"
     - heading "Guidelines Link to Guidelines" [level=2]:
       - text: Guidelines
@@ -208,11 +208,11 @@
         - text: Button This page
       - listitem:
         - 'link "Icon Button: an action shown as an icon alone, such as Settings in a toolbar."':
-          - /url: /helix/components/icon-button
+          - /url: /design/components/icon-button
           - text: An action shown as an icon alone, such as Settings in a toolbar. Icon Button
       - listitem:
         - 'link "Copy Button: a value you copy to the clipboard, such as an install command."':
-          - /url: /helix/components/copy-button
+          - /url: /design/components/copy-button
           - text: A value you copy to the clipboard, such as an install command. Copy Button
     - heading "Using Button" [level=3]
     - list:
@@ -331,45 +331,45 @@
     - table "Examples":
       - row "Name Description"
       - link "Accent":
-        - /url: /helix/sandbox?e=button.accent
+        - /url: /design/sandbox?e=button.accent
       - text: The
       - code: accent
       - text: tone, a second emphasis derived from your brand color.
       - link "As link":
-        - /url: /helix/sandbox?e=button.as-link
+        - /url: /design/sandbox?e=button.as-link
       - text: A button that navigates, rendered as an anchor.
       - link "Disabled":
-        - /url: /helix/sandbox?e=button.disabled
+        - /url: /design/sandbox?e=button.disabled
       - text: Disabled buttons in several appearances, including one disabled by its fieldset.
       - link "Emphasis":
-        - /url: /helix/sandbox?e=button.emphasis
+        - /url: /design/sandbox?e=button.emphasis
       - text: Each emphasis in the neutral, primary, and danger tones.
       - link "Focusable when disabled":
-        - /url: /helix/sandbox?e=button.focusable-when-disabled
+        - /url: /design/sandbox?e=button.focusable-when-disabled
       - text: Disabled buttons that stay in the tab order, with a tooltip that says why each one is disabled.
       - link "Form overrides":
-        - /url: /helix/sandbox?e=button.form-overrides
+        - /url: /design/sandbox?e=button.form-overrides
       - text: Three submit buttons on one form, each setting where and how its own submission goes.
       - link "Pending":
-        - /url: /helix/sandbox?e=button.pending
+        - /url: /design/sandbox?e=button.pending
       - text: "A button that waits after a press: it keeps focus, refuses another press, and says Saving to a screen reader."
       - link "Preview":
-        - /url: /helix/sandbox?e=button.preview
+        - /url: /design/sandbox?e=button.preview
       - text: A solid primary button.
       - link "Tone":
-        - /url: /helix/sandbox?e=button.tone
+        - /url: /design/sandbox?e=button.tone
       - text: Each tone at the resting emphasis and at
       - code: solid
       - text: .
       - link "Width":
-        - /url: /helix/sandbox?e=button.width
+        - /url: /design/sandbox?e=button.width
       - text: Buttons at their own width, at a standard width set by
       - code: "--button-inline-size"
       - text: ", and at full width with"
       - code: width
       - text: ", then a narrow column with one button as wide as the column and one as wide as its label."
       - link "With slots":
-        - /url: /helix/sandbox?e=button.with-slots
+        - /url: /design/sandbox?e=button.with-slots
       - text: Icons at either end of the label, placed in the
       - code: start
       - text: and
@@ -412,9 +412,9 @@
   - navigation "Footer":
     - text: Products
     - link "Helix":
-      - /url: /helix
+      - /url: /design
     - link "Cortex":
-      - /url: /cortex
+      - /url: /agents
     - text: Company
     - link "Services":
       - /url: /company/services

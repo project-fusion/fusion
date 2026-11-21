@@ -6,7 +6,7 @@ import { SandboxWorkbench } from './workbench'
 
 export const metadata = pageMetadata({
   description: 'Edit any Helix example and watch it render, in either syntax.',
-  path: '/helix/sandbox',
+  path: '/design/sandbox',
   title: 'Sandbox',
 })
 
@@ -44,9 +44,9 @@ export default function SandboxPage() {
           {
             group: 'Components',
             items: families.map((family) => ({
-              alternate: `/helix/sandbox?family=${family.slug}`,
+              alternate: `/design/sandbox?family=${family.slug}`,
               alternateLabel: 'Open in the sandbox',
-              href: `/helix/components/${family.slug}`,
+              href: `/design/components/${family.slug}`,
               label: family.label,
             })),
           },

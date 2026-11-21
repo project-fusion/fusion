@@ -29,7 +29,7 @@ import { styles } from './menu-item.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
- * @documentation https://fusion.dev/helix/components/menu
+ * @documentation https://fusion.dev/design/components/menu
  *
  * @cssproperty --menu-item-description-color - Color of the line under the label.
  * @cssproperty --menu-item-detail-color - Color of the shortcut and the words in the `end` slot.

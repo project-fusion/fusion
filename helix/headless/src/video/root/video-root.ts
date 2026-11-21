@@ -140,7 +140,7 @@ const clock = (seconds: number): string => {
  * @anatomy controls
  * @practice {native} Set `controls` only where you want the browser's own control bar. - The Helix bar is then not drawn and its keys are not bound, so a key press does not seek twice.
  * @practice {captions} Write sources and captions as `<source>` and `<track>` children of the player. - They are copied into the inner video, which selects resources from its own child nodes.
- * @documentation https://fusion.dev/helix/components/video
+ * @documentation https://fusion.dev/design/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
  * @slot captions-icon - Replaces the glyph on the captions control.

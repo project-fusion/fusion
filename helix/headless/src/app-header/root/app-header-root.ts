@@ -83,7 +83,7 @@ import { inSectioningContent } from '../sectioning.js'
  * @anatomy end
  * @practice Set `fold-below` to fold the middle region on a narrow screen. - Below that many pixels of the bar's own width, the middle region is hidden behind a toggle.
  * @practice Set `scroller` in an app shell whose content scrolls inside a container. - The bar reads the window's scroll unless `scroller` names the element that scrolls.
- * @documentation https://fusion.dev/helix/components/app-header
+ * @documentation https://fusion.dev/design/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.
  * @slot end - Trailing content.

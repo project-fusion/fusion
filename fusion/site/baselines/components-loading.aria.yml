@@ -2,9 +2,9 @@
   - /url: /
 - navigation "Sections":
   - link "Helix":
-    - /url: /helix
+    - /url: /design
   - link "Cortex":
-    - /url: /cortex
+    - /url: /agents
   - link "Services":
     - /url: /company/services
   - link "Insights":
@@ -27,9 +27,9 @@
   - navigation "Footer":
     - text: Products
     - link "Helix":
-      - /url: /helix
+      - /url: /design
     - link "Cortex":
-      - /url: /cortex
+      - /url: /agents
     - text: Company
     - link "Services":
       - /url: /company/services

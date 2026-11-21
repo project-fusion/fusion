@@ -82,7 +82,7 @@ export type TagSelectionMode = SelectionMode
  * @since 0.1.0
  * @status stable
  * @aliases Tag list, Chip group, Token list
- * @documentation https://fusion.dev/helix/components/tag
+ * @documentation https://fusion.dev/design/components/tag
  *
  * @slot - The tags, in the order they are read.
  * @slot empty - Shown in place of the tags while there are none, such as "No filters". Its fallback is `empty-text`.

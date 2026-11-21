@@ -20,7 +20,7 @@ import { HelixMapPartChangeEvent } from '../events/index.js'
  * @status stable
  * @category media
  * @aliases Land cover, Land use, Vegetation, Ground cover
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The layer's name or color changed. Used by `connectMap`; pages do not need to listen for it.
  */

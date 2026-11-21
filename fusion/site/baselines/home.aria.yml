@@ -2,9 +2,9 @@
   - /url: /
 - navigation "Sections":
   - link "Helix":
-    - /url: /helix
+    - /url: /design
   - link "Cortex":
-    - /url: /cortex
+    - /url: /agents
   - link "Services":
     - /url: /company/services
   - link "Insights":
@@ -17,7 +17,7 @@
   - heading "The foundation for building software with AI agents" [level=1]
   - paragraph: Ship faster because the system does the checking.
   - link "Open Fusion Helix":
-    - /url: /helix
+    - /url: /design
   - link "Work with us":
     - /url: /company/services
   - code: bun add @fusion.dev/helix
@@ -52,11 +52,11 @@
   - heading "The panel runs in your browser" [level=2]
   - paragraph: Each control in it is a custom element from the Helix package.
   - link "Explore components":
-    - /url: /helix
+    - /url: /design
   - link "Open the sandbox":
-    - /url: /helix/sandbox
+    - /url: /design/sandbox
   - link "Build a theme":
-    - /url: /helix/theme
+    - /url: /design/theme
   - switch "Outline the Helix elements"
   - text: Outline the Helix elements
   - status
@@ -64,7 +64,7 @@
   - heading "Use the behavior with your own design" [level=3]
   - text: The headless tier holds structure, state, and form behavior. You write the styling.
   - link "Read about the tiers":
-    - /url: /helix/docs/tiers
+    - /url: /design/docs/tiers
   - text: Showing
   - radio "Controls" [checked]
   - radio "Data"
@@ -128,14 +128,14 @@
   - paragraph: What attributes and events does helix-button have?
   - text: Request Manifest URL
   - button "Copy code, Manifest URL"
-  - code: https://fusion.dev/helix/custom-elements.json
+  - code: https://fusion.dev/design/custom-elements.json
   - text: Answer Manifest excerpt
   - button "Copy code, Manifest excerpt"
   - code: "{ \"attributes\": [\"width\", \"emphasis\", \"tone\", \"command\", \"commandfor\", \"focusable-when-disabled\", \"formaction\", \"formenctype\", \"formmethod\", \"formnovalidate\", \"formtarget\", \"label\", \"pending\", \"pending-label\", \"type\", \"value\", \"disabled\", \"name\"], \"events\": [\"helix-press\"], \"tagName\": \"helix-button\" }"
   - link "Read the index":
     - /url: /llms.txt
   - link "Read the button family":
-    - /url: /helix/components/button.json
+    - /url: /design/components/button.json
   - paragraph: Coverage
   - heading "components in one package" [level=2]
   - paragraph: Charts, data tables, chat, and date pickers use the same tokens as your buttons.
@@ -144,7 +144,7 @@
     - listitem: Ships it as experimental
   - paragraph: A typical extra component, compressed.
   - link "Compare the systems":
-    - /url: /helix/docs/metrics#what-each-system-ships
+    - /url: /design/docs/metrics#what-each-system-ships
   - table "Jobs each design system publishes an element for, from each system's manifest":
     - caption: Jobs each design system publishes an element for, from each system's manifest
     - rowgroup:
@@ -370,9 +370,9 @@
   - navigation "Footer":
     - text: Products
     - link "Helix":
-      - /url: /helix
+      - /url: /design
     - link "Cortex":
-      - /url: /cortex
+      - /url: /agents
     - text: Company
     - link "Services":
       - /url: /company/services

@@ -26,7 +26,7 @@ import { styles } from './strands-stop.css.js'
  *
  * @since 0.147.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/strands
+ * @documentation https://fusion.dev/design/components/strands
  */
 @customElement('helix-strands-stop')
 export class HelixStrandsStop extends HelixElement {

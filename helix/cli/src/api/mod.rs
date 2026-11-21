@@ -741,7 +741,7 @@ pub fn example(from: &Path, name: &str, slug: Option<&str>, tier: Option<&str>) 
             .map(|render| {
                 json!({
                     "shot": render["shot"],
-                    "url": format!("{SITE}/helix/components/{family_slug}/{}", text(&render["file"])),
+                    "url": format!("{SITE}/design/components/{family_slug}/{}", text(&render["file"])),
                 })
             })
             .collect()

@@ -2,9 +2,9 @@
   - /url: /
 - navigation "Sections":
   - link "Helix":
-    - /url: /helix
+    - /url: /design
   - link "Cortex":
-    - /url: /cortex
+    - /url: /agents
   - link "Services":
     - /url: /company/services
   - link "Insights":
@@ -20,7 +20,7 @@
   - link "Get started":
     - /url: "#get-started"
   - link "Build your theme":
-    - /url: /helix/theme?layout=map
+    - /url: /design/theme?layout=map
   - group "Map of Austin":
     - region "Map"
     - img "Walker":
@@ -217,7 +217,7 @@
   - button "Copy code, Install"
   - code: bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
   - link "Read the Maps guide":
-    - /url: /helix/docs/maps
+    - /url: /design/docs/maps
   - paragraph: Under the hood
   - heading "Six parts, from elements to tiles" [level=2]
   - paragraph: MapLibre or Leaflet draws the map itself.
@@ -258,9 +258,9 @@
   - navigation "Footer":
     - text: Products
     - link "Helix":
-      - /url: /helix
+      - /url: /design
     - link "Cortex":
-      - /url: /cortex
+      - /url: /agents
     - text: Company
     - link "Services":
       - /url: /company/services

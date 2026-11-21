@@ -35,7 +35,7 @@ import { styles } from './description-list-root.css.js'
  * @anatomy item
  * @anatomy label
  * @anatomy value
- * @documentation https://fusion.dev/helix/components/description-list
+ * @documentation https://fusion.dev/design/components/description-list
  *
  * @cssproperty --description-list-column-gap - The space between the column of labels and the column of values, with `direction="row"`.
  * @cssproperty --description-list-divider-color - The color of the rule between pairs, with `divided`.

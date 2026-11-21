@@ -14,7 +14,7 @@ import { styles } from './map-raster.css.js'
  * @status stable
  * @category media
  * @aliases Weather radar, Tile overlay, Raster layer
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  */
 @customElement('helix-map-raster')
 export class HelixMapRaster extends HelixHeadlessMapRaster {

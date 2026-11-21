@@ -18,7 +18,7 @@ import { property, state } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @aliases Menu group, Menu heading
- * @documentation https://fusion.dev/helix/components/menu
+ * @documentation https://fusion.dev/design/components/menu
  *
  * @slot - The rows.
  * @slot heading - The heading, for content richer than `label`.

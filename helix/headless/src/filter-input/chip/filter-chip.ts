@@ -57,7 +57,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category forms
  * @aliases FilterToken, FacetChip
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  *
  * @slot - The values the field is compared to, usually as text. It takes any
  * content you want shown there.

@@ -15,7 +15,7 @@ import { styles } from './map-area.css.js'
  * @status stable
  * @category media
  * @aliases Map region, Polygon, Zone
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-area-color - The area's color when no tone is set.
  */

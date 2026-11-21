@@ -121,7 +121,7 @@ const HERO_VIEWS = {
 
 export const metadata = pageMetadata({
   description: MAPS.lede,
-  path: '/helix/maps',
+  path: '/design/maps',
   title: MAPS.title,
 })
 
@@ -130,7 +130,7 @@ export const metadata = pageMetadata({
  *
  * **A page rather than a component's example**, because what is being shown
  * is more than a component: a frame, a connector, a style, the layers inside
- * it, and tiles later. `/helix/components/map` stays the frame's reference.
+ * it, and tiles later. `/design/components/map` stays the frame's reference.
  *
  * **Sold, then shown, then handed over.** Under the live map: what a map gets
  * from Helix, the one thing a marker cannot do shown running, what a map can
@@ -314,7 +314,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <Snippet code={MAP_INSTALL} label="Install" language="sh" />
             </div>
             <helix-flex class="siteActions" data-density="lg">
-              <Link data-button="solid" data-button-tone="primary" href="/helix/docs/maps">
+              <Link data-button="solid" data-button-tone="primary" href="/design/docs/maps">
                 Read the Maps guide
               </Link>
             </helix-flex>

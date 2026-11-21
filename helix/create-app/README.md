@@ -59,7 +59,7 @@ pre-release, or when `HELIX_NO_UPDATE_CHECK` is set.
 an unrelated project, so `npm create helix-app` runs somebody else's code.
 `npm create @fusion.dev/helix-app` resolves to this package and no other.
 
-[Documentation](https://fusion.dev/helix/docs) ·
-[Components](https://fusion.dev/helix/components)
+[Documentation](https://fusion.dev/design/docs) ·
+[Components](https://fusion.dev/design/components)
 
 MIT

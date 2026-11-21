@@ -32,7 +32,7 @@ import { styles } from './scroll-progress-root.css.js'
  * @anatomy bar
  * @practice Set `for` to the id of the box that scrolls. - Without it, the bar follows the page.
  * @practice Place the bar yourself, such as at the top of a sticky header. - It fills the width it is given and draws nothing else.
- * @documentation https://fusion.dev/helix/components/scroll-progress
+ * @documentation https://fusion.dev/design/components/scroll-progress
  *
  * @csspart bar - The fill, scaled along its length by how far the page or the box is scrolled.
  * @csspart track - The full length the bar fills.

@@ -416,7 +416,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      `read.current === true` beside a `familySlug` still null, wrote an empty
      query and emptied the address of the link it had just arrived on. Measured,
      not reasoned about: `?e=accordion.default&l=centered&d=rtl&tier=headless`
-     became `/helix/sandbox` within a frame. A `setState` batches with the other
+     became `/design/sandbox` within a frame. A `setState` batches with the other
      setters, so this turns true on the same render that carries the values, and
      the effect that reads it cannot run early. */
   const [read, setRead] = useState(false)
@@ -440,7 +440,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   /* **The sources arrive per family, when it is opened.** What the page hands
      down is a listing, names and addresses, because the whole catalog crossing
      as a prop put every example's three sources in the RSC payload to draw a
-     rail of names. The family's own JSON under `public/helix/components/` is
+     rail of names. The family's own JSON under `public/design/components/` is
      the catalog entry verbatim, written beside its markdown by the same
      generator, so it is the one source and not a second shape of it.
 
@@ -459,7 +459,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     const load = async (): Promise<void> => {
       let loaded: Family
       try {
-        const response = await fetch(`/helix/components/${slug}.json`)
+        const response = await fetch(`/design/components/${slug}.json`)
         if (!response.ok) {
           throw new Error(`${response.status} ${response.statusText}`)
         }
@@ -617,7 +617,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      question from whether an example is open. `familySlug` is null before the
      first effect runs, so testing it does stop the empty write that would
      replace a real query on load; it is also null for as long as nobody has
-     chosen an example, and at a bare `/helix/sandbox` that is forever, so every
+     chosen an example, and at a bare `/design/sandbox` that is forever, so every
      setting a reader changed there, tier and layout and direction and panes and
      syntax alike, went unrecorded, while the same sandbox reached from a
      component's preview worked because that link always carries `?e=`. `read`
@@ -1141,7 +1141,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                   <a
                     aria-label={`${entry.label} documentation`}
                     className={styles.docsJump}
-                    href={`/helix/components/${entry.slug}`}
+                    href={`/design/components/${entry.slug}`}
                   >
                     <helix-icon name="book-open-text" />
                   </a>
@@ -1504,7 +1504,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                   every example of it runs the same ones. */}
                   <helix-sandbox-specs
                     family={family.slug}
-                    src="/helix/sandbox/specs"
+                    src="/design/sandbox/specs"
                   ></helix-sandbox-specs>
                 </helix-tab-panel>
               </helix-tabs>

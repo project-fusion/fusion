@@ -3,7 +3,7 @@
 Finds the Helix mistakes that are valid CSS and therefore silent: a `::part()`
 naming a part nothing publishes, a custom property named for the wrong family, a
 part a composed component never forwarded, two copies of the library on one page.
-[Diagnostics](https://fusion.dev/helix/docs/diagnostics) in the Helix
+[Diagnostics](https://fusion.dev/design/docs/diagnostics) in the Helix
 documentation walks through the setup.
 
 ```sh
@@ -559,6 +559,6 @@ both sides say, a manifest from another version is one `manifest-skew`
 finding in place of all others. Where either is silent, the check falls back
 to a part rendering that the manifest does not list.
 
-[Documentation](https://fusion.dev/helix)
+[Documentation](https://fusion.dev/design)
 
 MIT

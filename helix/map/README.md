@@ -7,11 +7,11 @@ a driver of your own, with a style made from your tokens.
 bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
 ```
 
-**The guide is [Maps](https://fusion.dev/helix/docs/maps)**: connecting a
+**The guide is [Maps](https://fusion.dev/design/docs/maps)**: connecting a
 renderer, the style, markers, clusters, routes, a live position, points, layers
 such as 3D buildings, terrain, and weather radar, a snapshot drawn on the server
 for the first paint, the keyboard, and writing a driver. The elements themselves are on the
-[Map reference](https://fusion.dev/helix/components/map).
+[Map reference](https://fusion.dev/design/components/map).
 
 ```js
 import '@fusion.dev/helix/map'

@@ -37,7 +37,7 @@ import '../../tooltip/index.js'
  * @anatomy center
  * @practice Set the ring's thickness with `hole`. - The stroke width and the ring's radius must agree, so no CSS hook sets it.
  * @practice Point `for` at a table with one row per slice, its amount in the first column of numbers. - A donut divides one whole, so it reads one column where other Helix charts read one per series.
- * @documentation https://fusion.dev/helix/components/donut-chart
+ * @documentation https://fusion.dev/design/components/donut-chart
  *
  * @cssproperty --chart-glide-duration - How long the tooltip takes to glide from one slice to the next, along `--helix-easing-decelerate`, as the pointer or the keys move. Defaults to `--helix-duration-fast`. `0s` places it at once, and under reduced motion it moves at once, whatever it says. It is placed where its reading is when a reading is shown from none. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.
  * @cssproperty --chart-move-duration - How long a mark takes to move to a new reading. Defaults to `--helix-duration-normal`. `0s` moves nothing, and under reduced motion nothing moves, whatever it says. Bar Chart, Line Chart, Area Chart, Donut Chart, Scatter Chart, Sparkline, and Heatmap share this property.

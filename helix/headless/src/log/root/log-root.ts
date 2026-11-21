@@ -179,7 +179,7 @@ interface Heard {
  * @anatomy status
  * @practice Set `done` once the output you pass to `write()` is complete. - The status region then says that the run has ended.
  * @practice Set `quiet` where something around the log speaks for it, as a chat turn does for an agent's work. - The status region would say each error and each finished step a second time.
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  *
  * @slot - The lines, as `Log.Line` and `Log.Group` elements.
  * @slot resume - The control that returns to the newest line, shown while the reader is scrolled away. Defaults to a button named by `resume-label`.

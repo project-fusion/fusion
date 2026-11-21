@@ -108,7 +108,7 @@ import '../../time-picker/index.js'
  * @anatomy hint?
  * @anatomy surface
  * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
- * @documentation https://fusion.dev/helix/components/time-input
+ * @documentation https://fusion.dev/design/components/time-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the time, before the trigger, such as a clear button.

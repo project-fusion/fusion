@@ -100,7 +100,7 @@ const holds = (outer: Element, inner: Element): boolean => {
  * @anatomy header
  * @anatomy footer
  * @practice {alert} Under `alert`, put the action that dismisses first in the footer, and give it autofocus. - Focus then starts on the action that destroys nothing.
- * @documentation https://fusion.dev/helix/components/dialog
+ * @documentation https://fusion.dev/design/components/dialog
  *
  * @slot - The dialog's content.
  * @slot dismiss-icon - Replaces the glyph inside the close control.

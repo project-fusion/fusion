@@ -50,7 +50,7 @@ import '../../tooltip/index.js'
  * @anatomy labels
  * @practice Leave a total column out of the table `for` names. - Every numeric column is a part, so a total column is counted twice.
  * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
- * @documentation https://fusion.dev/helix/components/area-chart
+ * @documentation https://fusion.dev/design/components/area-chart
  *
  * @cssproperty --area-chart-block-size - Height of the drawing.
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.

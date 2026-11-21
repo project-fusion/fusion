@@ -47,7 +47,7 @@ export interface FamilyListing extends Pick<Family, 'label' | 'slug' | 'status'>
  * a page that hands it to a client component ships all of it in the RSC
  * payload** to draw a rail of names. Measured on the sandbox: 4.2 MB of the
  * payload was this prop. A listing is what the rail needs, and the sources of
- * a family arrive when it is opened, from the `public/helix/components/*.json`
+ * a family arrive when it is opened, from the `public/design/components/*.json`
  * the catalog already writes beside each family's markdown.
  */
 export const listFamilies = (): FamilyListing[] =>

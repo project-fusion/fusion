@@ -26,7 +26,7 @@ import { styles } from './megamenu-root.css.js'
  * @anatomy surface
  * @practice Write the panel's links and headings yourself, in its default slot. - A router renders its own anchors and cannot render them inside the megamenu's shadow root.
  * @practice {preview} Mark the panel's columns, headings, and links with their data-megamenu attributes. - `helix.css` lays out the panel through them, and without them the panel holds your markup as you styled it.
- * @documentation https://fusion.dev/helix/components/megamenu
+ * @documentation https://fusion.dev/design/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - The filter behind the panel. Inside an App Header it is the
  *   bar's own filter, so a glass bar's panel is glass too, and elsewhere `none`. This family has no

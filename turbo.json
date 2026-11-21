@@ -445,16 +445,16 @@
       //
       // The set is `.gitignore`'s, which is the list of what this task
       // generates and the only place it was written down: `public/*.md`,
-      // `public/helix/*.md`, `public/helix/components/`, `public/helix/docs/`
+      // `public/design/*.md`, `public/design/components/`, `public/design/docs/`
       // and `public/insights/`. Declaring them one failure at a time found
       // `insights` and then `helix/*.md` on the next run, because a `.md` is
       // written per route and a route is as deep as its path.
       "outputs": [
         "content/catalog/catalog.generated.json",
         "public/*.md",
-        "public/helix/components/**",
-        "public/helix/docs/**",
-        "public/helix/*.md",
+        "public/design/components/**",
+        "public/design/docs/**",
+        "public/design/*.md",
         "public/insights/**"
       ]
     },
@@ -798,8 +798,8 @@
     // better of the two ways for that to go wrong.
     "themed-page": {
       "dependsOn": ["^build"],
-      "inputs": ["app/*/helix/theme/**", "$TURBO_ROOT$/fusion/site/scripts/build-themed-page.mjs"],
-      "outputs": ["app/*/helix/theme/themed-page-markup.generated.ts"]
+      "inputs": ["app/*/design/theme/**", "$TURBO_ROOT$/fusion/site/scripts/build-themed-page.mjs"],
+      "outputs": ["app/*/design/theme/themed-page-markup.generated.ts"]
     },
     // Its own task for the reason `docs-check` gives.
     "themed-page-check": { "cache": false, "dependsOn": ["^build"] },
@@ -856,7 +856,7 @@
         "$TURBO_ROOT$/helix/theme/wasm/fusion_helix_theme_bg.wasm",
         "$TURBO_ROOT$/fusion/site/scripts/copy-wasm.mjs"
       ],
-      "outputs": ["public/helix/theme.wasm"]
+      "outputs": ["public/design/theme.wasm"]
     }
   },
   "ui": "stream"

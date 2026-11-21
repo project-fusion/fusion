@@ -112,7 +112,7 @@ import { hideOutside } from '../hide-outside.js'
  * @anatomy content
  * @practice {commanded} Open the popover from a button anywhere on the page with `commandfor="<id>"` and `command="--toggle"`. - The invoker attributes need no script, and work as they do on Dialog and Drawer.
  * @practice Set `modal` for a panel that has to be answered before the page goes on. - Without it, the popover does not trap focus.
- * @documentation https://fusion.dev/helix/components/popover
+ * @documentation https://fusion.dev/design/components/popover
  *
  * @slot - The contents of the panel.
  * @slot trigger - The element that opens the panel.

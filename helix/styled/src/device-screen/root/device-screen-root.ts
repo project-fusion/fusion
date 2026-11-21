@@ -41,7 +41,7 @@ import { styles } from './device-screen-root.css.js'
  * @anatomy screen
  * @practice Set `screen-width` and `screen-height` to the screen's size in the units your device takes input in. - Every point an event carries is in those units: points for the iOS Simulator, and pixels for an Android device.
  * @practice Set `readonly` while an agent drives the device. - The screen then shows the stream and sends nothing back.
- * @documentation https://fusion.dev/helix/components/device-screen
+ * @documentation https://fusion.dev/design/components/device-screen
  *
  * @cssproperty --device-screen-bezel - How thick the body is at the sides, as a fraction of the screen's width. `0.045` by default.
  * @cssproperty --device-screen-bezel-block - How thick the body is at the top and bottom, as a fraction of the screen's width. The same as `--device-screen-bezel` by default.

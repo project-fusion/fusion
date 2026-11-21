@@ -14,7 +14,7 @@ import { styles } from './timeline-item.css.js'
  * @status stable
  * @category data
  * @aliases Activity item, History entry, Event
- * @documentation https://fusion.dev/helix/components/timeline
+ * @documentation https://fusion.dev/design/components/timeline
  *
  * @cssproperty --timeline-column-gap - Space between the rail and the time and what happened.
  * @cssproperty --timeline-marker-color - The color of the mark on an entry with no `tone`. A `tone` colors the mark itself.

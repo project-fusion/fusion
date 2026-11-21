@@ -588,7 +588,7 @@ export async function generateMetadata({
        otherwise sets `images` to the site card, and a set `images` is what stops
        Next reading the convention at all, silently. */
     image: false,
-    path: `/helix/components/${family.slug}`,
+    path: `/design/components/${family.slug}`,
     title: family.label,
   })
 }
@@ -802,7 +802,7 @@ export default async function FamilyDocs({
                        reads its own tier from a preference this page had already
                        overridden. Carried only when it was forced, so an ordinary
                        link stays `?e=family.slug`. */
-                    sandboxHref={`/helix/sandbox?e=${family.slug}.${example.slug}${
+                    sandboxHref={`/design/sandbox?e=${family.slug}.${example.slug}${
                       forced ? `&tier=${forced}` : ''
                     }`}
                   />
@@ -858,7 +858,7 @@ export default async function FamilyDocs({
                         <Link
                           aria-label={`${one.label}: ${plainText(after(one.description))}`}
                           className={`${api.choice} ${api.choiceLink}`}
-                          href={`/helix/components/${one.slug}`}
+                          href={`/design/components/${one.slug}`}
                         >
                           <Picture slug={one.slug} />
                           <helix-text as="span" class={api.choiceSituation} scale="body">
@@ -1018,7 +1018,7 @@ export default async function FamilyDocs({
                           foreground on hover. */}
                         <Link
                           data-link="quiet"
-                          href={`/helix/sandbox?e=${family.slug}.${example.slug}${
+                          href={`/design/sandbox?e=${family.slug}.${example.slug}${
                             forced ? `&tier=${forced}` : ''
                           }`}
                         >

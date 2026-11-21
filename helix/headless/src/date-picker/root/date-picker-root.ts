@@ -152,7 +152,7 @@ const columnHeads = (
  * @anatomy day
  * @practice Write `value`, `min`, and `max` as `YYYY-MM-DD` strings. - Every calculation is in UTC, since a local-time `Date` shifts across a time zone or daylight-saving boundary.
  * @practice {controlled-month} Set `month` to choose the month on show apart from `value`. - Paging selects nothing, and an unset `month` follows the first chosen date, then the current month.
- * @documentation https://fusion.dev/helix/components/date-picker
+ * @documentation https://fusion.dev/design/components/date-picker
  *
  * @slot footer - Content under the calendar, such as buttons for today or a common range.
  * @slot header - Content above the calendar, such as a note on what the date is for.

@@ -53,7 +53,7 @@ import { property } from 'lit/decorators.js'
  * @practice Write the entries in the order the events happened, oldest or newest first. - The reading order is the order you write them in, in every layout.
  * @practice {grouped} Group entries by date with `Timeline.Group`. - The group puts a heading such as Today over its entries.
  * @practice Set `loading` while you fetch more entries, and put a button that asks for more after the timeline. - The timeline is busy, and an entry after the last says Loading.
- * @documentation https://fusion.dev/helix/components/timeline
+ * @documentation https://fusion.dev/design/components/timeline
  *
  * @slot - The entries, and any groups of them.
  * @slot loading - Content for the entry after the last while `loading` is set. Falls back to `loading-text`.

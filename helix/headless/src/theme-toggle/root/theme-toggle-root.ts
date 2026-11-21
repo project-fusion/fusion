@@ -53,7 +53,7 @@ import { property, state } from 'lit/decorators.js'
  * @anatomy button
  * @anatomy icon
  * @practice Listen for the change event, and write the mode into the next page you serve. - The button sets the mode on the page in front of you, and the next page starts from its own markup.
- * @documentation https://fusion.dev/helix/components/theme-toggle
+ * @documentation https://fusion.dev/design/components/theme-toggle
  *
  * @slot - The button's text, where it shows more than its icon. Defaults to nothing, the icon alone, named by `label`.
  * @slot icon - Replaces the icon, which is the moon while the page is light and the sun while it is dark.

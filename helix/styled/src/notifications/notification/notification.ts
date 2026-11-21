@@ -29,7 +29,7 @@ import '../../format-date/index.js'
  * @since 0.1.0
  * @status stable
  * @category feedback
- * @documentation https://fusion.dev/helix/components/notifications
+ * @documentation https://fusion.dev/design/components/notifications
  *
  * @slot - What happened, in your own markup.
  * @slot actions - Actions the user can take on the notification.

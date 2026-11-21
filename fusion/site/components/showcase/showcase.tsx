@@ -233,7 +233,7 @@ export function Showcase(): React.ReactElement {
               reading "Read about theming" that did nothing when pressed, which
               is the one control in the panel a reader would expect to work. */}
           <helix-flex>
-            <a data-button="solid" href="/helix/docs/tiers">
+            <a data-button="solid" href="/design/docs/tiers">
               Read about the tiers
             </a>
           </helix-flex>
@@ -792,12 +792,12 @@ export function Showcase(): React.ReactElement {
             <helix-flex direction="column" gap="md">
               <helix-breadcrumbs aria-label="Breadcrumb">
                 <helix-breadcrumb>
-                  <a data-link="quiet" href="/helix">
+                  <a data-link="quiet" href="/design">
                     Helix
                   </a>
                 </helix-breadcrumb>
                 <helix-breadcrumb>
-                  <a data-link="quiet" href="/helix">
+                  <a data-link="quiet" href="/design">
                     Components
                   </a>
                 </helix-breadcrumb>

@@ -25,7 +25,7 @@ import { styles } from './virtual-list-root.css.js'
  * @practice {loading-more} Set `loading` while you fetch more items, then add them to `items`. - The list is then busy, and a reader sees that more is on its way.
  * @practice Keep links and buttons in rows to a list without `selection-mode`. - With it, each row is an option, and a row's own links and buttons are not reached there.
  * @practice On the headless tier, give the `viewport` part a block size. - Without one, the viewport is as tall as its rows and does not scroll.
- * @documentation https://fusion.dev/helix/components/virtual-list
+ * @documentation https://fusion.dev/design/components/virtual-list
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.

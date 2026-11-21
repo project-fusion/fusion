@@ -24,7 +24,7 @@ import { styles } from './highlighter-root.css.js'
  * @use The words that carry a sentence's claim, such as a line on a landing page.
  * @instead find - Words you search for in content, with each match marked.
  * @instead reveal - A section that comes in as you scroll to it.
- * @documentation https://fusion.dev/helix/components/highlighter
+ * @documentation https://fusion.dev/design/components/highlighter
  *
  * @slot - The words marked.
  *

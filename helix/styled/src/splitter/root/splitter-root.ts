@@ -39,7 +39,7 @@ import { styles } from './splitter-root.css.js'
  * @practice Set `primary` to a sidebar's pane. - That pane keeps its size when the splitter's own size changes, and the other pane takes all of the change.
  * @practice {bounds} Set `min` and `end-min` to the least each pane needs. - By default the divider reaches either edge, so you can drag a pane fully closed.
  * @practice {nested} For three columns, nest a splitter in the `end` pane of another. - A divider then resizes only the two panes beside it.
- * @documentation https://fusion.dev/helix/components/splitter
+ * @documentation https://fusion.dev/design/components/splitter
  *
  * @csspart corner - The handle where a nested splitter's divider crosses this one.
  * @csspart end - The box that holds the second pane.
