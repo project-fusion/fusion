@@ -194,10 +194,8 @@ These are the hard spots, each with the way through it:
   in the runtime can measure in its layout pass. Scale and rotate are dropped
   until GPUI draws them.
 - **No implicit transitions.** 88 elements declare `transition`. GPUI animates
-  only what `with_animation` names. The runtime needs a transition driver: a
-  keyed state that remembers each animated value, eases toward the new one, and
-  asks for the next frame, as `helix/native/src/drivers/motion.ts` does on a
-  phone.
+  only what `with_animation` names. The runtime needs a transition driver,
+  which "Motion and computed values" below describes.
 - **No outline.** Focus rings are outlines, with an offset, in 293 rules. The
   runtime draws a ring as an absolute child with a border, sized by the offset.
 - **Grid tracks.** GPUI exposes Taffy grid as `grid_cols(n)` with equal
@@ -246,6 +244,123 @@ These are the hard spots, each with the way through it:
   How complete the screen reader support is on each platform is unknown, and
   Zed's own issue about Windows is still open. Each family's screen reader
   behavior needs testing on macOS before it is called done.
+
+### Motion and computed values
+
+**On React Native, Reanimated plays most of Helix's motion.** It reads the
+CSS `transition` and `@keyframes` a style table writes and runs them on the UI
+thread, so `helix/native` adds only what Reanimated lacks, such as presence
+and opening to a measured height. GPUI has no such engine. It gives
+`with_animation(id, Animation, |el, t| ..)`, `window.request_animation_frame()`,
+keyed state that lasts across frames, and springs. A Rust target therefore
+splits motion in two:
+
+- **The compiler parses every motion declaration** into typed data at build
+  time: each transition's properties, durations, curves, and delays, each
+  keyframe table, and each rule under `entering` or reduced motion.
+- **The runtime crate plays that data** each frame, in pieces written by
+  hand.
+
+The motion and computed values on the pilot branch, and how each ports:
+
+| What | Uses | How it ports |
+|---|---|---|
+| `transition` | 88 elements | A transition driver in the runtime |
+| `@keyframes` and `animation` | 29 elements | Keyframe tables the compiler writes, played with `with_animation` |
+| `entering` and the `exiting` and `closed` states | 38 `entering` rules | A presence phase in the runtime: closed, opening, open, and closing |
+| Reduced motion | 157 rules | A flag the runtime reads from the system setting and the app's Motion Toggle |
+| `translate`, `scale`, `rotate` | 52 elements | A translate through a runtime element; scale and rotate wait on GPUI |
+| `calc()`, `color-mix()`, `light-dark()` | 1,850, 330, and 120 uses | Folded at build time where they read tokens alone |
+| Measured lengths, `clip-path`, backdrop blur | 777 uses, 41 and 16 elements | Runtime elements that measure in the layout pass |
+
+The spike holds none of the motion work. It drops Button's `transition` and
+names it in the module's header. The Rust below is the planned output.
+
+**A transitioned property is resolved into one value first.** Without a
+transition, the emitter writes each rule as a style call and the last call
+wins. A transition needs the final value in one place, so the driver can ease
+toward it. For each transitioned property, the emitter applies the rules in
+order to a variable and hands the variable to the driver:
+
+```rust
+let background = {
+    let mut value = theme.color_accent;
+    if emphasis == Some(ButtonEmphasis::Outlined) {
+        value = gpui::transparent_black();
+    }
+    value
+};
+div().bg(motion.color("background-color", background, theme.duration_quick, theme.easing_out))
+```
+
+`motion` is keyed state on the element. It remembers the last target and when
+it changed, interpolates along the token's Bézier curve, asks for the next
+frame until the value arrives, and jumps to the target under reduced motion.
+`helix/native/src/drivers/motion.ts` does the same on a phone in about 300
+lines.
+
+**A hover that transitions is tracked in state.** GPUI applies a `.hover()`
+style at paint, with no render, so the driver never sees it. For a property
+that transitions, the emitter tracks hover with `on_hover` in keyed state and
+reads it while it resolves the value. A property with no transition keeps the
+`.hover()` closure.
+
+**Keyframes become constant tables.** Badge's `badge-bounce` becomes the
+offset at each stop, played over the duration its hook or token gives:
+
+```rust
+const BADGE_BOUNCE: &[(f32, f32)] = &[
+    (0.0, 0.0), (0.2, 0.0), (0.4, -0.3), (0.43, -0.3),
+    (0.53, 0.0), (0.7, -0.15), (0.9, -0.04), (1.0, 0.0),
+];
+indicator.when(attention == Some(BadgeAttention::Bounce) && !blank && !motion.reduced(), |el| {
+    el.with_animation(
+        "bounce",
+        Animation::new(hooks.attention_duration.unwrap_or(theme.duration_turn * 1.25)).repeat(),
+        |el, t| helix::translate_y(el, relative(sample(BADGE_BOUNCE, t))),
+    )
+})
+```
+
+**Transforms are the largest gap.** GPUI transforms an `svg` alone:
+
+- A translate in pixels becomes a relative offset, which GPUI draws today.
+- A translate in percentages of the element's own size, as the bounce above
+  and Badge's `50% -50%`, needs that size. A runtime element reads its bounds
+  in the layout pass and offsets its child as it paints.
+- Scale and rotate need GPUI to transform a paint layer, upstream or in a
+  fork. Until then they are dropped and named, as native's `dropped` list
+  names a property a phone cannot draw.
+
+**Presence and opening port from `helix/native`.** A dialog or a toast stays
+drawn through its exit transition, its first frame takes its `entering`
+values, and an accordion's content moves to its measured height. The runtime
+holds each in a phase of closed, opening, open, and closing, as
+`render/presence.ts` and `useOpenPhase` do on a phone. The compiler marks the
+rules under `entering`, so the first frame draws them and the driver moves
+away from them.
+
+**Reduced motion is a runtime value.** A rule under
+`prefers-reduced-motion: reduce` becomes a condition on `motion.reduced()`,
+which holds while the system asks for less motion or the app's Motion Toggle
+has paused it. Every transition takes no time while it holds.
+
+**Most computed values are folded at build time.** A `calc()` or a color mix
+that reads tokens alone becomes one value for each mode when the compiler
+writes the theme, with the OKLCH code `fusion-helix-theme` already has in
+Rust. A value that reads a prop or a hook a caller sets becomes a small
+expression in the render, such as
+`hooks.size.unwrap_or(theme.size_badge) / 4.0`.
+
+The motion work sits in three phases below:
+
+- **Phase 1:** the parsing, the keyframe tables, and the dropped list.
+- **Phase 3:** the transition driver, reduced motion, and translate.
+- **Phase 5:** presence and opening, which the layers need.
+
+Scale and rotate wait on GPUI. After the machines, the motion runtime is
+likely the largest piece written by hand, since Reanimated supplied most of
+it on React Native.
 
 ## 3. Scope: GPUI and the other Rust options
 
@@ -378,7 +493,7 @@ are rough, and phase 0 should correct them.
 
 | Phase | What it delivers | Weeks |
 |---|---|---|
-| 0. Spike | Acme's Button and Badge compiled to Rust and drawn in a small GPUI app, done in this branch; the decisions below made | 1 |
+| 0. Spike | Acme's Button and Badge compiled to Rust and drawn in a small GPUI app, done on `feat/helix-rust-components`; the decisions below made | 1 |
 | 1. Lowering | Typed values and the dropped list in the compiler; the cascade lowered to ordered conditional writes; a Rust token module emitted from the token layer; a `helix system` verb, internal at first | 3 |
 | 2. Rust core | The nine statecharts emitted as Rust from `helix system machines`, with their guards and updates ported and held to core's conformance vectors; the derivations waves 1 and 2 need, about 60 of 180 | 4 |
 | 3. Runtime and wave 1 | Theme, units, press, focus ring, transition driver, image, icons; wave 1's families with screenshots compared with the web's | 4 |
