@@ -52,10 +52,10 @@ export interface Vertical {
  * meeting this list wants to know what is for sale before what is being built,
  * and the practice is the one thing on the site belonging to no vertical at all.
  *
- * **Design and Mind point at their product's route, and that is the collapse
+ * **Design and Agents point at their product's route, and that is the collapse
  * rather than an oversight.** A vertical is how the company is organized and a
  * product is what a reader uses, and where exactly one product fills a
- * vertical, shipping two pages for it would be padding: `/helix` titles itself
+ * vertical, shipping two pages for it would be padding: `/design` titles itself
  * Helix and wears Fusion Design as an eyebrow. A vertical with no product would
  * need a page of its own.
  */
@@ -71,7 +71,7 @@ export const VERTICALS: Vertical[] = [
   },
   {
     body: 'Fusion Design builds Helix, a design system of web components. Helix computes its color tokens from your brand color.',
-    href: '/helix',
+    href: '/design',
     icon: 'palette',
     label: 'Design',
     name: 'Fusion Design',
@@ -79,11 +79,11 @@ export const VERTICALS: Vertical[] = [
     summary: 'Home of Helix, our design system.',
   },
   {
-    body: 'Fusion Mind builds Cortex, a memory and provenance layer for AI systems. Cortex records what a system knows, where it learned it, and how far to trust it.',
-    href: '/cortex',
+    body: 'Fusion Agents builds Cortex, a memory and provenance layer for AI systems. Cortex records what a system knows, where it learned it, and how far to trust it.',
+    href: '/agents',
     icon: 'pulse',
-    label: 'Mind',
-    name: 'Fusion Mind',
+    label: 'Agents',
+    name: 'Fusion Agents',
     stage: 'Active',
     summary: 'Home of Cortex, our memory layer.',
   },

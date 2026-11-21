@@ -24,7 +24,7 @@
  *
  * ```
  * bun run shot /                          the home page
- * bun run shot /helix/components/carousel --select helix-carousel
+ * bun run shot /design/components/carousel --select helix-carousel
  * bun run shot / --select helix-carousel --pad 24 --scheme dark
  * bun run shot https://example.com --viewport 390x844
  * ```
@@ -86,7 +86,7 @@ const target = args[0]
 if (target === undefined || target.startsWith('--')) {
   console.error(
     'shot: needs a URL or a path.\n\n' +
-      '  bun run shot /helix/components/carousel --select helix-carousel\n\n' +
+      '  bun run shot /design/components/carousel --select helix-carousel\n\n' +
       '  --select <css>      clip to this element instead of the viewport\n' +
       '  --pad <px>          widen the clip, for a shadow or a focus ring (default 0)\n' +
       '  --viewport <w>x<h>  default 1280x900\n' +

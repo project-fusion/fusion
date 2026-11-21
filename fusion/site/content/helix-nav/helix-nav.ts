@@ -54,29 +54,29 @@ const AFTER = 'Essentials'
  * Every family, under a row that goes to the index.
  *
  * The index row comes first because it is the whole of what the rows under it
- * are part of, and it carries `/helix` rather than a family, so it is never
+ * are part of, and it carries `/design` rather than a family, so it is never
  * marked current while a component is open.
  */
 const components = (): NavSection => ({
   entries: [
-    { href: '/helix', label: 'All components' },
+    { href: '/design', label: 'All components' },
     ...getFamilies().map((family) => ({
-      href: `/helix/components/${family.slug}`,
+      href: `/design/components/${family.slug}`,
       label: family.label,
     })),
   ],
   title: 'Components',
 })
 
-/** The whole sidebar, in render order, for every page under `/helix`. */
+/** The whole sidebar, in render order, for every page under `/design`. */
 export const helixNavigation = (): NavSection[] => {
   const prose: NavSection[] = navigation().map((section) => ({
     entries: section.pages.map((page) => ({
       children: page.children.map((child) => ({
-        href: `/helix/docs/${child.slug}`,
+        href: `/design/docs/${child.slug}`,
         label: child.title,
       })),
-      href: `/helix/docs/${page.slug}`,
+      href: `/design/docs/${page.slug}`,
       label: page.title,
     })),
     title: section.title,

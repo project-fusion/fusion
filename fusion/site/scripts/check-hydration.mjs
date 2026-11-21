@@ -24,7 +24,7 @@
  * - `/insights`: with focus off the search the page put it in, `/` is the
  *   shortcut `helix-kbd` sends as `helix-shortcut`, and `onhelix-shortcut`
  *   moves focus back to the search.
- * - `/helix/maps`: the walking route's `points` is an array, which the server
+ * - `/design/maps`: the walking route's `points` is an array, which the server
  *   cannot write and hydration never assigns. It arrives through the bridge.
  *
  * **Each page twice, the second time with the bridge blind.** An init script
@@ -109,7 +109,7 @@ const PAGES = [
   {
     name: 'an array prop arrives',
     needs: ['helix-map-route'],
-    path: '/helix/maps',
+    path: '/design/maps',
     run: (page) =>
       page
         .waitForFunction(

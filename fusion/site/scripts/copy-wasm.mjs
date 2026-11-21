@@ -2,7 +2,7 @@
 /**
  * Puts the theme engine where the site serves it from.
  *
- * `theme-engine.server.ts` reads `public/helix/theme.wasm` off disk at render
+ * `theme-engine.server.ts` reads `public/design/theme.wasm` off disk at render
  * time and the browser fetches the same path, so the binary has to be a static
  * file under `public/` before `next build` starts. It was tracked there, a
  * byte-for-byte twin of `helix/theme/wasm/fusion_helix_theme_bg.wasm` that
@@ -21,11 +21,11 @@ import { fileURLToPath } from 'node:url'
 const source = fileURLToPath(
   import.meta.resolve('@fusion.dev/helix-theme/wasm/fusion_helix_theme_bg.wasm'),
 )
-const served = join(import.meta.dirname, '..', 'public', 'helix', 'theme.wasm')
+const served = join(import.meta.dirname, '..', 'public', 'design', 'theme.wasm')
 
 mkdirSync(dirname(served), { recursive: true })
 copyFileSync(source, served)
 
 console.log(
-  'wasm-copy: helix/theme/wasm/fusion_helix_theme_bg.wasm copied to public/helix/theme.wasm',
+  'wasm-copy: helix/theme/wasm/fusion_helix_theme_bg.wasm copied to public/design/theme.wasm',
 )

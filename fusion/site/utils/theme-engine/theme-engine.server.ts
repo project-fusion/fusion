@@ -23,7 +23,7 @@ import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 let loading: Promise<ThemeEngine> | undefined
 
 export function serverTheme(): Promise<ThemeEngine> {
-  loading ??= readFile(join(process.cwd(), 'public/helix/theme.wasm')).then((bytes) =>
+  loading ??= readFile(join(process.cwd(), 'public/design/theme.wasm')).then((bytes) =>
     initTheme(bytes),
   )
   return loading

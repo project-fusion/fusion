@@ -9,10 +9,10 @@
     services on one foundation.
   </p>
   <p>
-    <a href="https://fusion.dev/helix/docs">Documentation</a> ·
-    <a href="https://fusion.dev/helix/components">Components</a> ·
-    <a href="https://fusion.dev/helix/sandbox">Sandbox</a> ·
-    <a href="https://fusion.dev/helix/theme">Theme builder</a> ·
+    <a href="https://fusion.dev/design/docs">Documentation</a> ·
+    <a href="https://fusion.dev/design/components">Components</a> ·
+    <a href="https://fusion.dev/design/sandbox">Sandbox</a> ·
+    <a href="https://fusion.dev/design/theme">Theme builder</a> ·
     <a href="https://fusion.dev">fusion.dev</a>
   </p>
   <p>
@@ -70,7 +70,7 @@ and documented CSS parts.
 | `@fusion.dev/helix-icons` | The icon set on its own |
 | `@fusion.dev/helix-diagnostics` | You want the Helix mistakes that are valid CSS found for you |
 
-[Installation](https://fusion.dev/helix/docs/installation) has the stylesheet
+[Installation](https://fusion.dev/design/docs/installation) has the stylesheet
 order, why it is load-bearing and fails silently, and a page for each framework.
 
 ## Working in this repository
@@ -108,8 +108,8 @@ bun run dev
 ```
 
 Next on its default port. The landing page is at `/`, the Helix documentation at
-`/helix/docs`, the component gallery at `/helix/components`, and the sandbox and
-theme builder at `/helix/sandbox` and `/helix/theme`.
+`/design/docs`, the component gallery at `/design/components`, and the sandbox and
+theme builder at `/design/sandbox` and `/design/theme`.
 
 The theme engine's browser build is tracked in `helix/theme/wasm`, so neither the
 dev server nor CI builds it, and the site copies it under `public/` as a build

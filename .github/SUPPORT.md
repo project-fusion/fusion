@@ -6,13 +6,13 @@ sit waiting for a reproduction that was never the point.
 
 Worth reading first, because they answer most of it:
 
-- [Installation](https://fusion.dev/helix/docs/installation) and
-  [Introduction](https://fusion.dev/helix/docs/introduction)
-- [Using the elements](https://fusion.dev/helix/docs/using-the-elements), which
+- [Installation](https://fusion.dev/design/docs/installation) and
+  [Introduction](https://fusion.dev/design/docs/introduction)
+- [Using the elements](https://fusion.dev/design/docs/using-the-elements), which
   is the page most first questions turn out to be about
-- [Theming](https://fusion.dev/helix/docs/theming) and
-  [Tokens](https://fusion.dev/helix/docs/tokens)
-- The [component gallery](https://fusion.dev/helix/components), where every
+- [Theming](https://fusion.dev/design/docs/theming) and
+  [Tokens](https://fusion.dev/design/docs/tokens)
+- The [component gallery](https://fusion.dev/design/components), where every
   family has a live example
 
 **If it is a defect**, open an [issue](https://github.com/project-fusion/fusion/issues/new/choose).

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import GalleryLoading from '@/app/(site)/helix/components/(gallery)/loading'
-import ReferenceLoading from '@/app/(site)/helix/components/(reference)/[family]/loading'
+import GalleryLoading from '@/app/(site)/design/components/(gallery)/loading'
+import ReferenceLoading from '@/app/(site)/design/components/(reference)/[family]/loading'
 import InsightsLoading from '@/app/(site)/insights/loading'
 import SiteLoading from '@/app/loading'
 import { DocsShell } from '@/components/docs-shell/docs-shell'
@@ -28,10 +28,10 @@ interface StandIn {
  * drawn with no chrome around it.
  */
 export const STAND_INS: Record<string, StandIn> = {
-  components: { path: '/helix/components', render: () => <GalleryLoading /> },
+  components: { path: '/design/components', render: () => <GalleryLoading /> },
   insights: { path: '/insights', render: () => <InsightsLoading /> },
   reference: {
-    path: '/helix/components/button',
+    path: '/design/components/button',
     render: (path) => (
       <DocsShell path={path}>
         <ReferenceLoading />

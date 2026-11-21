@@ -20,7 +20,7 @@ the answer is that it is not one, we say why.
 Every package we publish under the `@fusion.dev` scope, and the code in this
 repository that produces them.
 
-**`/helix/sandbox` executes whatever you type into it, by design.** Its frame is
+**`/design/sandbox` executes whatever you type into it, by design.** Its frame is
 `sandbox="allow-scripts allow-forms"` with `allow-same-origin` deliberately
 absent, so the code runs against an opaque origin: it cannot read our cookies,
 our storage or our DOM, because as far as the browser is concerned it is not us.

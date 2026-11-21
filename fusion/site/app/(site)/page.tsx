@@ -105,7 +105,7 @@ export default async function Home() {
                 direction="column"
                 gap="md"
               >
-                <Link data-button="subtle" href="/helix">
+                <Link data-button="subtle" href="/design">
                   Explore components
                 </Link>
 
@@ -119,11 +119,11 @@ export default async function Home() {
                  *                         invitation.
                  */}
                 <helix-flex data-density="sm" gap="lg" wrap>
-                  <Link className={styles.onward} data-link="quiet" href="/helix/sandbox">
+                  <Link className={styles.onward} data-link="quiet" href="/design/sandbox">
                     Open the sandbox
                     <helix-icon name="arrow-right"></helix-icon>
                   </Link>
-                  <Link className={styles.onward} data-link="quiet" href="/helix/theme">
+                  <Link className={styles.onward} data-link="quiet" href="/design/theme">
                     Build a theme
                     <helix-icon name="arrow-right"></helix-icon>
                   </Link>
