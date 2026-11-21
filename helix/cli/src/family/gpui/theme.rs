@@ -77,8 +77,8 @@ impl Tokens {
 pub fn module(tokens: &Tokens, source: &str) -> String {
     let mut out = header(source, &tokens.left);
     out.push_str(
-        "use std::time::Duration;\n\n\
-         use gpui::{AbsoluteLength, App, BoxShadow, Global, Hsla, Pixels, SharedString};\n\n",
+        "use std::time::{Duration, Instant};\n\n\
+         use gpui::{AbsoluteLength, App, BoxShadow, ElementId, Global, Hsla, Pixels, Rgba, SharedString, Window};\n\n",
     );
     out.push_str(
         "/// Each token's value in one mode.\n#[derive(Clone, Debug)]\npub struct Theme {\n",
@@ -134,6 +134,109 @@ fn family(families: &[&str], cx: &App) -> SharedString {
         }
     }
     SharedString::new_static(".SystemUIFont")
+}
+
+/// What the transition driver holds for one property of one part: where
+/// the last move started, where it is going, and when it began.
+struct Easing {
+    from: Hsla,
+    to: Hsla,
+    start: Option<Instant>,
+}
+
+impl Easing {
+    /// The color shown at `now`.
+    fn at(&self, now: Instant, duration: Duration, curve: [f32; 4]) -> Hsla {
+        let Some(start) = self.start else {
+            return self.to;
+        };
+        let progress = (now.duration_since(start).as_secs_f32() / duration.as_secs_f32()).min(1.0);
+        mix(self.from, self.to, bezier(curve, progress))
+    }
+}
+
+/// `target`, eased from the color the part showed before it changed, over
+/// `duration` along `curve`, as a CSS transition moves a color. The part's
+/// element `id` and `property` name the move. A first render shows `target`
+/// at once, and so does every render while `cx.reduce_motion()` holds, which
+/// the app sets from the system setting and its Motion Toggle.
+pub fn eased_color(
+    window: &mut Window,
+    cx: &mut App,
+    id: &ElementId,
+    property: &'static str,
+    target: Hsla,
+    duration: Duration,
+    curve: [f32; 4],
+) -> Hsla {
+    let reduced = cx.reduce_motion();
+    let state = window.with_element_namespace(id.clone(), |window| {
+        window.use_keyed_state(property, cx, |_, _| Easing {
+            from: target,
+            to: target,
+            start: None,
+        })
+    });
+    let now = Instant::now();
+    let (shown, moving) = state.update(cx, |easing, _| {
+        if easing.to != target {
+            let shown = easing.at(now, duration, curve);
+            easing.from = shown;
+            easing.to = target;
+            easing.start = (!reduced && !duration.is_zero()).then_some(now);
+        }
+        if easing
+            .start
+            .is_some_and(|start| reduced || now.duration_since(start) >= duration)
+        {
+            easing.start = None;
+        }
+        (easing.at(now, duration, curve), easing.start.is_some())
+    });
+    if moving {
+        window.request_animation_frame();
+    }
+    shown
+}
+
+/// `from` mixed with `amount` of `to`, in sRGB with premultiplied alpha, as
+/// CSS interpolates a color, so a fill fades to transparent without darkening.
+fn mix(from: Hsla, to: Hsla, amount: f32) -> Hsla {
+    let (a, b) = (from.to_rgb(), to.to_rgb());
+    let alpha = a.a + (b.a - a.a) * amount;
+    let channel = |x: f32, y: f32| {
+        let value = x * a.a + (y * b.a - x * a.a) * amount;
+        if alpha > 0.0 { value / alpha } else { 0.0 }
+    };
+    Rgba {
+        r: channel(a.r, b.r),
+        g: channel(a.g, b.g),
+        b: channel(a.b, b.b),
+        a: alpha,
+    }
+    .into()
+}
+
+/// How far along a `cubic-bezier(x1, y1, x2, y2)` curve is at `progress`.
+fn bezier([x1, y1, x2, y2]: [f32; 4], progress: f32) -> f32 {
+    let sample = |p1: f32, p2: f32, t: f32| {
+        let inverse = 1.0 - t;
+        3.0 * p1 * inverse * inverse * t + 3.0 * p2 * inverse * t * t + t * t * t
+    };
+    let (mut low, mut high, mut t) = (0.0_f32, 1.0_f32, progress);
+    for _ in 0..32 {
+        let x = sample(x1, x2, t);
+        if (x - progress).abs() < 1e-5 {
+            break;
+        }
+        if x < progress {
+            low = t;
+        } else {
+            high = t;
+        }
+        t = (low + high) / 2.0;
+    }
+    sample(y1, y2, t)
 }
 
 /// An outline `width` wide in `color`, drawn as a shadow with a spread so the

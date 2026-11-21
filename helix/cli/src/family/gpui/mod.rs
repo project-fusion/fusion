@@ -149,6 +149,8 @@ struct Element<'a> {
     faults: Vec<String>,
     /// The part the press machine binds, with the event it sends.
     press: Option<(String, String)>,
+    /// The lines the render runs before it draws: each eased color.
+    prelude: Vec<String>,
 }
 
 impl<'a> Element<'a> {
@@ -220,6 +222,7 @@ impl<'a> Element<'a> {
                 hooks: BTreeMap::new(),
                 left: Vec::new(),
                 faults,
+                prelude: Vec::new(),
                 press,
             })
         } else {
@@ -480,6 +483,9 @@ impl<'a> Element<'a> {
                 "        let focus = window\n            .use_keyed_state(id.clone(), cx, |_, cx| cx.focus_handle())\n            .read(cx)\n            .clone();\n",
             );
         }
+        for line in &self.prelude {
+            let _ = writeln!(out, "        {line}");
+        }
         let _ = writeln!(out, "        {tree}\n    }}\n}}");
     }
 
@@ -688,11 +694,21 @@ impl<'a> Element<'a> {
                 Err(why) => self.faults.push(format!("a rule on `{target}`: {why}")),
             }
         }
+        let eased = self.eased(target, &read, out, depth);
+        let without = |rule: &Rule| Rule {
+            set: rule
+                .set
+                .iter()
+                .filter(|(property, _)| !eased.iter().any(|one| one == property))
+                .cloned()
+                .collect(),
+            ..rule.clone()
+        };
         for (rule, (holds, interaction)) in &read {
             if interaction.is_some() {
                 continue;
             }
-            let calls = self.calls(target, rule);
+            let calls = self.calls(target, &without(rule));
             if calls.is_empty() {
                 continue;
             }
@@ -723,11 +739,10 @@ impl<'a> Element<'a> {
                     continue;
                 }
                 let kept = Rule {
-                    set: rule
+                    set: without(rule)
                         .set
-                        .iter()
+                        .into_iter()
                         .filter(|(property, _)| touched.contains(&property.as_str()))
-                        .cloned()
                         .collect(),
                     ..(*rule).clone()
                 };
@@ -760,6 +775,106 @@ impl<'a> Element<'a> {
                 "\n{indent}.{call}(|style| {{{body}\n{indent}    style\n{indent}}})"
             );
         }
+    }
+
+    /// The colors on `target` its unconditional `transition` moves: each one's
+    /// rules resolved in order into one value in the render's prelude, eased
+    /// by the runtime's driver, and set once in `out`. Returns the properties
+    /// it eases, with `transition` among them, which the rules then leave out.
+    #[allow(clippy::type_complexity, reason = "the rules as `styles` reads them")]
+    fn eased(
+        &mut self,
+        target: &str,
+        read: &[(&Rule, (Option<String>, Option<String>))],
+        out: &mut String,
+        depth: usize,
+    ) -> Vec<String> {
+        let declared: Vec<&crate::family::ir::Value> = read
+            .iter()
+            .filter(|(_, (holds, asks))| holds.is_none() && asks.is_none())
+            .flat_map(|(rule, _)| rule.set.iter())
+            .filter(|(property, _)| property == "transition")
+            .map(|(_, value)| value)
+            .collect();
+        let [declared] = declared.as_slice() else {
+            return Vec::new();
+        };
+        let reads = Reads {
+            tokens: self.tokens,
+            hooks: &mut self.hooks,
+        };
+        let moves = match style::transitions(declared, &reads) {
+            Ok(moves) => moves,
+            Err(why) => {
+                self.left.push(format!("`{target}`: `transition`: {why}"));
+                return vec!["transition".to_owned()];
+            }
+        };
+        let indent = "    ".repeat(depth);
+        let mut eased = vec!["transition".to_owned()];
+        for one in moves {
+            let writers: Vec<(&Option<String>, &Option<String>, &crate::family::ir::Value)> = read
+                .iter()
+                .flat_map(|(rule, (holds, asks))| {
+                    rule.set
+                        .iter()
+                        .filter(|(property, _)| *property == one.property)
+                        .map(move |(_, value)| (holds, asks, value))
+                })
+                .collect();
+            if writers.iter().any(|(_, asks, _)| asks.is_some()) {
+                self.faults.push(format!(
+                    "`{target}`: `{}` changes under an interaction, which the spike does not ease",
+                    one.property
+                ));
+                continue;
+            }
+            let Some((None, _, _)) = writers.first() else {
+                self.faults.push(format!(
+                    "`{target}`: the spike eases `{}` from a rule without a condition",
+                    one.property
+                ));
+                continue;
+            };
+            let name = field(&format!("{target}-{}", one.property));
+            let mut resolved = String::new();
+            for (holds, _, value) in &writers {
+                let mut reads = Reads {
+                    tokens: self.tokens,
+                    hooks: &mut self.hooks,
+                };
+                let value = match style::color(value, &mut reads) {
+                    Ok(value) => value,
+                    Err(why) => {
+                        self.faults.push(format!("`{target}`: {why}"));
+                        continue;
+                    }
+                };
+                match holds {
+                    None => {
+                        let _ = write!(resolved, " value = {value};");
+                    }
+                    Some(holds) => {
+                        let _ = write!(resolved, " if {holds} {{ value = {value}; }}");
+                    }
+                }
+            }
+            self.prelude.push(format!(
+                "let {name} = {{ let mut value; {} value }};",
+                resolved.trim_start()
+            ));
+            self.prelude.push(format!(
+                "let {name} = super::theme::eased_color(window, cx, &id, {:?}, {name}, {}, {});",
+                format!("{target}-{}", one.property),
+                one.duration,
+                one.curve
+            ));
+            if let Some(setter) = style::eased_setter(&one.property) {
+                let _ = write!(out, "\n{indent}.{setter}({name})");
+            }
+            eased.push(one.property);
+        }
+        eased
     }
 
     /// The calls of `rule`'s declarations, with each one dropped noted.
@@ -804,7 +919,7 @@ impl<'a> Element<'a> {
         for condition in &rule.when {
             match condition {
                 Condition::Attribute { name, value } => {
-                    terms.push(self.prop_is(name, value.as_deref())?)
+                    terms.push(self.prop_is(name, value.as_deref())?);
                 }
                 Condition::Part {
                     name,

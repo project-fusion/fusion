@@ -273,8 +273,9 @@ The motion and computed values on the pilot branch, and how each ports:
 | `calc()`, `color-mix()`, `light-dark()` | 1,850, 330, and 120 uses | Folded at build time where they read tokens alone |
 | Measured lengths, `clip-path`, backdrop blur | 777 uses, 41 and 16 elements | Runtime elements that measure in the layout pass |
 
-The spike holds none of the motion work. It drops Button's `transition` and
-names it in the module's header. The Rust below is the planned output.
+The spike eases Button's `transition`, as the next two paragraphs describe,
+and holds none of the rest. The keyframe code further down is the planned
+output.
 
 **A transitioned property is resolved into one value first.** Without a
 transition, the emitter writes each rule as a style call and the last call
@@ -283,21 +284,32 @@ toward it. For each transitioned property, the emitter applies the rules in
 order to a variable and hands the variable to the driver:
 
 ```rust
-let background = {
-    let mut value = theme.color_accent;
+let button_background_color = {
+    let mut value;
+    value = theme.color_accent;
     if emphasis == Some(ButtonEmphasis::Outlined) {
         value = gpui::transparent_black();
     }
     value
 };
-div().bg(motion.color("background-color", background, theme.duration_quick, theme.easing_out))
+let button_background_color = super::theme::eased_color(
+    window, cx, &id, "button-background-color",
+    button_background_color, theme.duration_quick, theme.easing_out,
+);
+// … and on the part, once:
+div().bg(button_background_color)
 ```
 
-`motion` is keyed state on the element. It remembers the last target and when
-it changed, interpolates along the token's Bézier curve, asks for the next
-frame until the value arrives, and jumps to the target under reduced motion.
-`helix/native/src/drivers/motion.ts` does the same on a phone in about 300
-lines.
+That is the spike's output for Acme's Button, formatted. `eased_color` is the
+driver. It keeps keyed state on the element: the color it eases from, the
+target, and when the move began. It interpolates in sRGB with premultiplied
+alpha along the token's Bézier curve, as CSS interpolates a color, so a fill
+fades to transparent without darkening. It asks for the next frame until the
+value arrives. A first render shows the target at once, and so does every
+render while `cx.reduce_motion()` holds. GPUI holds that flag for the app and
+does not read the system setting, so the runtime sets it from the system
+setting and the Motion Toggle. The driver is about 100 lines.
+`helix/native/src/drivers/motion.ts` does the same on a phone in about 300.
 
 **A hover that transitions is tracked in state.** GPUI applies a `.hover()`
 style at paint, with no render, so the driver never sees it. For a property
@@ -453,11 +465,13 @@ Rust and draws it in a GPUI window. It has three pieces:
   element only when the spike maps everything the element needs, and it names
   each element it leaves out with the reasons.
 - **The written modules**, committed in `helix/rust/gpui-spike/src/acme/`, so
-  the output can be read in review. Button is 142 lines and Badge is 108.
-- **A small GPUI app** in `helix/rust/gpui-spike/src/main.rs`. It draws four
+  the output can be read in review. Button is 141 lines and Badge is 108.
+- **A small GPUI app** in `helix/rust/gpui-spike/src/main.rs`. It draws five
   buttons and two badges, in light mode or with `cargo run -- dark` in dark
-  mode. `acme-light.png` and `acme-dark.png` beside it are captures of the
-  window.
+  mode. Switch emphasis turns the first button between solid and outlined, so
+  its background transition runs. `acme-light.png` and `acme-dark.png` beside
+  it are captures of the window. `acme-transition.png` is a capture taken
+  midway through the transition.
 
 What it shows:
 
@@ -471,9 +485,20 @@ What it shows:
 - **The written code draws what the web draws.** The outlined button sets a
   border color and no border width, so it draws no border on GPUI, as on the
   web. A caller's hook replaces the default radius.
-- **The emitter names what it leaves out.** Button's transition is listed in
-  its module's header. Tabs and Tab are left out, with the machines and the
-  states they need.
+- **A transition eases as on the web.** With `cargo run -- flip slow top`,
+  which switches the emphasis every two seconds and stretches
+  `duration-quick` to two seconds, captures about 0.25 seconds apart read the
+  button's fill at 221, 236, 243, 248, 251, 253, and 255 in its blue channel.
+  That is a fast start and a slow end, as `easing-out` draws, from the
+  accent to the page color. The label changes at once, since the transition
+  names `background-color` alone. With `reduce` added, the fill jumps from
+  one color to the other.
+- **A covered window drew no new frames.** While another app's window was
+  in front, the timer switched the emphasis and every capture showed the
+  first frame. The spike's `top` argument keeps the window above the others,
+  so a capture sees each frame.
+- **The emitter names what it leaves out.** Tabs and Tab are left out, with
+  the machines and the states they need.
 - **GPUI needs a newer Rust than the workspace.** The `gpui-pre` 0.3.12
   snapshot calls a library function that Rust 1.97 lacks. The spike pins Rust
   1.100.0 in its own `rust-toolchain.toml`. GPUI asks for the latest stable

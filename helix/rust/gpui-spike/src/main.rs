@@ -3,7 +3,15 @@
 //!
 //! `cargo run` opens the window in light mode, and `cargo run -- dark` in
 //! dark mode. Tab moves focus between the buttons, and a press prints the
-//! button and how it was pressed.
+//! button and how it was pressed. Switch emphasis turns the first button
+//! between solid and outlined, and its background eases between the two over
+//! `duration-quick`, as its `transition` says.
+//!
+//! - `flip` switches the emphasis every two seconds by itself.
+//! - `slow` stretches `duration-quick` to two seconds, to watch the motion.
+//! - `reduce` sets GPUI's reduce-motion flag, so the change shows at once.
+//! - `top` keeps the window above every other, so macOS keeps drawing its
+//!   frames while another app is in front, as a capture needs.
 
 mod acme;
 
@@ -11,6 +19,8 @@ use acme::badge::{Badge, BadgeTone};
 use acme::button::{Button, ButtonEmphasis, ButtonHooks};
 use acme::theme::{ActiveTheme as _, Theme};
 use gpui::prelude::*;
+use std::time::Duration;
+
 use gpui::{
     actions, div, px, size, App, Bounds, Context, FocusHandle, KeyBinding, Window, WindowBounds,
     WindowOptions,
@@ -22,6 +32,16 @@ actions!(spike, [Next, Previous]);
 /// The window's one view: a row of buttons and a row of badges.
 struct Spike {
     focus: FocusHandle,
+    /// Whether the first button is outlined.
+    outlined: bool,
+}
+
+impl Spike {
+    fn switch(&mut self, cx: &mut Context<Self>) {
+        self.outlined = !self.outlined;
+        println!("switched the first button to {}", if self.outlined { "outlined" } else { "solid" });
+        cx.notify();
+    }
 }
 
 impl Render for Spike {
@@ -49,7 +69,25 @@ impl Render for Spike {
                     .flex()
                     .gap(px(12.))
                     .items_center()
-                    .child(Button::new("save").on_press(press("Save")).child("Save"))
+                    .child(
+                        Button::new("save")
+                            .emphasis(if self.outlined {
+                                ButtonEmphasis::Outlined
+                            } else {
+                                ButtonEmphasis::Solid
+                            })
+                            .on_press(press("Save"))
+                            .child("Save"),
+                    )
+                    .child({
+                        let view = cx.entity().downgrade();
+                        Button::new("switch")
+                            .emphasis(ButtonEmphasis::Outlined)
+                            .on_press(move |_, _, cx| {
+                                let _ = view.update(cx, |spike, cx| spike.switch(cx));
+                            })
+                            .child("Switch emphasis")
+                    })
                     .child(
                         Button::new("cancel")
                             .emphasis(ButtonEmphasis::Outlined)
@@ -90,18 +128,34 @@ impl Render for Spike {
 }
 
 fn main() {
-    let dark = std::env::args().any(|argument| argument == "dark");
+    let given = |word: &str| std::env::args().any(|argument| argument == word);
+    let (dark, flip, slow, reduce, top) = (
+        given("dark"),
+        given("flip"),
+        given("slow"),
+        given("reduce"),
+        given("top"),
+    );
     application().run(move |cx: &mut App| {
-        let theme = if dark { Theme::dark(cx) } else { Theme::light(cx) };
+        let mut theme = if dark { Theme::dark(cx) } else { Theme::light(cx) };
+        if slow {
+            theme.duration_quick = Duration::from_secs(2);
+        }
         cx.set_global(theme);
+        cx.set_reduce_motion(reduce);
         cx.bind_keys([
             KeyBinding::new("tab", Next, None),
             KeyBinding::new("shift-tab", Previous, None),
         ]);
-        let bounds = Bounds::centered(None, size(px(640.), px(240.)), cx);
+        let bounds = Bounds::centered(None, size(px(760.), px(240.)), cx);
         cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
+                kind: if top {
+                    gpui::WindowKind::PopUp
+                } else {
+                    gpui::WindowKind::Normal
+                },
                 titlebar: Some(gpui::TitlebarOptions {
                     title: Some("Acme on GPUI".into()),
                     ..Default::default()
@@ -112,7 +166,19 @@ fn main() {
                 cx.new(|cx| {
                     let focus = cx.focus_handle();
                     window.focus(&focus, cx);
-                    Spike { focus }
+                    if flip {
+                        cx.spawn(async move |view, cx| loop {
+                            cx.background_executor().timer(Duration::from_secs(2)).await;
+                            if view.update(cx, |spike: &mut Spike, cx| spike.switch(cx)).is_err() {
+                                break;
+                            }
+                        })
+                        .detach();
+                    }
+                    Spike {
+                        focus,
+                        outlined: false,
+                    }
                 })
             },
         )

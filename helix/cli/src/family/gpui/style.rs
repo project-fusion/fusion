@@ -99,11 +99,80 @@ pub fn lower(property: &str, value: &Value, reads: &mut Reads) -> Result<Lowered
         "padding-block" => calls(&[format!(".py({})", read(Wanted::Length, value, reads)?)]),
         "opacity" => calls(&[format!(".opacity({})", read(Wanted::Number, value, reads)?)]),
         "outline" => outline(value, reads),
-        "transition" | "animation" => Ok(Lowered::Dropped(format!(
-            "`{property}`: GPUI animates only what `with_animation` names, and the runtime's transition driver is a later phase"
-        ))),
+        "transition" => Ok(Lowered::Dropped(
+            "`transition`: the spike eases a color the element's rules set without a condition, and writes no other transition".to_owned(),
+        )),
+        "animation" => Ok(Lowered::Dropped(
+            "`animation`: keyframes are a later phase".to_owned(),
+        )),
         other => Err(format!("`{other}` has no GPUI form in the spike")),
     }
+}
+
+/// One property a transition moves, with its duration and its curve as Rust
+/// expressions.
+pub struct Transition {
+    pub property: String,
+    pub duration: String,
+    pub curve: String,
+}
+
+/// The GPUI call that sets a color property the transition driver eases.
+pub fn eased_setter(property: &str) -> Option<&'static str> {
+    match property {
+        "background-color" => Some("bg"),
+        "color" => Some("text_color"),
+        "border-color" => Some("border_color"),
+        _ => None,
+    }
+}
+
+/// A `transition` value: one move, or a list of them, each a property, a
+/// duration token, and an easing token.
+///
+/// # Errors
+///
+/// Why the spike cannot read it: a delay, a value that is no token, or a
+/// property the driver does not ease.
+pub fn transitions(value: &Value, reads: &Reads) -> Result<Vec<Transition>, String> {
+    let moves = match value {
+        Value::List(moves) => moves.iter().collect(),
+        one => vec![one],
+    };
+    moves
+        .into_iter()
+        .map(|one| {
+            let Value::Space(parts) = one else {
+                return Err("a transition is written as its property, its duration, and its curve".to_owned());
+            };
+            let [Value::Text(property), Value::Token(duration), Value::Token(curve)] = parts.as_slice() else {
+                return Err("the spike eases a transition written as a property, a duration token, and an easing token".to_owned());
+            };
+            if eased_setter(property).is_none() {
+                return Err(format!("the spike eases colors, and `{property}` is none"));
+            }
+            if reads.tokens.kind(duration) != Some(Kind::Time) {
+                return Err(format!("`{duration}` is no duration token"));
+            }
+            if reads.tokens.kind(curve) != Some(Kind::Easing) {
+                return Err(format!("`{curve}` is no easing token"));
+            }
+            Ok(Transition {
+                property: property.clone(),
+                duration: format!("theme.{}", field(duration)),
+                curve: format!("theme.{}", field(curve)),
+            })
+        })
+        .collect()
+}
+
+/// `value` as a color.
+///
+/// # Errors
+///
+/// Why the spike cannot read it as one.
+pub fn color(value: &Value, reads: &mut Reads) -> Result<String, String> {
+    read(Wanted::Color, value, reads)
 }
 
 /// An outline, as a ring: GPUI draws no outline.

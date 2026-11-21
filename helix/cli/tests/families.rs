@@ -321,7 +321,10 @@ fn the_gpui_spike_writes_the_badge_and_the_button_and_names_the_tab_set_it_leave
         ".track_focus(&focus)",
         "radius: Option<gpui::AbsoluteLength>",
         ".rounded(hooks.radius.unwrap_or(theme.radius_control))",
-        ".when(emphasis == Some(ButtonEmphasis::Outlined), |el| el.bg(gpui::transparent_black())",
+        ".when(emphasis == Some(ButtonEmphasis::Outlined), |el| el.border_color(theme.color_line)",
+        "value = theme.color_accent; if emphasis == Some(ButtonEmphasis::Outlined) { value = gpui::transparent_black(); }",
+        "super::theme::eased_color(window, cx, &id, \"button-background-color\", button_background_color, theme.duration_quick, theme.easing_out)",
+        ".bg(button_background_color)",
         ".focus_visible(|style| {",
         "super::theme::ring(gpui::px(2.0), theme.color_focus)",
         ".when(disabled, |el| el.opacity(0.5_f32))",
@@ -329,8 +332,8 @@ fn the_gpui_spike_writes_the_badge_and_the_button_and_names_the_tab_set_it_leave
         assert!(button.contains(written), "{written}\n{button}");
     }
     assert!(
-        button.contains("`transition`"),
-        "the transition it drops is named:\n{button}"
+        !button.contains("Left out"),
+        "the eased background leaves nothing out:\n{button}"
     );
     let badge = acme.read("out/gpui/badge.rs");
     assert!(badge.contains(".role(Role::Status)"), "{badge}");
