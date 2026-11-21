@@ -613,7 +613,7 @@ mod tests {
     #[test]
     fn a_route_names_its_baselines() {
         assert_eq!(slug("/"), "index");
-        assert_eq!(slug("/helix/docs/install/"), "helix-docs-install");
+        assert_eq!(slug("/design/docs/install/"), "design-docs-install");
         assert_eq!(slug("/search?q=a"), "search");
     }
 
@@ -626,9 +626,9 @@ mod tests {
     #[test]
     fn a_sitemap_gives_paths_on_any_host() {
         let xml = "<urlset><url><loc>https://fusion.dev/</loc></url>\
-                   <url><loc> https://fusion.dev/helix/docs?a=1&amp;b=2 </loc></url>\
+                   <url><loc> https://fusion.dev/design/docs?a=1&amp;b=2 </loc></url>\
                    <url><loc>https://fusion.dev/</loc></url></urlset>";
-        assert_eq!(sitemap_paths(xml), ["/", "/helix/docs?a=1&b=2"]);
+        assert_eq!(sitemap_paths(xml), ["/", "/design/docs?a=1&b=2"]);
     }
 
     #[test]

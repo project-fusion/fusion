@@ -137,9 +137,9 @@ describe('the tools', () => {
 describe('setLink', () => {
   test('links a range to an address', () => {
     const state = at([paragraph(text('docs'))], 1, 5)
-    const linked = ran(state, setLink(schema, 'fusion.dev/helix'))
+    const linked = ran(state, setLink(schema, 'fusion.dev/design'))
     expect(formatsOf(at([sure(linked.doc.firstChild, 'first block')], 2), commands).link).toBe(
-      'https://fusion.dev/helix',
+      'https://fusion.dev/design',
     )
   })
 
@@ -170,7 +170,7 @@ describe('safeHref', () => {
   test('keeps web, mail, phone and same-site addresses, and refuses other schemes', () => {
     expect(safeHref('https://fusion.dev')).toBe('https://fusion.dev')
     expect(safeHref('mailto:ross@fusion.dev')).toBe('mailto:ross@fusion.dev')
-    expect(safeHref('/helix/components')).toBe('/helix/components')
+    expect(safeHref('/design/components')).toBe('/design/components')
     expect(safeHref('#usage')).toBe('#usage')
     expect(safeHref('fusion.dev')).toBe('https://fusion.dev')
     expect(safeHref('  ')).toBe('')
