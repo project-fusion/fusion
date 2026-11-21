@@ -32,7 +32,7 @@ import { styles } from './loader-root.css.js'
  * @anatomy indicator
  * @practice Set `delay` so a quick load does not flash a loader. - The loader stays hidden and silent for that many milliseconds, and appears only if the work is still going.
  * @practice Set `for` to the region being loaded. - A screen reader waits for a busy region to fill before reading it.
- * @documentation https://fusion.dev/helix/components/loader
+ * @documentation https://fusion.dev/design/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.
  * @cssproperty --loader-duration - How long one turn of the arc takes, 0.8s by default. With motion reduced the arc turns once every four seconds, whatever this says.

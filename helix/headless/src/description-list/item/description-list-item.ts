@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/description-list
+ * @documentation https://fusion.dev/design/components/description-list
  *
  * @slot - The value, or several `<dd>` elements for several values.
  * @slot actions - Controls that act on the value, such as a copy button, after it inside its `<dd>`.

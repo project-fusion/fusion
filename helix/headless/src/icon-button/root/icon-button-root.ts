@@ -29,7 +29,7 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  * @instead button - An action named in words, such as Save changes.
  * @instead copy-button - An icon that copies a value to the clipboard.
  * @practice Set `raised` on a button that floats over the page, such as one over a map or a board. - A raised button takes the theme's floating edge and shadow, as a popover does.
- * @documentation https://fusion.dev/helix/components/icon-button
+ * @documentation https://fusion.dev/design/components/icon-button
  *
  * @slot - The icon.
  *

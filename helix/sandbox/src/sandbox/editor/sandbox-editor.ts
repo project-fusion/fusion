@@ -259,7 +259,7 @@ const given = Annotation.define<boolean>()
  * @category tooling
  * @family sandbox
  * @aliases Code editor, Source pane
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.

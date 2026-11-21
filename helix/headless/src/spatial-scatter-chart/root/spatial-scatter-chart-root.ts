@@ -110,7 +110,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @anatomy point
  * @anatomy tick
  * @anatomy axis-name
- * @documentation https://fusion.dev/helix/components/spatial-scatter-chart
+ * @documentation https://fusion.dev/design/components/spatial-scatter-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no points. Falls back to `empty-text`.

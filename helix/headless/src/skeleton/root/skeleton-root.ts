@@ -38,7 +38,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy skeleton
  * @practice {loading} Put the real content inside the skeleton and set `loading`. - The skeleton takes the content's size, so nothing moves when the content arrives.
  * @practice {revealing} Draw your own placeholder in the `placeholder` slot for content that is not there until it loads. - The placeholder shows while `loading` is set, laid out as the content will be, such as a circle and three lines for a profile.
- * @documentation https://fusion.dev/helix/components/skeleton
+ * @documentation https://fusion.dev/design/components/skeleton
  *
  * @slot - The content the skeleton stands in for, which sizes it. Optional.
  * @slot placeholder - What shows while `loading` is set, in place of the content, such as skeletons laid out as the content will be. Falls back to the skeleton's own shape.

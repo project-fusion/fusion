@@ -29,7 +29,7 @@ import '../../voice-level/index.js'
  * @anatomy field
  * @anatomy hint?
  * @practice Import Code Block from Helix Sandbox once on the page. - Helix ships no grammar, and that import registers the highlighter that colors every Code Input.
- * @documentation https://fusion.dev/helix/components/code-input
+ * @documentation https://fusion.dev/design/components/code-input
  *
  * @cssproperty --code-input-background-color - Fill behind the code.
  * @cssproperty --code-input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.

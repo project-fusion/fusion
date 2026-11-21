@@ -18,7 +18,7 @@ import { styles } from './filter-operator.css.js'
  * @status stable
  * @category forms
  * @aliases Comparator, Predicate
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  */
 @customElement('helix-filter-operator')
 export class HelixFilterOperator extends HelixHeadlessFilterOperator {

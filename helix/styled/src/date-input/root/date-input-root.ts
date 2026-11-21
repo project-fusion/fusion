@@ -44,7 +44,7 @@ import { styles } from './date-input-root.css.js'
  * @anatomy trigger
  * @anatomy hint?
  * @anatomy surface
- * @documentation https://fusion.dev/helix/components/date-input
+ * @documentation https://fusion.dev/design/components/date-input
  *
  * @cssproperty --date-input-background-color - The fill behind the field.
  * @cssproperty --date-input-border-color - The color of the panel's border.

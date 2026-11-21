@@ -52,7 +52,7 @@ const splitColors = (list: string): string[] => {
  * @instead shine - A button that draws the eye before it is pressed.
  * @practice Call `burst()` once the action has finished. - A press does not burst by itself, because an action can still fail after it.
  * @practice Say that the action is done in words as well, such as in a status message. - A burst is decoration: a screen reader hears nothing, and reduced motion draws nothing.
- * @documentation https://fusion.dev/helix/components/confetti
+ * @documentation https://fusion.dev/design/components/confetti
  *
  * @slot - The content the confetti bursts out of.
  *

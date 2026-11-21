@@ -27,7 +27,7 @@ import '../../checkbox/index.js'
  * @anatomy hint?
  * @practice Write `name` once, on the group. - Each checkbox submits its own value under that name, and the group adds no value of its own.
  * @practice Set `feedback` for a message about the whole set. - The group never sets a form value, so the browser writes no message for it.
- * @documentation https://fusion.dev/helix/components/checkbox-group
+ * @documentation https://fusion.dev/design/components/checkbox-group
  *
  * @cssproperty --checkbox-group-gap - The space between the checkboxes.
  */

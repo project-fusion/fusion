@@ -28,7 +28,7 @@ import '../../radio/index.js'
  * @anatomy format
  * @anatomy actions
  * @practice Put Table Export in a Popover or a Dialog opened by an Export button. - The panel is the content, and it draws no trigger of its own.
- * @documentation https://fusion.dev/helix/components/table-export
+ * @documentation https://fusion.dev/design/components/table-export
  *
  * @cssproperty --table-export-gap - The space between the groups.
  * @cssproperty --table-export-segment-background-color - The fill of the track a segmented group sits in.

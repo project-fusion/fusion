@@ -47,7 +47,7 @@ const MARKS = {
  *
  * @since 0.200.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  *
  * @slot - The lines of the step, and any groups inside it.
  * @slot heading - The heading, where it holds more than text. Defaults to `heading`.

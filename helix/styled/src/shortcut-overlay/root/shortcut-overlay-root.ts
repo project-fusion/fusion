@@ -24,7 +24,7 @@ import { styles } from './shortcut-overlay-root.css.js'
  * @anatomy badge-keys
  * @anatomy badge-name
  * @practice Set `sheet-keys` to another chord where your page answers `?` with its own help. - Many apps, GitHub and Gmail among them, give `?` to their own help, and one press then opens both.
- * @documentation https://fusion.dev/helix/components/shortcut-overlay
+ * @documentation https://fusion.dev/design/components/shortcut-overlay
  *
  * @cssproperty --shortcut-overlay-badge-background-color - The badge's fill. Defaults to `surface-inverse`.
  * @cssproperty --shortcut-overlay-badge-border-width - The badge's edge. Defaults to `border-floating`, which a theme sets to zero where a shadow alone lifts a surface.

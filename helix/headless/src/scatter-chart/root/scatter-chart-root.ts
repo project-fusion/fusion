@@ -192,7 +192,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @anatomy x-name
  * @practice Put the measure read across in the first numeric column of the table `for` names. - That column is measured across, every other numeric column is measured up, and each row is one point.
  * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
- * @documentation https://fusion.dev/helix/components/scatter-chart
+ * @documentation https://fusion.dev/design/components/scatter-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.

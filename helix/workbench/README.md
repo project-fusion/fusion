@@ -12,7 +12,7 @@ The editor and the code highlighter publish from `@fusion.dev/helix-sandbox`,
 and the sandbox shell from `@fusion.dev/helix/sandbox`. These two stay here:
 
 - **The spec runner reads this repository.** It loads
-  `/helix/sandbox/specs`, the route in `fusion/site` that imports the bundles
+  `/design/sandbox/specs`, the route in `fusion/site` that imports the bundles
   `turbo run specs` writes to `fusion/site/public/specs`, one per family.
 - **`jsxToHtml` reads the examples' own convention**: a component that returns
   its markup, and `import './styles.css'` for the stylesheet beside it.

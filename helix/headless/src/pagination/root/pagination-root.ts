@@ -110,7 +110,7 @@ const fill = (template: string, page: number, pages: number): string =>
  * @anatomy next
  * @practice {links} Set `href` to render every page as a link, with `{page}` replaced by the page number. - The links can be crawled, a middle click opens a tab, and the address bar holds the state.
  * @practice {footer} Place `Pagination.Summary` and `Pagination.Size` beside the pagination. - They are separate elements, so you choose where they go and in what order.
- * @documentation https://fusion.dev/helix/components/pagination
+ * @documentation https://fusion.dev/design/components/pagination
  *
  * @slot first-icon - The glyph on the jump-to-first control, usually a double caret.
  * @slot last-icon - The glyph on the jump-to-last control, usually a double caret.

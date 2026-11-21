@@ -19,7 +19,7 @@ import { styles } from './stat-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Metrics, KPIs, Figures
- * @documentation https://fusion.dev/helix/components/stat
+ * @documentation https://fusion.dev/design/components/stat
  *
  * @cssproperty --stat-group-columns - An explicit track list while `columns` is set, such as one column below a width.
  * @cssproperty --stat-group-gap - Space between figures.

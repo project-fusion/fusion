@@ -32,7 +32,7 @@ import { HelixHeadlessMeter } from '../root/meter-root.js'
  * @since 0.1.0
  * @status experimental
  * @category feedback
- * @documentation https://fusion.dev/helix/components/meter
+ * @documentation https://fusion.dev/design/components/meter
  *
  * @slot - Nothing. A segment draws its share and has no content.
  *

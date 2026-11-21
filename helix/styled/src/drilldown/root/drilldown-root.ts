@@ -33,7 +33,7 @@ import { styles } from './drilldown-root.css.js'
  * @anatomy item
  * @anatomy mark
  * @practice {navigation} Set `navigation` for a site's navigation. - The host is then a navigation landmark, and each page a list of places to go in place of a menu of commands.
- * @documentation https://fusion.dev/helix/components/drilldown
+ * @documentation https://fusion.dev/design/components/drilldown
  *
  * @csspart leaving - A copy of the page going away, which slides out and fades as the next one arrives. Empty but during a move, and hidden from assistive technology and the pointer.
  *

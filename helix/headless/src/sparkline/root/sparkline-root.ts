@@ -96,7 +96,7 @@ const STRIP_HEIGHT = 32
  * @instead trend - Which way one measurement moved, and whether that is good.
  * @practice Set `values` to the numbers, and use `for` only where a real table stands behind the sparkline. - A table behind a small trend line would be read aloud row by row.
  * @practice Place the sparkline beside a `Stat`. - A change beside a figure is a second fact, and `Trend` is placed the same way.
- * @documentation https://fusion.dev/helix/components/sparkline
+ * @documentation https://fusion.dev/design/components/sparkline
  *
  * @slot empty - Content shown in place of the line when there are no readings. Falls back to `empty-text`.
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.

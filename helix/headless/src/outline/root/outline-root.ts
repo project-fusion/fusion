@@ -93,7 +93,7 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * @anatomy indicator
  * @practice Set `data-level` on each link to its heading's level, `2` through `6`. - The outline does not read heading levels from the document, because the headings are not always in it.
  * @practice Set `follow` on an outline with a scrollbar of its own. - It keeps the link of the section in view showing as you scroll the page.
- * @documentation https://fusion.dev/helix/components/outline
+ * @documentation https://fusion.dev/design/components/outline
  *
  * @slot - The links, as anchors with fragment hrefs, or lists holding them.
  * @slot heading - A heading above the links, such as "On this page". It names the navigation.

@@ -71,7 +71,7 @@ const stop = (event: Event): void => event.stopPropagation()
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @event {Event} change - Fired after the reader chose another level in the filter. `level` holds it.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the level filter changes, with the level chosen, `log` for every level. Cancelable: cancel it to keep the current level.

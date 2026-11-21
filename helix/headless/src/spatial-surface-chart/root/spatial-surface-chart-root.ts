@@ -129,7 +129,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @anatomy grid
  * @anatomy face
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-surface-chart
+ * @documentation https://fusion.dev/design/components/spatial-surface-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.

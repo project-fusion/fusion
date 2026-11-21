@@ -87,7 +87,7 @@ const API = 'api.json'
 const EXAMPLES = 'examples.json'
 
 /** Where the documentation pages a skill links to are published. */
-const DOCS = 'https://fusion.dev/helix/docs'
+const DOCS = 'https://fusion.dev/design/docs'
 
 /**
  * The agent skill, from the documentation pages it names: their bodies under

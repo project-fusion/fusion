@@ -29,7 +29,7 @@ const HEADING_ID = 'heading'
  * @since 0.1.0
  * @status stable
  * @aliases Day, Date group
- * @documentation https://fusion.dev/helix/components/timeline
+ * @documentation https://fusion.dev/design/components/timeline
  *
  * @slot - The entries.
  * @slot heading - The heading, when it is more than text. Falls back to `label`.

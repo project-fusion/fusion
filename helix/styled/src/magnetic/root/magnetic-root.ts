@@ -25,7 +25,7 @@ import { styles } from './magnetic-root.css.js'
  * @instead tilt - A card that turns in depth under the pointer.
  * @instead shine - A button that a band of light crosses.
  * @practice Keep `--magnetic-reach` smaller than the content. - The drift then never takes the content out from under the pointer.
- * @documentation https://fusion.dev/helix/components/magnetic
+ * @documentation https://fusion.dev/design/components/magnetic
  *
  * @slot - The content that drifts, such as a `Button`.
  *

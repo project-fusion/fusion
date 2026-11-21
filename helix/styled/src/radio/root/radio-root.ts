@@ -26,7 +26,7 @@ import { styles } from './radio-root.css.js'
  * @anatomy box
  * @anatomy label
  * @practice Set the label, the hint, and the message on the `Radio.Group`. - They belong to the set, and a radio has no label of its own: its content names it.
- * @documentation https://fusion.dev/helix/components/radio
+ * @documentation https://fusion.dev/design/components/radio
  *
  * @cssproperty --radio-background-color - The fill of an unselected circle.
  * @cssproperty --radio-border-color - The border color of the circle, in every state.

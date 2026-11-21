@@ -15,7 +15,7 @@ import '../../button/index.js'
  * @since 0.1.0
  * @status stable
  * @category overlays
- * @documentation https://fusion.dev/helix/components/tour
+ * @documentation https://fusion.dev/design/components/tour
  *
  * @cssproperty --tour-arrow-size - The size of the arrow's box, before it is rotated.
  * @cssproperty --tour-border-width - The width of the panel's border. It follows

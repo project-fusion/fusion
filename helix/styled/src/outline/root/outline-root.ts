@@ -38,7 +38,7 @@ import { styles } from './outline-root.css.js'
  * @anatomy indicator
  * @practice Set `data-level` on each link to its heading's level, `2` through `6`. - The outline does not read heading levels from the document, because the headings are not always in it.
  * @practice Set `follow` on an outline with a scrollbar of its own. - It keeps the link of the section in view showing as you scroll the page.
- * @documentation https://fusion.dev/helix/components/outline
+ * @documentation https://fusion.dev/design/components/outline
  *
  * @cssproperty --outline-heading-color - The color of the heading in the `heading` slot.
  * @cssproperty --outline-indent - How far each level is inset from the one above.

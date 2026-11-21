@@ -96,7 +96,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @anatomy surface
  * @practice Write the panel's links and headings yourself, in its default slot. - A router renders its own anchors and cannot render them inside the megamenu's shadow root.
  * @practice {preview} Mark the panel's columns, headings, and links with their data-megamenu attributes. - `helix.css` lays out the panel through them, and without them the panel holds your markup as you styled it.
- * @documentation https://fusion.dev/helix/components/megamenu
+ * @documentation https://fusion.dev/design/components/megamenu
  *
  * @slot - The panel's contents, such as your own lists of links and their headings.
  * @slot indicator - A mark for the open trigger, shown while the panel is open, such as a bar or an arrow pointing at the panel.

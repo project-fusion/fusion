@@ -11,7 +11,7 @@ import { HelixHeadlessQuickFilter } from '@fusion.dev/helix-headless/quick-filte
  * @status experimental
  * @category data
  * @aliases Preset, Saved filter, View tab
- * @documentation https://fusion.dev/helix/components/quick-filters
+ * @documentation https://fusion.dev/design/components/quick-filters
  */
 @customElement('helix-quick-filter')
 export class HelixQuickFilter extends HelixHeadlessQuickFilter {}

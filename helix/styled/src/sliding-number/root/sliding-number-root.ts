@@ -47,7 +47,7 @@ const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] as const
  * @anatomy value
  * @anatomy digit
  * @anatomy character?
- * @documentation https://fusion.dev/helix/components/sliding-number
+ * @documentation https://fusion.dev/design/components/sliding-number
  *
  * @csspart character - A sign, separator, or symbol in the number, which holds still.
  * @csspart digit - One digit's column, showing one figure at a time.

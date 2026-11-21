@@ -46,6 +46,6 @@ package beside it and says `0.0.0-dev`, which is what that build is.
 `helix --version --json` prints the same release as
 `{ "name": "helix", "package": "@fusion.dev/helix-cli", "version": … }`.
 
-[Documentation](https://fusion.dev/helix)
+[Documentation](https://fusion.dev/design)
 
 MIT

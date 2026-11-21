@@ -174,7 +174,7 @@ export interface AreaStack {
  * @anatomy labels
  * @practice Leave a total column out of the table `for` names. - Every numeric column is a part, so a total column is counted twice.
  * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
- * @documentation https://fusion.dev/helix/components/area-chart
+ * @documentation https://fusion.dev/design/components/area-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.

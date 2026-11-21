@@ -20,7 +20,7 @@ import { styles } from './toggle-root.css.js'
  * @anatomy group
  * @anatomy item
  * @anatomy label
- * @documentation https://fusion.dev/helix/components/toggle
+ * @documentation https://fusion.dev/design/components/toggle
  *
  * @slot - The item's label.
  *

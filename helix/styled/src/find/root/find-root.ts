@@ -33,7 +33,7 @@ import '../../toolbar/index.js'
  * @anatomy next
  * @anatomy close
  * @practice Copy the `::highlight(helix-find-match)` and `::highlight(helix-find-current)` rules into a shadow root of yours that holds text to search. - Text is painted from the tree it lives in.
- * @documentation https://fusion.dev/helix/components/find
+ * @documentation https://fusion.dev/design/components/find
  *
  * @cssproperty --find-background-color - The bar's fill. Defaults to the raised surface.
  * @cssproperty --find-border-color - The line under the bar and the fields' edges.

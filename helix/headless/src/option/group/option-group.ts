@@ -17,7 +17,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @aliases OptGroup, Section
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  *
  * @slot - The options in the group.
  * @slot label - The group's heading, for a heading that needs more than plain text.

@@ -77,7 +77,7 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @anatomy pin
  * @practice Put Column Manager in a Popover opened by a Columns button, or in a Drawer on a phone. - The list is the panel's content, and it draws no trigger of its own.
  * @practice Store the table's view to keep a reader's columns. - Every change goes to the table's view, and the list keeps nothing of its own.
- * @documentation https://fusion.dev/helix/components/column-manager
+ * @documentation https://fusion.dev/design/components/column-manager
  *
  * @csspart checkbox - The `Checkbox` that shows or hides a column.
  * @csspart checkbox-box - The box drawn for a row's checkbox.

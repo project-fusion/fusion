@@ -15,7 +15,7 @@ import { styles } from './map-points.css.js'
  * @status stable
  * @category media
  * @aliases Data layer, GeoJSON layer, Point layer
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-points-casing-color - The edge around each point and count.
  * @cssproperty --map-points-color - The points' color when no tone is set.

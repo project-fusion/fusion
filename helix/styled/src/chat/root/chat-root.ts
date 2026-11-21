@@ -33,7 +33,7 @@ import '../message/chat-message.js'
  * @anatomy composer
  * @practice Pass the turns either as children or as `turns`. - A chat given both draws every turn from `turns` and then the children.
  * @practice Import `@fusion.dev/helix/chat/composer` beside `@fusion.dev/helix/chat/root` where you write a `Chat.Composer`. - A chat that only shows a conversation needs no composer, so the root's entry leaves it out.
- * @documentation https://fusion.dev/helix/components/chat
+ * @documentation https://fusion.dev/design/components/chat
  *
  * @slot - The turns.
  * @slot composer - The composer, below the transcript.

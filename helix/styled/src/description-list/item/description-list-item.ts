@@ -12,7 +12,7 @@ import { styles } from './description-list-item.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/description-list
+ * @documentation https://fusion.dev/design/components/description-list
  *
  * @cssproperty --description-list-actions-gap - The space between the value and the controls in `actions`.
  * @cssproperty --description-list-item-align - How a label and its value line up beside each other, as `align-items`. Defaults to `baseline`; `center` suits a value taller than a line, such as an avatar.

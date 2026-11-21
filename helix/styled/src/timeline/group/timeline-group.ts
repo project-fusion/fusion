@@ -14,7 +14,7 @@ import { styles } from './timeline-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Day, Date group
- * @documentation https://fusion.dev/helix/components/timeline
+ * @documentation https://fusion.dev/design/components/timeline
  *
  * @cssproperty --timeline-group-heading-color - The color of the heading.
  */

@@ -42,7 +42,7 @@ export const FOLDS_UP_TO = 12
  * @since 0.1.0
  * @status stable
  * @aliases Avatar stack, Facepile
- * @documentation https://fusion.dev/helix/components/avatar
+ * @documentation https://fusion.dev/design/components/avatar
  *
  * @slot - The avatars, in the order they should be read.
  *

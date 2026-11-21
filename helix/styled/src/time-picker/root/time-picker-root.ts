@@ -29,7 +29,7 @@ import { styles } from './time-picker-root.css.js'
  * @anatomy option
  * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
  * @practice Keep `step` at 15 minutes or more where the list spans a day. - At 15 minutes a day is 96 rows, which people can scroll or type into, and at 1 minute it is 1,440.
- * @documentation https://fusion.dev/helix/components/time-picker
+ * @documentation https://fusion.dev/design/components/time-picker
  *
  * @cssproperty --time-picker-columns-gap - The space between the wheels. None by default.
  * @cssproperty --time-picker-feedback-color - The color of the message under the times, while `feedback` is set.

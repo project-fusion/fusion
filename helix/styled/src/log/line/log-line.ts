@@ -13,7 +13,7 @@ import { styles } from './log-line.css.js'
  *
  * @since 0.200.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  *
  * @cssproperty --log-error-color - The color of a line at `error`, and of the band behind it. Defaults to the danger color.
  * @cssproperty --log-mark-background-color - The band behind a line `mark-lines` names.

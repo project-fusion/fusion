@@ -31,7 +31,7 @@ import { styles } from './slider-root.css.js'
  * @anatomy hint?
  * @practice Read `valueAsNumber` for arithmetic. - The value is a string, like every other form control's.
  * @practice {markers} Set `step` for where the value can land, and `markers` for the marks drawn. - Marks are decoration, and the input holds to `step` whether or not marks are drawn.
- * @documentation https://fusion.dev/helix/components/slider
+ * @documentation https://fusion.dev/design/components/slider
  *
  * @cssproperty --slider-fill-color - The color of the filled part of the track, behind the thumb.
  * @cssproperty --slider-length - The length of a vertical track. It defaults to nine rem and applies only when `orientation` is `vertical`. A horizontal track takes the width of its row.

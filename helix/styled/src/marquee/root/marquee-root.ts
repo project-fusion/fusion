@@ -40,7 +40,7 @@ import { styles } from './marquee-root.css.js'
  * @instead sliding-number - A number whose digits roll to a new value.
  * @instead rotating-text - One word in a line that turns through others in its place.
  * @practice Give every Marquee on a page the same `speed`. - A longer row then takes longer to go round, and every row reads at one pace.
- * @documentation https://fusion.dev/helix/components/marquee
+ * @documentation https://fusion.dev/design/components/marquee
  *
  * @slot - The items the row carries.
  *

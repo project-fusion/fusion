@@ -30,7 +30,7 @@ import '../../menu/index.js'
  * @anatomy nav
  * @anatomy indicator
  * @practice Mark the current link with `aria-current`. - The marker reads it, so the attribute a screen reader announces also places the marker.
- * @documentation https://fusion.dev/helix/components/navigation
+ * @documentation https://fusion.dev/design/components/navigation
  *
  * @cssproperty --navigation-block-size - Height of the bar in a row. Each destination fills it.
  * @cssproperty --navigation-gap - Space between destinations.

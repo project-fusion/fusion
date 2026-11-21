@@ -759,7 +759,7 @@ const RAN = '__helixExampleRan'
  * The example's own `<link rel="stylesheet">` is removed first, as the preview
  * frame removes it. The stylesheet arrives as `styles`, and the link's relative
  * `href` would otherwise request a file that is not there, such as
- * `/helix/sandbox/styles.css` from the sandbox's spec results.
+ * `/design/sandbox/styles.css` from the sandbox's spec results.
  */
 export const example = async (file: unknown, styles: unknown = ''): Promise<HTMLElement> => {
   document.body.innerHTML = String(file).replace(

@@ -81,7 +81,7 @@ const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'shor
  * @instead date-picker - A month calendar you choose dates on.
  * @practice Set `elapsed` in a feed, and `relative` where a reading stands alone. - In en-US, a compact 3m can mean three minutes or three months.
  * @practice Set `fields` to style one field of a date, such as the year in a lighter ink. - Without `fields`, the reading is one text with no parts inside it.
- * @documentation https://fusion.dev/helix/components/format-date
+ * @documentation https://fusion.dev/design/components/format-date
  *
  * @csspart day - The day of the month, with `fields`.
  * @csspart day-period - AM or PM, or the locale's word for the part of the day, with `fields`.

@@ -173,7 +173,7 @@ const pathFor = (
  * @anatomy finders
  * @anatomy modules
  * @practice Write the value out in the `fallback` slot, such as the link as text. - A value too long for the correction level draws no code, and the slot shows in its place.
- * @documentation https://fusion.dev/helix/components/qr-code
+ * @documentation https://fusion.dev/design/components/qr-code
  *
  * @slot fallback - Shown in place of the code when the value is too long for it, such as the link as text.
  * @slot logo - A logo for the center. A code with a logo scans only at a high correction level.

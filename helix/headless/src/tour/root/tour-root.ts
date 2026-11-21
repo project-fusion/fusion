@@ -108,7 +108,7 @@ import { onPage, waitFor } from '../wait.js'
  * @anatomy arrow
  * @anatomy actions
  * @practice Open what a stop points at in the stop's `effect`, such as a menu or a drawer. - The tour runs it as it reaches the stop, and waits for a promise it returns before it shows the stop.
- * @documentation https://fusion.dev/helix/components/tour
+ * @documentation https://fusion.dev/design/components/tour
  *
  * @slot - The stops, in the order they are shown.
  *

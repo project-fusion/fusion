@@ -35,7 +35,7 @@ import { styles } from './video-root.css.js'
  * @anatomy controls
  * @practice {native} Set `controls` only where you want the browser's own control bar. - The Helix bar is then not drawn and its keys are not bound, so a key press does not seek twice.
  * @practice {captions} Write sources and captions as `<source>` and `<track>` children of the player. - They are copied into the inner video, which selects resources from its own child nodes.
- * @documentation https://fusion.dev/helix/components/video
+ * @documentation https://fusion.dev/design/components/video
  *
  * @cssproperty --video-accent-color - Color of the played part of the scrubber.
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the

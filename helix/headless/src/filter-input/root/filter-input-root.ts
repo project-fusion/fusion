@@ -232,7 +232,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @practice {suggesting} Import Option beside Filter Input for anything in `suggestions`. - A suggestion is an option, the Option family's, which the field does not register.
  * @practice {picking} Import the Filter Input `menu` entry to write a `FilterMenu`. - `FilterMenu` draws its pages with Menu, which the family's own entry leaves out.
  * @practice {dismissing} Remove a token in `tags` from your markup when it asks to go. - The field only sends the request, from the remove button or from Backspace.
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the text, such as a count or a control.

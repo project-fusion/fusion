@@ -187,7 +187,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @anatomy grid
  * @anatomy bar
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-bar-chart
+ * @documentation https://fusion.dev/design/components/spatial-bar-chart
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.

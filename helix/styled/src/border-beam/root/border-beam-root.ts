@@ -54,7 +54,7 @@ const LONGEST = 6000
  * @instead shimmer-text - A line of words that names the work while it runs.
  * @practice Set `idle` when the work stops. - A light left running says the work is still going.
  * @practice Say what is running in words as well, such as with a `Badge`. - The light takes no pointer and is hidden from screen readers.
- * @documentation https://fusion.dev/helix/components/border-beam
+ * @documentation https://fusion.dev/design/components/border-beam
  *
  * @slot - The content whose edge the light travels, such as a `Card`.
  *

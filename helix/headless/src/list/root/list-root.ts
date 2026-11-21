@@ -147,7 +147,7 @@ import {
  * @practice Leave `selection-mode` unset for a list you read, and set it for one you choose from or act on. - The rows of an interactive list are grid rows, which hold controls as a list box option cannot.
  * @practice {reordering} In a `reorderable` list, put your rows in the order a reorder reports. - The list moves no element of yours, so your framework keeps the order it rendered.
  * @practice Set `loading` while you fetch the rows `load-more` asks for. - The list asks for nothing more until `loading` clears.
- * @documentation https://fusion.dev/helix/components/list
+ * @documentation https://fusion.dev/design/components/list
  *
  * @slot - The rows.
  * @slot empty - Content for the row shown while the list has no rows and none are loading. Falls back to `empty-text`.

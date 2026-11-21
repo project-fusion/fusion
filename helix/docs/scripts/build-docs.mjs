@@ -46,7 +46,7 @@ const MODES = join(ROOT, 'helix/styles/src/_modes.css')
  * `<Tokens category="color" />` would be childless, which this same script
  * refuses two hundred lines below, and for the reason that applies exactly
  * here: the content would exist only in the rendered page and
- * `/helix/docs/color.md` would have a hole where the table was. A generated
+ * `/design/docs/color.md` would have a hole where the table was. A generated
  * region in the file is complete markdown on both surfaces and cannot drift,
  * which is the arrangement `tokens.css` already uses.
  *
@@ -527,7 +527,7 @@ ${pages.map(literal).join('\n')}
 `
 
 /* Written back, because the file is the source of both surfaces: the page
-   renders it and `/helix/docs/<slug>.md` serves it. A table that existed only
+   renders it and `/design/docs/<slug>.md` serves it. A table that existed only
    in a generated module would leave the document with a hole in it, which is
    the whole reason these are regions in the file rather than a component. */
 if (!check && refilled.length > 0) {

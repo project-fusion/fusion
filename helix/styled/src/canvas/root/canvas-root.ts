@@ -20,7 +20,7 @@ import '../../tooltip/index.js'
  * that one transform reads, so the cards are placed once in the document's
  * coordinates and are not laid out again.
  *
- * The [Canvases](https://fusion.dev/helix/docs/canvases) guide loads and saves
+ * The [Canvases](https://fusion.dev/design/docs/canvases) guide loads and saves
  * a board, keeps it in your state, and lists every key and the roles a screen
  * reader meets.
  *
@@ -35,7 +35,7 @@ import '../../tooltip/index.js'
  * @anatomy controls
  * @practice Set `readonly` on a published board, or on one card or connection to hold only that one. - A card moves by default, and the board writes its new `x` and `y` onto it.
  * @practice Write a Canvas Edge yourself for each connection the board asks for. - A connection is a new element, and React discards an element the board adds to its markup on the next render.
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  *
  * @cssproperty --canvas-background-color - The background behind the board.
  * @cssproperty --canvas-block-size - The height of the frame.

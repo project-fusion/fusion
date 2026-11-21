@@ -123,7 +123,7 @@ const SERIES = 24
  * @anatomy grid
  * @anatomy block
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-treemap
+ * @documentation https://fusion.dev/design/components/spatial-treemap
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.

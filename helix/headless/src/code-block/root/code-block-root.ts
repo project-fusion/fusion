@@ -166,7 +166,7 @@ const nameOf = (block: Element): string => {
  * @practice Import `@fusion.dev/helix-sandbox/code-block` beside the block to color code with no highlighter of your own. - It registers a highlighter for every block, which colors code as the sandbox's editor does.
  * @practice Call `registerHighlighter()` once, with the stylesheet for a highlighter that writes classes. - Every block on the page then shares it, and a block's own `highlight` still wins.
  * @practice Say in the text around the block what a marked line means. - The bands that `mark-lines`, `added-lines`, and `removed-lines` draw are hidden from screen readers.
- * @documentation https://fusion.dev/helix/components/code-block
+ * @documentation https://fusion.dev/design/components/code-block
  *
  * @slot - The code.
  * @slot actions - Controls for the block, in the header before the copy button.

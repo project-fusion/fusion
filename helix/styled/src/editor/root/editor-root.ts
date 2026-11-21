@@ -39,7 +39,7 @@ import '../../toolbar/index.js'
  * @anatomy viewport
  * @practice Write data-prose on the document element in the frame. - The base layer then draws its headings, lists, and quotes before a renderer connects.
  * @practice {in-a-pane} Set `fill` for an editor that fills a pane. - The document then scrolls inside the frame, where otherwise the frame grows with it.
- * @documentation https://fusion.dev/helix/components/editor
+ * @documentation https://fusion.dev/design/components/editor
  *
  * @cssproperty --editor-background-color - The ground the document is drawn on. Defaults to the page's background.
  * @cssproperty --editor-border-color - The frame's edge and the line under the toolbar.

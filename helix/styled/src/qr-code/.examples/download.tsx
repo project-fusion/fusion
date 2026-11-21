@@ -13,7 +13,7 @@ export function Example() {
       <helix-qr-code
         label="Documentation website"
         ref={code}
-        value="https://fusion.dev/helix"
+        value="https://fusion.dev/design"
       ></helix-qr-code>
       <helix-button onClick={() => code.current?.download('helix-docs.png')}>
         Download the code

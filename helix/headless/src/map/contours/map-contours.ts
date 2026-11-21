@@ -24,7 +24,7 @@ import type { MapTerrainEncoding } from '../terrain/map-terrain.js'
  * @status stable
  * @category media
  * @aliases Contours, Topographic lines, Elevation lines, Isolines
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The tiles, the unit, or the layer's name or color changed. Used by `connectMap`; pages do not need to listen for it.
  */

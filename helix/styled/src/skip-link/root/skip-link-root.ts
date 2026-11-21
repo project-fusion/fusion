@@ -22,7 +22,7 @@ import { styles } from './skip-link-root.css.js'
  * @aliases Skip navigation, Skip to content
  * @use A page with a header or a navigation before its main content.
  * @practice {custom-target} Put it first inside the body, and give the content region the id its `href` names. - A press moves focus past the header to that region.
- * @documentation https://fusion.dev/helix/components/skip-link
+ * @documentation https://fusion.dev/design/components/skip-link
  *
  * @cssproperty --skip-link-background-color - The background of the link while it is shown.
  * @cssproperty --skip-link-border-color - The border color of the link while it is shown.

@@ -58,7 +58,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy indicator
  * @anatomy value?
  * @practice Set `indeterminate` while the total is not known yet. - The bar then runs a segment across the track and claims no proportion.
- * @documentation https://fusion.dev/helix/components/progress
+ * @documentation https://fusion.dev/design/components/progress
  *
  * @slot - Words drawn on the bar, or in the middle of a ring, such as the reading. Said as the reading where `value-text` is not set.
  * @slot label - A visible label. Its words name the progress bar in place of `label`.

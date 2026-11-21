@@ -40,7 +40,7 @@ import { styles } from './legend-root.css.js'
  * @anatomy name
  * @practice Set `for` to the table the chart reads. - The legend takes its entries from that table, so the two always match.
  * @practice Set `entries="categories"` for a donut chart, and `entries="measures"` for a scatter chart. - A donut's slices are the table's rows, and a scatter's first data column is measured across.
- * @documentation https://fusion.dev/helix/components/legend
+ * @documentation https://fusion.dev/design/components/legend
  *
  * @cssproperty --legend-color - The color of the series names.
  * @cssproperty --legend-direction - The direction the entries run: `row`, which wraps, or `column`.

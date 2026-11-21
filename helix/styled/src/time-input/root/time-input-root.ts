@@ -41,7 +41,7 @@ import { styles } from './time-input-root.css.js'
  * @anatomy hint?
  * @anatomy surface
  * @practice Write `value`, `min`, and `max` as 24-hour `HH:mm`, or `HH:mm:ss` with `seconds`. - The form submits that shape, and it sorts correctly as a string.
- * @documentation https://fusion.dev/helix/components/time-input
+ * @documentation https://fusion.dev/design/components/time-input
  *
  * @cssproperty --time-input-background-color - Fill behind the field.
  * @cssproperty --time-input-border-color - Color of the panel's edge.

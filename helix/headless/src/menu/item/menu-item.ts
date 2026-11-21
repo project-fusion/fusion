@@ -83,7 +83,7 @@ import '../../kbd/index.js'
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
- * @documentation https://fusion.dev/helix/components/menu
+ * @documentation https://fusion.dev/design/components/menu
  *
  * @slot - The label.
  * @slot check - Replaces the check mark of a checked row, such as with your own icon.

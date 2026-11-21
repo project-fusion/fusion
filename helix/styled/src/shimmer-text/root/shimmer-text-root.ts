@@ -30,7 +30,7 @@ import { styles } from './shimmer-text-root.css.js'
  * @instead orb - What an agent is doing, shown as a shape.
  * @practice Take the element away, or put the result in its place, once the work is done. - The sweep runs for as long as the element is on the page.
  * @practice Put the element in a live region, such as a `Chat` turn's status or an element with `role="status"`, to have a change of words read out. - The element says nothing by itself.
- * @documentation https://fusion.dev/helix/components/shimmer-text
+ * @documentation https://fusion.dev/design/components/shimmer-text
  *
  * @slot - The words the sweep crosses.
  *

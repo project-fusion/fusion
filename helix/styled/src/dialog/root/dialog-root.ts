@@ -29,7 +29,7 @@ import { styles } from './dialog-root.css.js'
  * @anatomy header
  * @anatomy footer
  * @practice {alert} Under `alert`, put the action that dismisses first in the footer, and give it autofocus. - Focus then starts on the action that destroys nothing.
- * @documentation https://fusion.dev/helix/components/dialog
+ * @documentation https://fusion.dev/design/components/dialog
  *
  * @cssproperty --dialog-backdrop - Filter applied behind a `frosted` or `glass` panel. Follows the theme's material policy.
  * @cssproperty --dialog-background-color - The panel's fill. Follows `--helix-color-surface-overlay`.

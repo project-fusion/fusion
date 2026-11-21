@@ -16,7 +16,7 @@ import { styles } from './map-route.css.js'
  * @status stable
  * @category media
  * @aliases Map line, Path, Polyline
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-route-casing-color - The color of the casing under the route.
  * @cssproperty --map-route-color - The route's color when no tone is set.

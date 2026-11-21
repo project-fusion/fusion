@@ -54,7 +54,7 @@ import { property, state } from 'lit/decorators.js'
  * @instead popover - Content that opens on a press, such as a short form.
  * @practice Put nothing in the card that you can reach only there. - A touch screen has no hover, so it follows the link without opening the card.
  * @practice Place the card right after the link that `for` names. - The next Tab from the link goes into the card, whose content follows the link in the page's order.
- * @documentation https://fusion.dev/helix/components/hover-card
+ * @documentation https://fusion.dev/design/components/hover-card
  *
  * @slot - The card's content, which may hold links and buttons.
  *

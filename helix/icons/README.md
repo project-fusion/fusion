@@ -103,6 +103,6 @@ It throws where the command fails:
 
 Phosphor is MIT and its notice travels in `LICENSE` beside ours.
 
-[Documentation](https://fusion.dev/helix)
+[Documentation](https://fusion.dev/design)
 
 MIT

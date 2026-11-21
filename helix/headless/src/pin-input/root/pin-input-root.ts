@@ -108,7 +108,7 @@ const keepFocus = (event: Event): void => event.preventDefault()
  * @anatomy label
  * @anatomy cell
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/pin-input
+ * @documentation https://fusion.dev/design/components/pin-input
  *
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.

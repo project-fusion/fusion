@@ -30,7 +30,7 @@ import { styles } from './shine-root.css.js'
  * @instead spotlight - Cards lit under the pointer as it moves over them.
  * @instead shimmer-text - Words that light sweeps across while the work they name runs.
  * @practice Set `loop` on one action on a page at most. - The band then catches the eye for the one action that matters most.
- * @documentation https://fusion.dev/helix/components/shine
+ * @documentation https://fusion.dev/design/components/shine
  *
  * @slot - The content the band crosses.
  *

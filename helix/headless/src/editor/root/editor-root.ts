@@ -326,7 +326,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @anatomy viewport
  * @practice Write data-prose on the document element in the frame. - The base layer then draws its headings, lists, and quotes before a renderer connects.
  * @practice {in-a-pane} Set `fill` for an editor that fills a pane. - The document then scrolls inside the frame, where otherwise the frame grows with it.
- * @documentation https://fusion.dev/helix/components/editor
+ * @documentation https://fusion.dev/design/components/editor
  *
  * @slot - The element your renderer draws the document in.
  * @slot actions - Controls of your own at the end of the toolbar, such as Share or Comment.

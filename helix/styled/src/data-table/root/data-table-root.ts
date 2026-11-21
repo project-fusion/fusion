@@ -61,7 +61,7 @@ const bleedConverter = {
  * @practice Import Table beside Data Table. - A column is the Table family's `TableColumn`, which Data Table does not register.
  * @practice {serving-the-first-page} Write the first page as `TableRow` and `TableCell` elements under the columns. - A server does not pass the columns to the table, so on its own it serves the headings and no values.
  * @practice Style what a cell draws with `cellStyles`. - A cell renders in the table's shadow root, where tokens reach it and a class from your stylesheet does not.
- * @documentation https://fusion.dev/helix/components/data-table
+ * @documentation https://fusion.dev/design/components/data-table
  *
  * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.

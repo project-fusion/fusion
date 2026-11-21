@@ -45,7 +45,7 @@ const framesConverter = {
  * @status stable
  * @category media
  * @aliases Weather radar, Tile overlay, Raster layer
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The tiles, the frame shown, the opacity, or where the tiles are drawn changed. Used by `connectMap`; pages do not need to listen for it.
  */

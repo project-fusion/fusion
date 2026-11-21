@@ -24,7 +24,7 @@ import { styles } from './tooltip-root.css.js'
  * @anatomy surface
  * @anatomy arrow?
  * @practice {described} Place the tooltip beside its trigger, name the trigger in `for`, and name the tooltip in the trigger's aria-describedby. - The trigger is then described in the server's HTML and at rest, in every browser, before anyone points at it or focuses it.
- * @documentation https://fusion.dev/helix/components/tooltip
+ * @documentation https://fusion.dev/design/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - The size of the arrow on the bubble's edge.
  * @cssproperty --tooltip-backdrop - The blur behind a `frosted` or `glass` bubble.

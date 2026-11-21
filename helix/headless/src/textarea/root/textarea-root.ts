@@ -64,7 +64,7 @@ import { grownHeight, lineMetrics } from '../grow.js'
  * @anatomy label
  * @anatomy field
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/textarea
+ * @documentation https://fusion.dev/design/components/textarea
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - After the text, for an icon or an action beside it.

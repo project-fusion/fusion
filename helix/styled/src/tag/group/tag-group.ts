@@ -14,7 +14,7 @@ import { styles } from './tag-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Tag list, Chip group, Token list
- * @documentation https://fusion.dev/helix/components/tag
+ * @documentation https://fusion.dev/design/components/tag
  *
  * @cssproperty --tag-group-gap - The space between tags, across and between rows.
  * @cssproperty --tag-group-move-duration - How long a tag takes to slide to its new place, or to fade in. Defaults to `--helix-duration-normal`. `0ms` moves nothing.

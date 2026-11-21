@@ -96,7 +96,7 @@ const lengthOf = (value: string | undefined): string | undefined => {
  * @instead flex - Children in one row or one column.
  * @instead table - Data that you read across rows and down columns.
  * @practice {spans} In a `min` grid, span a child across every column with `data-grid-span="full"`. - A number wider than the grid adds columns of no width, as CSS does, and the count of a `min` grid changes with its width.
- * @documentation https://fusion.dev/helix/components/grid
+ * @documentation https://fusion.dev/design/components/grid
  *
  * @slot - The items to lay out.
  *

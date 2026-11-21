@@ -381,7 +381,7 @@ fn an_example_carries_the_imports_it_needs() {
     );
     assert_eq!(
         first["renders"],
-        json!([{ "shot": "wide", "url": "https://fusion.dev/helix/components/select/preview.png" }])
+        json!([{ "shot": "wide", "url": "https://fusion.dev/design/components/select/preview.png" }])
     );
     assert_eq!(first["environment"]["browser"], "chromium 1");
     let named = project.json(&["api", "example", "select", "grouped"]);

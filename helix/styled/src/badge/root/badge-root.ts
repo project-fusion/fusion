@@ -24,7 +24,7 @@ import { styles } from './badge-root.css.js'
  * @instead stat - A number that is the content itself.
  * @anatomy indicator
  * @practice {inline} Put the badge inside a control, with `placement="inline"`, to read its count in the control's name. - The button is then "Inbox 8 unread", and the badge keeps the name current with no label of yours to update.
- * @documentation https://fusion.dev/helix/components/badge
+ * @documentation https://fusion.dev/design/components/badge
  *
  * @cssproperty --badge-attention-duration - How long one beat of `attention` takes.
  * @cssproperty --badge-background-color - The fill of the indicator.

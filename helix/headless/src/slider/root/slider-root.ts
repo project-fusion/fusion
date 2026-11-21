@@ -104,7 +104,7 @@ const SLIDER_KEYS = new Set([
  * @anatomy hint?
  * @practice Read `valueAsNumber` for arithmetic. - The value is a string, like every other form control's.
  * @practice {markers} Set `step` for where the value can land, and `markers` for the marks drawn. - Marks are decoration, and the input holds to `step` whether or not marks are drawn.
- * @documentation https://fusion.dev/helix/components/slider
+ * @documentation https://fusion.dev/design/components/slider
  *
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.

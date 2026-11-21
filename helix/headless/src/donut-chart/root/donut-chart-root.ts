@@ -156,7 +156,7 @@ export interface DonutShare {
  * @anatomy center
  * @practice Set the ring's thickness with `hole`. - The stroke width and the ring's radius must agree, so no CSS hook sets it.
  * @practice Point `for` at a table with one row per slice, its amount in the first column of numbers. - A donut divides one whole, so it reads one column where other Helix charts read one per series.
- * @documentation https://fusion.dev/helix/components/donut-chart
+ * @documentation https://fusion.dev/design/components/donut-chart
  *
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
  * @slot empty - Content shown in place of the ring when the table has no readings. Falls back to `empty-text`.

@@ -66,7 +66,7 @@ import '../../tooltip/index.js'
  * @anatomy button
  * @anatomy mark
  * @practice Set `from` to copy from another element on the page, in place of `value`. - It reads that element's text, an attribute, or a property at the press.
- * @documentation https://fusion.dev/helix/components/copy-button
+ * @documentation https://fusion.dev/design/components/copy-button
  *
  * @slot - The icon shown before a copy. Defaults to a clipboard.
  * @slot copied - The icon shown after a successful copy. Defaults to a check mark.

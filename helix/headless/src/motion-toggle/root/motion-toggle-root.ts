@@ -49,7 +49,7 @@ import { property, state } from 'lit/decorators.js'
  * @instead video - One video, which has a pause button of its own.
  * @anatomy button
  * @anatomy icon
- * @documentation https://fusion.dev/helix/components/motion-toggle
+ * @documentation https://fusion.dev/design/components/motion-toggle
  *
  * @slot - The button's text, where it shows more than its icon. Defaults to nothing, the icon alone, named by `label`.
  * @slot icon - Replaces the icon, which is pause while motion runs and play while it is paused.

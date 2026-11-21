@@ -25,7 +25,7 @@ import { styles } from './reveal-root.css.js'
  * @instead skeleton - The shape of content that is still loading.
  * @instead highlighter - Words in a sentence marked as they come into view.
  * @practice Set a `--reveal-delay` on each of several in a row, such as `0ms`, `80ms`, and `160ms`. - They then come in one after another.
- * @documentation https://fusion.dev/helix/components/reveal
+ * @documentation https://fusion.dev/design/components/reveal
  *
  * @slot - The content that comes in.
  *

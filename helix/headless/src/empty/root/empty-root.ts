@@ -59,7 +59,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy heading
  * @anatomy actions?
  * @practice {heading} Set `heading` for a view rendered from data or on a server. - It draws a heading at `heading-level` that you find in the outline, with no element of yours to write.
- * @documentation https://fusion.dev/helix/components/empty
+ * @documentation https://fusion.dev/design/components/empty
  *
  * @slot - The message: why the region is empty, and what to do about it.
  * @slot actions - The action that would put something in the region.

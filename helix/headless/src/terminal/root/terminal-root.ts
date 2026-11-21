@@ -241,7 +241,7 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @practice Set `exit-code` when the process exits. - The frame says how it exited, stops sending input, and shows a Restart button.
  * @practice Connect `screen-reader-mode` to a setting your reader can turn on. - It costs time on every write, so it is off by default.
  * @practice {in-a-pane} Set `fill` for a terminal that fills a pane, such as one side of a Splitter, and give the pane a position, such as relative. - The frame covers its container.
- * @documentation https://fusion.dev/helix/components/terminal
+ * @documentation https://fusion.dev/design/components/terminal
  *
  * @slot - The element your renderer draws the terminal in.
  * @slot actions - Controls of your own in the header, before the built-in ones, such as a button that splits the pane.

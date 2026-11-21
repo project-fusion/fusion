@@ -40,7 +40,7 @@ const LABEL_ID = 'label'
  * @status stable
  * @category feedback
  * @aliases NotificationSection, FeedGroup
- * @documentation https://fusion.dev/helix/components/notifications
+ * @documentation https://fusion.dev/design/components/notifications
  *
  * @slot - The notifications in this group.
  * @slot actions - Beside the count, for a link to the rest of them.

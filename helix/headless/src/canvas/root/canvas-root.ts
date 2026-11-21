@@ -358,7 +358,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @anatomy controls
  * @practice Set `readonly` on a published board, or on one card or connection to hold only that one. - A card moves by default, and the board writes its new `x` and `y` onto it.
  * @practice Write a Canvas Edge yourself for each connection the board asks for. - A connection is a new element, and React discards an element the board adds to its markup on the next render.
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  *
  * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.
  * @slot empty - Content shown when the document has no nodes.

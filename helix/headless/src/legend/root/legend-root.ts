@@ -49,7 +49,7 @@ import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
  * @anatomy name
  * @practice Set `for` to the table the chart reads. - The legend takes its entries from that table, so the two always match.
  * @practice Set `entries="categories"` for a donut chart, and `entries="measures"` for a scatter chart. - A donut's slices are the table's rows, and a scatter's first data column is measured across.
- * @documentation https://fusion.dev/helix/components/legend
+ * @documentation https://fusion.dev/design/components/legend
  *
  * @event {Event} change - Fired once a toggle has hidden or shown a series.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a toggle hides or shows a series, with the `hidden-series` it would leave. Cancelable.

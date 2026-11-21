@@ -31,7 +31,7 @@ import { styles } from './notifications-root.css.js'
  * @anatomy notification
  * @practice Set `loading` while the next page is on its way, and take `load-more` off once there is none. - Rows that arrive while `loading` is set are not announced as new.
  * @practice Set `total` when the feed holds one page of a longer list. - Each row then says its place in the whole list.
- * @documentation https://fusion.dev/helix/components/notifications
+ * @documentation https://fusion.dev/design/components/notifications
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own.

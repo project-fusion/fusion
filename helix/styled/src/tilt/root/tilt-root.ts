@@ -24,7 +24,7 @@ import { styles } from './tilt-root.css.js'
  * @use A card or a picture that leans toward the mouse, such as a plan or a product shot.
  * @instead spotlight - Cards that stay flat and are lit under the pointer.
  * @instead magnetic - A button drawn a little way toward the pointer.
- * @documentation https://fusion.dev/helix/components/tilt
+ * @documentation https://fusion.dev/design/components/tilt
  *
  * @slot - The content that leans, such as a `Card`.
  *

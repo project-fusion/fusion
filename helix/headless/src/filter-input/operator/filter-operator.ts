@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Comparator, Predicate
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  */
 @customElement('helix-headless-filter-operator')
 export class HelixHeadlessFilterOperator extends HelixElement {

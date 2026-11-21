@@ -18,7 +18,7 @@ import { nothing, type PropertyValues } from 'lit'
  * @since 0.1.0
  * @status stable
  * @aliases Divider, ListBoxSeparator
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  */
 @customElement('helix-headless-option-separator')
 export class HelixHeadlessOptionSeparator extends HelixElement {

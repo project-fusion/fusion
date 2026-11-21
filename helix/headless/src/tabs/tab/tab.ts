@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @aliases Tab
- * @documentation https://fusion.dev/helix/components/tabs
+ * @documentation https://fusion.dev/design/components/tabs
  *
  * @slot - The tab's label.
  * @slot dismiss-icon - Replaces the glyph on the mark that closes a `dismissible` tab.

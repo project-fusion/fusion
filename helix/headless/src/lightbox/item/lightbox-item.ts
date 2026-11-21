@@ -24,7 +24,7 @@ import { property, state } from 'lit/decorators.js'
  * @status stable
  * @category media
  * @aliases LightboxSlide, GalleryItem
- * @documentation https://fusion.dev/helix/components/lightbox
+ * @documentation https://fusion.dev/design/components/lightbox
  *
  * @slot - The content to show.
  * @slot description - A line under the content that describes it.

@@ -238,7 +238,7 @@ export type PreviewMessage =
  * @since 0.1.0
  * @status stable
  * @aliases Result
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @event {HelixConsoleEvent} helix-console - Fired once per console call in the frame.
  * @event {HelixResizeEvent} helix-resize - Fired when the height of the frame's content changes, with the new height.

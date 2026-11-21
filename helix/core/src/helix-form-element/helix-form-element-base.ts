@@ -53,7 +53,7 @@ const firstTabStop = (node: Element | ShadowRoot): HTMLElement | null => {
  *
  * @since 0.176.0
  * @status experimental
- * @documentation https://fusion.dev/helix/docs/tiers
+ * @documentation https://fusion.dev/design/docs/tiers
  */
 export class HelixFormElementBase extends HelixElement {
   /** Opts the element into form ownership, labels, and submission. */

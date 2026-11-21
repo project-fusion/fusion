@@ -124,7 +124,7 @@ const DRAG_SLOP = 4
  * @anatomy next
  * @anatomy indicators
  * @practice {several-across} Set `slides-per-move` to match `per-view` for a run of cards. - Next then shows the next set, with one indicator for each set.
- * @documentation https://fusion.dev/helix/components/carousel
+ * @documentation https://fusion.dev/design/components/carousel
  *
  * @slot - The slides.
  * @slot next-icon - The glyph on the control that moves to the next slide. Defaults to a caret.

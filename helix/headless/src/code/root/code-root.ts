@@ -27,7 +27,7 @@ import { html, type TemplateResult } from 'lit'
  * @instead kbd - A key or a chord you press.
  * @instead code-input - Code you type into a form.
  * @practice Set `translate="no"` on the element to keep a page translator off the code. - A translator that rewrites prose would also rewrite an identifier.
- * @documentation https://fusion.dev/helix/components/code
+ * @documentation https://fusion.dev/design/components/code
  *
  * @slot - The code.
  *

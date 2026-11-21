@@ -24,7 +24,7 @@ import { styles } from './video-playlist-root.css.js'
  * @anatomy meta
  * @practice Put a `Video` in the `player` slot. - A plain video has no previous and next controls, so its moves are the entries, the menu, and your own buttons calling `previous()` and `next()`.
  * @practice Under `reorderable`, move the entries yourself, in the order the reorder event's keys hold. - The playlist moves no element of yours, and the next entry is the one after the current entry in the order you leave.
- * @documentation https://fusion.dev/helix/components/video-playlist
+ * @documentation https://fusion.dev/design/components/video-playlist
  *
  * @cssproperty --video-playlist-empty-color - The color of the words shown while there are no entries.
  * @cssproperty --video-playlist-empty-padding - The space around the words shown while there are no entries.

@@ -89,7 +89,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @anatomy item
  * @anatomy mark
  * @practice {navigation} Set `navigation` for a site's navigation. - The host is then a navigation landmark, and each page a list of places to go in place of a menu of commands.
- * @documentation https://fusion.dev/helix/components/drilldown
+ * @documentation https://fusion.dev/design/components/drilldown
  *
  * @slot - The rows of the top page.
  * @slot back-icon - Replaces the icon on the back button.

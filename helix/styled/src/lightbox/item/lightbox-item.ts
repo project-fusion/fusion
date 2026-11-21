@@ -15,7 +15,7 @@ import { styles } from './lightbox-item.css.js'
  * @status stable
  * @category media
  * @aliases LightboxSlide, GalleryItem
- * @documentation https://fusion.dev/helix/components/lightbox
+ * @documentation https://fusion.dev/design/components/lightbox
  *
  * @cssproperty --lightbox-item-description-color - Color of the line under the content.
  * @cssproperty --lightbox-item-gap - Space between the content and the line under it.

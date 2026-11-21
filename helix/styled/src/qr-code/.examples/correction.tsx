@@ -6,11 +6,11 @@ export function Example() {
     >
       <helix-qr-code
         correction="L"
-        value="https://fusion.dev/helix"
+        value="https://fusion.dev/design"
       ></helix-qr-code>
       <helix-qr-code
         correction="H"
-        value="https://fusion.dev/helix"
+        value="https://fusion.dev/design"
       ></helix-qr-code>
     </helix-flex>
   )

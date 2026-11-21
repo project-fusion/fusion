@@ -14,7 +14,7 @@ import { type CSSResultGroup, css } from 'lit'
  * @status stable
  * @category media
  * @aliases CanvasConnector, BoardEdge
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  */
 @customElement('helix-canvas-edge')
 export class HelixCanvasEdge extends HelixHeadlessCanvasEdge {

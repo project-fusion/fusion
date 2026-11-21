@@ -10,7 +10,7 @@ CodeMirror.
 bun add @fusion.dev/helix @fusion.dev/helix-code-editor
 ```
 
-The element is on the [Code Editor reference](https://fusion.dev/helix/components/code-editor).
+The element is on the [Code Editor reference](https://fusion.dev/design/components/code-editor).
 On its own it is a text field in the code face; connected, CodeMirror draws it.
 For a few lines of code in a form, `Code Input` needs no engine.
 

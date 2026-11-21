@@ -20,7 +20,7 @@ import { styles } from './hover-card-root.css.js'
  * @instead popover - Content that opens on a press, such as a short form.
  * @practice Put nothing in the card that you can reach only there. - A touch screen has no hover, so it follows the link without opening the card.
  * @practice Place the card right after the link that `for` names. - The next Tab from the link goes into the card, whose content follows the link in the page's order.
- * @documentation https://fusion.dev/helix/components/hover-card
+ * @documentation https://fusion.dev/design/components/hover-card
  *
  * @cssproperty --hover-card-background-color - The card's fill. Defaults to the floating overlay surface.
  * @cssproperty --hover-card-inline-size - The card's width. Defaults to 20rem, and never wider than the window.

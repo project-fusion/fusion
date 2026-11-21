@@ -34,7 +34,7 @@ import { styles } from './file-input-root.css.js'
  * @anatomy field
  * @anatomy trigger
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/file-input
+ * @documentation https://fusion.dev/design/components/file-input
  *
  * @cssproperty --file-input-background-color - Fill behind the field.
  * @cssproperty --file-input-border-color - The field's dashed edge at rest.

@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @category media
- * @documentation https://fusion.dev/helix/components/video-playlist
+ * @documentation https://fusion.dev/design/components/video-playlist
  *
  * @slot - The entry's name.
  * @slot indicator - A mark shown on the entry that is playing, such as an equalizer icon. Rendered only while the entry is current.

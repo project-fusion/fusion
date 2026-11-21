@@ -27,7 +27,7 @@ function steps(child: Element): Stepping | undefined {
  * @since 0.1.0
  * @status stable
  * @aliases Metrics, KPIs, Figures
- * @documentation https://fusion.dev/helix/components/stat
+ * @documentation https://fusion.dev/design/components/stat
  *
  * @slot - The stats.
  */

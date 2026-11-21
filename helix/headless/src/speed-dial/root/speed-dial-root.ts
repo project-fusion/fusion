@@ -107,7 +107,7 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * @anatomy icon
  * @practice Import Icon beside Speed Dial where your trigger or your actions use one. - Speed Dial draws no icon of its own, so it does not register one.
  * @practice Set `open-on="long-press"` for a trigger with an action of its own, such as composing a message. - A press then runs the trigger's action, and holding it for half a second opens the dial.
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @slot - The actions.
  * @slot icon - Replaces the plus on the button the dial draws when no trigger is slotted, such as with a pencil for a dial of ways to write.

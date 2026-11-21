@@ -36,7 +36,7 @@ const LABELS: Record<string, string> = {
  * @since 0.1.0
  * @status stable
  * @aliases Status line
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @slot - Items at the start of the bar.
  * @slot end - Items after the readouts, at the end of the bar.

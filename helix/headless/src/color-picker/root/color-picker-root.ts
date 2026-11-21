@@ -116,7 +116,7 @@ interface EyeDropperConstructor {
  * @anatomy sample
  * @anatomy channels
  * @anatomy value
- * @documentation https://fusion.dev/helix/components/color-picker
+ * @documentation https://fusion.dev/design/components/color-picker
  *
  * @slot eyedropper-icon - The icon on the eyedropper button, usually a dropper.
  * @slot hint - Help under the picker, for content richer than the `hint` text.

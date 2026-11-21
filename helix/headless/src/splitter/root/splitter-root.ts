@@ -155,7 +155,7 @@ const FOCUSABLE =
  * @practice Set `primary` to a sidebar's pane. - That pane keeps its size when the splitter's own size changes, and the other pane takes all of the change.
  * @practice {bounds} Set `min` and `end-min` to the least each pane needs. - By default the divider reaches either edge, so you can drag a pane fully closed.
  * @practice {nested} For three columns, nest a splitter in the `end` pane of another. - A divider then resizes only the two panes beside it.
- * @documentation https://fusion.dev/helix/components/splitter
+ * @documentation https://fusion.dev/design/components/splitter
  *
  * @slot end - The pane after the divider.
  * @slot handle - A mark drawn at the middle of the divider, such as a grip icon. It takes no focus and no pointer of its own: a press on it is a press on the divider.
