@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * @anatomy grid
  * @anatomy ribbon
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-ribbon-chart
+ * @documentation https://fusion.dev/design/components/spatial-ribbon-chart
  *
  * @cssproperty --spatial-ribbon-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  * @cssproperty --spatial-ribbon-chart-move-duration - How long the ribbons take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.

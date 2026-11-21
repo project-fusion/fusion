@@ -45,7 +45,7 @@ let toldSelected = false
  * @status stable
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @slot - The action's name.
  * @slot icon - The action's icon, the main way the action is recognized.

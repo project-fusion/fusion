@@ -30,7 +30,7 @@ import '../../radio/index.js'
  * @practice Put View Panel in a Drawer opened by one View button. - On a phone a table has no room above it for a filter field, a Columns button, and an Export button.
  * @practice Show the View button at the widths that need it, and the tools above the table at the rest. - The panel takes no width of its own.
  * @practice Show `active` in a badge on the View button. - It counts the search and the filters the view holds.
- * @documentation https://fusion.dev/helix/components/view-panel
+ * @documentation https://fusion.dev/design/components/view-panel
  *
  * @cssproperty --view-panel-rule-color - The line between the sections.
  */

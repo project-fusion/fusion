@@ -20,7 +20,7 @@ import { styles } from './pagination-size.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Page size, Rows per page
- * @documentation https://fusion.dev/helix/components/pagination
+ * @documentation https://fusion.dev/design/components/pagination
  *
  * @csspart control - The select.
  *

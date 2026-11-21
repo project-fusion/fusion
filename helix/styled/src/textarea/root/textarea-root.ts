@@ -28,7 +28,7 @@ import '../../voice-level/index.js'
  * @anatomy label
  * @anatomy field
  * @anatomy hint?
- * @documentation https://fusion.dev/helix/components/textarea
+ * @documentation https://fusion.dev/design/components/textarea
  *
  * @cssproperty --textarea-background-color - Fill behind the text.
  * @cssproperty --textarea-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.

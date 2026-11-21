@@ -32,7 +32,7 @@ import '../../tooltip/index.js'
  * @anatomy base
  * @anatomy start?
  * @anatomy end?
- * @documentation https://fusion.dev/helix/components/spatial-heatmap
+ * @documentation https://fusion.dev/design/components/spatial-heatmap
  *
  * @cssproperty --spatial-heatmap-cell-size - The largest a cell grows, along its edge. The strip is never wider than its box, and draws smaller cells to fit.
  * @cssproperty --spatial-heatmap-left-shade - How much less light the left face is than the top, as a step of OKLCH lightness from 0 to 1. 0.07 by default.

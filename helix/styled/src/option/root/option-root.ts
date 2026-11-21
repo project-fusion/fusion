@@ -23,7 +23,7 @@ import { styles } from './option-root.css.js'
  * @anatomy item
  * @anatomy label
  * @practice Put a tile's image in `media`, with empty alternative text. - The row stays the option, and its label stays its name.
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  *
  * @cssproperty --option-active-background-color - The background of the option the keyboard is on.
  * @cssproperty --option-block-padding - The space above and below the option. `Command` increases it for its longer list of rows.

@@ -23,7 +23,7 @@ import '../../tooltip/index.js'
  * @anatomy button
  * @anatomy mark
  * @practice Set `from` to copy from another element on the page, in place of `value`. - It reads that element's text, an attribute, or a property at the press.
- * @documentation https://fusion.dev/helix/components/copy-button
+ * @documentation https://fusion.dev/design/components/copy-button
  *
  * @cssproperty --copy-button-color - The icon's color at rest. A `tone` keeps its own.
  * @cssproperty --copy-button-color-hover - The icon's color under the pointer. Without it, `--copy-button-color` also applies on hover.

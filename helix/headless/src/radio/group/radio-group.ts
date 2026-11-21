@@ -61,7 +61,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @since 0.1.0
  * @status stable
  * @aliases RadioButtons, Choice group
- * @documentation https://fusion.dev/helix/components/radio
+ * @documentation https://fusion.dev/design/components/radio
  *
  * @slot - The radios.
  * @slot feedback - The error message, for content richer than a string. It shows while there is a message.

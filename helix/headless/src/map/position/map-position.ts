@@ -27,7 +27,7 @@ import { HelixMapPartChangeEvent } from '../events/index.js'
  * @status stable
  * @category media
  * @aliases Current location, Live position, Tracker, You are here
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - It moved, turned, or its accuracy changed. Used by `connectMap`; pages do not need to listen for it.
  *

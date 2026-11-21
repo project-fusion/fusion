@@ -45,7 +45,7 @@ interface ResultsMessage {
  * @status experimental
  * @family sandbox
  * @aliases Tests, Suite
- * @documentation https://fusion.dev/helix/docs/sandbox
+ * @documentation https://fusion.dev/design/docs/sandbox
  *
  * @csspart empty - Shown when there is nothing to report.
  * @csspart error - Why it failed.

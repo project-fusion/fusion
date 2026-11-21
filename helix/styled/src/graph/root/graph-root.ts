@@ -18,7 +18,7 @@ import '../../tooltip/index.js'
  * `no-panel`, the drawing takes the whole frame, and a button among the
  * controls opens the search and the list over its end.
  *
- * The [Graphs](https://fusion.dev/helix/docs/graphs) guide connects a
+ * The [Graphs](https://fusion.dev/design/docs/graphs) guide connects a
  * renderer, lists the keys and what a screen reader hears, and describes the
  * methods of a driver for another renderer.
  *
@@ -35,7 +35,7 @@ import '../../tooltip/index.js'
  * @anatomy list
  * @practice Set `nodes` and `links` as properties, from a script. - A graph of ten thousand notes as ten thousand elements would cost what the renderer exists to save.
  * @practice On the headless tier, give the `list` part a block size. - Without one, the list grows to hold every row.
- * @documentation https://fusion.dev/helix/components/graph
+ * @documentation https://fusion.dev/design/components/graph
  *
  * @cssproperty --graph-background-color - The color behind the drawing while it loads.
  * @cssproperty --graph-block-size - The frame's height, as a length.

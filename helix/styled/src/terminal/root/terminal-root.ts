@@ -27,7 +27,7 @@ import '../../toolbar/index.js'
  * `--terminal-cursor-color`, or `--terminal-selection-background-color` on
  * the terminal to choose them yourself, such as
  * `helix-terminal { --terminal-ansi-blue: #3b82f6 }`. The
- * [Terminals](https://fusion.dev/helix/docs/terminals) guide lists them all.
+ * [Terminals](https://fusion.dev/design/docs/terminals) guide lists them all.
  *
  * Set `separation="plain"` where a pane around the terminal already draws
  * the edge.
@@ -45,7 +45,7 @@ import '../../toolbar/index.js'
  * @practice Set `exit-code` when the process exits. - The frame says how it exited, stops sending input, and shows a Restart button.
  * @practice Connect `screen-reader-mode` to a setting your reader can turn on. - It costs time on every write, so it is off by default.
  * @practice {in-a-pane} Set `fill` for a terminal that fills a pane, such as one side of a Splitter, and give the pane a position, such as relative. - The frame covers its container.
- * @documentation https://fusion.dev/helix/components/terminal
+ * @documentation https://fusion.dev/design/components/terminal
  *
  * @cssproperty --terminal-block-size - The frame's height, as a length. Ignored with `fill`, where the container decides it.
  * @cssproperty --terminal-border-color - The edge around the frame and the rules inside it.

@@ -191,7 +191,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @practice Put each row directly in the menu, in a `Menu.Section`, or in another row's `submenu` slot. - The menu reads rows in those places only.
  * @practice {sections} Group rows under a heading with `Menu.Section`, and divide runs of rows with Divider. - A section is a group named by its heading, and a divider is a separator a screen reader announces.
  * @practice Import `@fusion.dev/helix/menu/filter` beside Menu to set `filterable`. - The filter field is a separate import, so a menu that never filters carries none of its code.
- * @documentation https://fusion.dev/helix/components/menu
+ * @documentation https://fusion.dev/design/components/menu
  *
  * @slot - The items.
  * @slot empty - What the menu shows when it has no items, for content richer than `empty-text`.

@@ -4,7 +4,7 @@ export function Example() {
   return (
     <helix-headless-qr-code
       label="Documentation website"
-      value="https://fusion.dev/helix"
+      value="https://fusion.dev/design"
     ></helix-headless-qr-code>
   )
 }

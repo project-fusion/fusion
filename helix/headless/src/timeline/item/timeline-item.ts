@@ -52,7 +52,7 @@ type TimelineTone = 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'war
  * @status stable
  * @category data
  * @aliases Activity item, History entry, Event
- * @documentation https://fusion.dev/helix/components/timeline
+ * @documentation https://fusion.dev/design/components/timeline
  *
  * @slot - What happened.
  * @slot marker - The mark on the line. Defaults to a dot, which is the slot's fallback

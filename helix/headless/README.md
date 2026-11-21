@@ -37,6 +37,6 @@ is this tier with our presentation on top.
 
 Framework typings ship alongside: `/jsx`, `/vue` and `/svelte`.
 
-[Documentation](https://fusion.dev/helix) · [Building on the headless tier](https://fusion.dev/helix/docs/building-on-the-headless-tier)
+[Documentation](https://fusion.dev/design) · [Building on the headless tier](https://fusion.dev/design/docs/building-on-the-headless-tier)
 
 MIT

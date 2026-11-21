@@ -13,7 +13,7 @@ import { styles } from './option-separator.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Divider, ListBoxSeparator
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  *
  * @cssproperty --option-separator-color - The rule's color.
  * @cssproperty --option-separator-space - The space above and below the rule.

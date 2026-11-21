@@ -17,7 +17,7 @@ import { styles } from './map-marker.css.js'
  * @status stable
  * @category media
  * @aliases Map pin, Place, Point of interest
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-marker-cluster-color - A cluster's fill color.
  * @cssproperty --map-marker-cluster-size - A cluster's width.

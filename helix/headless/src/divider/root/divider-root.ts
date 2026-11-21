@@ -42,7 +42,7 @@ import { property } from 'lit/decorators.js'
  * @instead card - Groups that each sit on a surface of their own.
  * @practice Set words into the line, and no controls. - Controls are hidden with the words, which a screen reader hears once, as the separator's name.
  * @practice Set `decorative` on a rule that separates nothing, such as one under a heading or between the facts of a byline. - It then leaves the accessibility tree.
- * @documentation https://fusion.dev/helix/components/divider
+ * @documentation https://fusion.dev/design/components/divider
  *
  * @slot - Content set into the line, such as a word between two sections.
  *

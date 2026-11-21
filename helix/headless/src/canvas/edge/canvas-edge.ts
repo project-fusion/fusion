@@ -20,7 +20,7 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  * @status stable
  * @category media
  * @aliases CanvasConnector, BoardEdge
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  */
 @customElement('helix-headless-canvas-edge')
 export class HelixHeadlessCanvasEdge extends HelixElement {

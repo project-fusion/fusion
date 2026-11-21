@@ -37,7 +37,7 @@ import { styles } from './date-picker-root.css.js'
  * @anatomy day
  * @practice Write `value`, `min`, and `max` as `YYYY-MM-DD` strings. - Every calculation is in UTC, since a local-time `Date` shifts across a time zone or daylight-saving boundary.
  * @practice {controlled-month} Set `month` to choose the month on show apart from `value`. - Paging selects nothing, and an unset `month` follows the first chosen date, then the current month.
- * @documentation https://fusion.dev/helix/components/date-picker
+ * @documentation https://fusion.dev/design/components/date-picker
  *
  * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.
  * @cssproperty --date-picker-day-size - Width and height of a day.

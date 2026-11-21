@@ -32,7 +32,7 @@ import { styles } from './card-root.css.js'
  * @anatomy footer?
  * @practice {actions} Put a header of more than one element in one wrapper. - The header and its `header-actions` share one line.
  * @practice Put an image or a chart in `media` with no inset of its own. - Media runs edge to edge and clips to the card's corners.
- * @documentation https://fusion.dev/helix/components/card
+ * @documentation https://fusion.dev/design/components/card
  *
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.

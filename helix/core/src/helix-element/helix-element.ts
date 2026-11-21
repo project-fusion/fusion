@@ -159,7 +159,7 @@ const LOWERED = new WeakMap<object, Map<string, string>>()
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://fusion.dev/helix/docs/tiers
+ * @documentation https://fusion.dev/design/docs/tiers
  *
  * @cssstate settled - Set one frame after the first render. Transitions wait for it, so an element does not animate its own arrival.
  */

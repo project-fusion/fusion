@@ -24,7 +24,7 @@ import { styles } from './meter-segment.css.js'
  * @status experimental
  * @category feedback
  * @groups charts
- * @documentation https://fusion.dev/helix/components/meter
+ * @documentation https://fusion.dev/design/components/meter
  *
  * @csspart fill - The slice of the bar the segment takes.
  *

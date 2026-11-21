@@ -14,7 +14,7 @@ import { styles } from './log-group.css.js'
  *
  * @since 0.200.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  */
 @customElement('helix-log-group')
 export class HelixLogGroup extends HelixHeadlessLogGroup {

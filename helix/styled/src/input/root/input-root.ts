@@ -39,7 +39,7 @@ import '../../voice-level/index.js'
  * @anatomy field
  * @anatomy hint?
  * @practice Set `type` and `required` before you write `validate`. - The browser checks those first, and `validate` runs on each change only once it finds nothing wrong.
- * @documentation https://fusion.dev/helix/components/input
+ * @documentation https://fusion.dev/design/components/input
  *
  * @cssproperty --input-background-color - Fill behind the text.
  * @cssproperty --input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.

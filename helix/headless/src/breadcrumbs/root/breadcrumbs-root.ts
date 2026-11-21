@@ -74,7 +74,7 @@ export interface BreadcrumbItem {
  * @anatomy start?
  * @anatomy link
  * @practice Set `items` for a trail built from data, such as a router's matched routes. - It draws each entry as a crumb in order, the last one as the current page.
- * @documentation https://fusion.dev/helix/components/breadcrumbs
+ * @documentation https://fusion.dev/design/components/breadcrumbs
  *
  * @slot - The trail's items, in order from the root to the current page. Put
  * the crumb that holds the folded items where the gap should appear.

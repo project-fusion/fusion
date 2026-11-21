@@ -56,7 +56,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @anatomy item
  * @anatomy label
  * @practice Put a tile's image in `media`, with empty alternative text. - The row stays the option, and its label stays its name.
- * @documentation https://fusion.dev/helix/components/option
+ * @documentation https://fusion.dev/design/components/option
  *
  * @slot - The option's label.
  * @slot description - A second line under the label, for content richer than the `description` text.

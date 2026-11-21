@@ -140,7 +140,7 @@ const OPENING_PATIENCE = 500
  * @instead pattern - A background of lines or points, such as a honeycomb or a night sky.
  * @practice Put a hero's heading inside the aura, and place it with `::part(content)`. - An interactive aura then answers the pointer over the content too, and clicks still reach the content.
  * @practice Set `pause-control` where the page has no pause control of its own. - WCAG 2.2.2 asks for a way to stop anything that moves for more than five seconds.
- * @documentation https://fusion.dev/helix/components/aura
+ * @documentation https://fusion.dev/design/components/aura
  *
  * @slot - Content drawn over the field, such as a heading.
  *
@@ -1211,7 +1211,7 @@ export class HelixAura extends HelixElement {
    * 33ms a frame the entire response is one or two samples and the follow reads
    * as a lag rather than a lightness. Every field on the landing page leaves
    * `interactive` unset; the only one that sets it is the lab on
-   * `/helix/aura`, where it is a toggle a reader chose. So the cap applies where
+   * `/design/aura`, where it is a toggle a reader chose. So the cap applies where
    * nothing is being followed and lifts where something is.
    *
    * **The cost scales with the count.** Three fields run on the landing page,

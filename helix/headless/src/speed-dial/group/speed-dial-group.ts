@@ -18,7 +18,7 @@ import { property, state } from 'lit/decorators.js'
  * @status stable
  * @category actions
  * @aliases Speed dial section, Action group
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @slot - The group's actions.
  * @slot label - The group's name, for content richer than the `label` text.

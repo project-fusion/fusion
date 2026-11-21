@@ -29,7 +29,7 @@ import '../../menu/index.js'
  * @status stable
  * @category media
  * @aliases Episode Menu, Queue Menu, Up Next
- * @documentation https://fusion.dev/helix/components/video-playlist
+ * @documentation https://fusion.dev/design/components/video-playlist
  *
  * @slot trigger - Replaces the button that opens the menu.
  *

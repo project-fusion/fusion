@@ -16,7 +16,7 @@ import { styles } from './map-buildings.css.js'
  * @status stable
  * @category media
  * @aliases 3D buildings, Extrusion
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-buildings-color - The buildings' color when no tone is set.
  */

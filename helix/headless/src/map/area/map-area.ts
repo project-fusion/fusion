@@ -21,7 +21,7 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  * @status stable
  * @category media
  * @aliases Map region, Polygon, Zone
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The area's points, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  */

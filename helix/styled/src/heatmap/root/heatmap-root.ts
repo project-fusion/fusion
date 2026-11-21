@@ -33,7 +33,7 @@ import '../../tooltip/index.js'
  * @anatomy summary?
  * @anatomy end?
  * @practice Set `rows` to 7 for a contribution graph, and to 1 for a status strip. - With seven rows, each column is a week, read top to bottom in days.
- * @documentation https://fusion.dev/helix/components/heatmap
+ * @documentation https://fusion.dev/design/components/heatmap
  *
  * @slot end - Below the strip, at the trailing edge.
  * @slot start - Below the strip, at the leading edge.

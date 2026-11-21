@@ -14,7 +14,7 @@ import { styles } from './map-contours.css.js'
  * @status stable
  * @category media
  * @aliases Contours, Topographic lines, Elevation lines, Isolines
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-contours-color - The lines' color.
  */

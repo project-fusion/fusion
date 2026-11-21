@@ -59,7 +59,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/toast
+ * @documentation https://fusion.dev/design/components/toast
  *
  * @slot - The message.
  * @slot actions - Actions for the message, usually a button or a link.

@@ -34,7 +34,7 @@ import '../../voice-level/index.js'
  * @practice Import Option beside Listbox, for options you write and for `items` alike. - An option belongs to the Option family, which Listbox does not register.
  * @practice Import `@fusion.dev/helix/listbox/reorder` to set `reorderable`. - Moving options is a separate import, so a list that never moves options carries none of its code.
  * @practice Move the options yourself after a reorder, or set `items` in the new order. - The list moves no element of yours, and the reorder event holds every value in the new order.
- * @documentation https://fusion.dev/helix/components/listbox
+ * @documentation https://fusion.dev/design/components/listbox
  *
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
  * @cssproperty --listbox-bleed - How far a option's fill reaches past its words unless `bleed` is `none`. Defaults to `--helix-space-row-bleed`, which follows the density.

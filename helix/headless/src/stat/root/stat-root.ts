@@ -83,7 +83,7 @@ interface StepSharing {
  * @anatomy group?
  * @practice {trend} Put a Trend in the `trend` slot. - It is read inside the stat's group, after the figure it qualifies.
  * @practice {counting} Set `value` for a figure a dashboard refreshes. - A new `value` counts from the one before, so the figure reads as having moved, and a slotted figure changes at once.
- * @documentation https://fusion.dev/helix/components/stat
+ * @documentation https://fusion.dev/design/components/stat
  *
  * @slot - The value.
  * @slot label - What the value measures, which also names the stat for a screen reader.

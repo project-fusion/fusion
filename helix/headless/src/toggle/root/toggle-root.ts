@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy group
  * @anatomy item
  * @anatomy label
- * @documentation https://fusion.dev/helix/components/toggle
+ * @documentation https://fusion.dev/design/components/toggle
  *
  * @slot - The item's label.
  * @slot end - Content after the label, such as a count or a shortcut.

@@ -54,7 +54,7 @@ import { property } from 'lit/decorators.js'
  * @instead button - A word that performs an action.
  * @anatomy label
  * @practice {group} Remove a dismissed tag in your listener. - The tag does not remove itself, because your code owns the list it is in.
- * @documentation https://fusion.dev/helix/components/tag
+ * @documentation https://fusion.dev/design/components/tag
  *
  * @slot - The tag's label.
  * @slot dismiss-icon - Replaces the glyph on the remove button.

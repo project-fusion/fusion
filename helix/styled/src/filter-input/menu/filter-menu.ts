@@ -24,7 +24,7 @@ import '../../menu/index.js'
  * @status stable
  * @category forms
  * @aliases FacetPicker, FilterBuilder
- * @documentation https://fusion.dev/helix/components/filter-input
+ * @documentation https://fusion.dev/design/components/filter-input
  *
  * @event {HelixBeforeFacetEvent} helix-before-facet - Fired when a field's values are about to change, with the field's whole set. Cancelable: call `preventDefault()` to keep the previous values.
  * @event {HelixFacetEvent} helix-facet - Fired after a field's values change, with the field's whole set now in force. Draw the chip from it.

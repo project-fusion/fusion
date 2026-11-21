@@ -58,7 +58,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @since 0.1.0
  * @status stable
  * @aliases Panel item, Drill row
- * @documentation https://fusion.dev/helix/components/drilldown
+ * @documentation https://fusion.dev/design/components/drilldown
  *
  * @slot - The row's label.
  * @slot chevron - Replaces the caret of a row that opens a page, such as with your own icon.

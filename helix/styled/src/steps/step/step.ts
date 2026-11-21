@@ -23,7 +23,7 @@ import { styles } from './step.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Stage
- * @documentation https://fusion.dev/helix/components/steps
+ * @documentation https://fusion.dev/design/components/steps
  */
 @customElement('helix-step')
 export class HelixStep extends HelixHeadlessStep {

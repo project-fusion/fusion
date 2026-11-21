@@ -19,7 +19,7 @@ import { styles } from './chat-message.css.js'
  * @since 0.1.0
  * @status stable
  * @category feedback
- * @documentation https://fusion.dev/helix/components/chat
+ * @documentation https://fusion.dev/design/components/chat
  *
  * @slot - The turn's content.
  * @slot actions - Controls for the turn.

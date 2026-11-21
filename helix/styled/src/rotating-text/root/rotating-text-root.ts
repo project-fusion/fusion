@@ -41,7 +41,7 @@ const MOST = 6
  * @instead marquee - A row of items that scrolls by itself, such as a band of logos.
  * @instead sliding-number - A number that rolls to a new value.
  * @practice {preview} Put each word in an element of its own, six at most. - The words turn one element at a time, and a seventh never shows.
- * @documentation https://fusion.dev/helix/components/rotating-text
+ * @documentation https://fusion.dev/design/components/rotating-text
  *
  * @slot - The words, each in an element of its own.
  *

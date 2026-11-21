@@ -36,7 +36,7 @@ import { typedMarks } from '../marks.js'
  * @anatomy quote
  * @practice Leave quotation marks out of the text. - The browser draws the marks for the language, so a typed one shows twice.
  * @practice {languages} Write the language on a quotation in another language, such as `lang="fr"`. - Its marks follow it, so `lang="fr"` sets «…» inside an English page.
- * @documentation https://fusion.dev/helix/components/quote
+ * @documentation https://fusion.dev/design/components/quote
  *
  * @slot - The quoted text.
  *

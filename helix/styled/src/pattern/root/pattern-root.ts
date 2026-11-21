@@ -40,7 +40,7 @@ export type PatternMotif = 'contours' | 'hexagons' | 'stars'
  * @use Lines or points drawn behind a section, such as a landing page's heading.
  * @instead aura - A background of drifting light in the theme's colors.
  * @instead strands - A ribbon of fine strands of light, in a box or down a whole page.
- * @documentation https://fusion.dev/helix/components/pattern
+ * @documentation https://fusion.dev/design/components/pattern
  *
  * @slot - The content drawn over the pattern.
  *

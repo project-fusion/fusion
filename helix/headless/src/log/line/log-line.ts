@@ -43,7 +43,7 @@ const elapsed = (seconds: number): string => {
  *
  * @since 0.200.0
  * @status experimental
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  *
  * @slot - The text of the line.
  *

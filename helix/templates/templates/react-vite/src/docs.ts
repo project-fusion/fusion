@@ -11,19 +11,19 @@
  */
 export const DOCS = {
   /** How the elements are registered and written, which is the first page to read. */
-  elements: 'https://fusion.dev/helix/docs/using-the-elements',
+  elements: 'https://fusion.dev/design/docs/using-the-elements',
   /** What a `<form>` does with these controls, and what it cannot do. */
-  forms: 'https://fusion.dev/helix/docs/forms',
+  forms: 'https://fusion.dev/design/docs/forms',
   /** Every component, with its API, its parts, and its examples. */
-  gallery: 'https://fusion.dev/helix/components',
+  gallery: 'https://fusion.dev/design/components',
   /** The light and dark pair, and the attribute that sets which one shows. */
-  modes: 'https://fusion.dev/helix/docs/color-modes',
+  modes: 'https://fusion.dev/design/docs/color-modes',
   /** Reaching a component's parts from a page, which `app.css` does once. */
-  parts: 'https://fusion.dev/helix/docs/overriding-a-component',
+  parts: 'https://fusion.dev/design/docs/overriding-a-component',
   /** React specifically: properties, events, and the server boundary. */
-  react: 'https://fusion.dev/helix/docs/react',
+  react: 'https://fusion.dev/design/docs/react',
   /** The data view's own page, where the rest of its API is. */
-  table: 'https://fusion.dev/helix/components/data-table',
+  table: 'https://fusion.dev/design/components/data-table',
   /** Every token, and what each one is for. */
-  tokens: 'https://fusion.dev/helix/docs/tokens',
+  tokens: 'https://fusion.dev/design/docs/tokens',
 } as const

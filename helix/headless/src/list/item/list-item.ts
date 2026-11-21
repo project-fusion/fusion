@@ -60,7 +60,7 @@ export type ListItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @since 0.1.0
  * @status stable
  * @aliases Entry
- * @documentation https://fusion.dev/helix/components/list
+ * @documentation https://fusion.dev/design/components/list
  *
  * @slot - The label.
  * @slot description - Secondary text under the label.

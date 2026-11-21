@@ -14,7 +14,7 @@ import { styles } from './toast-item.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/toast
+ * @documentation https://fusion.dev/design/components/toast
  *
  * @cssproperty --toast-background-color - The panel's color. The inverse ground Tooltip draws, #f5f5f5 over a dark page and #121212 over a light one.
  * @cssproperty --toast-border-color - Color of the panel's edge, once `--toast-border-width` gives it one.

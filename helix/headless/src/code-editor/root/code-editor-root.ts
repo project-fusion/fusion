@@ -251,7 +251,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @anatomy status
  * @practice Connect CodeMirror for highlighting, line numbers, and folding. - On its own the code is a plain textarea in the code face.
  * @practice {fill} Set `fill` for an editor that fills a pane, such as one side of a split view. - Without it, the editor is 24rem tall.
- * @documentation https://fusion.dev/helix/components/code-editor
+ * @documentation https://fusion.dev/design/components/code-editor
  *
  * @slot actions - The page's own controls in the header, such as Run or Format, before the built-in ones.
  * @slot hint - Help under the editor, in place of `hint`.

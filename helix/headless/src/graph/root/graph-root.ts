@@ -121,7 +121,7 @@ const LONG_LAYOUT = 5000
  * @anatomy list
  * @practice Set `nodes` and `links` as properties, from a script. - A graph of ten thousand notes as ten thousand elements would cost what the renderer exists to save.
  * @practice On the headless tier, give the `list` part a block size. - Without one, the list grows to hold every row.
- * @documentation https://fusion.dev/helix/components/graph
+ * @documentation https://fusion.dev/design/components/graph
  *
  * @slot - The renderer's box, which the drawing is made in.
  * @slot empty - What the panel shows when the list holds no notes. Defaults to `empty-text`.

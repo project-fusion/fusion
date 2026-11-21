@@ -38,7 +38,7 @@ import '../line/log-line.js'
  * @anatomy status
  * @practice Set `done` once the output you pass to `write()` is complete. - The status region then says that the run has ended.
  * @practice Set `quiet` where something around the log speaks for it, as a chat turn does for an agent's work. - The status region would say each error and each finished step a second time.
- * @documentation https://fusion.dev/helix/components/log
+ * @documentation https://fusion.dev/design/components/log
  *
  * @cssproperty --log-background-color - The fill behind the lines. Defaults to the page background.
  * @cssproperty --log-border-color - The edge around the log and the rules inside it.

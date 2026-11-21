@@ -21,7 +21,7 @@ import { styles } from './canvas-node.css.js'
  * @status stable
  * @category media
  * @aliases CanvasCard, BoardNode
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  *
  * @cssproperty --canvas-grip-size - The size of the corner handles that resize a selected card.
  * @cssproperty --canvas-handle-size - The size of the points you draw a connection from.

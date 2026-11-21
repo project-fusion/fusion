@@ -330,11 +330,11 @@ describe('the address bar', () => {
     expect(hasState(host, 'link-open')).toBe(true)
     const field = part(host, 'link-field') as HTMLInputElement
     expect(field.value).toBe('https://fusion.dev')
-    field.value = 'https://fusion.dev/helix'
+    field.value = 'https://fusion.dev/design'
     field.dispatchEvent(new Event('input', { bubbles: true }))
     keyIn(field, 'Enter')
     await settle(host)
-    expect(asked.ran).toEqual([['link', 'https://fusion.dev/helix']])
+    expect(asked.ran).toEqual([['link', 'https://fusion.dev/design']])
     expect(hasState(host, 'link-open')).toBe(false)
     expect(asked.focused).toBeGreaterThan(0)
   })

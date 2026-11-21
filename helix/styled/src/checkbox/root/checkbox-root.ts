@@ -28,7 +28,7 @@ import { styles } from './checkbox-root.css.js'
  * @anatomy label
  * @anatomy hint?
  * @practice {states} Set `indeterminate` from your own state, on a box over a set that is partly checked. - It changes only the presentation, it never submits, and the first click resolves it.
- * @documentation https://fusion.dev/helix/components/checkbox
+ * @documentation https://fusion.dev/design/components/checkbox
  *
  * @cssproperty --checkbox-background-color - The fill of the box. It stays the same when the box is checked.
  * @cssproperty --checkbox-border-color - The border color of the box, in every state.

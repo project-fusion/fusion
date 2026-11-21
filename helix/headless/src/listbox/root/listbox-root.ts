@@ -159,7 +159,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @practice Import Option beside Listbox, for options you write and for `items` alike. - An option belongs to the Option family, which Listbox does not register.
  * @practice Import `@fusion.dev/helix/listbox/reorder` to set `reorderable`. - Moving options is a separate import, so a list that never moves options carries none of its code.
  * @practice Move the options yourself after a reorder, or set `items` in the new order. - The list moves no element of yours, and the reorder event holds every value in the new order.
- * @documentation https://fusion.dev/helix/components/listbox
+ * @documentation https://fusion.dev/design/components/listbox
  *
  * @slot - The options, and any groups of them.
  * @slot empty - What the list shows when it has no options to show, for content richer than `empty-text`.

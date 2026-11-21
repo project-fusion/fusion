@@ -25,7 +25,7 @@ import { styles } from './steps-root.css.js'
  * @anatomy progress?
  * @practice Give every step a `value`, or none. - A step with no value is named by its place, so a value of 2 and the second place are one name.
  * @practice Set `--button-background-color` to change the hover color of a step's name. - The name is a Button, and Steps has no `--steps-hover-color`.
- * @documentation https://fusion.dev/helix/components/steps
+ * @documentation https://fusion.dev/design/components/steps
  *
  * @csspart progress - How far through the sequence is, drawn as a bar under the steps once a stylesheet gives the part a `display`, such as `helix-steps::part(progress) { display: block }`.
  *

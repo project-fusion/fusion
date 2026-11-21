@@ -29,7 +29,7 @@ import { styles } from './icon-root.css.js'
  * @instead badge - A count or a dot pinned to another element.
  * @instead avatar - A person or an account, shown by their photo or their initials.
  * @practice Import the element's own entry, `icon/root`, and register only the glyphs a page names. - That entry registers no glyph, so the page ships the glyphs it registers and no others.
- * @documentation https://fusion.dev/helix/components/icon
+ * @documentation https://fusion.dev/design/components/icon
  *
  * @csspart svg - The rendered SVG.
  *

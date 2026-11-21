@@ -7,7 +7,7 @@ keep an id, the editing plugins, and a document drawn in your tokens.
 bun add @fusion.dev/helix @fusion.dev/helix-editor prosemirror-model prosemirror-state prosemirror-view
 ```
 
-The element is on the [Editor reference](https://fusion.dev/helix/components/editor),
+The element is on the [Editor reference](https://fusion.dev/design/components/editor),
 with its toolbar, its keys, and its parts.
 
 ```html

@@ -143,7 +143,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @anatomy base
  * @anatomy start?
  * @anatomy end?
- * @documentation https://fusion.dev/helix/components/spatial-heatmap
+ * @documentation https://fusion.dev/design/components/spatial-heatmap
  *
  * @slot renderer - The renderer's box, which a 3D drawing is made in, over the chart's own.
  *

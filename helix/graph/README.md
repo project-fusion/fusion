@@ -9,7 +9,7 @@ bun add @fusion.dev/helix @fusion.dev/helix-graph sigma graphology graphology-la
 ```
 
 The elements themselves are on the
-[Graph reference](https://fusion.dev/helix/components/graph).
+[Graph reference](https://fusion.dev/design/components/graph).
 
 ```js
 import { connectGraph } from '@fusion.dev/helix-graph'

@@ -37,7 +37,7 @@ import { styles } from './color-input-root.css.js'
  * @anatomy trigger
  * @anatomy hint?
  * @anatomy surface
- * @documentation https://fusion.dev/helix/components/color-input
+ * @documentation https://fusion.dev/design/components/color-input
  *
  * @cssproperty --color-input-background-color - Fill behind the field.
  * @cssproperty --color-input-border-color - Color of the panel's edge.

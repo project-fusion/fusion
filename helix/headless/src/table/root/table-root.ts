@@ -255,7 +255,7 @@ const ESTIMATE = 40
  * @practice {reordering} Give each row a `value` in a `reorderable` table. - A row without one is known by its place, so its key changes as it moves.
  * @practice Put your rows in the order a reorder reports. - The table moves no element of yours.
  * @practice Set `grid` only where each cell may take focus. - A grid table gives every cell a `tabindex`, so focus can rest on it.
- * @documentation https://fusion.dev/helix/components/table
+ * @documentation https://fusion.dev/design/components/table
  *
  * @slot - The table's rows.
  * @slot columns - The columns, as `TableColumn` elements. The table moves each column here itself, so markup that runs in a browser leaves it out; a server-rendered page writes `slot="columns"` on each column so the headings sit in place before the table upgrades.

@@ -14,7 +14,7 @@ import { styles } from './map-landcover.css.js'
  * @status stable
  * @category media
  * @aliases Land cover, Land use, Vegetation, Ground cover
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-landcover-ground - The land color the covers are mixed into.
  */

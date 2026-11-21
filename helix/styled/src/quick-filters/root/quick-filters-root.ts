@@ -23,7 +23,7 @@ import { styles } from './quick-filters-root.css.js'
  * @anatomy save
  * @practice Give each preset its `count` for a table in server mode. - A count comes from the rows the table holds, and a table in server mode holds one page.
  * @practice Set `view-key`, or keep a saved view from the save event yourself. - Without a key, Save view keeps nothing.
- * @documentation https://fusion.dev/helix/components/quick-filters
+ * @documentation https://fusion.dev/design/components/quick-filters
  *
  * @cssproperty --quick-filters-background-color - The fill of the track the presets sit in.
  * @cssproperty --quick-filters-pressed-background-color - The fill of the preset the view holds.

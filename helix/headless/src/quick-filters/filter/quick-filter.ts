@@ -22,7 +22,7 @@ import { type PartialView, readPartialView } from '../../data-table/view.js'
  * @status experimental
  * @category data
  * @aliases Preset, Saved filter, View tab
- * @documentation https://fusion.dev/helix/components/quick-filters
+ * @documentation https://fusion.dev/design/components/quick-filters
  *
  * @slot - The preset's name.
  */

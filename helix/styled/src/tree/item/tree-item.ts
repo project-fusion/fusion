@@ -20,7 +20,7 @@ import '../../checkbox/index.js'
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
- * @documentation https://fusion.dev/helix/components/tree
+ * @documentation https://fusion.dev/design/components/tree
  *
  * @slot - The item's label. A nested item does not go here: give it `slot="children"`. In a development build, an item nested here is reported.
  * @slot chevron - Replaces the expand and collapse mark of a branch. A slotted icon is sized and

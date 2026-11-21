@@ -62,7 +62,7 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
  * @anatomy indicator
  * @practice Set `delay` so a quick load does not flash a loader. - The loader stays hidden and silent for that many milliseconds, and appears only if the work is still going.
  * @practice Set `for` to the region being loaded. - A screen reader waits for a busy region to fill before reading it.
- * @documentation https://fusion.dev/helix/components/loader
+ * @documentation https://fusion.dev/design/components/loader
  *
  * @slot - An icon or logo that stays still at the center. Empty by default.
  * @slot content - What the loader stands in for while the work runs, such as a button. It keeps its size, hidden and inert, until `idle` is set.

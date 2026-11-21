@@ -25,7 +25,7 @@ import { styles } from './tree-root.css.js'
  * @anatomy toggle
  * @anatomy children
  * @practice {reordering} Move the items yourself in a `reorderable` tree. - The tree moves no element of yours, and focus follows the moved item once you have.
- * @documentation https://fusion.dev/helix/components/tree
+ * @documentation https://fusion.dev/design/components/tree
  *
  * @slot - The tree's items.
  *

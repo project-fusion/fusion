@@ -72,7 +72,7 @@ import '../../color-picker/index.js'
  * @anatomy trigger
  * @anatomy hint?
  * @anatomy surface
- * @documentation https://fusion.dev/helix/components/color-input
+ * @documentation https://fusion.dev/design/components/color-input
  *
  * @slot end - Content at the trailing end, before the trigger.
  * @slot feedback - The message that says what is wrong with the value.

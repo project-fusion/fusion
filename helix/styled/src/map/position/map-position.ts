@@ -15,7 +15,7 @@ import { styles } from './map-position.css.js'
  * @status stable
  * @category media
  * @aliases Current location, Live position, Tracker, You are here
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-position-color - The color of the halo, direction cone, and pulse when no tone is set.
  * @cssproperty --map-position-edge - The edge around the point and the arrow.

@@ -83,7 +83,7 @@ const printed = (keys: string, apple: boolean): string => {
  * @anatomy badge-keys
  * @anatomy badge-name
  * @practice Set `sheet-keys` to another chord where your page answers `?` with its own help. - Many apps, GitHub and Gmail among them, give `?` to their own help, and one press then opens both.
- * @documentation https://fusion.dev/helix/components/shortcut-overlay
+ * @documentation https://fusion.dev/design/components/shortcut-overlay
  *
  * @csspart badge - One control's badge.
  * @csspart badge-keys - A badge's keys.

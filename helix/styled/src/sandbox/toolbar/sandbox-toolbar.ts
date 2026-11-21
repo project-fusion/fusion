@@ -20,7 +20,7 @@ import { styles } from './sandbox-toolbar.css.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @slot - Items at the start, usually the files.
  * @slot end - Items at the end, usually menus.

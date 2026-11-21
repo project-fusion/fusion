@@ -43,7 +43,7 @@ import { property, state } from 'lit/decorators.js'
  * @instead lightbox - Pictures opened large over the page, one at a time.
  * @instead carousel - Several pictures that take turns in one place.
  * @instead avatar - A person's photo, or their initials where there is no photo.
- * @documentation https://fusion.dev/helix/components/image
+ * @documentation https://fusion.dev/design/components/image
  *
  * @slot fallback - Shown in place of the image if it fails to load, and read by screen readers then, such as "Photo unavailable".
  * @slot placeholder - Shown until the image loads.

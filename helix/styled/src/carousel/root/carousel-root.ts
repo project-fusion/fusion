@@ -30,7 +30,7 @@ import { styles } from './carousel-root.css.js'
  * @anatomy next
  * @anatomy indicators
  * @practice {several-across} Set `slides-per-move` to match `per-view` for a run of cards. - Next then shows the next set, with one indicator for each set.
- * @documentation https://fusion.dev/helix/components/carousel
+ * @documentation https://fusion.dev/design/components/carousel
  *
  * @cssproperty --carousel-bleed - Room inside the scroller so it does not clip a slide's
  * shadow, border, or focus ring. The default leaves room for `--helix-shadow-md`, which

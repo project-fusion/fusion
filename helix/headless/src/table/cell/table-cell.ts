@@ -23,7 +23,7 @@ import { property, state } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @aliases Cell, TableCell
- * @documentation https://fusion.dev/helix/components/table
+ * @documentation https://fusion.dev/design/components/table
  *
  * @slot - The cell's content.
  *

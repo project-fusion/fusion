@@ -59,7 +59,7 @@ export const FAILED_LABEL = 'Not sent'
  * @status stable
  * @category feedback
  * @aliases Message, Bubble, Turn
- * @documentation https://fusion.dev/helix/components/chat
+ * @documentation https://fusion.dev/design/components/chat
  *
  * @slot - The turn's content.
  * @slot actions - Controls for the turn, such as copy, retry, or react.

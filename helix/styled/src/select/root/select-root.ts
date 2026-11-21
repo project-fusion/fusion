@@ -39,7 +39,7 @@ import '../../listbox/index.js'
  * @practice Import Option beside Select. - An option belongs to the Option family, which Select does not register.
  * @practice Group options with `Option.Group`, and divide them with `Option.Separator`. - The Option import registers all three.
  * @practice Set `items` for a list too long to draw whole. - The list draws only the options in sight, and the trigger, its keys, and the form still read the whole set.
- * @documentation https://fusion.dev/helix/components/select
+ * @documentation https://fusion.dev/design/components/select
  *
  * @cssproperty --select-border-color - Color of the panel's edge.
  * @cssproperty --select-border-width - Width of the panel's edge. Defaults to

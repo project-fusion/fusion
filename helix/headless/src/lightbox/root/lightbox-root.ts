@@ -129,7 +129,7 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  * @anatomy description
  * @practice {preview} Set `controls`, or compose the chrome in the `header` and `footer` slots with buttons that send `--previous`, `--next`, and `--close`. - Without either, the viewer has no control a pointer presses to move or to close.
  * @practice Set `max-zoom`, such as 3, where a reader needs the detail of a picture. - Without it, the shown item stays at its own size.
- * @documentation https://fusion.dev/helix/components/lightbox
+ * @documentation https://fusion.dev/design/components/lightbox
  *
  * @slot - The items, which are `<helix-headless-lightbox-item>` elements.
  * @slot dismiss-icon - Replaces the glyph inside the close control.

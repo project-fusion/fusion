@@ -63,7 +63,7 @@ const DRAWN = [
  * @status stable
  * @category media
  * @aliases CanvasCard, BoardNode
- * @documentation https://fusion.dev/helix/components/canvas
+ * @documentation https://fusion.dev/design/components/canvas
  *
  * @slot - The card's content, such as text, a picture, or a chart.
  * @slot description - A line of secondary text under the content.

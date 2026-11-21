@@ -16,7 +16,7 @@ import { styles } from './speed-dial-item.css.js'
  * @status stable
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
- * @documentation https://fusion.dev/helix/components/speed-dial
+ * @documentation https://fusion.dev/design/components/speed-dial
  *
  * @cssproperty --speed-dial-item-background-color - Fill of the round icon.
  * @cssproperty --speed-dial-item-color - Color of the icon.

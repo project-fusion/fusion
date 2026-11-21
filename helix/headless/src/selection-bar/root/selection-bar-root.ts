@@ -32,7 +32,7 @@ import { TableBinding, type ToolTable } from '../../data-table/binding.js'
  * @anatomy clear
  * @practice Put Selection Bar in the Data Table's selection slot. - It then takes the toolbar's place while rows are selected.
  * @practice Set `for` to the table's id where the bar is written outside the table. - Written inside the table, it finds the table.
- * @documentation https://fusion.dev/helix/components/selection-bar
+ * @documentation https://fusion.dev/design/components/selection-bar
  *
  * @slot - What you can do to the selected rows, such as buttons.
  *

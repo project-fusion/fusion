@@ -194,7 +194,7 @@ const quietOf = (runs: readonly SandboxToken[], length: number): Uint8Array => {
  * @since 0.1.0
  * @status stable
  * @aliases Editor, Code pane
- * @documentation https://fusion.dev/helix/components/sandbox
+ * @documentation https://fusion.dev/design/components/sandbox
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: cancel it to keep the source unchanged.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.

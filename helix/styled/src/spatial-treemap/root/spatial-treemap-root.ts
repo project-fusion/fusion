@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * @anatomy grid
  * @anatomy block
  * @anatomy tick
- * @documentation https://fusion.dev/helix/components/spatial-treemap
+ * @documentation https://fusion.dev/design/components/spatial-treemap
  *
  * @cssproperty --spatial-treemap-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  * @cssproperty --spatial-treemap-move-duration - How long the blocks take to move to a new table's readings. Defaults to `--helix-duration-normal`. `0ms` draws a new table at once.

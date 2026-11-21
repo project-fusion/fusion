@@ -35,7 +35,7 @@ import '../../tooltip/index.js'
  * @anatomy bar
  * @anatomy labels
  * @practice Point `for` at a table on the page, and set `data` only where there is none. - A table reads before any script runs.
- * @documentation https://fusion.dev/helix/components/bar-chart
+ * @documentation https://fusion.dev/design/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - Fill of the category band under the pointer.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.

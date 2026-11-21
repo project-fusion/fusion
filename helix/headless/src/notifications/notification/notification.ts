@@ -48,7 +48,7 @@ import '../../format-date/index.js'
  * @status stable
  * @category feedback
  * @aliases Notification item, Inbox item
- * @documentation https://fusion.dev/helix/components/notifications
+ * @documentation https://fusion.dev/design/components/notifications
  *
  * @slot - What happened, in your own markup.
  * @slot actions - Actions the user can take, shown under the text. They are always visible,

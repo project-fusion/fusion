@@ -52,7 +52,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy label
  * @anatomy hint?
  * @practice {states} Set `indeterminate` from your own state, on a box over a set that is partly checked. - It changes only the presentation, it never submits, and the first click resolves it.
- * @documentation https://fusion.dev/helix/components/checkbox
+ * @documentation https://fusion.dev/design/components/checkbox
  *
  * @slot - The label.
  * @slot check - An icon drawn as the mark while the box is checked, in place of the tick.

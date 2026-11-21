@@ -20,7 +20,7 @@ import { styles } from './code-root.css.js'
  * @instead kbd - A key or a chord you press.
  * @instead code-input - Code you type into a form.
  * @practice Set `translate="no"` on the element to keep a page translator off the code. - A translator that rewrites prose would also rewrite an identifier.
- * @documentation https://fusion.dev/helix/components/code
+ * @documentation https://fusion.dev/design/components/code
  *
  * @cssproperty --code-background-color - Fill behind the fragment. Defaults to the
  * foreground color at 6%, which looks the same on a light page and a dark one.

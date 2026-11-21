@@ -33,7 +33,7 @@ import { styles } from './callout-root.css.js'
  * @anatomy content
  * @practice {dismissible} Set `open` to show a dismissed callout again, or remove it in your listener. - A dismissed callout hides itself and stays in the page.
  * @practice {density} Size a callout with `data-density="sm"` or `data-density="lg"`, on the callout or a region around it. - A callout follows the density of the controls around it, and has no size property.
- * @documentation https://fusion.dev/helix/components/callout
+ * @documentation https://fusion.dev/design/components/callout
  *
  * @slot - The callout's content.
  * @slot dismiss-icon - Replaces the cross inside the dismiss button.

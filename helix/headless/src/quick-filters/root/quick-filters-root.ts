@@ -69,7 +69,7 @@ const storage = (): Storage | undefined => {
  * @anatomy save
  * @practice Give each preset its `count` for a table in server mode. - A count comes from the rows the table holds, and a table in server mode holds one page.
  * @practice Set `view-key`, or keep a saved view from the save event yourself. - Without a key, Save view keeps nothing.
- * @documentation https://fusion.dev/helix/components/quick-filters
+ * @documentation https://fusion.dev/design/components/quick-filters
  *
  * @slot - The presets, as `QuickFilter` elements.
  *

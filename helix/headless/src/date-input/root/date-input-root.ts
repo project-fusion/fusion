@@ -133,7 +133,7 @@ const dates = (value: string): string[] =>
  * @anatomy trigger
  * @anatomy hint?
  * @anatomy surface
- * @documentation https://fusion.dev/helix/components/date-input
+ * @documentation https://fusion.dev/design/components/date-input
  *
  * @slot clear-icon - Replaces the cross on the clear button, under `clearable`.
  * @slot end - Content after the date, before the trigger, such as a clear button.

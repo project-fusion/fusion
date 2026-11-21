@@ -117,7 +117,7 @@ const PACE = 0.25
  * @instead pattern - A background of lines or points, such as a honeycomb or a night sky.
  * @practice Name a hero's words in `quiet`. - A bright ribbon can then cross the page under them, and they stay crisp.
  * @practice {travel} Under `travel`, pin a form to each section with a Strands Stop that names it in `for`. - Between stops the ribbon fills the gap in its own `pattern`.
- * @documentation https://fusion.dev/helix/components/strands
+ * @documentation https://fusion.dev/design/components/strands
  *
  * @slot - Content drawn over the ribbon, such as a heading, and the `helix-strands-stop` elements that pin its forms in `travel`.
  *

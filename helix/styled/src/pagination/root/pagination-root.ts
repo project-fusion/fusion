@@ -34,7 +34,7 @@ import { styles } from './pagination-root.css.js'
  * @anatomy next
  * @practice {links} Set `href` to render every page as a link, with `{page}` replaced by the page number. - The links can be crawled, a middle click opens a tab, and the address bar holds the state.
  * @practice {footer} Place `Pagination.Summary` and `Pagination.Size` beside the pagination. - They are separate elements, so you choose where they go and in what order.
- * @documentation https://fusion.dev/helix/components/pagination
+ * @documentation https://fusion.dev/design/components/pagination
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control in place of hidden pages, which jumps into them.

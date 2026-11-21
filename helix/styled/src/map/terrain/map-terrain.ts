@@ -15,7 +15,7 @@ import { styles } from './map-terrain.css.js'
  * @status stable
  * @category media
  * @aliases Terrain, Hillshade, Elevation, Relief
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @cssproperty --map-terrain-highlight-color - The color of slopes that face the light.
  * @cssproperty --map-terrain-shadow-color - The color of slopes that face away from the light.

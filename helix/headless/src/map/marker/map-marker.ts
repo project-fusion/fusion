@@ -41,7 +41,7 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * @status stable
  * @category media
  * @aliases Map pin, Place, Point of interest
- * @documentation https://fusion.dev/helix/components/map
+ * @documentation https://fusion.dev/design/components/map
  *
  * @slot icon - A letter, number, or icon shown in the point, such as a stop's order. Screen readers read the marker's label only.
  *

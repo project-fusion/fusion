@@ -15,7 +15,7 @@ import '../../checkbox/index.js'
  *
  * @since 0.1.0
  * @status stable
- * @documentation https://fusion.dev/helix/components/table
+ * @documentation https://fusion.dev/design/components/table
  *
  * @slot - The row's cells.
  *

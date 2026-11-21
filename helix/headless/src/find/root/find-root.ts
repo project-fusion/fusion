@@ -94,7 +94,7 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  * @anatomy next
  * @anatomy close
  * @practice Copy the `::highlight(helix-find-match)` and `::highlight(helix-find-current)` rules into a shadow root of yours that holds text to search. - Text is painted from the tree it lives in.
- * @documentation https://fusion.dev/helix/components/find
+ * @documentation https://fusion.dev/design/components/find
  *
  * @slot actions - Controls of your own in the bar's toolbar, between its options and the buttons that move between matches.
  * @slot close-icon - Replaces the glyph inside the close button.

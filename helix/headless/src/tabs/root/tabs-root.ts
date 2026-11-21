@@ -103,7 +103,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @anatomy panel
  * @practice {manual} Set `manual` where showing a panel is expensive. - Under `manual`, the arrow keys move focus without selecting.
  * @practice Put a control that adds a tab, such as a plus, beside the set. - The tab list then holds tabs alone.
- * @documentation https://fusion.dev/helix/components/tabs
+ * @documentation https://fusion.dev/design/components/tabs
  *
  * @slot - The tabs, as direct children of this element.
  * @slot indicator - A mark of your own, drawn inside the `indicator` part, where `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size` reach it.

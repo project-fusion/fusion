@@ -77,7 +77,7 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem =>
  * @anatomy chevron
  * @anatomy content
  * @practice Set `heading-level` to the level that fits the page's outline. - The sections join the page's headings, at level 3 unless it is set.
- * @documentation https://fusion.dev/helix/components/accordion
+ * @documentation https://fusion.dev/design/components/accordion
  *
  * @slot - The accordion's items.
  */

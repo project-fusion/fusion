@@ -32,7 +32,7 @@ import { styles } from './spotlight-root.css.js'
  * @instead border-beam - A card whose work is running, lit around its edge.
  * @instead tilt - A card that leans toward the pointer.
  * @practice Put each card of a row in its own Spotlight. - The row then reads as one surface the light moves over.
- * @documentation https://fusion.dev/helix/components/spotlight
+ * @documentation https://fusion.dev/design/components/spotlight
  *
  * @slot - The content the light moves over, such as a `Card`.
  *

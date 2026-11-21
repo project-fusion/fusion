@@ -112,7 +112,7 @@ import { over } from '../align.js'
  * @practice Import Option beside Select. - An option belongs to the Option family, which Select does not register.
  * @practice Group options with `Option.Group`, and divide them with `Option.Separator`. - The Option import registers all three.
  * @practice Set `items` for a list too long to draw whole. - The list draws only the options in sight, and the trigger, its keys, and the form still read the whole set.
- * @documentation https://fusion.dev/helix/components/select
+ * @documentation https://fusion.dev/design/components/select
  *
  * @slot - The options, and any groups of them.
  * @slot end - Content after the chosen value, such as a count, a unit, or a clear button.

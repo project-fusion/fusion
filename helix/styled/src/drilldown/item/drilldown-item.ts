@@ -13,7 +13,7 @@ import { styles } from './drilldown-item.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Panel item, Drill row
- * @documentation https://fusion.dev/helix/components/drilldown
+ * @documentation https://fusion.dev/design/components/drilldown
  *
  * @cssproperty --drilldown-item-block-size - Height of a row.
  * @cssproperty --drilldown-item-color - Color of a row's words.

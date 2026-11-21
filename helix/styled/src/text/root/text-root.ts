@@ -60,7 +60,7 @@ const TAGS: Record<string, StaticValue> = {
  * @instead markdown - A document that arrives as Markdown, such as an agent's reply.
  * @instead blockquote - A passage quoted from another source and set apart.
  * @practice Set `as` for the element, and `scale` only where the look and the element differ. - The two match by default, so `as="h2"` alone draws a heading in the heading ramp.
- * @documentation https://fusion.dev/helix/components/text
+ * @documentation https://fusion.dev/design/components/text
  *
  * @slot - The text.
  *

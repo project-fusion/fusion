@@ -35,7 +35,7 @@ import { property } from 'lit/decorators.js'
  * @anatomy box
  * @anatomy label
  * @practice Set the label, the hint, and the message on the `Radio.Group`. - They belong to the set, and a radio has no label of its own: its content names it.
- * @documentation https://fusion.dev/helix/components/radio
+ * @documentation https://fusion.dev/design/components/radio
  *
  * @slot - The radio's label.
  * @slot icon - An icon shown beside the label. With `chip`, the icon
