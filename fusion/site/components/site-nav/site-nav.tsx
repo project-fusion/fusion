@@ -19,17 +19,17 @@ export const MASTHEAD_QUIET = 'masthead-quiet'
 /**
  * The other two sections of the site, beside the Products panel.
  */
+const SECTIONS = [
+  { href: '/company/services', label: 'Services' },
+  { href: '/insights', label: 'Insights' },
+]
+
 /**
  * The word a product goes by in the bar and the menu: its vertical's, which says
  * what kind of thing is there. The product's own name is in the panel, on its
  * page and in the footer.
  */
 const barLabel = (product: Product) => findVertical(product.href)?.label ?? product.name
-
-const SECTIONS = [
-  { href: '/company/services', label: 'Services' },
-  { href: '/insights', label: 'Insights' },
-]
 
 /**
  * The top level, with every destination in it exactly once.
