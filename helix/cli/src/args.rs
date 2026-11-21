@@ -498,6 +498,16 @@ pub enum System {
     /// date.
     Stylesheets(SystemStylesheets),
 
+    /// Write each element's GPUI component, and the theme they draw with, as Rust.
+    ///
+    /// An experiment: writes `<element>.rs`, `theme.rs`, and `mod.rs` under
+    /// `--out`, for the elements whose form needs no more than the spike
+    /// maps, and names each one it leaves out with why. `helix/neutral/RUST.md`
+    /// holds the plan. With `--check`, writes nothing and exits 1 when a
+    /// written module is missing or out of date.
+    #[cfg(feature = "internal")]
+    Gpui(SystemGpui),
+
     /// Compile each machine in core to the flat module beside it.
     ///
     /// Reads `src/machines/<machine>/machine.ts` and writes
@@ -559,6 +569,22 @@ pub struct SystemComponents {
     /// given.
     #[arg(long, value_name = "DIR")]
     pub out: Option<PathBuf>,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system gpui` takes.
+#[derive(Args, Debug)]
+pub struct SystemGpui {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The directory the modules are written in.
+    #[arg(long, value_name = "DIR")]
+    pub out: PathBuf,
 
     /// The package holding the sources, which is the directory holding its
     /// `src`: the system's `families` unless given.

@@ -42,6 +42,8 @@ mod compile;
 mod components;
 mod css;
 #[cfg(feature = "internal")]
+mod gpui;
+#[cfg(feature = "internal")]
 mod host_states;
 mod ir;
 #[cfg(feature = "internal")]
@@ -67,7 +69,7 @@ use crate::args::{
     SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemParts, SystemStylesheets,
 };
 #[cfg(feature = "internal")]
-use crate::args::{SystemCapabilities, SystemMachines, SystemTypes};
+use crate::args::{SystemCapabilities, SystemGpui, SystemMachines, SystemTypes};
 use crate::family::compile::Compiled;
 use crate::family::project::Project;
 use crate::PRODUCT;
@@ -469,6 +471,46 @@ pub fn components(
             .map(|(family, text)| (root.join(family).join("index.native.ts"), text))
             .collect();
     output::settle(&outputs, args.check, &command("components"), json)
+}
+
+#[cfg(feature = "internal")]
+/// Writes each element's GPUI component, and the theme they draw with, under
+/// `--out`, or with `--check` says which written ones are behind. An element
+/// the spike cannot write is named with why, and the rest are written.
+///
+/// # Errors
+///
+/// [`Failure`] when a source cannot be compiled, the project reads no Design
+/// Tokens Format Module file, or a module cannot be written.
+pub fn gpui(
+    args: &SystemGpui,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let compiled = compile::all(&project)?;
+    let project::Tokens::Dtcg { file, modes } = &project.tokens else {
+        return Err(Failure::input(
+            "cannot write the GPUI theme",
+            "the GPUI spike reads a Design Tokens Format Module file, `tokens.dtcg`",
+        ));
+    };
+    let values = tokens::Read::file(file)?.values(modes)?;
+    let source = format!("the sources in {}", project.named(&project.families));
+    let written = gpui::modules(&compiled, &values, &source);
+    if !json {
+        for left in &written.left {
+            eprintln!("left out {left}");
+        }
+    }
+    let root = locate(&args.out, from);
+    let outputs: Vec<(PathBuf, String)> = written
+        .files
+        .into_iter()
+        .map(|(name, text)| (root.join(name), text))
+        .collect();
+    output::settle(&outputs, args.check, &command("gpui"), json)
 }
 
 #[cfg(feature = "internal")]
