@@ -13,7 +13,7 @@ type Palette = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
 const palette = async (): Promise<Palette> => {
   const host = (await mount(`<helix-headless-command default-open label="Commands">
       <helix-headless-option
-        alternate="/helix/sandbox?family=card"
+        alternate="/design/sandbox?family=card"
         alternate-label="Open in the sandbox"
         value="/components/card"
       >Card</helix-headless-option>
@@ -42,7 +42,7 @@ describe('a command row with two destinations', () => {
     })
 
     host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', metaKey: true }))
-    expect(heard?.value).toBe('/helix/sandbox?family=card')
+    expect(heard?.value).toBe('/design/sandbox?family=card')
     expect(heard?.alternate).toBe(true)
   })
 
