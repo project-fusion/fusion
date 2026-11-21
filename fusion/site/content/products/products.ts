@@ -153,16 +153,18 @@ export interface Product {
 /**
  * The two substrates, which are the only two products.
  *
- * **The masthead names each product, and lists no verticals.** A vertical is
- * a division and a product is a thing you use: nobody uses Fusion Design, they
- * use Helix. A product with pictured destinations gets its own panel, a band of
- * tiles beside a column of text links. A product with none is a plain link to
- * its page until it has pages to tile: today that is Cortex.
+ * **The masthead names each product's vertical, and the panel names what is
+ * in it.** Design and Agents say what kind of thing is there to a reader who
+ * has not met Helix or Cortex yet. The rows say what each thing does, and the
+ * product's own name appears once, on the first row. A product with pictured
+ * destinations gets its own panel, a band of tiles beside a column of text
+ * links. A product with none is a plain link to its page until it has pages to
+ * tile: today that is Cortex.
  *
- * Engram, Trace and Recall are named because the division of Cortex is the
- * argument. Each one's place is its cell on the Cortex page, which describes it
- * and carries the same stage, so each row links there. A module named before it
- * has anywhere to go takes no `href`, and keeps its stage until it is finished.
+ * Cortex's rows are its three modules by what each does. Engram, Trace and
+ * Recall keep their names on the Cortex page, where each is described, and
+ * each row links to its cell there. A module named before it has anywhere to
+ * go takes no `href`, and keeps its stage until it is finished.
  */
 export const PRODUCTS: Product[] = [
   {
@@ -175,16 +177,16 @@ export const PRODUCTS: Product[] = [
          as often as the catalog is, so they keep rows of their own beside
          it, under a heading that says what they are. */
       {
-        href: '/helix/components',
+        href: '/design/components',
         picture: 'components',
-        summary: 'Every component and its API.',
-        title: 'Components',
+        summary: 'Helix: every component and its API.',
+        title: 'Design System',
       },
       /* A part of Helix rather than a third product: its argument is Helix's,
          a map in the page's theme that a screen reader can find, and without
          Helix it is MapLibre and somebody's tiles. */
       {
-        href: '/helix/maps',
+        href: '/design/maps',
         picture: 'map',
         summary: 'Maps in your brand’s colors.',
         title: 'Maps',
@@ -193,7 +195,7 @@ export const PRODUCTS: Product[] = [
          the page's theme with a list of every note beside it, and without
          Helix it is Sigma.js, cosmos.gl, or three.js and somebody's data. */
       {
-        href: '/helix/graph',
+        href: '/design/graph',
         picture: 'graph',
         summary: 'Graphs in 2D and 3D.',
         title: 'Graph',
@@ -201,7 +203,7 @@ export const PRODUCTS: Product[] = [
       /* **The column, and Docs leads it**: the panel is where a reader
          arrives, and the front door comes before the tools.
 
-         **`/helix/docs`, not `/helix/docs/introduction`.** That route derives
+         **`/design/docs`, not `/design/docs/introduction`.** That route derives
          the first page of the first section rather than naming one, so a deep
          link here would hardcode the single thing it exists to compute, and the
          masthead would be the last place still pointing at the old front page
@@ -212,31 +214,31 @@ export const PRODUCTS: Product[] = [
          never to a position in a list. */
       {
         column: 'Docs',
-        href: '/helix/docs',
+        href: '/design/docs',
         summary: 'How to install and use Helix.',
         title: 'Introduction',
       },
       {
         column: 'Docs',
-        href: '/helix/docs/installation',
+        href: '/design/docs/installation',
         summary: 'What to install, in order.',
         title: 'Installation',
       },
       {
         column: 'Docs',
-        href: '/helix/docs/theming',
+        href: '/design/docs/theming',
         summary: 'Tokens from your brand color.',
         title: 'Deriving a theme',
       },
       {
         column: 'Tools',
-        href: '/helix/sandbox',
+        href: '/design/sandbox',
         summary: 'Edit code, see the result.',
         title: 'Sandbox',
       },
       {
         column: 'Tools',
-        href: '/helix/theme',
+        href: '/design/theme',
         summary: 'A palette from your brand.',
         title: 'Theme builder',
       },
@@ -244,12 +246,12 @@ export const PRODUCTS: Product[] = [
          page is the one that documents it. */
       {
         column: 'Tools',
-        href: '/helix/docs/visual-testing',
+        href: '/design/docs/visual-testing',
         summary: 'Compare pages with baselines.',
         title: 'Visual testing',
       },
     ],
-    href: '/helix',
+    href: '/design',
     install: 'bun add @fusion.dev/helix',
     license: 'MIT',
     mark: 'helix',
@@ -260,36 +262,36 @@ export const PRODUCTS: Product[] = [
   },
   {
     body: 'A memory and provenance layer for AI systems. Cortex records what a system knows, where each fact came from, and how far to trust it. The record stays when you replace the model.',
-    /* The three modules that have earned an evocative name, per `AGENTS.md`:
-       inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
-       descriptive. The `cortex` command line ships all three, and each links
-       to its own cell on the Cortex page. */
+    /* Engram, Trace and Recall, the three modules that have earned an
+       evocative name per `AGENTS.md`, listed by what each does. The `cortex`
+       command line ships all three, and each links to its own cell on the
+       Cortex page, which carries the name. */
     destinations: [
       {
-        href: '/cortex',
-        summary: 'What a system knows, and how far to trust it.',
-        title: 'Docs',
+        href: '/agents',
+        summary: 'Memory and provenance for AI systems.',
+        title: 'Cortex',
       },
       {
-        href: '/cortex#engram',
+        href: '/agents#engram',
         stage: 'Active',
-        summary: 'Memory: what a system keeps, and for how long.',
-        title: 'Engram',
+        summary: 'What a system keeps, and for how long.',
+        title: 'Memory',
       },
       {
-        href: '/cortex#trace',
+        href: '/agents#trace',
         stage: 'Active',
-        summary: 'Provenance: where each fact came from.',
-        title: 'Trace',
+        summary: 'Where each fact came from.',
+        title: 'Provenance',
       },
       {
-        href: '/cortex#recall',
+        href: '/agents#recall',
         stage: 'Active',
-        summary: 'Context: what to give a model, and why.',
-        title: 'Recall',
+        summary: 'What to give a model, and why.',
+        title: 'Context',
       },
     ],
-    href: '/cortex',
+    href: '/agents',
     install: 'npm install --global @fusion.dev/cortex-cli',
     mark: 'cortex',
     name: 'Cortex',

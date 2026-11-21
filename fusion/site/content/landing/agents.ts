@@ -2,7 +2,7 @@
  * The Agents band, read from the manifest the page builds against.
  *
  * The excerpt is one element of `@fusion.dev/helix/custom-elements.json`, the
- * file an agent fetches at `/helix/custom-elements.json`. The tag and the names
+ * file an agent fetches at `/design/custom-elements.json`. The tag and the names
  * of every attribute and event are taken from that file, so the band shows the
  * manifest.
  */
@@ -51,7 +51,7 @@ export const AGENT_EXCHANGE = {
     .join(',\n')}\n}`,
   line: JSON.stringify(answer),
   question: `What attributes and events does ${TAG} have?`,
-  url: `${SITE}/helix/custom-elements.json`,
+  url: `${SITE}/design/custom-elements.json`,
 } as const
 
 /**
@@ -63,5 +63,5 @@ export const AGENT_EXCHANGE = {
  */
 export const AGENT_SURFACES = [
   { href: '/llms.txt', label: 'Read the index' },
-  { href: '/helix/components/button.json', label: 'Read the button family' },
+  { href: '/design/components/button.json', label: 'Read the button family' },
 ] as const

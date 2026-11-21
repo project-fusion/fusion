@@ -13,30 +13,30 @@ const DESTINATIONS: Findable[] = [
   {
     group: 'Products',
     items: [
-      { description: 'The design system', href: '/helix', label: 'Helix' },
-      { description: 'Every family Helix ships', href: '/helix/components', label: 'Components' },
-      { description: 'Memory and provenance', href: '/cortex', label: 'Cortex' },
+      { description: 'The design system', href: '/design', label: 'Helix' },
+      { description: 'Every family Helix ships', href: '/design/components', label: 'Components' },
+      { description: 'Memory and provenance', href: '/agents', label: 'Cortex' },
       /* The workbench, not the component. `Sandbox` is a family like any other
          and the catalog already offers its reference page; this is the tool
          that page describes, which nothing else in the palette could reach. */
-      { description: 'The component workbench', href: '/helix/sandbox', label: 'Sandbox' },
+      { description: 'The component workbench', href: '/design/sandbox', label: 'Sandbox' },
       /* The other tool, and the same reasoning: `@fusion.dev/helix-theme` is a package
          rather than a component family, so the catalog cannot offer it and
          nothing else in the palette could reach the thing that drives it. */
-      { description: 'A palette and its audit', href: '/helix/theme', label: 'Theme builder' },
+      { description: 'A palette and its audit', href: '/design/theme', label: 'Theme builder' },
       /* Not a tool, and here for the opposite reason to the two above: nothing
          else reaches it. It is in `routes.ts`, so it is in the sitemap and in
          `llms.txt`, and there is no panel row and no link from any page.
 
          The link is here rather than from `motion.mdx`, which mentions the aura
          shader without linking it, because `@fusion.dev/helix-docs`
-         is a content package and `/helix/aura` is this site's route. The
+         is a content package and `/design/aura` is this site's route. The
          package links its own pages relatively and describes the sandbox and
          the theme builder without linking either, which is the same boundary
          the manifest keeps when it records a path and lets the site compose the
          URL. Versioned MDX naming a live route would point every archived page
          at today's site. */
-      { description: 'The field and its geometry', href: '/helix/aura', label: 'Aura' },
+      { description: 'The field and its geometry', href: '/design/aura', label: 'Aura' },
     ],
   },
   {

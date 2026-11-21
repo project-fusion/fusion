@@ -57,11 +57,11 @@ const LISTS = {
 const COPY: Record<string, PageCopy> = {
   '/': LANDING,
   '/contact': CONTACT,
-  '/helix/aura': AURA,
-  '/helix/graph': GRAPH,
-  '/helix/maps': MAPS,
-  '/helix/sandbox': SANDBOX,
-  '/helix/theme': THEME_BUILDER,
+  '/design/aura': AURA,
+  '/design/graph': GRAPH,
+  '/design/maps': MAPS,
+  '/design/sandbox': SANDBOX,
+  '/design/theme': THEME_BUILDER,
 }
 
 /**
@@ -139,10 +139,10 @@ export const copyFor = (path: string): PageCopy | undefined => {
   if (path === '/insights') {
     return insightsCopy()
   }
-  if (path === '/helix/components') {
+  if (path === '/design/components') {
     return componentsCopy()
   }
-  if (path === '/helix/docs') {
+  if (path === '/design/docs') {
     return guidesCopy()
   }
   return COPY[path] ?? verticalCopy(path)

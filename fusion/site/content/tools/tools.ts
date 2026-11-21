@@ -27,7 +27,7 @@ export const SANDBOX: PageCopy = {
     },
     {
       body: [
-        '`/helix/sandbox?e=<family>` opens the sandbox on a component, and `/helix/sandbox?e=<family>.<example>` opens one of its examples. The family is the slug in `/helix/components/<family>`.',
+        '`/design/sandbox?e=<family>` opens the sandbox on a component, and `/design/sandbox?e=<family>.<example>` opens one of its examples. The family is the slug in `/design/components/<family>`.',
         'Send a sandbox link to share a working example that the other person can edit.',
       ],
       title: 'Link to a component',
@@ -71,7 +71,7 @@ export const AURA: PageCopy = {
   blocks: [
     {
       body: [
-        'Aura has twelve animated backgrounds colored by your tokens. The page shows each one at full size, with controls for every parameter and the response to the pointer. The component is `helix-aura`, and its reference is at `/helix/components/aura`.',
+        'Aura has twelve animated backgrounds colored by your tokens. The page shows each one at full size, with controls for every parameter and the response to the pointer. The component is `helix-aura`, and its reference is at `/design/components/aura`.',
         'Aura draws with WebGL. In a browser without WebGL, it draws nothing and the page shows its content on the plain background.',
       ],
       title: 'What it is',

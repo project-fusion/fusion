@@ -44,7 +44,7 @@ helix/styles/src/tokens.css
 fusion/site/content/catalog/catalog.generated.json
 fusion/docs/insights/src/pages.generated.ts
 fusion/docs/insights/src/sources.generated.ts
-fusion/site/app/*/helix/theme/themed-page-markup.generated.ts
+fusion/site/app/*/design/theme/themed-page-markup.generated.ts
 helix/docs/src/pages.generated.ts
 helix/docs/src/sources.generated.ts
 helix/docs/content/metrics.mdx
@@ -77,9 +77,9 @@ fusion/site/public/*.md
 fusion/site/public/.probe/
 fusion/site/public/_lab/
 fusion/site/public/check
-fusion/site/public/helix/*.md
-fusion/site/public/helix/components/
-fusion/site/public/helix/docs/
+fusion/site/public/design/*.md
+fusion/site/public/design/components/
+fusion/site/public/design/docs/
 fusion/site/public/insights/
 fusion/site/public/probe-events/
 fusion/site/public/sandbox
@@ -87,7 +87,7 @@ fusion/site/public/specs
 
 # The theme engine the site serves, copied from `helix/theme/wasm` by
 # `turbo run wasm-copy`. The tracked binary is the one in the package.
-fusion/site/public/helix/theme.wasm
+fusion/site/public/design/theme.wasm
 fusion/site/public/helix-speech/
 # MapLibre's worker and its shared module, copied from the installed package by
 # `scripts/copy-maplibre.mjs`.

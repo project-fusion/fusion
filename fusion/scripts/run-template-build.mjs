@@ -160,7 +160,7 @@ const SHOTS = [
  */
 const framework = (name, docs, entry) => ({
   text: [[name, 'React'], ...(entry ? [[entry, 'src/main.tsx']] : [])],
-  values: [[docs, 'https://fusion.dev/helix/docs/react']],
+  values: [[docs, 'https://fusion.dev/design/docs/react']],
 })
 
 /**
@@ -182,7 +182,7 @@ const PARITY = {
     hosts: '^app-site-header$',
     ignore: '^app-',
     served: 'dist/browser',
-    ...framework('Angular', 'https://fusion.dev/helix/docs/angular', 'src/main.ts'),
+    ...framework('Angular', 'https://fusion.dev/design/docs/angular', 'src/main.ts'),
   },
   'react-nextjs': {
     paths: true,
@@ -200,15 +200,15 @@ const PARITY = {
   'react-vite': { served: 'dist' },
   'solid-vite': {
     served: 'dist',
-    ...framework('Solid', 'https://fusion.dev/helix/docs/other-frameworks'),
+    ...framework('Solid', 'https://fusion.dev/design/docs/other-frameworks'),
   },
   'svelte-vite': {
     served: 'dist',
-    ...framework('Svelte', 'https://fusion.dev/helix/docs/svelte', 'src/main.ts'),
+    ...framework('Svelte', 'https://fusion.dev/design/docs/svelte', 'src/main.ts'),
   },
   'vue-vite': {
     served: 'dist',
-    ...framework('Vue', 'https://fusion.dev/helix/docs/vue', 'src/main.ts'),
+    ...framework('Vue', 'https://fusion.dev/design/docs/vue', 'src/main.ts'),
   },
 }
 

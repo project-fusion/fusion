@@ -74,7 +74,7 @@ const Card = ({
         return (
           <li key={element.tag}>
             {family ? (
-              <Link href={`/helix/components/${family.slug}`} {...look}>
+              <Link href={`/design/components/${family.slug}`} {...look}>
                 {body}
               </Link>
             ) : (

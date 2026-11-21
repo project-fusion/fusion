@@ -17,7 +17,7 @@ We put the intelligence in the foundation:
 
 ## An intelligent design system
 
-[Helix](/helix) computes its palette from one brand color, so contrast is part
+[Helix](/design) computes its palette from one brand color, so contrast is part
 of how the colors are made. Helix rejects a palette that misses its own
 contrast targets. It publishes a custom elements manifest and a token file at
 their own URLs, so a model reads the complete description of every component
@@ -46,7 +46,7 @@ foundation.
 
 ## What holds the three together
 
-[Cortex](/cortex) is the memory layer under all three. It records what a system
+[Cortex](/agents) is the memory layer under all three. It records what a system
 knows, where it learned it, and how far to trust it:
 
 - Engram holds the memory.
