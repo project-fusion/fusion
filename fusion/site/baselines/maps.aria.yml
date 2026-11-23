@@ -1,9 +1,9 @@
 - link "Fusion":
   - /url: /
 - navigation "Sections":
-  - link "Helix":
+  - link "Design":
     - /url: /design
-  - link "Cortex":
+  - link "Agents":
     - /url: /agents
   - link "Services":
     - /url: /company/services
