@@ -65,38 +65,63 @@ interface Case {
 type TestOptions = number | { timeout?: number }
 
 const cases: Case[] = []
-const hooks: { body: () => unknown; depth: number }[] = []
 /**
- * A `beforeEach` or an `afterEach`, with the blocks it was declared in.
+ * A `beforeAll`, `beforeEach`, `afterEach`, or `afterAll`, with the blocks it
+ * was declared in.
  *
  * **Scoped by block, as `bun:test` scopes it.** Every hook ran before every
  * test of its family, wherever it was declared: on November 19, 2026 a
  * headless Data Table spec's stand-in for `animate`, declared inside its own
  * `describe`, stood in for it in the styled example spec sharing the page, and
  * the example lit no rows. A block is a number, since two files can name a
- * block alike. A hook declared outside any block still runs before every test
- * of the family's page.
+ * block alike. Each spec file is a block too, opened by `enterFile`, so a hook
+ * declared at a file's top level covers that file's tests. A hook declared
+ * outside any block runs for every test of the family's page.
  */
-interface EachHook {
+interface Hook {
   blocks: number[]
   body: () => unknown
 }
 
-const setups: EachHook[] = []
-const teardowns: EachHook[] = []
+/** Every hook registered so far, by kind, in the order they were declared. */
+interface Hooks {
+  closings: Hook[]
+  openings: Hook[]
+  setups: Hook[]
+  teardowns: Hook[]
+}
+
+const hooks: Hooks = { closings: [], openings: [], setups: [], teardowns: [] }
 let suite: string[] = []
 let blocks: number[] = []
 let lastBlock = 0
 
 /** Whether a hook was declared in a block that holds the test. */
-const holds = (hook: EachHook, entry: Case): boolean =>
+const holds = (hook: Hook, entry: Case): boolean =>
   hook.blocks.every((block, place) => entry.blocks[place] === block)
 
 /** How much of the above a previous bundle has already claimed. */
 let claimedCases = 0
-let claimedHooks = 0
-let claimedSetups = 0
-let claimedTeardowns = 0
+const claimedHooks: Record<keyof Hooks, number> = {
+  closings: 0,
+  openings: 0,
+  setups: 0,
+  teardowns: 0,
+}
+
+/**
+ * Starts a spec file's own block, outside every block declared so far.
+ *
+ * `build-specs.mjs` puts a call at the top of each spec file it bundles,
+ * because a family's page holds several files and `bun test` runs each in a
+ * process of its own. Without it, a Data Table spec's top-level `beforeEach`
+ * ran before every test of every Data Table file.
+ */
+export const enterFile = (): void => {
+  lastBlock += 1
+  blocks = [lastBlock]
+  suite = []
+}
 
 /** Groups tests. Nests, and the names join for reporting. */
 export const describe = (name: string, body: () => void): void => {
@@ -170,9 +195,21 @@ export const test: TestApi = Object.assign(register, {
 /** `it` and `test` are the same thing, and the specs use both. */
 export const it = test
 
-/** Runs once before the tests in the block it was declared in. */
+/**
+ * Runs once before the first test in the block it was declared in. A block
+ * with no tests never runs it. One that throws fails every test in its block,
+ * and none of them runs.
+ */
 export const beforeAll = (body: () => unknown): void => {
-  hooks.push({ body, depth: suite.length })
+  hooks.openings.push({ blocks: [...blocks], body })
+}
+
+/**
+ * Runs once after the last test in the block it was declared in, passed or
+ * failed. One that throws fails that last test.
+ */
+export const afterAll = (body: () => unknown): void => {
+  hooks.closings.push({ blocks: [...blocks], body })
 }
 
 /**
@@ -180,7 +217,7 @@ export const beforeAll = (body: () => unknown): void => {
  * fails that test, which then does not run.
  */
 export const beforeEach = (body: () => unknown): void => {
-  setups.push({ blocks: [...blocks], body })
+  hooks.setups.push({ blocks: [...blocks], body })
 }
 
 /**
@@ -198,7 +235,7 @@ export const beforeEach = (body: () => unknown): void => {
  * for every file that runs after it in the same page.
  */
 export const afterEach = (body: () => unknown): void => {
-  teardowns.push({ blocks: [...blocks], body })
+  hooks.teardowns.push({ blocks: [...blocks], body })
 }
 
 const show = (value: unknown): string => {
@@ -541,69 +578,100 @@ export const expect = Object.assign(
  */
 export const claim = (): (() => Promise<SpecResult[]>) => {
   const mine = cases.slice(claimedCases)
-  const myHooks = hooks.slice(claimedHooks)
-  const mySetups = setups.slice(claimedSetups)
-  const myTeardowns = teardowns.slice(claimedTeardowns)
   claimedCases = cases.length
-  claimedHooks = hooks.length
-  claimedSetups = setups.length
-  claimedTeardowns = teardowns.length
-  return () => runThese(myHooks, mySetups, myTeardowns, mine)
+  const take = (kind: keyof Hooks): Hook[] => {
+    const taken = hooks[kind].slice(claimedHooks[kind])
+    claimedHooks[kind] = hooks[kind].length
+    return taken
+  }
+  const myHooks: Hooks = {
+    closings: take('closings'),
+    openings: take('openings'),
+    setups: take('setups'),
+    teardowns: take('teardowns'),
+  }
+  return () => runThese(myHooks, mine)
 }
+
+/** Why a hook failed, from whatever it threw. */
+const reason = (error: unknown): string => (error instanceof Error ? error.message : String(error))
+
+/**
+ * Waits for a hook or a test, and rejects once it has taken longer than
+ * `limit`. The message names a hook and leaves a test unnamed, since the
+ * report already names the test.
+ */
+const within = (work: unknown, limit: number, hook?: string): Promise<unknown> =>
+  Promise.race([
+    work,
+    new Promise((_, reject) => {
+      const message = `timed out after ${limit}ms`
+      setTimeout(() => reject(new Error(hook ? `${hook} ${message}` : message)), limit)
+    }),
+  ])
 
 /**
  * Runs one bundle's hooks and tests, in order.
  *
  * Sequential on purpose. `mount` replaces the document body, so two tests in
  * flight at once would be mounting over each other.
+ *
+ * A `beforeAll` runs when the first test of its block is about to, outer blocks
+ * first, and an `afterAll` once the last test of its block has finished, inner
+ * blocks first. That is the order `bun:test` keeps, and it means a block that
+ * installs a fake for all its tests has put it back before the next block runs.
  */
-const runThese = async (
-  ownHooks: { body: () => unknown; depth: number }[],
-  ownSetups: EachHook[],
-  ownTeardowns: EachHook[],
-  ownCases: Case[],
-): Promise<SpecResult[]> => {
-  for (const hook of ownHooks) {
-    await Promise.race([
-      hook.body(),
-      new Promise((_, reject) => {
-        setTimeout(
-          () => reject(new Error(`a beforeAll hook timed out after ${TIMEOUT}ms`)),
-          TIMEOUT,
-        )
-      }),
-    ])
-  }
+const runThese = async (own: Hooks, ownCases: Case[]): Promise<SpecResult[]> => {
+  const opened = new Map<Hook, string | undefined>()
+  const outerFirst = (one: Hook, other: Hook): number => one.blocks.length - other.blocks.length
   const results: SpecResult[] = []
-  for (const entry of ownCases) {
+  for (const [index, entry] of ownCases.entries()) {
     const started = performance.now()
     let failure: string | undefined
     const limit = entry.timeout ?? TIMEOUT
     try {
-      for (const setup of ownSetups.filter((one) => holds(one, entry))) {
+      for (const opening of own.openings.filter((one) => holds(one, entry)).sort(outerFirst)) {
+        if (!opened.has(opening)) {
+          try {
+            await within(opening.body(), TIMEOUT, 'a beforeAll hook')
+            opened.set(opening, undefined)
+          } catch (error) {
+            opened.set(opening, reason(error))
+          }
+        }
+        const fault = opened.get(opening)
+        if (fault !== undefined) {
+          throw new Error(`a beforeAll hook threw: ${fault}`)
+        }
+      }
+      for (const setup of own.setups.filter((one) => holds(one, entry))) {
         await setup.body()
       }
-      await Promise.race([
-        entry.body(),
-        new Promise((_, reject) => {
-          setTimeout(() => reject(new Error(`timed out after ${limit}ms`)), limit)
-        }),
-      ])
+      await within(entry.body(), limit)
     } catch (error) {
-      failure = error instanceof Error ? error.message : String(error)
+      failure = reason(error)
     }
     /* Whatever the test did, because what a teardown is for is putting a global
        back and the failing test is the one most likely to have left it. A
        teardown that throws fails the test it followed rather than being
        swallowed: a restore that did not happen is the fault that shows up three
        files later as somebody else's failure. */
-    for (const teardown of ownTeardowns.filter((one) => holds(one, entry))) {
+    for (const teardown of own.teardowns.filter((one) => holds(one, entry))) {
       try {
         await teardown.body()
       } catch (error) {
-        failure ??= `an afterEach hook threw: ${
-          error instanceof Error ? error.message : String(error)
-        }`
+        failure ??= `an afterEach hook threw: ${reason(error)}`
+      }
+    }
+    const later = ownCases.slice(index + 1)
+    const closing = own.closings
+      .filter((one) => holds(one, entry) && !later.some((next) => holds(one, next)))
+      .sort((one, other) => outerFirst(other, one))
+    for (const hook of closing) {
+      try {
+        await within(hook.body(), TIMEOUT, 'an afterAll hook')
+      } catch (error) {
+        failure ??= `an afterAll hook threw: ${reason(error)}`
       }
     }
     results.push({

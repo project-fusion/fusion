@@ -44,6 +44,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { specFileBlocks } from '@fusion.dev/scripts/spec-file-blocks'
 import { root, TIERS } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -110,7 +111,8 @@ const built = await Bun.build({
         }))
         build.onLoad({ filter: /testing\/src\/browser\.ts$/ }, async (item) => {
           const source = await Bun.file(item.path).text()
-          const anchor = '  for (const entry of ownCases) {\n    const started = performance.now()'
+          const anchor =
+            '  for (const [index, entry] of ownCases.entries()) {\n    const started = performance.now()'
           if (!source.includes(anchor)) {
             throw new Error('probe:stuck: the harness no longer has the loop this patches')
           }
@@ -122,7 +124,7 @@ const built = await Bun.build({
             contents: source.replace(
               anchor,
               [
-                '  for (const entry of ownCases) {',
+                '  for (const [index, entry] of ownCases.entries()) {',
                 announce,
                 '    const started = performance.now()',
               ].join('\n'),
@@ -132,6 +134,7 @@ const built = await Bun.build({
         })
       },
     },
+    specFileBlocks(harness),
   ],
   splitting: false,
   target: 'browser',
